@@ -115,7 +115,7 @@
     
     .summary-details { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #b3d4fc; font-size: 13px; color: #444; line-height: 1.6; text-align: left; font-weight: normal; }
 
-    /* ====== TỔNG HỢP CHU KỲ ====== */
+    /* ====== TỔNG HỢP CHU KỲ NÚT ĐỘNG ====== */
     .cycle-selection-card { border-radius: 12px; padding: 14px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); border: 1px solid #eef2f5; background: #fff;}
     
     .quick-actions-row { display: flex; gap: 8px; margin-bottom: 12px; }
@@ -126,7 +126,7 @@
     .c-btn-solid { margin:0; flex:1; padding: 12px 0; font-size: 13px; font-weight: 800; text-align: center; border-radius: 6px; cursor: pointer; transition: 0.2s; background: #fff; color: #1976d2; border: 1px solid #1976d2; text-transform: uppercase; width: 100%; display: block;}
     .c-btn-solid.active { background: #1976d2 !important; color: #fff !important; }
 
-    /* ====== BẢNG TỔNG HỢP (THU GỌN NGOÀI TAB) ====== */
+    /* ====== BẢNG TỔNG HỢP ====== */
     .table-wrapper { width: 100%; border-radius: 8px; border: 1px solid #eee; overflow: hidden; }
     table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: center; table-layout: fixed; background: white; }
     th, td { padding: 8px 4px; border-bottom: 1px solid #eee; border-right: 1px solid #eee; vertical-align: top; word-break: break-word;}
@@ -161,15 +161,60 @@
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     .close-modal { position: absolute; top: 15px; right: 15px; font-size: 24px; color: #888; cursor: pointer; line-height: 1; background: #f0f0f0; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 10;}
 
-    /* ====== MODAL BẢNG CHẤM CÔNG CHI TIẾT ====== */
+    /* ====== MODAL BẢNG CHẤM CÔNG CHI TIẾT (SỬA LỖI ÉP CỘT IOS) ====== */
     .modal-bcc { align-items: center; padding: 10px; }
-    .modal-content-bcc { border-radius: 12px; height: 95vh; max-height: 900px; padding: 15px; display: flex; flex-direction: column; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-    .bcc-table-wrapper { flex: 1; overflow: auto; border: 1px solid #ccc; border-radius: 8px; box-shadow: inset 0 0 5px rgba(0,0,0,0.05); background: #fafafa;}
-    .bcc-table { width: 100%; border-collapse: collapse; min-width: max-content; font-size: 13px; background: #fff;}
-    .bcc-table th, .bcc-table td { border: 1px solid #ccc; padding: 8px 6px; text-align: center; white-space: nowrap; }
-    .bcc-table th { background: #1976d2; color: #fff; font-weight: bold; position: sticky; top: 0; z-index: 10; box-shadow: 0 1px 2px rgba(0,0,0,0.1);}
-    .col-sticky { position: sticky; left: 0; background: #fff; z-index: 5; text-align: left !important; box-shadow: 2px 0 4px rgba(0,0,0,0.05); }
-    .bcc-table th.col-sticky { background: #0d47a1; z-index: 15; color: #fff;}
+    .modal-content-bcc { border-radius: 12px; height: 95vh; max-height: 900px; padding: 15px; display: flex; flex-direction: column; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); width: 100%; }
+    
+    .bcc-table-wrapper { 
+        flex: 1; 
+        width: 100%; 
+        overflow: scroll; /* Bắt buộc iOS phải cho cuộn */
+        -webkit-overflow-scrolling: touch; /* Cuộn mượt trên iOS */
+        border: 1px solid #ccc; 
+        border-radius: 8px; 
+        background: #fafafa;
+    }
+    
+    .bcc-table { 
+        width: max-content; /* Ép bảng giãn ra tối đa theo nội dung, cấm co cụm */
+        min-width: 100%; 
+        border-collapse: collapse; 
+        font-size: 13px; 
+        background: #fff;
+    }
+    
+    .bcc-table th, .bcc-table td { 
+        border: 1px solid #ccc; 
+        padding: 8px 6px; 
+        text-align: center; 
+        white-space: nowrap; /* Tuyệt đối cấm xuống dòng làm hỏng form */
+    }
+    
+    .bcc-table th { 
+        background: #1976d2; 
+        color: #fff; 
+        font-weight: bold; 
+        position: sticky; 
+        top: 0; 
+        z-index: 10; 
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    /* Đóng băng cột Họ tên để vuốt ngang không bị che khuất */
+    .col-sticky { 
+        position: sticky; 
+        left: 0; 
+        background: #fff; 
+        z-index: 20; 
+        text-align: left !important; 
+        box-shadow: 2px 0 4px rgba(0,0,0,0.1); 
+    }
+    
+    .bcc-table th.col-sticky { 
+        background: #0d47a1; 
+        z-index: 30; 
+        color: #fff;
+    }
 
     /* MÀN HÌNH KHÓA */
     #lock-screen {
@@ -330,7 +375,7 @@
         <button class="btn btn-primary" onclick="xemTongHop()" style="margin-top: 15px;">📊 TẠO BẢNG TỔNG HỢP</button>
       </div>
 
-      <div id="cycle-summary-box" class="summary-day-box" style="display:none; margin-bottom: 15px; background: #fdfdfd; position: relative;">
+      <div id="cycle-summary-box" class="summary-day-box" style="display:none; margin-bottom: 15px; background: #fdfdfd;">
           <div style="font-weight: 900; color: #1976d2; font-size: 14px; text-align: center; border-bottom: 1px solid #b3d4fc; padding-bottom: 10px; margin-bottom: 10px;">📊 TỔNG KẾT TOÀN ĐỘI TRONG KỲ</div>
           
           <div id="cycle-summary-text" style="font-size: 13px; color: #333; line-height: 1.6; text-align:left;"></div>
