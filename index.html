@@ -116,7 +116,7 @@
     .summary-details { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #b3d4fc; font-size: 13px; color: #444; line-height: 1.6; text-align: left; font-weight: normal; }
 
     /* ====== TỔNG HỢP CHU KỲ ====== */
-    .cycle-selection-card { border-radius: 12px; padding: 14px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); border: 1px solid #eef2f5; background: #fff; position: relative;}
+    .cycle-selection-card { border-radius: 12px; padding: 14px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); border: 1px solid #eef2f5; background: #fff;}
     
     .quick-actions-row { display: flex; gap: 8px; margin-bottom: 12px; }
     .quick-actions-row .btn { flex: 1; margin: 0; }
@@ -284,28 +284,31 @@
       <div class="cycle-selection-card">
         <h3 class="card-title" style="margin-bottom:12px;">CHỌN CHU KỲ THỐNG KÊ</h3>
         
-        <input type="date" id="week-picker-surrogate" style="position:absolute; width:1px; height:1px; opacity:0.01; border:none; bottom:0; left:0; z-index:-1;" onchange="applyTuanBangDate()">
-        <input type="month" id="month-year-picker" style="position:absolute; width:1px; height:1px; opacity:0.01; border:none; bottom:0; left:0; z-index:-1;" onchange="applyThang()">
+        <div class="flex-row" style="margin-bottom: 12px; gap: 8px; height: 44px;">
+          <div style="position: relative; flex: 1; height: 100%;">
+            <div id="btn-lbl-tuan" style="position: absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#f9fcff; border:1px dashed #1976d2; color:#1976d2; font-size:13px; font-weight:bold; border-radius:6px; pointer-events:none;">▾ Tuần ...</div>
+            <input type="date" id="week-picker-surrogate" onchange="applyTuanBangDate()" style="position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; z-index:10; cursor:pointer; margin:0; padding:0; box-sizing:border-box;">
+          </div>
 
-        <div class="quick-actions-row" style="margin-bottom: 8px;">
-          <button class="btn btn-outline" style="border: 1px dashed #1976d2; color: #1976d2; background: #f9fcff; text-transform:none; font-size:13px; padding: 12px 0;" onclick="triggerPicker('week-picker-surrogate')" id="btn-lbl-tuan">▾ Tuần ...</button>
-          
-          <button class="btn btn-outline" style="border: 1px dashed #1976d2; color: #1976d2; background: #f9fcff; text-transform:none; font-size:13px; padding: 12px 0;" onclick="triggerPicker('month-year-picker')" id="btn-lbl-thang">▾ Tháng ...</button>
+          <div style="position: relative; flex: 1; height: 100%;">
+            <div id="btn-lbl-thang" style="position: absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#f9fcff; border:1px dashed #1976d2; color:#1976d2; font-size:13px; font-weight:bold; border-radius:6px; pointer-events:none;">▾ Tháng ...</div>
+            <input type="month" id="month-year-picker" onchange="applyThang()" style="position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; z-index:10; cursor:pointer; margin:0; padding:0; box-sizing:border-box;">
+          </div>
         </div>
 
-        <div class="quick-actions-row">
-          <button class="btn btn-primary" onclick="chonTuanNay()">TUẦN NÀY</button>
-          <button class="btn btn-outline" style="background:#fff;" onclick="chonThangNay()">THÁNG NÀY</button>
+        <div class="flex-row" style="margin-bottom: 15px; gap: 8px;">
+          <button class="btn btn-primary" style="margin: 0;" onclick="chonTuanNay()">TUẦN NÀY</button>
+          <button class="btn btn-outline" style="margin: 0; background: #fff;" onclick="chonThangNay()">THÁNG NÀY</button>
         </div>
 
-        <div style="border-top: 1px dashed #ddd; padding-top: 15px; margin-top: 10px;">
+        <div style="border-top: 1px dashed #ddd; padding-top: 15px;">
           <div class="date-row" style="margin-bottom: 12px; justify-content: space-between; align-items:center;">
             <label style="margin:0; font-weight:bold; font-size: 14px; color:#444;">Từ ngày:</label>
-            <input type="date" id="cycle-start" style="width: 65%; padding: 8px 10px; font-size: 13px; font-weight: bold; color: #1976d2; text-align:center; border-radius:6px; border: 1px solid #ccc; background:#fff;" onchange="capNhatLabelTuDate()">
+            <input type="date" id="cycle-start" style="width: 65%; padding: 8px; font-size: 14px; font-weight: bold; color: #1976d2; text-align:center; border-radius:8px; border: 1px solid #ccc; background:#fff; margin:0;" onchange="capNhatLabelTuDate()">
           </div>
           <div class="date-row" style="justify-content: space-between; align-items:center;">
             <label style="margin:0; font-weight:bold; font-size: 14px; color:#444;">Đến ngày:</label>
-            <input type="date" id="cycle-end" style="width: 65%; padding: 8px 10px; font-size: 13px; font-weight: bold; color: #1976d2; text-align:center; border-radius:6px; border: 1px solid #ccc; background:#fff;" onchange="capNhatLabelTuDate()">
+            <input type="date" id="cycle-end" style="width: 65%; padding: 8px; font-size: 14px; font-weight: bold; color: #1976d2; text-align:center; border-radius:8px; border: 1px solid #ccc; background:#fff; margin:0;" onchange="capNhatLabelTuDate()">
           </div>
         </div>
         
@@ -1400,7 +1403,7 @@
   }
 
   // ==========================================
-  // TAB TỔNG HỢP CHU KỲ 
+  // TAB TỔNG HỢP CHU KỲ (THIẾT KẾ MỚI, NATIVE IOS PICKER)
   // ==========================================
   function getWeekNumber(d) {
       d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -1419,16 +1422,6 @@
       document.getElementById('btn-lbl-thang').innerHTML = `▾ Tháng ${d.getMonth()+1} / ${d.getFullYear()}`;
   }
 
-  function triggerPicker(id) {
-      let el = document.getElementById(id);
-      try {
-          el.showPicker();
-      } catch (e) {
-          el.focus();
-          el.click();
-      }
-  }
-
   function applyThang() {
       let val = document.getElementById('month-year-picker').value;
       if(!val) return;
@@ -1444,12 +1437,13 @@
   function applyTuanBangDate() {
       let val = document.getElementById('week-picker-surrogate').value;
       if(!val) return;
-      let d = new Date(val);
+      let parts = val.split('-');
+      let d = new Date(parts[0], parts[1]-1, parts[2]); 
       let day = d.getDay();
       let diff = d.getDate() - day + (day === 0 ? -6 : 1);
-      let start = new Date(d.setDate(diff));
-      let end = new Date(start);
-      end.setDate(end.getDate() + 6);
+      
+      let start = new Date(d.getFullYear(), d.getMonth(), diff);
+      let end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
       
       document.getElementById('cycle-start').value = formatIsoLocal(start);
       document.getElementById('cycle-end').value = formatIsoLocal(end);
