@@ -103,8 +103,8 @@
     .list-item-note { font-size: 12px; color: #7f8c8d; font-style: italic; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #eee; }
     
     /* Nút Sửa / Xóa */
-    .btn-edit-item { position: absolute; top: 12px; right: 46px; color: #1976d2; background: #eaf6ff; border: none; width: 28px; height: 28px; border-radius: 50%; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .btn-delete-item { position: absolute; top: 12px; right: 12px; color: #e74c3c; background: #ffeeee; border: none; width: 28px; height: 28px; border-radius: 50%; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center;}
+    .btn-edit-item { position: absolute; top: 12px; right: 46px; color: #f39c12; background: #fdf2e9; border: 1px solid #fae5d3; width: 28px; height: 28px; border-radius: 50%; font-size: 13px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .btn-delete-item { position: absolute; top: 12px; right: 12px; color: #e74c3c; background: #fdedec; border: 1px solid #fadbd8; width: 28px; height: 28px; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold;}
 
     /* ====== TÓM TẮT TRONG NGÀY ====== */
     .summary-day-box { background: #eaf6ff; border: 1px solid #b3d4fc; padding: 12px; border-radius: 12px; margin-bottom: 12px; }
@@ -117,11 +117,8 @@
 
     /* ====== TỔNG HỢP CHU KỲ ====== */
     .cycle-selection-card { border-radius: 12px; padding: 14px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); border: 1px solid #eef2f5; background: #fff;}
-    .selection-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; background: #f9f9f9; padding: 8px 12px; border-radius: 8px; border: 1px solid #eee; }
-    .selection-display { font-size: 14px; font-weight: 700; color: #333; flex-shrink: 0;}
-    .selection-btn { background: none; border: none; padding: 0; font-size: 13px; font-weight: bold; color: #1976d2; cursor: pointer; text-transform: uppercase;}
     
-    .quick-actions-row { display: flex; gap: 8px; margin-top: 10px; margin-bottom: 12px; }
+    .quick-actions-row { display: flex; gap: 8px; margin-bottom: 12px; }
     .quick-actions-row .btn { flex: 1; margin: 0; }
 
     /* ====== BẢNG TỔNG HỢP ====== */
@@ -287,14 +284,9 @@
       <div class="cycle-selection-card">
         <h3 class="card-title" style="margin-bottom:12px;">CHỌN CHU KỲ THỐNG KÊ</h3>
         
-        <div class="selection-row">
-          <div class="selection-display" id="lbl-tuan">[ Tuần ... ]</div>
-          <button class="selection-btn" onclick="moChonTuan()">CHỌN TUẦN</button>
-        </div>
-        
-        <div class="selection-row">
-          <div class="selection-display" id="lbl-thang">[ tháng ... ]</div>
-          <button class="selection-btn" onclick="moChonThang()">CHỌN THÁNG</button>
+        <div class="quick-actions-row" style="margin-bottom: 8px;">
+          <button class="btn btn-outline" style="border: 1px dashed #1976d2; color: #1976d2; background: #f9fcff; text-transform:none; font-size:12px;" onclick="moChonTuan()" id="btn-lbl-tuan">▾ Tuần ...</button>
+          <button class="btn btn-outline" style="border: 1px dashed #1976d2; color: #1976d2; background: #f9fcff; text-transform:none; font-size:12px;" onclick="moChonThang()" id="btn-lbl-thang">▾ Tháng ...</button>
           <input type="month" id="month-year-picker" style="display:none; width:0; height:0;" onchange="applyThang()">
         </div>
 
@@ -304,13 +296,13 @@
         </div>
 
         <div style="border-top: 1px dashed #ddd; padding-top: 15px; margin-top: 10px;">
-          <div class="date-row" style="margin-bottom: 12px; justify-content: space-between;">
+          <div class="date-row" style="margin-bottom: 12px; justify-content: space-between; align-items:center;">
             <label style="margin:0; font-weight:bold; font-size: 14px; color:#444;">Từ ngày:</label>
-            <input type="date" id="cycle-start" style="width: 70%; font-weight: bold; color: #1976d2;" onchange="capNhatLabelTuDate()">
+            <input type="date" id="cycle-start" style="width: 65%; padding: 8px 10px; font-size: 13px; font-weight: bold; color: #1976d2; text-align:center; border-radius:6px; border: 1px solid #ccc; background:#fff;" onchange="capNhatLabelTuDate()">
           </div>
-          <div class="date-row" style="justify-content: space-between;">
+          <div class="date-row" style="justify-content: space-between; align-items:center;">
             <label style="margin:0; font-weight:bold; font-size: 14px; color:#444;">Đến ngày:</label>
-            <input type="date" id="cycle-end" style="width: 70%; font-weight: bold; color: #1976d2;" onchange="capNhatLabelTuDate()">
+            <input type="date" id="cycle-end" style="width: 65%; padding: 8px 10px; font-size: 13px; font-weight: bold; color: #1976d2; text-align:center; border-radius:6px; border: 1px solid #ccc; background:#fff;" onchange="capNhatLabelTuDate()">
           </div>
         </div>
         
@@ -1041,7 +1033,6 @@
   function formatGroupedUsersBullet(records, categoryField) {
       let groups = {};
       records.forEach(r => {
-          // BỎ GHI CHÚ, CHỈ LẤY TÊN GỐC
           let cat = r[categoryField];
           r.users.forEach(u => { 
               if(!groups[cat]) groups[cat] = [];
@@ -1204,26 +1195,19 @@
     document.getElementById('sum-nghi').innerText = sumNghi; document.getElementById('sum-tc').innerText = sumTC;
     document.getElementById('sum-ht').innerText = sumHT; document.getElementById('sum-bqtx').innerText = sumBQTX;
 
-    // CẬP NHẬT: CHI TIẾT TÓM TẮT DƯỚI 4 Ô
     let detailText = [];
     let tcRecords = recordsDaily.filter(r => r.type === 'viec');
     if (tcRecords.length > 0) { 
-        let htmlStr = `<div style="color:#f39c12; font-weight:bold; font-size:14px; margin-top:8px; margin-bottom:4px;">⚡ Tăng cường:</div>`;
-        htmlStr += formatGroupedUsersBullet(tcRecords, 'taskName');
-        detailText.push(htmlStr); 
+        detailText.push(`<div style="color:#f39c12; font-weight:bold; font-size:14px; margin-top:8px; margin-bottom:4px;">⚡ Tăng cường:</div>${formatGroupedUsersBullet(tcRecords, 'taskName')}`); 
     }
     
     if (!isWeekend && recordsLeave.length > 0) { 
-        let htmlStr = `<div style="color:#e74c3c; font-weight:bold; font-size:14px; margin-top:8px; margin-bottom:4px;">⛱️ Nghỉ:</div>`;
-        htmlStr += formatGroupedUsersBullet(recordsLeave, 'category');
-        detailText.push(htmlStr); 
+        detailText.push(`<div style="color:#e74c3c; font-weight:bold; font-size:14px; margin-top:8px; margin-bottom:4px;">⛱️ Nghỉ:</div>${formatGroupedUsersBullet(recordsLeave, 'category')}`); 
     }
 
     let htRecords = recordsDaily.filter(r => r.type === 'hoctap');
     if (htRecords.length > 0) { 
-        let htmlStr = `<div style="color:#00bcd4; font-weight:bold; font-size:14px; margin-top:8px; margin-bottom:4px;">📘 Học tập/CT:</div>`;
-        htmlStr += formatGroupedUsersBullet(htRecords, 'taskName');
-        detailText.push(htmlStr); 
+        detailText.push(`<div style="color:#00bcd4; font-weight:bold; font-size:14px; margin-top:8px; margin-bottom:4px;">📘 Học tập/CT:</div>${formatGroupedUsersBullet(htRecords, 'taskName')}`); 
     }
     
     document.getElementById('summary-details-text').innerHTML = detailText.length > 0 ? detailText.join('') : '<i style="color:#888;">Chưa có báo cáo chi tiết</i>';
@@ -1386,7 +1370,6 @@
               while(cur <= end) {
                   if(cur.getFullYear().toString() === yearStr) {
                       let val = (l.start === l.end && l.session !== 'all') ? 0.5 : 1;
-                      // Gộp KHÔNG ghi chú
                       let reason = l.category;
                       l.users.forEach(u => {
                           if(stats[u]) { stats[u].total += val; stats[u].chitiet[reason] = (stats[u].chitiet[reason]||0) + val; }
@@ -1414,7 +1397,7 @@
   }
 
   // ==========================================
-  // TAB TỔNG HỢP CHU KỲ (THIẾT KẾ MỚI, GỘP KHÔNG GHI CHÚ)
+  // TAB TỔNG HỢP CHU KỲ 
   // ==========================================
   function getWeekNumber(d) {
       d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -1429,8 +1412,8 @@
       if (!val) return;
       let d = new Date(val);
       let wInfo = getWeekNumber(d);
-      document.getElementById('lbl-tuan').innerText = `[ Tuần ${wInfo.week} năm ${wInfo.year} ]`;
-      document.getElementById('lbl-thang').innerText = `[ tháng ${d.getMonth()+1} năm ${d.getFullYear()} ]`;
+      document.getElementById('btn-lbl-tuan').innerHTML = `▾ Tuần ${wInfo.week} / ${wInfo.year}`;
+      document.getElementById('btn-lbl-thang').innerHTML = `▾ Tháng ${d.getMonth()+1} / ${d.getFullYear()}`;
   }
 
   function applyThang() {
@@ -1485,11 +1468,10 @@
       capNhatLabelTuDate();
   }
 
-  // TÍNH CHUẨN: TỪ MÙNG 1 ĐẾN NGÀY CUỐI CÙNG CỦA THÁNG
   function chonThangNay() { 
       let date = new Date(); 
       let start = new Date(date.getFullYear(), date.getMonth(), 1);
-      let end = new Date(date.getFullYear(), date.getMonth() + 1, 0); // Lấy chính xác ngày cuối tháng
+      let end = new Date(date.getFullYear(), date.getMonth() + 1, 0); 
       
       document.getElementById('cycle-start').value = formatIsoLocal(start); 
       document.getElementById('cycle-end').value = formatIsoLocal(end); 
@@ -1528,7 +1510,6 @@
 
         dsDaily.filter(r => r.date === dStr).forEach(r => {
             let val = r.session === 'all' ? 1 : 0.5;
-            // NGHIÊM NGẶT: Bỏ note, chỉ lấy tên việc gốc để gộp
             let taskTitle = r.taskName;
 
             r.users.forEach(u => { 
@@ -1551,7 +1532,6 @@
 
         dsLeaves.filter(l => dStr >= l.start && dStr <= l.end).forEach(l => {
             let val = (l.start === l.end && l.session !== 'all') ? 0.5 : 1; 
-            // NGHIÊM NGẶT: Bỏ note, chỉ lấy tên lý do gốc để gộp
             let catTitle = l.category;
 
             l.users.forEach(u => { 
@@ -1574,7 +1554,7 @@
     if(Object.keys(globalNghiStats).length > 0) { 
         let detailHtml = Object.keys(globalNghiStats).map(k => {
             let userArr = Object.keys(globalNghiStats[k].users).map(u => `${u}: ${globalNghiStats[k].users[u]}`);
-            return `<div style="margin-left:4px; margin-bottom:4px; color:#444;">&bull; <b style="color:#2c3e50;">${k}: ${globalNghiStats[k].total}</b> <br><span style="font-size:12px; color:#666; font-weight:normal; margin-left: 14px;">[${userArr.join(', ')}]</span></div>`;
+            return `<div style="margin-left:4px; margin-bottom:4px; color:#444;">&bull; <b style="color:#2c3e50;">${k}: ${globalNghiStats[k].total}</b> <br><span style="font-size:12px; color:#666; font-weight:normal; margin-left: 14px;">[${userArr.join('; ')}]</span></div>`;
         }).join('');
         textSummary.push(`<div style="color:#e74c3c; font-weight:bold; font-size:14px; margin-top:8px; margin-bottom:4px;">⛱️ NGHỈ: <span style="font-size:16px;">${sumNghi}</span></div>${detailHtml}`); 
     }
@@ -1582,7 +1562,7 @@
     if(Object.keys(globalTaskStats).length > 0) { 
         let detailHtml = Object.keys(globalTaskStats).map(k => {
             let userArr = Object.keys(globalTaskStats[k].users).map(u => `${u}: ${globalTaskStats[k].users[u]}`);
-            return `<div style="margin-left:4px; margin-bottom:4px; color:#444;">&bull; <b style="color:#2c3e50;">${k}: ${globalTaskStats[k].total}</b> <br><span style="font-size:12px; color:#666; font-weight:normal; margin-left: 14px;">[${userArr.join(', ')}]</span></div>`;
+            return `<div style="margin-left:4px; margin-bottom:4px; color:#444;">&bull; <b style="color:#2c3e50;">${k}: ${globalTaskStats[k].total}</b> <br><span style="font-size:12px; color:#666; font-weight:normal; margin-left: 14px;">[${userArr.join('; ')}]</span></div>`;
         }).join('');
         textSummary.push(`<div style="color:#f39c12; font-weight:bold; font-size:14px; margin-top:12px; margin-bottom:4px;">⚡ TĂNG CƯỜNG: <span style="font-size:16px;">${sumViec}</span></div>${detailHtml}`); 
     }
@@ -1590,7 +1570,7 @@
     if(Object.keys(globalHocStats).length > 0) { 
         let detailHtml = Object.keys(globalHocStats).map(k => {
             let userArr = Object.keys(globalHocStats[k].users).map(u => `${u}: ${globalHocStats[k].users[u]}`);
-            return `<div style="margin-left:4px; margin-bottom:4px; color:#444;">&bull; <b style="color:#2c3e50;">${k}: ${globalHocStats[k].total}</b> <br><span style="font-size:12px; color:#666; font-weight:normal; margin-left: 14px;">[${userArr.join(', ')}]</span></div>`;
+            return `<div style="margin-left:4px; margin-bottom:4px; color:#444;">&bull; <b style="color:#2c3e50;">${k}: ${globalHocStats[k].total}</b> <br><span style="font-size:12px; color:#666; font-weight:normal; margin-left: 14px;">[${userArr.join('; ')}]</span></div>`;
         }).join('');
         textSummary.push(`<div style="color:#00bcd4; font-weight:bold; font-size:14px; margin-top:12px; margin-bottom:4px;">📘 HỌC TẬP/CT: <span style="font-size:16px;">${sumHoc}</span></div>${detailHtml}`); 
     }
