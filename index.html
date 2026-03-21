@@ -54,6 +54,7 @@
     .btn { display: block; width: 100%; padding: 12px; font-size: 13px; font-weight: 800; text-align: center; border: none; border-radius: 8px; cursor: pointer; color: white; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-transform: uppercase;}
     .btn:active { transform: scale(0.97); }
     .btn-primary { background: #1976d2; }
+    .btn-outline { background: white; color: #1976d2; border: 1px solid #1976d2; }
     .btn-warning { background: #f39c12; }
     .btn-info { background: #00bcd4; }
     .btn-danger { background: #e74c3c; }
@@ -78,7 +79,7 @@
     input:checked + .slider:before { transform: translateX(22px); }
 
     /* ====== CHECKBOX NHÂN VIÊN ====== */
-    .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; max-height: 250px; overflow-y: auto; padding: 4px; }
+    .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 8px; max-height: 250px; overflow-y: auto; padding: 4px; }
     .check-item { display: flex; align-items: center; background: #f8f9fa; padding: 12px; border-radius: 10px; border: 1px solid #ddd; cursor: pointer; transition: 0.2s; margin: 0;}
     .check-item.active { background: #eaf6ff; border-color: #1976d2; color: #1976d2; }
     .check-item input { display: none; }
@@ -90,24 +91,40 @@
     .check-item.active .check-role { color: #5fa8e3; }
 
     /* ====== DANH SÁCH BẢN GHI ====== */
-    .list-item { background: #fff; border-left: 4px solid #1976d2; padding: 14px; border-radius: 8px; margin-bottom: 12px; position: relative; box-shadow: 0 1px 4px rgba(0,0,0,0.05); border: 1px solid #eee;}
+    .list-item { background: #fff; border-left: 4px solid #1976d2; padding: 14px; border-radius: 10px; margin-bottom: 12px; position: relative; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #eee;}
     .list-item.type-hoctap { border-left-color: #00bcd4; }
     .list-item.type-viec { border-left-color: #f39c12; }
-    .list-item.type-nghi-auto { border-left-color: #e74c3c; background: #fffcfc; }
-    .list-item-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; padding-right: 65px;}
-    .list-item-title { font-weight: 800; font-size: 14px; color: #333; line-height: 1.4; padding-right: 65px; }
-    .list-item-badge { font-size: 11px; padding: 4px 8px; border-radius: 6px; background: #eee; font-weight: bold; color: #555; white-space: nowrap; margin-left: 8px; }
-    .list-item-users { font-size: 13px; color: #2c3e50; line-height: 1.5; font-weight: 600;}
+    .list-item.type-nghi-auto { border-left-color: #e74c3c; background: #fffdfd; }
     
-    .btn-delete-item { position: absolute; top: 12px; right: 12px; color: #e74c3c; background: #ffeeee; border: none; width: 28px; height: 28px; border-radius: 50%; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center;}
-    .btn-edit-item { position: absolute; top: 12px; right: 46px; color: #1976d2; background: #eaf6ff; border: none; width: 28px; height: 28px; border-radius: 50%; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .list-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-right: 95px;}
+    .list-item-title { font-weight: 800; font-size: 14px; color: #333; line-height: 1.4; display: flex; align-items: center; gap: 6px; }
+    .list-item-badge { font-size: 11px; padding: 4px 8px; border-radius: 6px; background: #eee; font-weight: bold; color: #555; white-space: nowrap; }
+    .list-item-users { font-size: 13px; color: #2c3e50; line-height: 1.5; font-weight: 600;}
+    .list-item-note { font-size: 12px; color: #7f8c8d; font-style: italic; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #eee; }
+    
+    /* Nút Sửa / Xóa */
+    .btn-edit-item { position: absolute; top: 12px; right: 46px; color: #f39c12; background: #fdf2e9; border: 1px solid #fae5d3; width: 28px; height: 28px; border-radius: 50%; font-size: 13px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .btn-delete-item { position: absolute; top: 12px; right: 12px; color: #e74c3c; background: #fdedec; border: 1px solid #fadbd8; width: 28px; height: 28px; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold;}
 
     /* ====== TÓM TẮT TRONG NGÀY ====== */
-    .summary-day-box { background: #eaf6ff; border: 1px solid #b3d4fc; padding: 10px 12px; border-radius: 12px; margin-bottom: 12px; }
-    .summary-day-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; color: #555; font-weight: bold;}
-    .summary-day-grid div { background: #fff; padding: 8px 4px; border-radius: 8px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .val-b { font-weight: 900; font-size: 15px; display: block; margin-top: 4px; }
+    .summary-day-box { background: #eaf6ff; border: 1px solid #b3d4fc; padding: 12px; border-radius: 12px; margin-bottom: 12px; }
+    .summary-day-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 14px; color: #555; font-weight: bold;}
+    .summary-day-grid div { background: #fff; padding: 12px 10px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+    .sum-lbl { font-size: 13px; font-weight: bold; color: #555; margin: 0;}
+    .val-b { font-weight: 900; font-size: 16px; margin: 0; }
+    
     .summary-details { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #b3d4fc; font-size: 13px; color: #444; line-height: 1.6; text-align: left; font-weight: normal; }
+
+    /* ====== TỔNG HỢP CHU KỲ ====== */
+    .cycle-selection-card { border-radius: 12px; padding: 14px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); border: 1px solid #eef2f5; background: #fff;}
+    .selection-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; background: #f9f9f9; padding: 8px 12px; border-radius: 8px; border: 1px solid #eee; }
+    .selection-display { font-size: 14px; font-weight: 700; color: #333; flex-shrink: 0;}
+    .selection-btn { background: none; border: none; padding: 0; font-size: 13px; font-weight: bold; color: #1976d2; cursor: pointer; text-transform: uppercase;}
+    
+    .quick-actions-row { display: flex; gap: 8px; margin-top: 10px; margin-bottom: 12px; }
+    .quick-actions-row .btn { flex: 1; margin: 0; }
+    
+    .compressed-date-picker { height: 24px !important; padding: 0 4px !important; font-size: 13px !important; line-height: 24px !important; border-radius: 6px !important; border: 1px solid #ccc !important; -webkit-appearance: none; -moz-appearance: none; appearance: none; background: white !important;}
 
     /* ====== BẢNG TỔNG HỢP ====== */
     .table-wrapper { width: 100%; border-radius: 8px; border: 1px solid #eee; overflow: hidden; }
@@ -115,19 +132,14 @@
     th, td { padding: 8px 4px; border-bottom: 1px solid #eee; border-right: 1px solid #eee; vertical-align: top; word-break: break-word;}
     th { background: #eaf6ff; color: #1976d2; font-weight: 800; position: sticky; top: 0; font-size: 10px; text-transform: uppercase; }
     td.td-left { text-align: left; font-weight: 800; color: #333; font-size: 13px; width: 25%;}
-    td.td-number { color: #e74c3c; width: 25%; }
-    td.td-hoctap { color: #00bcd4; width: 25%; }
-    td.td-task { color: #f39c12; width: 25%; }
+    td.td-number { color: #e74c3c; width: 25%; font-weight: bold;}
+    td.td-hoctap { color: #00bcd4; width: 25%; font-weight: bold;}
+    td.td-task { color: #f39c12; width: 25%; font-weight: bold;}
     tr.total-row td { background: #fdf2e9; font-weight: 900; color: #d35400; font-size: 14px; }
     .main-val { font-weight: 900; font-size: 15px; margin-bottom: 4px;}
     .detail-text { font-size: 11px; color: #666; font-weight: normal; display: block; line-height: 1.4; text-align: left;}
 
-    /* ====== QUICK ACTIONS ====== */
-    .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;}
-    .quick-btn { background: #f8f9fa; border: 1px solid #ddd; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: bold; color: #555; cursor: pointer; text-align: center; transition: 0.2s;}
-    .quick-btn.active { background: #1976d2; color: #fff; border-color: #1976d2; box-shadow: 0 2px 8px rgba(25,118,210,0.3); }
-
-    /* ====== DANH SÁCH CÀI ĐẶT (MỚI) ====== */
+    /* ====== CÀI ĐẶT DANH SÁCH ====== */
     .setting-item { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);}
     .setting-info { display: flex; flex-direction: column; gap: 2px; }
     .setting-info strong { font-size: 14px; color: #1976d2; }
@@ -136,7 +148,6 @@
     .setting-actions button { width: 30px; height: 30px; border: none; border-radius: 6px; background: #f0f4f8; color: #555; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .setting-actions button.edit { background: #fff3cd; color: #f39c12; border: 1px solid #ffe69c;}
     .setting-actions button.del { background: #fdedec; color: #e74c3c; border: 1px solid #fadbd8;}
-    .btn-toggle-list { background: #eaf6ff; color: #1976d2; border: 1px dashed #b3d4fc; padding: 10px; width: 100%; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 5px; }
 
     /* ====== TABS ====== */
     .tab-content { display: none; animation: fadeIn 0.2s ease-out; }
@@ -148,9 +159,6 @@
     .modal-content { background: white; width: 100%; max-width: 600px; border-radius: 16px 16px 0 0; padding: 20px; max-height: 90vh; overflow-y: auto; position: relative; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     .close-modal { position: absolute; top: 15px; right: 15px; font-size: 24px; color: #888; cursor: pointer; line-height: 1; background: #f0f0f0; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 10;}
-
-    .tag-chip { display: inline-block; background: #eaf6ff; color: #1976d2; padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; margin: 0 6px 8px 0; border: 1px solid #b3d4fc; }
-    .tag-chip.task { background: #fff8e1; color: #f39c12; border-color: #ffe0b2; }
 
     /* MÀN HÌNH KHÓA */
     #lock-screen {
@@ -201,26 +209,30 @@
     </div>
 
     <div id="tab-ngay" class="tab-content active container">
-      <div class="summary-day-box">
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #b3d4fc; padding-bottom:10px; margin-bottom:12px;">
-           <div style="font-weight:900; color:#1976d2; font-size:14px; text-transform:uppercase;">📊 TỔNG KẾT QUÂN SỐ</div>
-           <input type="date" id="date-picker" style="width:140px; padding:6px; font-size:14px; border:1px solid #1976d2; color:#1976d2; font-weight:bold; background:#fff;" onchange="loadDuLieuNgay()">
-        </div>
+      
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; margin-top:4px;">
+         <div style="font-weight:900; color:#1976d2; font-size:15px; display:flex; align-items:center; gap:6px;">
+            <span style="font-size:20px;">📊</span> TỔNG KẾT QUÂN SỐ
+         </div>
+         <div style="background:white; border:1px solid #1976d2; border-radius:8px; padding:6px 8px; box-shadow: 0 1px 3px rgba(25,118,210,0.1); flex-shrink:0; white-space: nowrap;">
+             <input type="date" id="date-picker" style="border:none; padding:0; background:transparent; color:#1976d2; font-weight:bold; font-size:14px; outline:none; text-align:center; width:160px;" onchange="loadDuLieuNgay()">
+         </div>
+      </div>
 
+      <div class="summary-day-box" style="margin-top:0;">
         <div class="summary-day-grid">
-          <div>⛱️ Nghỉ: <span id="sum-nghi" class="val-b" style="color:#e74c3c;">0</span></div>
-          <div>⚡ T.Cường: <span id="sum-tc" class="val-b" style="color:#f39c12;">0</span></div>
-          <div>📘 Học/CT: <span id="sum-ht" class="val-b" style="color:#00bcd4;">0</span></div>
-          <div>✅ BQTX: <span id="sum-bqtx" class="val-b" style="color:#27ae60;">0</span></div>
+          <div><span class="sum-lbl">⛱️ Nghỉ:</span> <span id="sum-nghi" class="val-b" style="color:#e74c3c;">0</span></div>
+          <div><span class="sum-lbl">⚡ T.Cường:</span> <span id="sum-tc" class="val-b" style="color:#f39c12;">0</span></div>
+          <div><span class="sum-lbl">📘 Học/CT:</span> <span id="sum-ht" class="val-b" style="color:#00bcd4;">0</span></div>
+          <div><span class="sum-lbl">✅ BQTX:</span> <span id="sum-bqtx" class="val-b" style="color:#27ae60;">0</span></div>
         </div>
-        
         <div class="summary-details" id="summary-details-text"></div>
       </div>
 
-      <div id="wrap-lam-cuoi-tuan" style="display:none; justify-content:space-between; align-items:center; background:#fff3cd; padding:12px 14px; border-radius:12px; border:1px solid #ffe69c; margin-bottom:12px;">
+      <div id="wrap-lam-cuoi-tuan" style="display:none; justify-content:space-between; align-items:center; background:#fff9e6; padding:12px 14px; border-radius:10px; border:1px solid #ffe0b2; margin-bottom:14px;">
           <div>
-            <span style="font-weight:bold; color:#b97a00; font-size:14px;">🌟 Làm việc ngày nghỉ</span>
-            <span style="display:block; font-size:11px; color:#d48f00; margin-top:4px;">Bật công tắc để tính công BQTX</span>
+            <span style="font-weight:bold; color:#d35400; font-size:14px;">🌟 Làm việc ngày nghỉ</span>
+            <span style="display:block; font-size:11px; color:#d35400; margin-top:2px;">Bật công tắc để tính công BQTX</span>
           </div>
           <label class="switch">
             <input type="checkbox" id="chk-lam-cuoi-tuan" onchange="toggleCuoiTuan()">
@@ -228,15 +240,15 @@
           </label>
       </div>
 
-      <div class="flex-row">
+      <div class="flex-row" style="margin-bottom: 16px;">
         <button class="btn btn-info" onclick="moModal('modal-hoctap')">📘 HỌC TẬP/C.TÁC</button>
         <button class="btn btn-warning" onclick="moModal('modal-tang-cuong')">⚡ TĂNG CƯỜNG</button>
       </div>
 
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+      <div class="card" style="background:transparent; border:none; padding:0; box-shadow:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; padding: 0 4px;">
           <h3 class="card-title" style="margin:0; border:none; padding:0;">CHI TIẾT BÁO CÁO</h3>
-          <span id="count-records" style="font-size:12px; font-weight:bold; color:#888; background:#eee; padding:4px 10px; border-radius:12px;">0 bản ghi</span>
+          <span id="count-records" style="font-size:12px; font-weight:bold; color:#888; background:#e0e0e0; padding:4px 12px; border-radius:12px;">0 bản ghi</span>
         </div>
         <div id="list-records-today"></div>
       </div>
@@ -273,30 +285,40 @@
     </div>
 
     <div id="tab-tong-hop" class="tab-content container">
-      <div class="card">
-        <h3 class="card-title">CHỌN CHU KỲ THỐNG KÊ</h3>
+      <div class="cycle-selection-card">
+        <h3 class="card-title" style="margin-bottom:12px;">CHỌN CHU KỲ THỐNG KÊ</h3>
         
-        <div style="display:flex; gap:8px; margin-bottom: 12px; align-items:center;">
-          <input type="month" id="month-year-picker" style="flex:2; padding: 12px; font-weight: bold; color: #1976d2; font-size: 14px; text-align: center;">
-          <button class="btn btn-info" style="flex:1; padding: 12px; margin: 0; font-size: 12px;" onclick="chonThangTuyChinh()">LỌC THÁNG</button>
+        <div class="selection-row">
+          <div class="selection-display" id="lbl-tuan">[ Tuần ... ]</div>
+          <button class="selection-btn" onclick="moChonTuan()">CHỌN TUẦN</button>
+        </div>
+        
+        <div class="selection-row">
+          <div class="selection-display" id="lbl-thang">[ tháng ... ]</div>
+          <button class="selection-btn" onclick="moChonThang()">CHỌN THÁNG</button>
+          <input type="month" id="month-year-picker" style="display:none; width:0; height:0;" onchange="applyThang()">
         </div>
 
-        <div class="quick-actions">
-          <button class="quick-btn" id="btn-tuan-truoc" onclick="chonTuanTruoc()">Tuần trước</button>
-          <button class="quick-btn" id="btn-tuan-nay" onclick="chonTuanNay()">Tuần này</button>
-          <button class="quick-btn" id="btn-thang-truoc" onclick="chonThangTruoc()">Tháng trước</button>
-          <button class="quick-btn" id="btn-thang-nay" onclick="chonThangNay()">Tháng này</button>
+        <div class="quick-actions-row">
+          <button class="btn btn-primary" onclick="chonTuanNay()">Tuần này</button>
+          <button class="btn btn-outline" onclick="chonThangNay()">Tháng này</button>
         </div>
 
-        <div class="date-group">
-          <div class="date-row"><label>Từ ngày:</label><input type="date" id="cycle-start" onchange="clearQuickActive(); autoCalcEndDate();"></div>
-          <div class="date-row"><label>Đến ngày:</label><input type="date" id="cycle-end" onchange="clearQuickActive();"></div>
+        <div class="flex-row" style="gap: 15px; border-top: 1px dashed #ddd; padding-top: 12px; margin-top: 10px;">
+          <div style="display: flex; align-items: center; gap: 5px; flex: 1;">
+            <label style="margin:0; font-weight:bold; font-size: 13px; flex-shrink: 0; color:#444;">Từ ngày:</label>
+            <input type="date" id="cycle-start" class="compressed-date-picker" style="flex:1;" onchange="capNhatLabelTuDate()">
+          </div>
+          <div style="display: flex; align-items: center; gap: 5px; flex: 1;">
+            <label style="margin:0; font-weight:bold; font-size: 13px; flex-shrink: 0; color:#444;">Đến ngày:</label>
+            <input type="date" id="cycle-end" class="compressed-date-picker" style="flex:1;" onchange="capNhatLabelTuDate()">
+          </div>
         </div>
         
         <button class="btn btn-primary" onclick="xemTongHop()" style="margin-top: 15px;">📊 TẠO BẢNG TỔNG HỢP</button>
       </div>
 
-      <div id="cycle-summary-box" class="summary-day-box" style="display:none; margin-bottom: 12px;">
+      <div id="cycle-summary-box" class="summary-day-box" style="display:none; margin-bottom: 15px; background: #fdfdfd;">
           <div style="font-weight: 900; color: #1976d2; font-size: 14px; text-align: center; border-bottom: 1px solid #b3d4fc; padding-bottom: 10px; margin-bottom: 10px;">📊 TỔNG KẾT TOÀN ĐỘI TRONG KỲ</div>
           <div id="cycle-summary-text" style="font-size: 13px; color: #333; line-height: 1.6; text-align:left;"></div>
       </div>
@@ -352,41 +374,43 @@
           <button class="btn btn-primary" onclick="document.getElementById('import-file').click()">📤 PHỤC HỒI</button>
         </div>
         <input type="file" id="import-file" style="display:none;" accept=".json" onchange="importBackupJSON(event)">
-        <button class="btn" style="background:#fff; color:#1976d2; border:1px solid #1976d2; margin-top: 10px;" onclick="xuatDuLieuRaExcel()">Xuất Excel Báo Cáo</button>
+        <button class="btn btn-outline" style="margin-top: 10px; padding: 12px; font-size:13px;" onclick="xuatDuLieuRaExcel()">XUẤT EXCEL BÁO CÁO</button>
       </div>
 
       <div class="card">
-        <h3 class="card-title">👥 DANH SÁCH NHÂN SỰ</h3>
-        <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <h3 class="card-title" style="margin:0; margin-bottom:12px; padding:0; border:none;">👥 DANH SÁCH NHÂN SỰ</h3>
+        <div style="display:flex; gap:8px; margin-bottom:15px;">
           <input type="text" id="input-new-user" placeholder="Tên NV..." style="flex:2;">
           <input type="text" id="input-new-role" placeholder="Chức vụ" style="flex:1;">
           <button class="btn btn-primary" style="flex:1; padding:12px 0;" onclick="themNhanVien()">THÊM</button>
         </div>
-        <button class="btn-toggle-list" onclick="toggleList('list-users', this)">📂 XEM DANH SÁCH</button>
-        <div id="list-users" style="display:none; max-height: 250px; overflow-y: auto; margin-top: 10px;"></div>
+        <button class="btn btn-small btn-toggle-list" onclick="toggleList('list-users', this)">📂 XEM DANH SÁCH TÙY CHỈNH</button>
+        <div id="list-users" style="display:none; max-height: 400px; overflow-y: auto; margin-top: 10px;"></div>
       </div>
 
       <div class="card">
-        <h3 class="card-title">⚡ MẪU VIỆC TĂNG CƯỜNG</h3>
-        <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <h3 class="card-title" style="margin:0; margin-bottom:12px; padding:0; border:none;">⚡ MẪU VIỆC TĂNG CƯỜNG</h3>
+        <div style="display:flex; gap:8px; margin-bottom:15px;">
           <input type="text" id="input-new-task" placeholder="Tên công việc..." style="flex:3;">
           <button class="btn btn-primary" style="flex:1; padding:12px 0;" onclick="themViec()">THÊM</button>
         </div>
-        <button class="btn-toggle-list" onclick="toggleList('list-tasks', this)">📂 XEM DANH SÁCH</button>
-        <div id="list-tasks" style="display:none; max-height: 250px; overflow-y: auto; margin-top: 10px;"></div>
+        <button class="btn btn-small btn-toggle-list" onclick="toggleList('list-tasks', this)">📂 XEM DANH SÁCH TÙY CHỈNH</button>
+        <div id="list-tasks" style="display:none; max-height: 300px; overflow-y: auto; margin-top: 10px;"></div>
       </div>
 
       <div class="card">
-        <h3 class="card-title">⛱️ MẪU LÝ DO NGHỈ</h3>
-        <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <h3 class="card-title" style="margin:0; margin-bottom:12px; padding:0; border:none;">⛱️ MẪU LÝ DO NGHỈ</h3>
+        <div style="display:flex; gap:8px; margin-bottom:15px;">
           <input type="text" id="input-new-leave" placeholder="Loại nghỉ..." style="flex:3;">
           <button class="btn btn-primary" style="flex:1; padding:12px 0;" onclick="themLoaiNghi()">THÊM</button>
         </div>
-        <button class="btn-toggle-list" onclick="toggleList('list-leaves', this)">📂 XEM DANH SÁCH</button>
-        <div id="list-leaves" style="display:none; max-height: 250px; overflow-y: auto; margin-top: 10px;"></div>
+        <button class="btn btn-small btn-toggle-list" onclick="toggleList('list-leaves', this)">📂 XEM DANH SÁCH TÙY CHỈNH</button>
+        <div id="list-leaves" style="display:none; max-height: 300px; overflow-y: auto; margin-top: 10px;"></div>
       </div>
 
-      <button class="btn" style="background:#e74c3c; box-shadow:none; margin-top:20px;" onclick="xoaToanBoDuLieu()">⚠️ KHÔI PHỤC DỮ LIỆU GỐC</button>
+      <div class="card" style="background:transparent; border:none; padding:0; box-shadow:none; margin-top:20px;">
+        <button class="btn" style="background:#e74c3c; box-shadow:none; padding:14px;" onclick="xoaToanBoDuLieu()">⚠️ KHÔI PHỤC DỮ LIỆU GỐC</button>
+      </div>
     </div>
   </div> 
 
@@ -431,8 +455,11 @@
         <input type="radio" id="h-aft" name="sess_hoctap" value="afternoon" onchange="updateCheckboxes('hoctap')"><label for="h-aft">Chiều</label>
       </div>
 
+      <label>3. Ghi chú (nếu có):</label>
+      <input type="text" id="txt-note-hoctap" placeholder="Ví dụ: Học chính trị...">
+
       <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top: 15px;">
-        <label style="margin:0;">3. Chọn nhân sự:</label>
+        <label style="margin:0;">4. Chọn nhân sự:</label>
         <button class="btn-small" onclick="selectAll('grid-user-hoctap')">☑ Chọn hết</button>
       </div>
       <div class="checkbox-grid" id="grid-user-hoctap"></div>
@@ -462,8 +489,11 @@
         <input type="radio" id="t-aft" name="sess_viec" value="afternoon" onchange="updateCheckboxes('viec')"><label for="t-aft">Chiều</label>
       </div>
 
+      <label>3. Ghi chú (nếu có):</label>
+      <input type="text" id="txt-note-viec" placeholder="Ví dụ: Cắt cỏ khu A...">
+
       <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top: 15px;">
-        <label style="margin:0;">3. Chọn nhân sự:</label>
+        <label style="margin:0;">4. Chọn nhân sự:</label>
         <button class="btn-small" onclick="selectAll('grid-user-viec')">☑ Chọn hết</button>
       </div>
       <div class="checkbox-grid" id="grid-user-viec"></div>
@@ -498,8 +528,11 @@
         </div>
       </div>
 
+      <label>3. Ghi chú (nếu có):</label>
+      <input type="text" id="txt-note-nghi" placeholder="Ví dụ: Giải quyết việc gia đình...">
+
       <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top: 15px;">
-        <label style="margin:0;">3. Chọn nhân sự (Đã lọc người bận):</label>
+        <label style="margin:0;">4. Chọn nhân sự (Đã lọc người bận):</label>
         <button class="btn-small" onclick="selectAll('grid-user-nghi')">☑ Chọn hết</button>
       </div>
       <div class="checkbox-grid" id="grid-user-nghi"></div>
@@ -514,7 +547,7 @@
   <div class="modal-overlay" id="modal-chi-tiet-nhan-su">
     <div class="modal-content" style="background: #f9fbff;">
       <div class="close-modal" onclick="dongModal('modal-chi-tiet-nhan-su')">&times;</div>
-      <h3 id="detail-modal-title" style="margin-top:0; font-size:16px; color:#1976d2; border-bottom:2px solid #b3d4fc; padding-bottom:8px; text-transform:uppercase;">CHI TIẾT LỊCH TRÌNH</h3>
+      <h3 id="detail-modal-title" style="margin-top:0; font-size:16px; color:#1976d2; border-bottom:2px solid #b3d4fc; padding-bottom:8px; text-transform:uppercase;">CHI TIẾT LỊCH NGHỈ</h3>
       <p id="detail-modal-subtitle" style="font-size:12px; color:#555; font-weight:bold; margin-top:0; margin-bottom:15px;"></p>
       
       <div id="detail-modal-body" style="max-height: 50vh; overflow-y: auto;">
@@ -557,9 +590,13 @@
   let editingId = null; 
 
   let today = new Date();
-  document.getElementById('date-picker').value = today.toISOString().split('T')[0];
-  document.getElementById('tk-nam').value = today.getFullYear();
-  document.getElementById('month-year-picker').value = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0');
+  let dd = String(today.getDate()).padStart(2, '0');
+  let mm = String(today.getMonth() + 1).padStart(2, '0'); 
+  let yyyy = today.getFullYear();
+  let todayStrLocal = yyyy + '-' + mm + '-' + dd;
+
+  document.getElementById('date-picker').value = todayStrLocal;
+  document.getElementById('tk-nam').value = yyyy;
 
   const SES_LABELS = { 'all': '', 'morning': '(Sáng)', 'afternoon': '(Chiều)' };
   const SES_LABELS_FULL = { 'all': 'Cả ngày', 'morning': 'Sáng', 'afternoon': 'Chiều' };
@@ -762,13 +799,13 @@
 
       var dataDaily = dsDaily.map(r => ({
           "Ngày": r.date, "Phân loại": r.type === 'viec' ? 'Tăng cường' : 'Học tập/Công tác',
-          "Nội dung": r.taskName, "Buổi": SES_LABELS_FULL[r.session], "Nhân sự": r.users.join(', ')
+          "Nội dung": r.taskName, "Buổi": SES_LABELS_FULL[r.session], "Nhân sự": r.users.join(', '), "Ghi chú": r.note || ""
       }));
       var ws_daily = XLSX.utils.json_to_sheet(dataDaily); XLSX.utils.book_append_sheet(wb, ws_daily, "ChamCongNgay");
 
       var dataLeave = dsLeaves.map(r => ({
           "Từ ngày": r.start, "Đến ngày": r.end, "Loại nghỉ": r.category,
-          "Buổi": r.start === r.end ? SES_LABELS_FULL[r.session] : "Xuyên suốt", "Nhân sự": r.users.join(', ')
+          "Buổi": r.start === r.end ? SES_LABELS_FULL[r.session] : "Xuyên suốt", "Nhân sự": r.users.join(', '), "Ghi chú": r.note || ""
       }));
       var ws_leaves = XLSX.utils.json_to_sheet(dataLeave); XLSX.utils.book_append_sheet(wb, ws_leaves, "LichNghiPhep");
 
@@ -814,20 +851,23 @@
     if(tabId === 'tab-cai-dat') loadCaiDat();
     if(tabId === 'tab-ngay') loadDuLieuNgay();
     if(tabId === 'tab-nghi') { updateFilterOptions(); loadDanhSachNghi(); }
-    if(tabId === 'tab-tong-hop') initChuKy();
+    if(tabId === 'tab-tong-hop') { 
+       initChuKy(); 
+       if(!document.getElementById('cycle-start').value) chonTuanNay();
+    }
   }
-  
+
   // ==========================================
-  // XỬ LÝ CÀI ĐẶT (EDIT/MOVE/DELETE)
+  // XỬ LÝ CÀI ĐẶT DANH SÁCH (ẨN/HIỆN, EDIT, DEL)
   // ==========================================
-  function toggleList(id, btn) {
-      let el = document.getElementById(id);
-      if (el.style.display === 'none') {
-          el.style.display = 'block';
-          btn.innerHTML = '📂 ẨN DANH SÁCH';
+  function toggleList(listId, btn) {
+      let listEl = document.getElementById(listId);
+      if (listEl.style.display === "none" || listEl.style.display === "") {
+          listEl.style.display = "block";
+          btn.innerHTML = "📂 ẨN DANH SÁCH";
       } else {
-          el.style.display = 'none';
-          btn.innerHTML = '📂 XEM DANH SÁCH SỬA / XÓA';
+          listEl.style.display = "none";
+          btn.innerHTML = "📂 XEM DANH SÁCH TÙY CHỈNH";
       }
   }
 
@@ -932,18 +972,21 @@
     
     if(id === 'modal-nghi') {
       document.getElementById('btn-submit-nghi').innerText = 'LƯU BÁO CÁO';
+      document.getElementById('txt-note-nghi').value = '';
       document.getElementById('sel-loai-nghi').innerHTML = dsLoaiNghi.map(l => `<option value="${l}">${l}</option>`).join(''); 
       document.getElementById('nghi-tu').value = selectedDate; document.getElementById('nghi-den').value = selectedDate; 
       kiemTraHienThiBuoiNghi(); updateCheckboxes('nghi', []); 
     }
     if(id === 'modal-tang-cuong') {
       document.getElementById('btn-submit-viec').innerText = 'LƯU BÁO CÁO';
+      document.getElementById('txt-note-viec').value = '';
       document.getElementById('sel-loai-viec').innerHTML = dsViecTangCuong.map(t => `<option value="${t}">${t}</option>`).join('') + '<option value="khac">-- ✍️ Nhập việc khác --</option>';
       document.getElementById('wrap-viec-moi').style.display = 'none'; document.getElementById('t-all').checked = true;
       updateCheckboxes('viec', []);
     }
     if(id === 'modal-hoctap') {
       document.getElementById('btn-submit-hoctap').innerText = 'LƯU BÁO CÁO';
+      document.getElementById('txt-note-hoctap').value = '';
       document.getElementById('sel-loai-hoctap').value = 'Học tập'; document.getElementById('txt-hoctap-moi').style.display = 'none'; document.getElementById('h-all').checked = true;
       updateCheckboxes('hoctap', []);
     }
@@ -966,18 +1009,21 @@
               let end = new Date(Math.min(new Date(l.end), new Date(`${yearStr}-12-31`)));
               let validDays = 0;
               while(cur <= end) {
-                   validDays += (l.start === l.end && l.session !== 'all') ? 0.5 : 1; // Tính cả T7, CN
+                   validDays += (l.start === l.end && l.session !== 'all') ? 0.5 : 1; 
                    cur.setDate(cur.getDate()+1);
               }
               if(validDays > 0) {
                    let dateText = l.start === l.end ? formatDateVN(l.start) : `${formatDateVN(l.start)} - ${formatDateVN(l.end)}`;
                    let sessText = l.start === l.end ? ` (${SES_LABELS_FULL[l.session]})` : '';
+                   let noteHtml = l.note ? `<div style="font-size:11px; color:#7f8c8d; margin-top:4px; font-style:italic;">📝 ${l.note}</div>` : '';
+                   
                    details.push({date: l.start, html: `<div style="padding:10px; border-left:4px solid #e74c3c; background:#fffcfc; margin-bottom:8px; border-radius:6px; box-shadow:0 1px 2px rgba(0,0,0,0.05); border: 1px solid #eee;">
                         <div style="font-weight:bold; color:#e74c3c; font-size:13px; margin-bottom:4px;">⛱️ ${l.category}${sessText}</div>
                         <div style="font-size:11px; color:#555; display:flex; justify-content:space-between;">
                             <span>📅 ${dateText}</span> 
                             <span style="color:#c0392b; font-weight:900;">+${validDays} ngày</span>
                         </div>
+                        ${noteHtml}
                    </div>`});
               }
           }
@@ -990,10 +1036,11 @@
       document.getElementById('modal-chi-tiet-nhan-su').style.display = 'flex';
   }
 
-  // CẬP NHẬT: THÊM HÀM FORMAT DETAIL CHO TAB 1
+  // CẬP NHẬT: GỘP KHÔNG KÈM GHI CHÚ
   function formatGroupedUsersBullet(records, categoryField) {
       let groups = {};
       records.forEach(r => {
+          // BỎ GHI CHÚ, CHỈ LẤY TÊN GỐC
           let cat = r[categoryField];
           r.users.forEach(u => { 
               if(!groups[cat]) groups[cat] = [];
@@ -1026,6 +1073,7 @@
             document.getElementById('sel-loai-viec').value = 'khac'; document.getElementById('wrap-viec-moi').style.display = 'block'; document.getElementById('txt-viec-moi').value = r.taskName;
         }
         document.querySelector(`input[name="sess_viec"][value="${r.session}"]`).checked = true;
+        document.getElementById('txt-note-viec').value = r.note || '';
         updateCheckboxes('viec', allUsers);
         document.getElementById('btn-submit-viec').innerText = 'CẬP NHẬT';
     } 
@@ -1038,6 +1086,7 @@
             document.getElementById('sel-loai-hoctap').value = 'khac'; document.getElementById('txt-hoctap-moi').style.display = 'block'; document.getElementById('txt-hoctap-moi').value = r.taskName;
         }
         document.querySelector(`input[name="sess_hoctap"][value="${r.session}"]`).checked = true;
+        document.getElementById('txt-note-hoctap').value = r.note || '';
         updateCheckboxes('hoctap', allUsers);
         document.getElementById('btn-submit-hoctap').innerText = 'CẬP NHẬT';
     }
@@ -1055,6 +1104,7 @@
     document.getElementById('sel-loai-nghi').innerHTML = dsLoaiNghi.map(l => `<option value="${l}">${l}</option>`).join('');
     document.getElementById('sel-loai-nghi').value = r.category;
     document.getElementById('nghi-tu').value = r.start; document.getElementById('nghi-den').value = r.end;
+    document.getElementById('txt-note-nghi').value = r.note || '';
     kiemTraHienThiBuoiNghi();
     
     if (r.start === r.end) { document.querySelector(`input[name="sess_nghi"][value="${r.session}"]`).checked = true; }
@@ -1086,19 +1136,22 @@
         if (isWeekend) return; // Bỏ qua hiển thị ở Tab 1
 
         let isMulti = r.start !== r.end; let effectiveSession = isMulti ? 'multi' : r.session;
-        let key = r.category + '|' + effectiveSession; 
+        let noteKey = r.note || '';
+        let key = r.category + '|' + effectiveSession + '|' + noteKey; 
         
         let existing = groupedLeavesToday.find(x => x.key === key);
         if(!existing) { 
-            groupedLeavesToday.push({ key: key, category: r.category, sessionText: isMulti ? 'Xuyên suốt' : SES_LABELS_FULL[r.session], combinedUsers: [...r.users] }); 
+            groupedLeavesToday.push({ key: key, category: r.category, sessionText: isMulti ? 'Xuyên suốt' : SES_LABELS_FULL[r.session], combinedUsers: [...r.users], note: r.note, ids: [r.id] }); 
         } 
         else { 
+            existing.ids.push(r.id);
             r.users.forEach(u => { if(!existing.combinedUsers.includes(u)) existing.combinedUsers.push(u); }); 
         }
     });
 
     let groupedDaily = Object.values(recordsDaily.reduce((acc, r) => {
-        let key = r.type + '|' + r.taskName + '|' + r.session;
+        let noteKey = r.note || '';
+        let key = r.type + '|' + r.taskName + '|' + r.session + '|' + noteKey;
         if(!acc[key]) acc[key] = { ...r, ids: [r.id], combinedUsers: [...r.users] };
         else { acc[key].ids.push(r.id); r.users.forEach(u => { if(!acc[key].combinedUsers.includes(u)) acc[key].combinedUsers.push(u); }); }
         return acc;
@@ -1151,20 +1204,26 @@
     document.getElementById('sum-nghi').innerText = sumNghi; document.getElementById('sum-tc').innerText = sumTC;
     document.getElementById('sum-ht').innerText = sumHT; document.getElementById('sum-bqtx').innerText = sumBQTX;
 
-    // CẬP NHẬT: CHI TIẾT TÓM TẮT DƯỚI 4 Ô
+    // HIỂN THỊ CHI TIẾT TÓM TẮT DƯỚI 4 Ô
     let detailText = [];
     let tcRecords = recordsDaily.filter(r => r.type === 'viec');
     if (tcRecords.length > 0) { 
-        detailText.push(`<div style="color:#f39c12; font-weight:bold; font-size:14px; margin-top:8px; margin-bottom:4px;">⚡ Tăng cường:</div>${formatGroupedUsersBullet(tcRecords, 'taskName')}`); 
+        let htmlStr = `<div style="color:#f39c12; font-weight:bold; font-size:14px; margin-top:8px; margin-bottom:4px;">⚡ Tăng cường:</div>`;
+        htmlStr += formatGroupedUsersBullet(tcRecords, 'taskName');
+        detailText.push(htmlStr); 
     }
     
     if (!isWeekend && recordsLeave.length > 0) { 
-        detailText.push(`<div style="color:#e74c3c; font-weight:bold; font-size:14px; margin-top:8px; margin-bottom:4px;">⛱️ Nghỉ:</div>${formatGroupedUsersBullet(recordsLeave, 'category')}`); 
+        let htmlStr = `<div style="color:#e74c3c; font-weight:bold; font-size:14px; margin-top:8px; margin-bottom:4px;">⛱️ Nghỉ:</div>`;
+        htmlStr += formatGroupedUsersBullet(recordsLeave, 'category');
+        detailText.push(htmlStr); 
     }
 
     let htRecords = recordsDaily.filter(r => r.type === 'hoctap');
     if (htRecords.length > 0) { 
-        detailText.push(`<div style="color:#00bcd4; font-weight:bold; font-size:14px; margin-top:8px; margin-bottom:4px;">📘 Học tập/CT:</div>${formatGroupedUsersBullet(htRecords, 'taskName')}`); 
+        let htmlStr = `<div style="color:#00bcd4; font-weight:bold; font-size:14px; margin-top:8px; margin-bottom:4px;">📘 Học tập/CT:</div>`;
+        htmlStr += formatGroupedUsersBullet(htRecords, 'taskName');
+        detailText.push(htmlStr); 
     }
     
     document.getElementById('summary-details-text').innerHTML = detailText.length > 0 ? detailText.join('') : '<i style="color:#888;">Chưa có báo cáo chi tiết</i>';
@@ -1173,30 +1232,38 @@
     if(totalRec === 0) { html = '<div style="text-align:center; padding:20px; color:#888; font-size:13px; background:#f9f9f9; border-radius:8px;">Chưa có báo cáo nào.</div>'; }
     
     groupedLeavesToday.forEach(r => {
-      html += `<div class="list-item type-nghi-auto" style="padding-right:14px;">
-                 <div class="list-item-header" style="padding-right:0;">
+      let idsStr = r.ids.join(',');
+      let noteHtml = r.note ? `<div class="list-item-note">📝 ${r.note}</div>` : '';
+      html += `<div class="list-item type-nghi-auto">
+                 <button class="btn-edit-item" onclick="suaLeave('${idsStr}')">✏️</button>
+                 <button class="btn-delete-item" onclick="xoaLeave('${idsStr}')">✖</button>
+                 <div class="list-item-header">
                      <span class="list-item-title">⛱️ Nghỉ: ${r.category}</span>
                      <span class="list-item-badge" style="background:#fadbd8; color:#c0392b;">${r.sessionText}</span>
                  </div>
                  <div class="list-item-users">👤 ${r.combinedUsers.join(', ')}</div>
+                 ${noteHtml}
                </div>`;
     });
 
     groupedDaily.forEach(r => {
       let sessionText = SES_LABELS_FULL[r.session]; let idsStr = r.ids.join(',');
+      let noteHtml = r.note ? `<div class="list-item-note">📝 ${r.note}</div>` : '';
       if(r.type === 'hoctap') {
         html += `<div class="list-item type-hoctap">
                    <button class="btn-edit-item" onclick="suaRecordDaily('${idsStr}', 'hoctap')">✏️</button>
-                   <button class="btn-delete-item" onclick="xoaRecordDaily('${idsStr}')">×</button>
+                   <button class="btn-delete-item" onclick="xoaRecordDaily('${idsStr}')">✖</button>
                    <div class="list-item-header"><span class="list-item-title">📘 ${r.taskName}</span><span class="list-item-badge" style="background:#e0f7fa; color:#0097a7;">${sessionText}</span></div>
                    <div class="list-item-users">👤 ${r.combinedUsers.join(', ')}</div>
+                   ${noteHtml}
                  </div>`;
       } else if (r.type === 'viec') {
         html += `<div class="list-item type-viec">
                    <button class="btn-edit-item" onclick="suaRecordDaily('${idsStr}', 'viec')">✏️</button>
-                   <button class="btn-delete-item" onclick="xoaRecordDaily('${idsStr}')">×</button>
+                   <button class="btn-delete-item" onclick="xoaRecordDaily('${idsStr}')">✖</button>
                    <div class="list-item-header"><span class="list-item-title">⚡ T.Cường: ${r.taskName}</span><span class="list-item-badge" style="background:#ffe0b2; color:#d35400;">${sessionText}</span></div>
                    <div class="list-item-users">👤 ${r.combinedUsers.join(', ')}</div>
+                   ${noteHtml}
                  </div>`;
       }
     });
@@ -1211,9 +1278,10 @@
     if(!taskName) { alert('Vui lòng nhập lý do/công việc!'); return; }
 
     let sess = document.querySelector(`input[name="sess_${type}"]:checked`).value;
+    let note = document.getElementById(`txt-note-${type}`).value.trim();
     
     if (editingId) { let idArr = editingId.split(','); dsDaily = dsDaily.filter(x => !idArr.includes(x.id)); editingId = null; }
-    dsDaily.push({ id: Date.now().toString(), date: document.getElementById('date-picker').value, type: type, taskName: taskName, session: sess, users: users });
+    dsDaily.push({ id: Date.now().toString(), date: document.getElementById('date-picker').value, type: type, taskName: taskName, session: sess, users: users, note: note });
     saveData('cc_daily', dsDaily); dongModal(type === 'viec' ? 'modal-tang-cuong' : 'modal-hoctap'); loadDuLieuNgay();
   }
   
@@ -1238,9 +1306,10 @@
     let tu = document.getElementById('nghi-tu').value; let den = document.getElementById('nghi-den').value;
     if(den < tu) { alert('Ngày kết thúc không hợp lệ!'); return; }
     let cat = document.getElementById('sel-loai-nghi').value; let sess = document.querySelector('input[name="sess_nghi"]:checked').value;
+    let note = document.getElementById('txt-note-nghi').value.trim();
 
     if (editingId) { let idArr = editingId.split(','); dsLeaves = dsLeaves.filter(x => !idArr.includes(x.id)); editingId = null; }
-    dsLeaves.push({ id: Date.now().toString(), start: tu, end: den, category: cat, session: sess, users: users });
+    dsLeaves.push({ id: Date.now().toString(), start: tu, end: den, category: cat, session: sess, users: users, note: note });
     
     saveData('cc_leaves_data', dsLeaves); dongModal('modal-nghi'); loadDanhSachNghi();
     if(document.getElementById('tab-ngay').classList.contains('active')) loadDuLieuNgay();
@@ -1264,7 +1333,8 @@
     });
 
     let grouped = Object.values(filteredLeaves.reduce((acc, r) => {
-        let key = r.category + '|' + r.session + '|' + r.start + '|' + r.end;
+        let noteKey = r.note || '';
+        let key = r.category + '|' + r.session + '|' + r.start + '|' + r.end + '|' + noteKey;
         if(!acc[key]) acc[key] = { ...r, ids: [r.id], combinedUsers: [...r.users] };
         else { acc[key].ids.push(r.id); r.users.forEach(u => { if(!acc[key].combinedUsers.includes(u)) acc[key].combinedUsers.push(u); }); }
         return acc;
@@ -1280,13 +1350,15 @@
       else { let d1 = new Date(r.start); let d2 = new Date(r.end); let dayDiff = Math.round((d2 - d1) / (1000 * 3600 * 24)) + 1; durationText = dayDiff + " ngày"; }
 
       let idsStr = r.ids.join(',');
+      let noteHtml = r.note ? `<div class="list-item-note">📝 ${r.note}</div>` : '';
 
       html += `<div class="list-item type-nghi-auto">
                  <button class="btn-edit-item" onclick="suaLeave('${idsStr}')">✏️</button>
-                 <button class="btn-delete-item" onclick="xoaLeave('${idsStr}')">×</button>
+                 <button class="btn-delete-item" onclick="xoaLeave('${idsStr}')">✖</button>
                  <div class="list-item-header"><span class="list-item-title" style="padding-right:0;">⛱️ ${r.category} <span style="color:#1976d2; font-size:13px; font-weight:900;">- ${durationText}</span></span></div>
                  <div style="font-size:12px; color:#c0392b; margin-bottom:6px; font-weight:bold;">📅 ${dateText}</div>
                  <div class="list-item-users">👤 ${r.combinedUsers.join(', ')}</div>
+                 ${noteHtml}
                </div>`;
     });
     document.getElementById('list-nghi-dai-han').innerHTML = html;
@@ -1314,8 +1386,10 @@
               while(cur <= end) {
                   if(cur.getFullYear().toString() === yearStr) {
                       let val = (l.start === l.end && l.session !== 'all') ? 0.5 : 1;
+                      // Gộp KHÔNG ghi chú
+                      let reason = l.category;
                       l.users.forEach(u => {
-                          if(stats[u]) { stats[u].total += val; stats[u].chitiet[l.category] = (stats[u].chitiet[l.category]||0) + val; }
+                          if(stats[u]) { stats[u].total += val; stats[u].chitiet[reason] = (stats[u].chitiet[reason]||0) + val; }
                       });
                   }
                   cur.setDate(cur.getDate()+1);
@@ -1326,7 +1400,7 @@
       let tbody = '';
       dsNhanVien.forEach(u => {
           let st = stats[u.name];
-          let str = Object.keys(st.chitiet).map(k=>`• ${k}: ${st.chitiet[k]}`).join('<br>');
+          let str = Object.keys(st.chitiet).map(k=>`• <span style="color:#555;">${k}:</span> ${st.chitiet[k]}`).join('<br>');
           
           let detailBtn = st.total > 0 ? `<div style="margin-top:6px; text-align:left;"><span onclick="xemChiTietNghiNam('${u.name}', '${yearStr}')" style="background:#eaf6ff; color:#1976d2; font-size:11px; font-weight:bold; padding:4px 8px; border-radius:6px; border:1px solid #b3d4fc; cursor:pointer;">Xem lịch 📅</span></div>` : '';
 
@@ -1340,29 +1414,89 @@
   }
 
   // ==========================================
-  // TAB TỔNG HỢP CHU KỲ (BỎ QUA T7, CN KHI TÍNH CÔNG/PHÉP)
+  // TAB TỔNG HỢP CHU KỲ (THIẾT KẾ MỚI, GỘP KHÔNG GHI CHÚ)
   // ==========================================
-  function clearQuickActive() { document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active')); }
-  function chonThangTuyChinh() {
-      clearQuickActive(); let val = document.getElementById('month-year-picker').value; if(!val) { alert("Vui lòng chọn tháng/năm!"); return; }
+  function getWeekNumber(d) {
+      d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+      d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
+      var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+      var weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
+      return { week: weekNo, year: d.getUTCFullYear() };
+  }
+
+  function capNhatLabelTuDate() {
+      let val = document.getElementById('cycle-start').value;
+      if (!val) return;
+      let d = new Date(val);
+      let wInfo = getWeekNumber(d);
+      document.getElementById('lbl-tuan').innerText = `[ Tuần ${wInfo.week} năm ${wInfo.year} ]`;
+      document.getElementById('lbl-thang').innerText = `[ tháng ${d.getMonth()+1} năm ${d.getFullYear()} ]`;
+  }
+
+  function applyThang() {
+      let val = document.getElementById('month-year-picker').value;
+      if(!val) return;
       let parts = val.split('-'); let year = parseInt(parts[0]); let month = parseInt(parts[1]) - 1; 
       let start = new Date(year, month, 1); let end = new Date(year, month + 1, 0); 
       let formatIsoLocal = (d) => { return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); };
       document.getElementById('cycle-start').value = formatIsoLocal(start); document.getElementById('cycle-end').value = formatIsoLocal(end);
+      capNhatLabelTuDate();
   }
-  function chonTuanTruoc() { clearQuickActive(); document.getElementById('btn-tuan-truoc').classList.add('active'); let curr = new Date(); let first = curr.getDate() - curr.getDay() + 1 - 7; let start = new Date(curr.setDate(first)); let end = new Date(start); end.setDate(end.getDate() + 6); document.getElementById('cycle-start').value = start.toISOString().split('T')[0]; document.getElementById('cycle-end').value = end.toISOString().split('T')[0]; }
-  function chonTuanNay() { clearQuickActive(); document.getElementById('btn-tuan-nay').classList.add('active'); let curr = new Date(); let first = curr.getDate() - curr.getDay() + 1; let last = first + 6; document.getElementById('cycle-start').value = new Date(curr.setDate(first)).toISOString().split('T')[0]; document.getElementById('cycle-end').value = new Date(curr.setDate(last)).toISOString().split('T')[0]; }
-  function chonThangTruoc() { clearQuickActive(); document.getElementById('btn-thang-truoc').classList.add('active'); let date = new Date(); document.getElementById('cycle-start').value = new Date(date.getFullYear(), date.getMonth() - 1, 1).toISOString().split('T')[0]; document.getElementById('cycle-end').value = new Date(date.getFullYear(), date.getMonth(), 0).toISOString().split('T')[0]; }
-  function chonThangNay() { clearQuickActive(); document.getElementById('btn-thang-nay').classList.add('active'); let date = new Date(); document.getElementById('cycle-start').value = new Date(date.getFullYear(), date.getMonth(), 1).toISOString().split('T')[0]; document.getElementById('cycle-end').value = new Date(date.getFullYear(), date.getMonth() + 1, 0).toISOString().split('T')[0]; }
-  
-  function initChuKy() { let savedEnd = localStorage.getItem('cc_last_end_date'); if(savedEnd) { let nextStart = new Date(savedEnd); nextStart.setDate(nextStart.getDate() + 1); document.getElementById('cycle-start').value = nextStart.toISOString().split('T')[0]; autoCalcEndDate(); } }
-  function autoCalcEndDate() { let startVal = document.getElementById('cycle-start').value; if(startVal) { let end = new Date(startVal); end.setMonth(end.getMonth() + 1); end.setDate(end.getDate() - 1); document.getElementById('cycle-end').value = end.toISOString().split('T')[0]; } }
 
-  function formatGlobalStat(statsObj) {
-      return Object.keys(statsObj).map(key => {
-          let item = statsObj[key]; let userArr = Object.keys(item.users).map(u => `${u}: ${item.users[u]}`);
-          return `&bull; <b style="color:#2c3e50;">${key}: ${item.total}</b> <span style="font-size:12px; color:#666; font-weight:normal;">[${userArr.join('; ')}]</span>`;
-      }).join('<br>');
+  function moChonThang() {
+      let picker = document.getElementById('month-year-picker');
+      if(picker.showPicker) { picker.showPicker(); } else { picker.click(); }
+  }
+
+  function moChonTuan() {
+      let wInfo = getWeekNumber(new Date());
+      let week = prompt("Nhập số tuần (1 - 53):", wInfo.week);
+      if(!week || isNaN(week) || week < 1 || week > 53) return;
+      let year = prompt("Nhập năm:", wInfo.year);
+      if(!year || isNaN(year)) return;
+      
+      let simple = new Date(year, 0, 1 + (week - 1) * 7);
+      let dow = simple.getDay();
+      let ISOweekStart = simple;
+      if (dow <= 4)
+          ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
+      else
+          ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
+      
+      let end = new Date(ISOweekStart);
+      end.setDate(end.getDate() + 6);
+      
+      document.getElementById('cycle-start').value = ISOweekStart.toISOString().split('T')[0];
+      document.getElementById('cycle-end').value = end.toISOString().split('T')[0];
+      capNhatLabelTuDate();
+  }
+
+  function chonTuanNay() { 
+      let curr = new Date(); 
+      let first = curr.getDate() - curr.getDay() + (curr.getDay() === 0 ? -6 : 1);
+      let start = new Date(curr.setDate(first)); 
+      let end = new Date(start); end.setDate(end.getDate() + 6); 
+      document.getElementById('cycle-start').value = start.toISOString().split('T')[0]; 
+      document.getElementById('cycle-end').value = end.toISOString().split('T')[0]; 
+      capNhatLabelTuDate();
+  }
+
+  function chonThangNay() { 
+      let date = new Date(); 
+      document.getElementById('cycle-start').value = new Date(date.getFullYear(), date.getMonth(), 1).toISOString().split('T')[0]; 
+      document.getElementById('cycle-end').value = new Date(date.getFullYear(), date.getMonth() + 1, 0).toISOString().split('T')[0]; 
+      capNhatLabelTuDate();
+  }
+  
+  function initChuKy() { 
+      let savedEnd = localStorage.getItem('cc_last_end_date'); 
+      if(savedEnd) { 
+          let nextStart = new Date(savedEnd); nextStart.setDate(nextStart.getDate() + 1); 
+          document.getElementById('cycle-start').value = nextStart.toISOString().split('T')[0]; 
+          let end = new Date(nextStart); end.setMonth(end.getMonth() + 1); end.setDate(end.getDate() - 1);
+          document.getElementById('cycle-end').value = end.toISOString().split('T')[0];
+      } 
+      if(document.getElementById('cycle-start').value) { capNhatLabelTuDate(); }
   }
 
   function xemTongHop() {
@@ -1372,8 +1506,8 @@
 
     let stats = {}; dsNhanVien.forEach(u => { stats[u.name] = { nghiTotal: 0, hocTotal: 0, viecTotal: 0, chiTietNghi: {}, chiTietViec: {}, chiTietHoc: {} }; });
     let curDate = new Date(start); let endDate = new Date(end);
-    let sumNghi = 0, sumHoc = 0, sumViec = 0, sumBQTX_cycle = 0;
-    
+    let sumNghi = 0, sumHoc = 0, sumViec = 0;
+
     let globalTaskStats = {}; let globalHocStats = {}; let globalNghiStats = {};
 
     while(curDate <= endDate) {
@@ -1384,24 +1518,25 @@
         let isWorkingDay = true;
         if(isWeekend && !dsWeekendWork.includes(dStr)) { isWorkingDay = false; }
 
-        let dailyAbsence = {}; dsNhanVien.forEach(u => dailyAbsence[u.name] = 0);
-
         dsDaily.filter(r => r.date === dStr).forEach(r => {
             let val = r.session === 'all' ? 1 : 0.5;
+            let taskTitle = r.taskName; // BỎ GHI CHÚ KHI GỘP
+
             r.users.forEach(u => { 
                 if(stats[u]) { 
-                    dailyAbsence[u] += val;
                     if(r.type === 'hoctap') { 
                         stats[u].hocTotal += val; sumHoc += val; 
-                        stats[u].chiTietHoc[r.taskName] = (stats[u].chiTietHoc[r.taskName]||0) + val;
-                        if(!globalHocStats[r.taskName]) globalHocStats[r.taskName] = {total:0, users:{}};
-                        globalHocStats[r.taskName].total += val; globalHocStats[r.taskName].users[u] = (globalHocStats[r.taskName].users[u]||0) + val;
+                        stats[u].chiTietHoc[taskTitle] = (stats[u].chiTietHoc[taskTitle]||0) + val;
+                        
+                        if(!globalHocStats[taskTitle]) globalHocStats[taskTitle] = {total:0, users:{}};
+                        globalHocStats[taskTitle].total += val; globalHocStats[taskTitle].users[u] = (globalHocStats[taskTitle].users[u]||0) + val;
                     } 
                     if(r.type === 'viec') { 
                         stats[u].viecTotal += val; sumViec += val; 
-                        stats[u].chiTietViec[r.taskName] = (stats[u].chiTietViec[r.taskName]||0) + val;
-                        if(!globalTaskStats[r.taskName]) globalTaskStats[r.taskName] = {total:0, users:{}};
-                        globalTaskStats[r.taskName].total += val; globalTaskStats[r.taskName].users[u] = (globalTaskStats[r.taskName].users[u]||0) + val;
+                        stats[u].chiTietViec[taskTitle] = (stats[u].chiTietViec[taskTitle]||0) + val;
+                        
+                        if(!globalTaskStats[taskTitle]) globalTaskStats[taskTitle] = {total:0, users:{}};
+                        globalTaskStats[taskTitle].total += val; globalTaskStats[taskTitle].users[u] = (globalTaskStats[taskTitle].users[u]||0) + val;
                     } 
                 } 
             });
@@ -1409,36 +1544,51 @@
 
         dsLeaves.filter(l => dStr >= l.start && dStr <= l.end).forEach(l => {
             let val = (l.start === l.end && l.session !== 'all') ? 0.5 : 1; 
+            let catTitle = l.category; // BỎ GHI CHÚ KHI GỘP
+
             l.users.forEach(u => { 
                 if(stats[u]) { 
-                    dailyAbsence[u] += val;
                     if(!isWeekend) {
                         stats[u].nghiTotal += val; sumNghi += val; 
-                        stats[u].chiTietNghi[l.category] = (stats[u].chiTietNghi[l.category]||0) + val;
-                        if(!globalNghiStats[l.category]) globalNghiStats[l.category] = {total:0, users:{}};
-                        globalNghiStats[l.category].total += val; globalNghiStats[l.category].users[u] = (globalNghiStats[l.category].users[u]||0) + val;
+                        stats[u].chiTietNghi[catTitle] = (stats[u].chiTietNghi[catTitle]||0) + val;
+                        
+                        if(!globalNghiStats[catTitle]) globalNghiStats[catTitle] = {total:0, users:{}};
+                        globalNghiStats[catTitle].total += val; globalNghiStats[catTitle].users[u] = (globalNghiStats[catTitle].users[u]||0) + val;
                     }
                 } 
             });
-        });
-
-        dsNhanVien.forEach(nv => {
-            let base = 0;
-            if(isWorkingDay) { base = 1.0; if(nv.role === 'Đội trưởng') base = 0; else if(nv.role === 'Phó đội trưởng') base = 0.5; }
-            let bqtx = Math.max(0, base - dailyAbsence[nv.name]);
-            sumBQTX_cycle += bqtx;
         });
 
         curDate.setDate(curDate.getDate() + 1);
     }
 
     let textSummary = [];
-    if(Object.keys(globalNghiStats).length > 0) { textSummary.push(`<span style="color:#e74c3c; font-weight:900;">⛱️ NGHỈ: ${sumNghi}</span><br>${formatGlobalStat(globalNghiStats)}`); }
-    if(Object.keys(globalHocStats).length > 0) { textSummary.push(`<span style="color:#00bcd4; font-weight:900;">📘 HỌC TẬP/CT: ${sumHoc}</span><br>${formatGlobalStat(globalHocStats)}`); }
-    if(Object.keys(globalTaskStats).length > 0) { textSummary.push(`<span style="color:#f39c12; font-weight:900;">⚡ TĂNG CƯỜNG: ${sumViec}</span><br>${formatGlobalStat(globalTaskStats)}`); }
-    textSummary.push(`<span style="color:#27ae60; font-weight:900;">✅ TỔNG BQTX:</span> <span style="font-size:14px; font-weight:bold; color:#2c3e50;">${sumBQTX_cycle} công</span>`);
-
-    document.getElementById('cycle-summary-text').innerHTML = textSummary.length > 0 ? textSummary.join('<br><div style="margin-top:6px;"></div>') : '<i style="color:#888;">Không có dữ liệu trong chu kỳ này</i>';
+    
+    if(Object.keys(globalNghiStats).length > 0) { 
+        let detailHtml = Object.keys(globalNghiStats).map(k => {
+            let userArr = Object.keys(globalNghiStats[k].users).map(u => `${u}: ${globalNghiStats[k].users[u]}`);
+            return `<div style="margin-left:4px; margin-bottom:4px; color:#444;">&bull; <b style="color:#2c3e50;">${k}: ${globalNghiStats[k].total}</b> <br><span style="font-size:12px; color:#666; font-weight:normal; margin-left: 14px;">[${userArr.join('; ')}]</span></div>`;
+        }).join('');
+        textSummary.push(`<div style="color:#e74c3c; font-weight:bold; font-size:14px; margin-top:8px; margin-bottom:4px;">⛱️ NGHỈ: <span style="font-size:16px;">${sumNghi}</span></div>${detailHtml}`); 
+    }
+    
+    if(Object.keys(globalTaskStats).length > 0) { 
+        let detailHtml = Object.keys(globalTaskStats).map(k => {
+            let userArr = Object.keys(globalTaskStats[k].users).map(u => `${u}: ${globalTaskStats[k].users[u]}`);
+            return `<div style="margin-left:4px; margin-bottom:4px; color:#444;">&bull; <b style="color:#2c3e50;">${k}: ${globalTaskStats[k].total}</b> <br><span style="font-size:12px; color:#666; font-weight:normal; margin-left: 14px;">[${userArr.join('; ')}]</span></div>`;
+        }).join('');
+        textSummary.push(`<div style="color:#f39c12; font-weight:bold; font-size:14px; margin-top:12px; margin-bottom:4px;">⚡ TĂNG CƯỜNG: <span style="font-size:16px;">${sumViec}</span></div>${detailHtml}`); 
+    }
+    
+    if(Object.keys(globalHocStats).length > 0) { 
+        let detailHtml = Object.keys(globalHocStats).map(k => {
+            let userArr = Object.keys(globalHocStats[k].users).map(u => `${u}: ${globalHocStats[k].users[u]}`);
+            return `<div style="margin-left:4px; margin-bottom:4px; color:#444;">&bull; <b style="color:#2c3e50;">${k}: ${globalHocStats[k].total}</b> <br><span style="font-size:12px; color:#666; font-weight:normal; margin-left: 14px;">[${userArr.join('; ')}]</span></div>`;
+        }).join('');
+        textSummary.push(`<div style="color:#00bcd4; font-weight:bold; font-size:14px; margin-top:12px; margin-bottom:4px;">📘 HỌC TẬP/CT: <span style="font-size:16px;">${sumHoc}</span></div>${detailHtml}`); 
+    }
+    
+    document.getElementById('cycle-summary-text').innerHTML = textSummary.length > 0 ? textSummary.join('') : '<i style="color:#888;">Không có dữ liệu trong chu kỳ này</i>';
     document.getElementById('cycle-summary-box').style.display = 'block';
 
     let tbody = '';
@@ -1453,14 +1603,13 @@
       let cellViec = st.viecTotal > 0 ? `<div class="main-val">${st.viecTotal}</div><div class="detail-text">${strViec}</div>` : `<div style="color:#ccc">-</div>`;
 
       tbody += `<tr>
-                  <td class="td-left" style="vertical-align:middle;">
-                     ${u.name}
-                  </td>
+                  <td class="td-left" style="vertical-align:middle;">${u.name}</td>
                   <td class="td-number">${cellNghi}</td>
                   <td class="td-hoctap">${cellHoc}</td>
                   <td class="td-task">${cellViec}</td>
                 </tr>`;
     });
+    
     document.querySelector('#table-tong-hop tbody').innerHTML = tbody || '<tr><td colspan="4">Chưa có nhân sự</td></tr>';
     document.getElementById('table-footer').innerHTML = `<tr class="total-row"><td>TỔNG ĐỘI</td><td>${sumNghi}</td><td>${sumHoc}</td><td>${sumViec}</td></tr>`;
   }
