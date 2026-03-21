@@ -54,7 +54,6 @@
     .btn { display: block; width: 100%; padding: 12px; font-size: 13px; font-weight: 800; text-align: center; border: none; border-radius: 8px; cursor: pointer; color: white; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-transform: uppercase;}
     .btn:active { transform: scale(0.97); }
     .btn-primary { background: #1976d2; }
-    .btn-outline { background: white; color: #1976d2; border: 1px solid #1976d2; }
     .btn-warning { background: #f39c12; }
     .btn-info { background: #00bcd4; }
     .btn-danger { background: #e74c3c; }
@@ -115,11 +114,14 @@
     
     .summary-details { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #b3d4fc; font-size: 13px; color: #444; line-height: 1.6; text-align: left; font-weight: normal; }
 
-    /* ====== TỔNG HỢP CHU KỲ ====== */
+    /* ====== TỔNG HỢP CHU KỲ NÚT ĐỘNG ====== */
     .cycle-selection-card { border-radius: 12px; padding: 14px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); border: 1px solid #eef2f5; background: #fff;}
     
-    .quick-actions-row { display: flex; gap: 8px; margin-bottom: 12px; }
-    .quick-actions-row .btn { flex: 1; margin: 0; }
+    .c-btn-dash { position: absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#f9fcff; border:1px dashed #1976d2; color:#1976d2; font-size:13px; font-weight:bold; border-radius:6px; pointer-events:none; transition: 0.2s; margin:0; }
+    .c-btn-dash.active { background:#1976d2; color:#fff; border:1px solid #1976d2; }
+
+    .c-btn-solid { margin:0; flex:1; padding: 12px; font-size: 13px; font-weight: 800; text-align: center; border-radius: 6px; cursor: pointer; transition: 0.2s; background: #fff; color: #1976d2; border: 1px solid #1976d2; text-transform: uppercase; }
+    .c-btn-solid.active { background: #1976d2; color: #fff; }
 
     /* ====== BẢNG TỔNG HỢP ====== */
     .table-wrapper { width: 100%; border-radius: 8px; border: 1px solid #eee; overflow: hidden; }
@@ -286,29 +288,29 @@
         
         <div class="flex-row" style="margin-bottom: 12px; gap: 8px; height: 44px;">
           <div style="position: relative; flex: 1; height: 100%;">
-            <div id="btn-lbl-tuan" style="position: absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#f9fcff; border:1px dashed #1976d2; color:#1976d2; font-size:13px; font-weight:bold; border-radius:6px; pointer-events:none;">▾ Tuần ...</div>
-            <input type="date" id="week-picker-surrogate" onchange="applyTuanBangDate()" style="position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; z-index:10; cursor:pointer; margin:0; padding:0; box-sizing:border-box;">
+            <div id="btn-lbl-tuan" class="c-btn-dash">▾ Tuần ...</div>
+            <input type="date" id="week-picker-surrogate" onchange="applyTuanBangDate()" style="position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; z-index:10; cursor:pointer; margin:0; padding:0;">
           </div>
 
           <div style="position: relative; flex: 1; height: 100%;">
-            <div id="btn-lbl-thang" style="position: absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#f9fcff; border:1px dashed #1976d2; color:#1976d2; font-size:13px; font-weight:bold; border-radius:6px; pointer-events:none;">▾ Tháng ...</div>
-            <input type="month" id="month-year-picker" onchange="applyThang()" style="position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; z-index:10; cursor:pointer; margin:0; padding:0; box-sizing:border-box;">
+            <div id="btn-lbl-thang" class="c-btn-dash">▾ Tháng ...</div>
+            <input type="month" id="month-year-picker" onchange="applyThang()" style="position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; z-index:10; cursor:pointer; margin:0; padding:0;">
           </div>
         </div>
 
         <div class="flex-row" style="margin-bottom: 15px; gap: 8px;">
-          <button class="btn btn-primary" style="margin: 0;" onclick="chonTuanNay()">TUẦN NÀY</button>
-          <button class="btn btn-outline" style="margin: 0; background: #fff;" onclick="chonThangNay()">THÁNG NÀY</button>
+          <button id="btn-tuan-nay" class="c-btn-solid" onclick="chonTuanNay()">TUẦN NÀY</button>
+          <button id="btn-thang-nay" class="c-btn-solid" onclick="chonThangNay()">THÁNG NÀY</button>
         </div>
 
         <div style="border-top: 1px dashed #ddd; padding-top: 15px;">
           <div class="date-row" style="margin-bottom: 12px; justify-content: space-between; align-items:center;">
             <label style="margin:0; font-weight:bold; font-size: 14px; color:#444;">Từ ngày:</label>
-            <input type="date" id="cycle-start" style="width: 65%; padding: 8px; font-size: 14px; font-weight: bold; color: #1976d2; text-align:center; border-radius:8px; border: 1px solid #ccc; background:#fff; margin:0;" onchange="capNhatLabelTuDate()">
+            <input type="date" id="cycle-start" style="width: 65%; padding: 8px 10px; font-size: 13px; font-weight: bold; color: #1976d2; text-align:center; border-radius:6px; border: 1px solid #ccc; background:#fff; margin:0;" onchange="setActiveFilter(''); capNhatLabelTuDate()">
           </div>
           <div class="date-row" style="justify-content: space-between; align-items:center;">
             <label style="margin:0; font-weight:bold; font-size: 14px; color:#444;">Đến ngày:</label>
-            <input type="date" id="cycle-end" style="width: 65%; padding: 8px; font-size: 14px; font-weight: bold; color: #1976d2; text-align:center; border-radius:8px; border: 1px solid #ccc; background:#fff; margin:0;" onchange="capNhatLabelTuDate()">
+            <input type="date" id="cycle-end" style="width: 65%; padding: 8px 10px; font-size: 13px; font-weight: bold; color: #1976d2; text-align:center; border-radius:6px; border: 1px solid #ccc; background:#fff; margin:0;" onchange="setActiveFilter(''); capNhatLabelTuDate()">
           </div>
         </div>
         
@@ -1403,7 +1405,7 @@
   }
 
   // ==========================================
-  // TAB TỔNG HỢP CHU KỲ (THIẾT KẾ MỚI, NATIVE IOS PICKER)
+  // TAB TỔNG HỢP CHU KỲ (THIẾT KẾ MỚI, GỘP KHÔNG GHI CHÚ)
   // ==========================================
   function getWeekNumber(d) {
       d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -1422,6 +1424,14 @@
       document.getElementById('btn-lbl-thang').innerHTML = `▾ Tháng ${d.getMonth()+1} / ${d.getFullYear()}`;
   }
 
+  function setActiveFilter(id) {
+      document.getElementById('btn-lbl-tuan').classList.remove('active');
+      document.getElementById('btn-lbl-thang').classList.remove('active');
+      document.getElementById('btn-tuan-nay').classList.remove('active');
+      document.getElementById('btn-thang-nay').classList.remove('active');
+      if(id) { document.getElementById(id).classList.add('active'); }
+  }
+
   function applyThang() {
       let val = document.getElementById('month-year-picker').value;
       if(!val) return;
@@ -1432,6 +1442,7 @@
       document.getElementById('cycle-start').value = formatIsoLocal(start); 
       document.getElementById('cycle-end').value = formatIsoLocal(end);
       capNhatLabelTuDate();
+      setActiveFilter('btn-lbl-thang');
   }
 
   function applyTuanBangDate() {
@@ -1448,6 +1459,7 @@
       document.getElementById('cycle-start').value = formatIsoLocal(start);
       document.getElementById('cycle-end').value = formatIsoLocal(end);
       capNhatLabelTuDate();
+      setActiveFilter('btn-lbl-tuan');
   }
 
   function chonTuanNay() { 
@@ -1461,6 +1473,7 @@
       document.getElementById('cycle-start').value = formatIsoLocal(start); 
       document.getElementById('cycle-end').value = formatIsoLocal(end); 
       capNhatLabelTuDate();
+      setActiveFilter('btn-tuan-nay');
   }
 
   function chonThangNay() { 
@@ -1471,6 +1484,7 @@
       document.getElementById('cycle-start').value = formatIsoLocal(start); 
       document.getElementById('cycle-end').value = formatIsoLocal(end); 
       capNhatLabelTuDate();
+      setActiveFilter('btn-thang-nay');
   }
   
   function initChuKy() { 
@@ -1480,8 +1494,11 @@
           document.getElementById('cycle-start').value = formatIsoLocal(nextStart); 
           let end = new Date(nextStart); end.setMonth(end.getMonth() + 1); end.setDate(end.getDate() - 1);
           document.getElementById('cycle-end').value = formatIsoLocal(end);
-      } 
-      if(document.getElementById('cycle-start').value) { capNhatLabelTuDate(); }
+          capNhatLabelTuDate();
+          setActiveFilter(''); // Nếu là kỳ lưu tùy chỉnh thì bỏ tô xanh
+      } else {
+          chonTuanNay();
+      }
   }
 
   function xemTongHop() {
