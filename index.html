@@ -161,46 +161,53 @@
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     .close-modal { position: absolute; top: 15px; right: 15px; font-size: 24px; color: #888; cursor: pointer; line-height: 1; background: #f0f0f0; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 10;}
 
-    /* ====== MODAL BẢNG CHẤM CÔNG CHI TIẾT (SỬA LỖI ÉP CỘT IOS) ====== */
+    /* ====== MODAL BẢNG CHẤM CÔNG CHI TIẾT (NÂNG CẤP XỊN) ====== */
     .modal-bcc { align-items: center; padding: 10px; }
     .modal-content-bcc { border-radius: 12px; height: 95vh; max-height: 900px; padding: 15px; display: flex; flex-direction: column; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); width: 100%; }
     
     .bcc-table-wrapper { 
         flex: 1; 
         width: 100%; 
-        overflow: scroll; /* Bắt buộc iOS phải cho cuộn */
-        -webkit-overflow-scrolling: touch; /* Cuộn mượt trên iOS */
+        overflow: auto; /* Bật Scroll đa chiều */
+        -webkit-overflow-scrolling: touch; /* Cuộn cực mượt trên iOS */
         border: 1px solid #ccc; 
         border-radius: 8px; 
         background: #fafafa;
     }
     
     .bcc-table { 
-        width: max-content; /* Ép bảng giãn ra tối đa theo nội dung, cấm co cụm */
+        width: max-content; /* Ép bảng bung to theo nội dung, không bị bóp méo */
         min-width: 100%; 
         border-collapse: collapse; 
-        font-size: 13px; 
         background: #fff;
     }
     
+    /* Chữ số to rõ, căn giữa chuẩn */
     .bcc-table th, .bcc-table td { 
         border: 1px solid #ccc; 
-        padding: 8px 6px; 
+        padding: 12px 6px; /* Rộng rãi hơn */
         text-align: center; 
-        white-space: nowrap; /* Tuyệt đối cấm xuống dòng làm hỏng form */
+        vertical-align: middle; 
+        white-space: nowrap; /* Không cho rớt dòng */
     }
     
     .bcc-table th { 
         background: #1976d2; 
         color: #fff; 
-        font-weight: bold; 
+        font-weight: 900; /* Đậm hơn */
+        font-size: 15px; /* To hơn */
         position: sticky; 
         top: 0; 
         z-index: 10; 
         box-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
+
+    .bcc-table td {
+        font-size: 14px; /* Chữ to dễ nhìn */
+        font-weight: bold;
+    }
     
-    /* Đóng băng cột Họ tên để vuốt ngang không bị che khuất */
+    /* Đóng băng cột Họ tên, đổ bóng nhẹ */
     .col-sticky { 
         position: sticky; 
         left: 0; 
@@ -375,7 +382,7 @@
         <button class="btn btn-primary" onclick="xemTongHop()" style="margin-top: 15px;">📊 TẠO BẢNG TỔNG HỢP</button>
       </div>
 
-      <div id="cycle-summary-box" class="summary-day-box" style="display:none; margin-bottom: 15px; background: #fdfdfd;">
+      <div id="cycle-summary-box" class="summary-day-box" style="display:none; margin-bottom: 15px; background: #fdfdfd; position: relative;">
           <div style="font-weight: 900; color: #1976d2; font-size: 14px; text-align: center; border-bottom: 1px solid #b3d4fc; padding-bottom: 10px; margin-bottom: 10px;">📊 TỔNG KẾT TOÀN ĐỘI TRONG KỲ</div>
           
           <div id="cycle-summary-text" style="font-size: 13px; color: #333; line-height: 1.6; text-align:left;"></div>
@@ -1651,7 +1658,7 @@
           let end = new Date(nextStart); end.setMonth(end.getMonth() + 1); end.setDate(end.getDate() - 1);
           document.getElementById('cycle-end').value = formatIsoLocal(end);
           capNhatLabelTuDate();
-          setActiveFilter(''); // Tắt xanh khi là tùy chỉnh cũ
+          setActiveFilter(''); 
       } else {
           chonTuanNay();
       }
@@ -1746,7 +1753,6 @@
     document.getElementById('cycle-summary-text').innerHTML = textSummary.length > 0 ? textSummary.join('') : '<i style="color:#888;">Không có dữ liệu trong chu kỳ này</i>';
     document.getElementById('cycle-summary-box').style.display = 'block';
     
-    // Khôi phục hiển thị Bảng tóm tắt 4 cột
     document.getElementById('card-old-table').style.display = 'block';
 
     let tbody = '';
@@ -1773,9 +1779,9 @@
   }
 
   // ==========================================
-  // THUẬT TOÁN SINH BẢNG CHẤM CÔNG CHI TIẾT
+  // THUẬT TOÁN SINH BẢNG CHẤM CÔNG CHI TIẾT (NÂNG CẤP VỚI FLEXBOX PHÂN SỐ TỰ ĐỘNG CỘNG 0.5)
   // ==========================================
-  function getDaySymbol(user, dateStr) {
+  function getDayData(user, dateStr) {
       let isWorkingDay = true;
       let dObj = new Date(dateStr);
       let dayOfWeek = dObj.getDay();
@@ -1796,17 +1802,17 @@
           else if (sess === 'afternoon') { aft = sym; }
       };
 
-      // 1. Việc (Mặc định là đi làm bình thường -> +)
+      // 1. Việc 
       dailyRecs.filter(r => r.type === 'viec').forEach(r => applySess(r.session, '+'));
       
-      // 2. Khác (Lấy ký hiệu, KHÔNG có ký hiệu -> +)
+      // 2. Khác
       dailyRecs.filter(r => r.type === 'khac').forEach(r => {
           let loai = dsKhac.find(x => x.name === r.taskName);
           let sym = (loai && loai.symbol && loai.symbol.trim() !== '') ? loai.symbol.trim() : '+';
           applySess(r.session, sym);
       });
 
-      // 3. Nghỉ (Lấy ký hiệu, KHÔNG có ký hiệu -> +)
+      // 3. Nghỉ
       leaveRecs.forEach(l => {
           let loai = dsLoaiNghi.find(x => x.name === l.category);
           let sym = (loai && loai.symbol && loai.symbol.trim() !== '') ? loai.symbol.trim() : '+';
@@ -1814,18 +1820,38 @@
           applySess(s, sym);
       });
 
-      if (mor === aft) return mor;
-      
-      // Ký hiệu Hỗn số HTML (½)
-      let half = '&frac12;'; 
-      if (mor === '+' && aft === '') return half;
-      if (mor === '' && aft === '+') return half;
-      if (mor !== '+' && mor !== '' && aft === '+') return mor + half;
-      if (mor === '+' && aft !== '+' && aft !== '') return aft + half;
-      if (mor !== '' && aft === '') return mor + half;
-      if (mor === '' && aft !== '') return aft + half;
-      
-      return mor + '/' + aft;
+      // TÍNH TỔNG CÔNG TRỰC TIẾP
+      let sumVal = 0;
+      if (mor === '+') sumVal += 0.5;
+      if (aft === '+') sumVal += 0.5;
+
+      let html = '';
+      if (mor === aft) {
+          html = mor;
+      } else {
+          // Cấu trúc HTML Flexbox vẽ phân số xếp dọc hoàn hảo y như hình SGK
+          const frac = `<span style="display:inline-flex; flex-direction:column; vertical-align:middle; font-size:10px; font-weight:900; line-height:1.1; margin-left:2px;"><span style="border-bottom:1.5px solid currentColor; padding:0 1px;">1</span><span style="padding:0 1px;">2</span></span>`;
+          
+          let types = [];
+          if (mor !== '' && mor !== '+') types.push(mor);
+          if (aft !== '' && aft !== '+' && aft !== mor) types.push(aft);
+
+          if (types.length === 0) {
+              html = frac;
+          } else if (types.length === 1) {
+              html = types[0] + frac;
+          } else {
+              html = mor + '/' + aft;
+          }
+      }
+
+      // Xếp màu cho đẹp mắt
+      let color = '#1976d2'; 
+      if (html === '+') color = '#27ae60'; 
+      else if (html === '' || html === null) color = '#ccc';
+      else if (html.includes('inline-flex')) color = '#d35400'; 
+
+      return { html: html, color: color, sumVal: sumVal };
   }
 
   function moBangChamCong() {
@@ -1854,10 +1880,10 @@
       let days = [];
       while(curDate <= endDate) {
           days.push(formatIsoLocal(curDate));
-          theadHtml += `<th style="min-width:35px; padding:6px 2px;">${curDate.getDate()}</th>`;
+          theadHtml += `<th style="min-width:40px; padding:10px 4px;">${curDate.getDate()}</th>`;
           curDate.setDate(curDate.getDate() + 1);
       }
-      theadHtml += `<th style="min-width:50px;">Tổng<br>cộng</th></tr>`;
+      theadHtml += `<th style="min-width:60px;">Tổng<br>cộng</th></tr>`;
 
       let tbodyHtml = '';
       dsNhanVien.forEach((u, idx) => {
@@ -1867,18 +1893,11 @@
 
           let rowSum = 0;
           days.forEach(dStr => {
-              let sym = getDaySymbol(u, dStr);
-              let tdColor = '#1976d2'; 
-              if(sym === '+') tdColor = '#27ae60';
-              else if(sym === '' || sym === null) tdColor = '#ccc';
-              else if(sym.includes('&frac12;')) tdColor = '#d35400';
-
-              rowHtml += `<td style="font-weight:bold; color:${tdColor};">${sym}</td>`;
-              
-              if (sym === '+') rowSum += 1;
-              else if (sym.includes('&frac12;')) rowSum += 0.5;
+              let dayData = getDayData(u, dStr);
+              rowHtml += `<td style="color:${dayData.color}; font-size:15px; padding: 10px 4px;">${dayData.html}</td>`;
+              rowSum += dayData.sumVal;
           });
-          rowHtml += `<td style="font-weight:900; color:#d35400; background:#fff9e6;">${rowSum}</td></tr>`;
+          rowHtml += `<td style="font-weight:900; color:#d35400; background:#fff9e6; font-size:15px;">${rowSum}</td></tr>`;
           tbodyHtml += rowHtml;
       });
 
