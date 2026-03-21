@@ -103,8 +103,8 @@
     .list-item-note { font-size: 12px; color: #7f8c8d; font-style: italic; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #eee; }
     
     /* Nút Sửa / Xóa */
-    .btn-edit-item { position: absolute; top: 12px; right: 46px; color: #f39c12; background: #fdf2e9; border: 1px solid #fae5d3; width: 28px; height: 28px; border-radius: 50%; font-size: 13px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-    .btn-delete-item { position: absolute; top: 12px; right: 12px; color: #e74c3c; background: #fdedec; border: 1px solid #fadbd8; width: 28px; height: 28px; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold;}
+    .btn-edit-item { position: absolute; top: 12px; right: 46px; color: #1976d2; background: #eaf6ff; border: none; width: 28px; height: 28px; border-radius: 50%; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .btn-delete-item { position: absolute; top: 12px; right: 12px; color: #e74c3c; background: #ffeeee; border: none; width: 28px; height: 28px; border-radius: 50%; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center;}
 
     /* ====== TÓM TẮT TRONG NGÀY ====== */
     .summary-day-box { background: #eaf6ff; border: 1px solid #b3d4fc; padding: 12px; border-radius: 12px; margin-bottom: 12px; }
@@ -123,8 +123,6 @@
     
     .quick-actions-row { display: flex; gap: 8px; margin-top: 10px; margin-bottom: 12px; }
     .quick-actions-row .btn { flex: 1; margin: 0; }
-    
-    .compressed-date-picker { height: 24px !important; padding: 0 4px !important; font-size: 13px !important; line-height: 24px !important; border-radius: 6px !important; border: 1px solid #ccc !important; -webkit-appearance: none; -moz-appearance: none; appearance: none; background: white !important;}
 
     /* ====== BẢNG TỔNG HỢP ====== */
     .table-wrapper { width: 100%; border-radius: 8px; border: 1px solid #eee; overflow: hidden; }
@@ -148,6 +146,7 @@
     .setting-actions button { width: 30px; height: 30px; border: none; border-radius: 6px; background: #f0f4f8; color: #555; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .setting-actions button.edit { background: #fff3cd; color: #f39c12; border: 1px solid #ffe69c;}
     .setting-actions button.del { background: #fdedec; color: #e74c3c; border: 1px solid #fadbd8;}
+    .btn-toggle-list { background: #eaf6ff; color: #1976d2; border: 1px dashed #b3d4fc; padding: 10px; width: 100%; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 5px; }
 
     /* ====== TABS ====== */
     .tab-content { display: none; animation: fadeIn 0.2s ease-out; }
@@ -300,18 +299,18 @@
         </div>
 
         <div class="quick-actions-row">
-          <button class="btn btn-primary" onclick="chonTuanNay()">Tuần này</button>
-          <button class="btn btn-outline" onclick="chonThangNay()">Tháng này</button>
+          <button class="btn btn-primary" onclick="chonTuanNay()">TUẦN NÀY</button>
+          <button class="btn btn-outline" onclick="chonThangNay()">THÁNG NÀY</button>
         </div>
 
-        <div class="flex-row" style="gap: 15px; border-top: 1px dashed #ddd; padding-top: 12px; margin-top: 10px;">
-          <div style="display: flex; align-items: center; gap: 5px; flex: 1;">
-            <label style="margin:0; font-weight:bold; font-size: 13px; flex-shrink: 0; color:#444;">Từ ngày:</label>
-            <input type="date" id="cycle-start" class="compressed-date-picker" style="flex:1;" onchange="capNhatLabelTuDate()">
+        <div style="border-top: 1px dashed #ddd; padding-top: 15px; margin-top: 10px;">
+          <div class="date-row" style="margin-bottom: 12px; justify-content: space-between;">
+            <label style="margin:0; font-weight:bold; font-size: 14px; color:#444;">Từ ngày:</label>
+            <input type="date" id="cycle-start" style="width: 70%; font-weight: bold; color: #1976d2;" onchange="capNhatLabelTuDate()">
           </div>
-          <div style="display: flex; align-items: center; gap: 5px; flex: 1;">
-            <label style="margin:0; font-weight:bold; font-size: 13px; flex-shrink: 0; color:#444;">Đến ngày:</label>
-            <input type="date" id="cycle-end" class="compressed-date-picker" style="flex:1;" onchange="capNhatLabelTuDate()">
+          <div class="date-row" style="justify-content: space-between;">
+            <label style="margin:0; font-weight:bold; font-size: 14px; color:#444;">Đến ngày:</label>
+            <input type="date" id="cycle-end" style="width: 70%; font-weight: bold; color: #1976d2;" onchange="capNhatLabelTuDate()">
           </div>
         </div>
         
@@ -589,14 +588,16 @@
   
   let editingId = null; 
 
+  // Hàm chuyển đổi Local Time chống lệch múi giờ
+  function formatIsoLocal(d) { 
+      return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); 
+  }
+
   let today = new Date();
-  let dd = String(today.getDate()).padStart(2, '0');
-  let mm = String(today.getMonth() + 1).padStart(2, '0'); 
-  let yyyy = today.getFullYear();
-  let todayStrLocal = yyyy + '-' + mm + '-' + dd;
+  let todayStrLocal = formatIsoLocal(today);
 
   document.getElementById('date-picker').value = todayStrLocal;
-  document.getElementById('tk-nam').value = yyyy;
+  document.getElementById('tk-nam').value = today.getFullYear();
 
   const SES_LABELS = { 'all': '', 'morning': '(Sáng)', 'afternoon': '(Chiều)' };
   const SES_LABELS_FULL = { 'all': 'Cả ngày', 'morning': 'Sáng', 'afternoon': 'Chiều' };
@@ -1130,10 +1131,9 @@
 
     let groupedLeavesToday = [];
     recordsLeave.forEach(r => {
-        // Chỉ ẩn thẻ của người nghỉ trong Tab Chấm Ngày nếu đó là ngày T7, CN
         let dObj = new Date(targetDate);
         let isWeekend = (dObj.getDay() === 0 || dObj.getDay() === 6);
-        if (isWeekend) return; // Bỏ qua hiển thị ở Tab 1
+        if (isWeekend) return; 
 
         let isMulti = r.start !== r.end; let effectiveSession = isMulti ? 'multi' : r.session;
         let noteKey = r.note || '';
@@ -1181,7 +1181,7 @@
       recordsLeave.forEach(r => { 
           if(r.users.includes(uName)) { 
               let val = (r.start === r.end && r.session !== 'all') ? 0.5 : 1; 
-              if (!isWeekend) { uNghi += val; } // Bỏ qua T7, CN khi đếm số ngày ở Tab Ngày
+              if (!isWeekend) { uNghi += val; } 
               absenceForBQTX += val;
           } 
       });
@@ -1204,7 +1204,7 @@
     document.getElementById('sum-nghi').innerText = sumNghi; document.getElementById('sum-tc').innerText = sumTC;
     document.getElementById('sum-ht').innerText = sumHT; document.getElementById('sum-bqtx').innerText = sumBQTX;
 
-    // HIỂN THỊ CHI TIẾT TÓM TẮT DƯỚI 4 Ô
+    // CẬP NHẬT: CHI TIẾT TÓM TẮT DƯỚI 4 Ô
     let detailText = [];
     let tcRecords = recordsDaily.filter(r => r.type === 'viec');
     if (tcRecords.length > 0) { 
@@ -1438,8 +1438,9 @@
       if(!val) return;
       let parts = val.split('-'); let year = parseInt(parts[0]); let month = parseInt(parts[1]) - 1; 
       let start = new Date(year, month, 1); let end = new Date(year, month + 1, 0); 
-      let formatIsoLocal = (d) => { return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); };
-      document.getElementById('cycle-start').value = formatIsoLocal(start); document.getElementById('cycle-end').value = formatIsoLocal(end);
+      
+      document.getElementById('cycle-start').value = formatIsoLocal(start); 
+      document.getElementById('cycle-end').value = formatIsoLocal(end);
       capNhatLabelTuDate();
   }
 
@@ -1466,25 +1467,32 @@
       let end = new Date(ISOweekStart);
       end.setDate(end.getDate() + 6);
       
-      document.getElementById('cycle-start').value = ISOweekStart.toISOString().split('T')[0];
-      document.getElementById('cycle-end').value = end.toISOString().split('T')[0];
+      document.getElementById('cycle-start').value = formatIsoLocal(ISOweekStart);
+      document.getElementById('cycle-end').value = formatIsoLocal(end);
       capNhatLabelTuDate();
   }
 
   function chonTuanNay() { 
       let curr = new Date(); 
-      let first = curr.getDate() - curr.getDay() + (curr.getDay() === 0 ? -6 : 1);
-      let start = new Date(curr.setDate(first)); 
-      let end = new Date(start); end.setDate(end.getDate() + 6); 
-      document.getElementById('cycle-start').value = start.toISOString().split('T')[0]; 
-      document.getElementById('cycle-end').value = end.toISOString().split('T')[0]; 
+      let day = curr.getDay();
+      let diff = curr.getDate() - day + (day === 0 ? -6 : 1);
+      let start = new Date(curr.setDate(diff)); 
+      let end = new Date(start); 
+      end.setDate(end.getDate() + 6); 
+      
+      document.getElementById('cycle-start').value = formatIsoLocal(start); 
+      document.getElementById('cycle-end').value = formatIsoLocal(end); 
       capNhatLabelTuDate();
   }
 
+  // TÍNH CHUẨN: TỪ MÙNG 1 ĐẾN NGÀY CUỐI CÙNG CỦA THÁNG
   function chonThangNay() { 
       let date = new Date(); 
-      document.getElementById('cycle-start').value = new Date(date.getFullYear(), date.getMonth(), 1).toISOString().split('T')[0]; 
-      document.getElementById('cycle-end').value = new Date(date.getFullYear(), date.getMonth() + 1, 0).toISOString().split('T')[0]; 
+      let start = new Date(date.getFullYear(), date.getMonth(), 1);
+      let end = new Date(date.getFullYear(), date.getMonth() + 1, 0); // Lấy chính xác ngày cuối tháng
+      
+      document.getElementById('cycle-start').value = formatIsoLocal(start); 
+      document.getElementById('cycle-end').value = formatIsoLocal(end); 
       capNhatLabelTuDate();
   }
   
@@ -1492,9 +1500,9 @@
       let savedEnd = localStorage.getItem('cc_last_end_date'); 
       if(savedEnd) { 
           let nextStart = new Date(savedEnd); nextStart.setDate(nextStart.getDate() + 1); 
-          document.getElementById('cycle-start').value = nextStart.toISOString().split('T')[0]; 
+          document.getElementById('cycle-start').value = formatIsoLocal(nextStart); 
           let end = new Date(nextStart); end.setMonth(end.getMonth() + 1); end.setDate(end.getDate() - 1);
-          document.getElementById('cycle-end').value = end.toISOString().split('T')[0];
+          document.getElementById('cycle-end').value = formatIsoLocal(end);
       } 
       if(document.getElementById('cycle-start').value) { capNhatLabelTuDate(); }
   }
@@ -1511,7 +1519,7 @@
     let globalTaskStats = {}; let globalHocStats = {}; let globalNghiStats = {};
 
     while(curDate <= endDate) {
-        let dStr = curDate.toISOString().split('T')[0];
+        let dStr = formatIsoLocal(curDate);
         
         let dayOfWeek = curDate.getDay();
         let isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
@@ -1520,21 +1528,20 @@
 
         dsDaily.filter(r => r.date === dStr).forEach(r => {
             let val = r.session === 'all' ? 1 : 0.5;
-            let taskTitle = r.taskName; // BỎ GHI CHÚ KHI GỘP
+            // NGHIÊM NGẶT: Bỏ note, chỉ lấy tên việc gốc để gộp
+            let taskTitle = r.taskName;
 
             r.users.forEach(u => { 
                 if(stats[u]) { 
                     if(r.type === 'hoctap') { 
                         stats[u].hocTotal += val; sumHoc += val; 
                         stats[u].chiTietHoc[taskTitle] = (stats[u].chiTietHoc[taskTitle]||0) + val;
-                        
                         if(!globalHocStats[taskTitle]) globalHocStats[taskTitle] = {total:0, users:{}};
                         globalHocStats[taskTitle].total += val; globalHocStats[taskTitle].users[u] = (globalHocStats[taskTitle].users[u]||0) + val;
                     } 
                     if(r.type === 'viec') { 
                         stats[u].viecTotal += val; sumViec += val; 
                         stats[u].chiTietViec[taskTitle] = (stats[u].chiTietViec[taskTitle]||0) + val;
-                        
                         if(!globalTaskStats[taskTitle]) globalTaskStats[taskTitle] = {total:0, users:{}};
                         globalTaskStats[taskTitle].total += val; globalTaskStats[taskTitle].users[u] = (globalTaskStats[taskTitle].users[u]||0) + val;
                     } 
@@ -1544,14 +1551,14 @@
 
         dsLeaves.filter(l => dStr >= l.start && dStr <= l.end).forEach(l => {
             let val = (l.start === l.end && l.session !== 'all') ? 0.5 : 1; 
-            let catTitle = l.category; // BỎ GHI CHÚ KHI GỘP
+            // NGHIÊM NGẶT: Bỏ note, chỉ lấy tên lý do gốc để gộp
+            let catTitle = l.category;
 
             l.users.forEach(u => { 
                 if(stats[u]) { 
                     if(!isWeekend) {
                         stats[u].nghiTotal += val; sumNghi += val; 
                         stats[u].chiTietNghi[catTitle] = (stats[u].chiTietNghi[catTitle]||0) + val;
-                        
                         if(!globalNghiStats[catTitle]) globalNghiStats[catTitle] = {total:0, users:{}};
                         globalNghiStats[catTitle].total += val; globalNghiStats[catTitle].users[u] = (globalNghiStats[catTitle].users[u]||0) + val;
                     }
@@ -1567,7 +1574,7 @@
     if(Object.keys(globalNghiStats).length > 0) { 
         let detailHtml = Object.keys(globalNghiStats).map(k => {
             let userArr = Object.keys(globalNghiStats[k].users).map(u => `${u}: ${globalNghiStats[k].users[u]}`);
-            return `<div style="margin-left:4px; margin-bottom:4px; color:#444;">&bull; <b style="color:#2c3e50;">${k}: ${globalNghiStats[k].total}</b> <br><span style="font-size:12px; color:#666; font-weight:normal; margin-left: 14px;">[${userArr.join('; ')}]</span></div>`;
+            return `<div style="margin-left:4px; margin-bottom:4px; color:#444;">&bull; <b style="color:#2c3e50;">${k}: ${globalNghiStats[k].total}</b> <br><span style="font-size:12px; color:#666; font-weight:normal; margin-left: 14px;">[${userArr.join(', ')}]</span></div>`;
         }).join('');
         textSummary.push(`<div style="color:#e74c3c; font-weight:bold; font-size:14px; margin-top:8px; margin-bottom:4px;">⛱️ NGHỈ: <span style="font-size:16px;">${sumNghi}</span></div>${detailHtml}`); 
     }
@@ -1575,7 +1582,7 @@
     if(Object.keys(globalTaskStats).length > 0) { 
         let detailHtml = Object.keys(globalTaskStats).map(k => {
             let userArr = Object.keys(globalTaskStats[k].users).map(u => `${u}: ${globalTaskStats[k].users[u]}`);
-            return `<div style="margin-left:4px; margin-bottom:4px; color:#444;">&bull; <b style="color:#2c3e50;">${k}: ${globalTaskStats[k].total}</b> <br><span style="font-size:12px; color:#666; font-weight:normal; margin-left: 14px;">[${userArr.join('; ')}]</span></div>`;
+            return `<div style="margin-left:4px; margin-bottom:4px; color:#444;">&bull; <b style="color:#2c3e50;">${k}: ${globalTaskStats[k].total}</b> <br><span style="font-size:12px; color:#666; font-weight:normal; margin-left: 14px;">[${userArr.join(', ')}]</span></div>`;
         }).join('');
         textSummary.push(`<div style="color:#f39c12; font-weight:bold; font-size:14px; margin-top:12px; margin-bottom:4px;">⚡ TĂNG CƯỜNG: <span style="font-size:16px;">${sumViec}</span></div>${detailHtml}`); 
     }
@@ -1583,7 +1590,7 @@
     if(Object.keys(globalHocStats).length > 0) { 
         let detailHtml = Object.keys(globalHocStats).map(k => {
             let userArr = Object.keys(globalHocStats[k].users).map(u => `${u}: ${globalHocStats[k].users[u]}`);
-            return `<div style="margin-left:4px; margin-bottom:4px; color:#444;">&bull; <b style="color:#2c3e50;">${k}: ${globalHocStats[k].total}</b> <br><span style="font-size:12px; color:#666; font-weight:normal; margin-left: 14px;">[${userArr.join('; ')}]</span></div>`;
+            return `<div style="margin-left:4px; margin-bottom:4px; color:#444;">&bull; <b style="color:#2c3e50;">${k}: ${globalHocStats[k].total}</b> <br><span style="font-size:12px; color:#666; font-weight:normal; margin-left: 14px;">[${userArr.join(', ')}]</span></div>`;
         }).join('');
         textSummary.push(`<div style="color:#00bcd4; font-weight:bold; font-size:14px; margin-top:12px; margin-bottom:4px;">📘 HỌC TẬP/CT: <span style="font-size:16px;">${sumHoc}</span></div>${detailHtml}`); 
     }
