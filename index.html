@@ -115,7 +115,7 @@
     
     .summary-details { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #b3d4fc; font-size: 13px; color: #444; line-height: 1.6; text-align: left; font-weight: normal; }
 
-    /* ====== TỔNG HỢP CHU KỲ NÚT ĐỘNG ====== */
+    /* ====== TỔNG HỢP CHU KỲ ====== */
     .cycle-selection-card { border-radius: 12px; padding: 14px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); border: 1px solid #eef2f5; background: #fff;}
     
     .quick-actions-row { display: flex; gap: 8px; margin-bottom: 12px; }
@@ -126,7 +126,7 @@
     .c-btn-solid { margin:0; flex:1; padding: 12px 0; font-size: 13px; font-weight: 800; text-align: center; border-radius: 6px; cursor: pointer; transition: 0.2s; background: #fff; color: #1976d2; border: 1px solid #1976d2; text-transform: uppercase; width: 100%; display: block;}
     .c-btn-solid.active { background: #1976d2 !important; color: #fff !important; }
 
-    /* ====== BẢNG TỔNG HỢP ====== */
+    /* ====== BẢNG TỔNG HỢP (THU GỌN NGOÀI TAB) ====== */
     .table-wrapper { width: 100%; border-radius: 8px; border: 1px solid #eee; overflow: hidden; }
     table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: center; table-layout: fixed; background: white; }
     th, td { padding: 8px 4px; border-bottom: 1px solid #eee; border-right: 1px solid #eee; vertical-align: top; word-break: break-word;}
@@ -330,7 +330,7 @@
         <button class="btn btn-primary" onclick="xemTongHop()" style="margin-top: 15px;">📊 TẠO BẢNG TỔNG HỢP</button>
       </div>
 
-      <div id="cycle-summary-box" class="summary-day-box" style="display:none; margin-bottom: 15px; background: #fdfdfd;">
+      <div id="cycle-summary-box" class="summary-day-box" style="display:none; margin-bottom: 15px; background: #fdfdfd; position: relative;">
           <div style="font-weight: 900; color: #1976d2; font-size: 14px; text-align: center; border-bottom: 1px solid #b3d4fc; padding-bottom: 10px; margin-bottom: 10px;">📊 TỔNG KẾT TOÀN ĐỘI TRONG KỲ</div>
           
           <div id="cycle-summary-text" style="font-size: 13px; color: #333; line-height: 1.6; text-align:left;"></div>
@@ -341,7 +341,23 @@
       </div>
 
       <div class="card" style="padding: 0; overflow: hidden; border: 1px solid #eee; display:none;" id="card-old-table">
+        <div class="table-wrapper">
+          <table id="table-tong-hop">
+            <thead>
+              <tr>
+                <th>NHÂN SỰ</th>
+                <th>SỐ NGHỈ<br><span style="font-size:10px; font-weight:normal; color:#888;">(Ngày)</span></th>
+                <th>KHÁC<br><span style="font-size:10px; font-weight:normal; color:#888;">(Công)</span></th>
+                <th>T.CƯỜNG<br><span style="font-size:10px; font-weight:normal; color:#888;">(Công)</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="4" style="padding: 30px; color:#888; text-align:center;">Vui lòng bấm "Tạo Bảng Tổng Hợp"</td></tr>
+            </tbody>
+            <tfoot id="table-footer"></tfoot>
+          </table>
         </div>
+      </div>
     </div>
 
     <div id="tab-cai-dat" class="tab-content container">
@@ -1684,6 +1700,31 @@
     
     document.getElementById('cycle-summary-text').innerHTML = textSummary.length > 0 ? textSummary.join('') : '<i style="color:#888;">Không có dữ liệu trong chu kỳ này</i>';
     document.getElementById('cycle-summary-box').style.display = 'block';
+    
+    // Khôi phục hiển thị Bảng tóm tắt 4 cột
+    document.getElementById('card-old-table').style.display = 'block';
+
+    let tbody = '';
+    dsNhanVien.forEach(u => {
+      let st = stats[u.name];
+      let strNghi = Object.keys(st.chiTietNghi).map(k=>`&bull; ${k}: ${st.chiTietNghi[k]}`).join('<br>');
+      let strKhac = Object.keys(st.chiTietKhac).map(k=>`&bull; ${k}: ${st.chiTietKhac[k]}`).join('<br>');
+      let strViec = Object.keys(st.chiTietViec).map(k=>`&bull; ${k}: ${st.chiTietViec[k]}`).join('<br>');
+      
+      let cellNghi = st.nghiTotal > 0 ? `<div class="main-val">${st.nghiTotal}</div><div class="detail-text">${strNghi}</div>` : `<div style="color:#ccc">-</div>`;
+      let cellKhac = st.khacTotal > 0 ? `<div class="main-val">${st.khacTotal}</div><div class="detail-text">${strKhac}</div>` : `<div style="color:#ccc">-</div>`;
+      let cellViec = st.viecTotal > 0 ? `<div class="main-val">${st.viecTotal}</div><div class="detail-text">${strViec}</div>` : `<div style="color:#ccc">-</div>`;
+
+      tbody += `<tr>
+                  <td class="td-left" style="vertical-align:middle;">${u.name}</td>
+                  <td class="td-number">${cellNghi}</td>
+                  <td class="td-khac">${cellKhac}</td>
+                  <td class="td-task">${cellViec}</td>
+                </tr>`;
+    });
+    
+    document.querySelector('#table-tong-hop tbody').innerHTML = tbody || '<tr><td colspan="4">Chưa có nhân sự</td></tr>';
+    document.getElementById('table-footer').innerHTML = `<tr class="total-row"><td>TỔNG ĐỘI</td><td>${sumNghi}</td><td>${sumKhac}</td><td>${sumViec}</td></tr>`;
   }
 
   // ==========================================
