@@ -1675,6 +1675,9 @@
     let stats = {}; dsNhanVien.forEach(u => { stats[u.name] = { nghiTotal: 0, khacTotal: 0, viecTotal: 0, chiTietNghi: {}, chiTietViec: {}, chiTietKhac: {} }; });
     let curDate = new Date(start); let endDate = new Date(end);
     let sumNghi = 0, sumKhac = 0, sumViec = 0;
+    
+    // TỔNG BQTX TOÀN ĐỘI TRONG KỲ
+    let totalBQTXCycle = 0;
 
     let globalTaskStats = {}; let globalKhacStats = {}; let globalNghiStats = {};
 
@@ -1723,6 +1726,28 @@
                 } 
             });
         });
+        
+        // TÍNH BQTX CHO NGÀY NÀY
+        dsNhanVien.forEach(u => {
+            let absenceForBQTX = 0;
+            dsLeaves.filter(l => dStr >= l.start && dStr <= l.end && l.users.includes(u.name)).forEach(l => {
+                let val = (l.start === l.end && l.session !== 'all') ? 0.5 : 1;
+                if(isWorkingDay) absenceForBQTX += val;
+            });
+            dsDaily.filter(r => r.date === dStr && r.users.includes(u.name)).forEach(r => {
+                let val = (r.session === 'all') ? 1 : 0.5;
+                absenceForBQTX += val;
+            });
+
+            let base = 0;
+            if (isWorkingDay) {
+                base = 1.0;
+                if(u.role === 'Đội trưởng') base = 0;
+                else if(u.role === 'Phó đội trưởng') base = 0.5;
+            }
+            let bqtx = Math.max(0, base - absenceForBQTX);
+            totalBQTXCycle += bqtx;
+        });
 
         curDate.setDate(curDate.getDate() + 1);
     }
@@ -1753,6 +1778,9 @@
         textSummary.push(`<div style="color:#00bcd4; font-weight:bold; font-size:14px; margin-top:12px; margin-bottom:4px;">📘 KHÁC: <span style="font-size:16px;">${sumKhac}</span></div>${detailHtml}`); 
     }
     
+    // NỐI TỔNG BQTX VÀO CUỐI
+    textSummary.push(`<div style="color:#27ae60; font-weight:bold; font-size:14px; margin-top:12px; border-top:1px dashed #eee; padding-top:10px;">✅ TỔNG BQTX: <span style="font-size:16px;">${totalBQTXCycle}</span> công</div>`);
+    
     document.getElementById('cycle-summary-text').innerHTML = textSummary.length > 0 ? textSummary.join('') : '<i style="color:#888;">Không có dữ liệu trong chu kỳ này</i>';
     document.getElementById('cycle-summary-box').style.display = 'block';
     
@@ -1782,7 +1810,7 @@
   }
 
   // ==========================================
-  // THUẬT TOÁN SINH BẢNG CHẤM CÔNG CHI TIẾT (CÓ LÀM TRÒN CỘT TỔNG CỘNG)
+  // THUẬT TOÁN SINH BẢNG CHẤM CÔNG CHI TIẾT (CÓ LÀM TRÒN VÀ TỔNG CỘNG CỘT DỌC)
   // ==========================================
   function getDayData(user, dateStr) {
       let isWorkingDay = true;
@@ -1882,24 +1910,40 @@
       theadHtml += `<th style="min-width:60px;">Tổng<br>cộng</th></tr>`;
 
       let tbodyHtml = '';
+      let colSums = new Array(days.length).fill(0);
+      let grandTotalSum = 0;
+
       dsNhanVien.forEach((u, idx) => {
           let rowHtml = `<tr>
               <td class="col-sticky" style="text-align:left; padding-left:10px;"><b>${idx+1}. ${u.name}</b></td>
               <td style="font-size:11px; color:#555;">${u.role}</td>`;
 
           let rowSum = 0;
-          days.forEach(dStr => {
+          days.forEach((dStr, dIdx) => {
               let dayData = getDayData(u, dStr);
               rowHtml += `<td style="color:${dayData.color}; font-size:15px; padding: 10px 4px;">${dayData.html}</td>`;
+              
               rowSum += dayData.sumVal;
+              colSums[dIdx] += dayData.sumVal;
           });
           
-          // LÀM TRÒN SỐ CHỈ TRONG BẢNG NÀY THEO LỆNH CỦA SẾP
           let roundedSum = Math.round(rowSum);
+          grandTotalSum += roundedSum;
 
           rowHtml += `<td style="font-weight:900; color:#d35400; background:#fff9e6; font-size:15px;">${roundedSum}</td></tr>`;
           tbodyHtml += rowHtml;
       });
+
+      // TẠO HÀNG TỔNG CỘNG Ở DƯỚI CÙNG
+      let tfootHtml = `<tr style="background:#fdf2e9; font-weight:900; color:#d35400; font-size:15px;">
+          <td class="col-sticky" style="text-align:center; padding:10px; background:#fae5d3;" colspan="2">TỔNG CỘNG</td>`;
+      
+      colSums.forEach(sum => {
+          tfootHtml += `<td style="padding: 10px 4px;">${sum > 0 ? sum : ''}</td>`;
+      });
+      tfootHtml += `<td style="padding: 10px 4px;">${Math.round(grandTotalSum)}</td></tr>`;
+      
+      tbodyHtml += tfootHtml;
 
       document.getElementById('bcc-thead').innerHTML = theadHtml;
       document.getElementById('bcc-tbody').innerHTML = tbodyHtml;
