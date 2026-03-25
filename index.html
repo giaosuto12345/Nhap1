@@ -445,6 +445,41 @@
       </div>
     </div>
 
+    <!-- MỚI: TAB CHI TIÊU -->
+    <div id="tab-chi-tieu" class="tab-content container">
+      <div class="card">
+        <div class="card-title">KẾT NỐI DỮ LIỆU TELEGRAM</div>
+        <p style="font-size: 12px; color: #666; margin-bottom: 10px; text-align: center;">Vui lòng nhập Link Web App của Google Apps Script để đồng bộ dữ liệu.</p>
+        <input type="text" id="gas-url" placeholder="https://script.google.com/macros/s/.../exec" />
+        <button onclick="fetchChiTieuData()" class="btn" style="background:#1976d2; margin-top:15px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <span>🔄</span> ĐỒNG BỘ DỮ LIỆU
+        </button>
+      </div>
+
+      <div id="chi-tieu-loading" class="loading-text" style="display:none;">
+        Đang đồng bộ dữ liệu từ máy chủ...
+      </div>
+
+      <div id="chi-tieu-result" style="display:none;">
+        <div class="grid-2">
+          <div class="result-box" style="border: 2px solid #ff9800; background: #fff9e6;">
+            <p>Chi Cá Nhân (Tháng này)</p>
+            <div id="val-cn" class="value" style="color:#ff9800;">--K</div>
+          </div>
+          <div class="result-box" style="border: 2px solid #4caf50; background: #e8f5e9;">
+            <p>Chi Chung (Tháng này)</p>
+            <div id="val-cc" class="value" style="color:#2e7d32;">--K</div>
+          </div>
+        </div>
+        
+        <div class="card" style="margin-top: 15px; border-top: 4px solid #f44336;">
+           <div class="card-title" style="color:#f44336; margin-bottom: 5px;">TỔNG NỢ HIỆN TẠI</div>
+           <p style="font-size: 11px; color: #888; text-align: center; margin-top: 0; margin-bottom: 15px;">(Ai nợ bạn và nợ bao nhiêu)</p>
+           <div id="list-tong-no" style="font-size: 15px; line-height: 1.8; color: #333;"></div>
+        </div>
+      </div>
+    </div>
+
     <div id="tab-cai-dat" class="tab-content container">
       <div class="card">
           <h3 class="card-title" style="color:#4caf50;">HỆ THỐNG & CẬP NHẬT</h3>
@@ -510,10 +545,11 @@
     'tab-chia-gio': { icon: '⏰', title: 'Chia giờ', fullTitle: 'CHIA GIỜ LỊCH TRÌNH' },
     'tab-thoi-tiet': { icon: '🌤️', title: 'Thời tiết', fullTitle: 'TRA CỨU THỜI TIẾT' },
     'tab-danh-muc': { icon: '📋', title: 'Danh mục', fullTitle: 'QUẢN LÝ DANH MỤC' },
+    'tab-chi-tieu': { icon: '💸', title: 'Chi tiêu', fullTitle: 'QUẢN LÝ CHI TIÊU' }, // MỚI
     'tab-cai-dat': { icon: '⚙️', title: 'Cài đặt', fullTitle: 'CÀI ĐẶT HỆ THỐNG' }
   };
 
-  const defaultMainTabs = ['tab-thong-gio', 'tab-chia-gio', 'tab-thoi-tiet', 'tab-danh-muc', 'tab-cai-dat'];
+  const defaultMainTabs = ['tab-thong-gio', 'tab-chia-gio', 'tab-thoi-tiet', 'tab-danh-muc', 'tab-chi-tieu', 'tab-cai-dat']; // Đã thêm tab-chi-tieu
 
   function getMainTabOrder() { 
     let saved = localStorage.getItem('mainTabOrder'); 
@@ -584,6 +620,10 @@
          grid.appendChild(card);
       });
 
+      // Tự động điền URL Web App đã lưu vào ô input Chi Tiêu
+      let savedGasUrl = localStorage.getItem('gasWebAppUrl');
+      if (savedGasUrl) document.getElementById('gas-url').value = savedGasUrl;
+
       if (sessionStorage.getItem('appUnlocked') !== 'true' && (localStorage.getItem('isAppLocked') !== 'false')) {
          khoiDongKhoa();
       } else { moKhoaThanhCong(); }
@@ -612,6 +652,45 @@
     if (todayData) { document.querySelector('#bang-ra-vao tbody').innerHTML = todayData.bangRaVao; document.querySelector('#bang-thong-gio tbody').innerHTML = todayData.bangThongGio; document.getElementById('wrap-bang-ra-vao').style.display = todayData.isFixed ? 'none' : 'block'; document.getElementById('ket-qua-chia-gio').style.display = 'block'; } else { taoDuLieu(); }
     
     let savedDanhMuc = localStorage.getItem('duLieuExcelOffline'); if (savedDanhMuc) { duLieuDanhMuc = JSON.parse(savedDanhMuc); let savedConfig = localStorage.getItem('cauHinhBangExcel'); if (savedConfig) { cauHinhBang = JSON.parse(savedConfig); } else { taoCauHinhMacDinh(); } hienThiBangDanhMuc(duLieuDanhMuc); }
+  }
+
+  // MỚI: API LẤY DỮ LIỆU CHI TIÊU
+  async function fetchChiTieuData() {
+    const url = document.getElementById('gas-url').value.trim();
+    if (!url) { alert("Vui lòng nhập Link Web App của Google Apps Script!"); return; }
+    
+    localStorage.setItem('gasWebAppUrl', url);
+    document.getElementById('chi-tieu-loading').style.display = 'block';
+    document.getElementById('chi-tieu-result').style.display = 'none';
+    
+    try {
+      const response = await fetch(url + "?action=getSummary", { method: 'GET', redirect: 'follow' });
+      const data = await response.json();
+      
+      if (data.status === 'success') {
+        document.getElementById('val-cn').innerText = data.data.chiCaNhan + 'K';
+        document.getElementById('val-cc').innerText = data.data.chiChung + 'K';
+        
+        let noHtml = '';
+        if (data.data.tongNo.length === 0) {
+          noHtml = '<i style="display:block; text-align:center;">Tuyệt vời! Không có ai nợ bạn cả.</i>';
+        } else {
+          data.data.tongNo.forEach(item => {
+            noHtml += `<div style="display:flex; justify-content:space-between; border-bottom:1px dashed #ddd; padding:5px 0;">
+                         <span>👤 ${item.name}</span>
+                         <strong style="color:#f44336;">${item.amount}K</strong>
+                       </div>`;
+          });
+        }
+        document.getElementById('list-tong-no').innerHTML = noHtml;
+        document.getElementById('chi-tieu-result').style.display = 'block';
+      } else { alert("Lỗi từ máy chủ: " + data.message); }
+    } catch (e) {
+      alert("Kết nối thất bại. Hãy đảm bảo bạn đã chèn code API doGet() vào Google Apps Script và cập nhật Deployment mới.");
+      console.error(e);
+    } finally {
+      document.getElementById('chi-tieu-loading').style.display = 'none';
+    }
   }
 
   document.getElementById('btnTinh').addEventListener('click', function() {
