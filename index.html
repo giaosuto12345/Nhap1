@@ -169,6 +169,9 @@
     .btn-down { background: #fff3e0; color: #ef6c00; }
     .btn-sort:active { transform: scale(0.9); }
     .btn-update { background: linear-gradient(135deg, #4caf50, #2e7d32) !important; margin-top: 10px; box-shadow: 0 4px 12px rgba(76,175,80,0.3) !important; color: white; border: none; }
+    
+    .form-box { display: none; padding-top: 15px; margin-top: 10px; border-top: 1px dashed #ccc; }
+    .btn-mini { padding: 8px 12px; font-size: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; color: #fff; margin-bottom: 5px; width: 100%; }
   </style>
 </head>
 <body>
@@ -445,11 +448,11 @@
       </div>
     </div>
 
-    <!-- MỚI: TAB CHI TIÊU -->
+    <!-- MỚI: TAB CHI TIÊU HOÀN THIỆN -->
     <div id="tab-chi-tieu" class="tab-content container">
       <div class="card">
-        <div class="card-title">KẾT NỐI DỮ LIỆU TELEGRAM</div>
-        <p style="font-size: 12px; color: #666; margin-bottom: 10px; text-align: center;">Vui lòng nhập Link Web App của Google Apps Script để đồng bộ dữ liệu.</p>
+        <div class="card-title">KẾT NỐI MÁY CHỦ TELEGRAM</div>
+        <p style="font-size: 12px; color: #666; margin-bottom: 10px; text-align: center;">Vui lòng nhập Link Web App của Google Apps Script để đồng bộ và nhập liệu.</p>
         <input type="text" id="gas-url" placeholder="https://script.google.com/macros/s/.../exec" />
         <button onclick="fetchChiTieuData()" class="btn" style="background:#1976d2; margin-top:15px; display: flex; align-items: center; justify-content: center; gap: 8px;">
           <span>🔄</span> ĐỒNG BỘ DỮ LIỆU
@@ -457,10 +460,59 @@
       </div>
 
       <div id="chi-tieu-loading" class="loading-text" style="display:none;">
-        Đang đồng bộ dữ liệu từ máy chủ...
+        Đang giao tiếp với máy chủ...
       </div>
 
       <div id="chi-tieu-result" style="display:none;">
+        
+        <!-- BẢNG ĐIỀU KHIỂN NHẬP LIỆU NHƯ CHATBOT -->
+        <div class="card" style="border: 2px solid #1976d2;">
+          <div class="card-title" style="margin-bottom: 15px;">NHẬP LIỆU CHI TIÊU</div>
+          <div class="grid-2">
+            <button class="btn-mini" style="background:#ff9800;" onclick="showFormChiTieu('form-cn')">💰 Chi Cá Nhân</button>
+            <button class="btn-mini" style="background:#4caf50;" onclick="showFormChiTieu('form-cc')">👥 Chi Chung</button>
+            <button class="btn-mini" style="background:#2196f3;" onclick="showFormChiTieu('form-cv')">💸 Cho Vay</button>
+            <button class="btn-mini" style="background:#9c27b0;" onclick="showFormChiTieu('form-tn')">✅ Trả Nợ</button>
+          </div>
+
+          <!-- Form Chi Cá Nhân -->
+          <div id="form-cn" class="form-box">
+            <label>Nội dung chi cá nhân:</label>
+            <input type="text" id="inp-cn-content" placeholder="VD: Ăn sáng, Đổ xăng..." style="font-size:16px;">
+            <label>Số tiền (K):</label>
+            <input type="number" id="inp-cn-amount" placeholder="VD: 30" style="font-size:16px;">
+            <button onclick="submitChiTieu('addCaNhan')" class="btn" style="background:#ff9800; margin-top:10px; font-size:14px; padding:10px;">LƯU CHI CÁ NHÂN</button>
+          </div>
+
+          <!-- Form Chi Chung -->
+          <div id="form-cc" class="form-box">
+            <label>Nội dung chi chung:</label>
+            <input type="text" id="inp-cc-content" placeholder="VD: Mua đồ nhậu..." style="font-size:16px;">
+            <label>Tổng số tiền (K):</label>
+            <input type="number" id="inp-cc-amount" placeholder="VD: 500" style="font-size:16px;">
+            <label>Chia cho những ai? (Cách nhau bằng dấu phẩy):</label>
+            <input type="text" id="inp-cc-persons" placeholder="VD: Tuấn, Tài, Linh" style="font-size:16px;">
+            <button onclick="submitChiTieu('addChiChung')" class="btn" style="background:#4caf50; margin-top:10px; font-size:14px; padding:10px;">LƯU CHI CHUNG</button>
+          </div>
+
+          <!-- Form Cho Vay -->
+          <div id="form-cv" class="form-box">
+            <label>Tên người vay:</label>
+            <input type="text" id="inp-cv-person" placeholder="VD: A.Tuấn" style="font-size:16px;">
+            <label>Số tiền cho vay (K):</label>
+            <input type="number" id="inp-cv-amount" placeholder="VD: 200" style="font-size:16px;">
+            <button onclick="submitChiTieu('addChoVay')" class="btn" style="background:#2196f3; margin-top:10px; font-size:14px; padding:10px;">LƯU CHO VAY</button>
+          </div>
+
+          <!-- Form Trả Nợ -->
+          <div id="form-tn" class="form-box">
+            <label>Nhập tên người muốn trả hết nợ:</label>
+            <input type="text" id="inp-tn-person" placeholder="Nhập đúng tên trong danh sách nợ..." style="font-size:16px;">
+            <button onclick="submitChiTieu('payDebt')" class="btn" style="background:#9c27b0; margin-top:10px; font-size:14px; padding:10px;">XÓA HẾT NỢ CHO NGƯỜI NÀY</button>
+          </div>
+        </div>
+
+        <!-- TỔNG QUAN -->
         <div class="grid-2">
           <div class="result-box" style="border: 2px solid #ff9800; background: #fff9e6;">
             <p>Chi Cá Nhân (Tháng này)</p>
@@ -473,7 +525,7 @@
         </div>
         
         <div class="card" style="margin-top: 15px; border-top: 4px solid #f44336;">
-           <div class="card-title" style="color:#f44336; margin-bottom: 5px;">TỔNG NỢ HIỆN TẠI</div>
+           <div class="card-title" style="color:#f44336; margin-bottom: 5px;">DANH SÁCH TỔNG NỢ</div>
            <p style="font-size: 11px; color: #888; text-align: center; margin-top: 0; margin-bottom: 15px;">(Ai nợ bạn và nợ bao nhiêu)</p>
            <div id="list-tong-no" style="font-size: 15px; line-height: 1.8; color: #333;"></div>
         </div>
@@ -545,11 +597,11 @@
     'tab-chia-gio': { icon: '⏰', title: 'Chia giờ', fullTitle: 'CHIA GIỜ LỊCH TRÌNH' },
     'tab-thoi-tiet': { icon: '🌤️', title: 'Thời tiết', fullTitle: 'TRA CỨU THỜI TIẾT' },
     'tab-danh-muc': { icon: '📋', title: 'Danh mục', fullTitle: 'QUẢN LÝ DANH MỤC' },
-    'tab-chi-tieu': { icon: '💸', title: 'Chi tiêu', fullTitle: 'QUẢN LÝ CHI TIÊU' }, // MỚI
+    'tab-chi-tieu': { icon: '💸', title: 'Chi tiêu', fullTitle: 'QUẢN LÝ CHI TIÊU' },
     'tab-cai-dat': { icon: '⚙️', title: 'Cài đặt', fullTitle: 'CÀI ĐẶT HỆ THỐNG' }
   };
 
-  const defaultMainTabs = ['tab-thong-gio', 'tab-chia-gio', 'tab-thoi-tiet', 'tab-danh-muc', 'tab-chi-tieu', 'tab-cai-dat']; // Đã thêm tab-chi-tieu
+  const defaultMainTabs = ['tab-thong-gio', 'tab-chia-gio', 'tab-thoi-tiet', 'tab-danh-muc', 'tab-chi-tieu', 'tab-cai-dat'];
 
   function getMainTabOrder() { 
     let saved = localStorage.getItem('mainTabOrder'); 
@@ -620,7 +672,6 @@
          grid.appendChild(card);
       });
 
-      // Tự động điền URL Web App đã lưu vào ô input Chi Tiêu
       let savedGasUrl = localStorage.getItem('gasWebAppUrl');
       if (savedGasUrl) document.getElementById('gas-url').value = savedGasUrl;
 
@@ -654,9 +705,89 @@
     let savedDanhMuc = localStorage.getItem('duLieuExcelOffline'); if (savedDanhMuc) { duLieuDanhMuc = JSON.parse(savedDanhMuc); let savedConfig = localStorage.getItem('cauHinhBangExcel'); if (savedConfig) { cauHinhBang = JSON.parse(savedConfig); } else { taoCauHinhMacDinh(); } hienThiBangDanhMuc(duLieuDanhMuc); }
   }
 
-  // MỚI: API LẤY DỮ LIỆU CHI TIÊU
+  // MỚI: HÀM LÀM SẠCH VÀ CHUẨN HÓA URL (CHỐNG LỖI CORS)
+  function getCleanUrl() {
+    let url = document.getElementById('gas-url').value.trim();
+    if (!url) return null;
+    if (!url.startsWith('http')) url = 'https://' + url;
+    // Tự động chuyển link /edit thành /exec nếu người dùng dán nhầm
+    if (url.includes('/edit')) url = url.substring(0, url.indexOf('/edit')) + '/exec';
+    return url;
+  }
+
+  // CÁC HÀM XỬ LÝ CHI TIÊU MỚI TẠI ĐÂY
+  function showFormChiTieu(formId) {
+    document.querySelectorAll('.form-box').forEach(el => el.style.display = 'none');
+    document.getElementById(formId).style.display = 'block';
+  }
+
+  async function submitChiTieu(actionType) {
+    const url = getCleanUrl();
+    if (!url) { alert("Vui lòng nhập Link Web App ở trên!"); return; }
+
+    const params = new URLSearchParams();
+    params.append('action', actionType);
+    
+    if (actionType === 'addCaNhan') {
+      const c = document.getElementById('inp-cn-content').value.trim();
+      const a = document.getElementById('inp-cn-amount').value.trim();
+      if (!c || !a) { alert("Nhập đủ nội dung và số tiền!"); return; }
+      params.append('content', c);
+      params.append('amount', a);
+    } 
+    else if (actionType === 'addChiChung') {
+      const c = document.getElementById('inp-cc-content').value.trim();
+      const a = document.getElementById('inp-cc-amount').value.trim();
+      const p = document.getElementById('inp-cc-persons').value.trim();
+      if (!c || !a || !p) { alert("Nhập đủ nội dung, số tiền và người chia!"); return; }
+      params.append('content', c);
+      params.append('total', a);
+      params.append('persons', p);
+    }
+    else if (actionType === 'addChoVay') {
+      const p = document.getElementById('inp-cv-person').value.trim();
+      const a = document.getElementById('inp-cv-amount').value.trim();
+      if (!p || !a) { alert("Nhập đủ tên người vay và số tiền!"); return; }
+      params.append('person', p);
+      params.append('amount', a);
+    }
+    else if (actionType === 'payDebt') {
+      const p = document.getElementById('inp-tn-person').value.trim();
+      if (!p) { alert("Nhập tên người cần trả nợ!"); return; }
+      params.append('person', p);
+    }
+
+    document.getElementById('chi-tieu-loading').style.display = 'block';
+    
+    try {
+      const response = await fetch(`${url}?${params.toString()}`, { 
+          method: 'GET', 
+          mode: 'cors',
+          headers: { 'Accept': 'application/json' }
+      });
+      
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      
+      const data = await response.json();
+      if (data.status === 'success') {
+        alert("✅ " + data.message);
+        // Clear forms
+        document.querySelectorAll('.form-box input').forEach(inp => inp.value = '');
+        // Tự động tải lại tổng quan sau khi nhập liệu thành công
+        fetchChiTieuData();
+      } else {
+        alert("❌ Lỗi: " + data.message);
+      }
+    } catch (e) {
+      alert("❌ Kết nối thất bại (Failed to fetch). Lỗi này thường do:\n1. Bạn dán sai link (chưa có chữ /exec ở cuối).\n2. Cài đặt 'Who has access' trên Apps Script chưa để là 'Anyone'.\n3. Bạn chưa tạo New Deployment sau khi sửa code.");
+      console.error(e);
+    } finally {
+      document.getElementById('chi-tieu-loading').style.display = 'none';
+    }
+  }
+
   async function fetchChiTieuData() {
-    const url = document.getElementById('gas-url').value.trim();
+    const url = getCleanUrl();
     if (!url) { alert("Vui lòng nhập Link Web App của Google Apps Script!"); return; }
     
     localStorage.setItem('gasWebAppUrl', url);
@@ -664,7 +795,14 @@
     document.getElementById('chi-tieu-result').style.display = 'none';
     
     try {
-      const response = await fetch(url + "?action=getSummary", { method: 'GET', redirect: 'follow' });
+      const response = await fetch(`${url}?action=getSummary`, { 
+          method: 'GET', 
+          mode: 'cors',
+          headers: { 'Accept': 'application/json' }
+      });
+      
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      
       const data = await response.json();
       
       if (data.status === 'success') {
@@ -686,7 +824,7 @@
         document.getElementById('chi-tieu-result').style.display = 'block';
       } else { alert("Lỗi từ máy chủ: " + data.message); }
     } catch (e) {
-      alert("Kết nối thất bại. Hãy đảm bảo bạn đã chèn code API doGet() vào Google Apps Script và cập nhật Deployment mới.");
+      alert("❌ Kết nối thất bại (Failed to fetch). Lỗi này thường do:\n1. Bạn dán sai link (chưa có chữ /exec ở cuối).\n2. Cài đặt 'Who has access' trên Apps Script chưa để là 'Anyone'.\n3. Bạn chưa tạo New Deployment sau khi sửa code.");
       console.error(e);
     } finally {
       document.getElementById('chi-tieu-loading').style.display = 'none';
