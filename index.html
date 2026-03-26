@@ -120,8 +120,12 @@
     <div class="search-bar-container">
       <input type="text" id="search-contact" class="search-input" placeholder="Tìm tên, SĐT, nhóm..." onkeyup="searchContacts()">
       <button class="btn-add" style="background:#ff9800; font-size:22px;" onclick="openGroupSettingsModal()" title="Cài đặt Nhóm">⚙️</button>
+      <button class="btn-add" style="background:#8e44ad; font-size:20px;" onclick="document.getElementById('contact-file-upload').click()" title="Nhập từ file CSV/VCF">📁</button>
       <button class="btn-add" style="background:#007AFF; font-size:22px;" onclick="importFromContacts()" title="Nhập từ danh bạ thiết bị">📇</button>
       <button class="btn-add" onclick="openContactModal()" title="Thêm thủ công">+</button>
+      
+      <!-- Nơi nhận file ẩn -->
+      <input type="file" id="contact-file-upload" style="display:none;" accept=".csv, .vcf, text/csv, text/vcard" onchange="handleContactFileUpload(event)">
     </div>
 
     <!-- DANH SÁCH LIÊN HỆ -->
@@ -147,6 +151,24 @@
       <input type="text" id="import-contact-group" class="modal-input" placeholder="VD: Đội Trực..." list="group-suggestions" />
 
       <button onclick="saveImportedContacts()" class="btn" style="background:#4caf50; width:100%;">HOÀN TẤT THÊM</button>
+    </div>
+  </div>
+
+  <!-- MODAL CẢNH BÁO IOS (MỚI THÊM) -->
+  <div id="ios-warning-modal" class="modal-overlay" onclick="if(event.target === this) closeIosWarningModal()">
+    <div class="modal-content" style="text-align: center;">
+      <div class="pull-bar"></div>
+      <div style="font-size: 50px; margin-bottom: 10px;">🍎</div>
+      <h3 style="color: #1C1C1E; margin: 0 0 15px 0; font-size: 20px; font-weight: 800;">Hạn Chế Của iOS</h3>
+      <p style="color: #555; font-size: 15px; line-height: 1.5; margin-bottom: 25px; padding: 0 10px;">
+        Hệ điều hành iOS (iPhone/iPad) hiện <b>chưa cho phép</b> các trang Web truy cập tự động vào Danh bạ để bảo vệ quyền riêng tư.<br><br>
+        Bạn có thể tải lên tệp <b>.VCF / .CSV</b> hoặc thêm liên hệ theo cách thủ công!
+      </p>
+      <div style="display:flex; gap:8px; flex-wrap: wrap; justify-content: center;">
+        <button onclick="closeIosWarningModal()" class="btn" style="background:#E5E5EA; color: #333; flex: 1;">ĐÓNG</button>
+        <button onclick="closeIosWarningModal(); document.getElementById('contact-file-upload').click();" class="btn" style="background:#8e44ad; flex: 1;">📁 TẢI FILE VCF</button>
+        <button onclick="closeIosWarningModal(); openContactModal();" class="btn" style="background:#4caf50; flex: 1; min-width: 100%;">+ THÊM THỦ CÔNG</button>
+      </div>
     </div>
   </div>
 
@@ -529,7 +551,10 @@
       // Kiểm tra xem trình duyệt có hỗ trợ Web Contact Picker API không
       const supported = ('contacts' in navigator && 'ContactsManager' in window);
       if (!supported) {
-          alert('Rất tiếc, trình duyệt/thiết bị của bạn không hỗ trợ lấy danh bạ tự động (Tính năng này thường bị Apple khóa trên iOS, hoặc chỉ hoạt động trên Android Chrome). Vui lòng dùng nút + màu xanh lá để thêm thủ công!');
+          // Bỏ alert(), gọi Modal iOS thân thiện
+          let modal = document.getElementById('ios-warning-modal');
+          modal.style.display = 'flex';
+          setTimeout(() => modal.classList.add('show'), 10);
           return;
       }
 
@@ -590,6 +615,119 @@
       }
       
       closeImportGroupModal();
+  }
+
+  // ================== XỬ LÝ NHẬP TỪ FILE (.CSV / .VCF) ==================
+  function handleContactFileUpload(event) {
+      let file = event.target.files[0];
+      if (!file) return;
+      
+      let reader = new FileReader();
+      reader.onload = function(e) {
+          let text = e.target.result;
+          let parsedContacts = [];
+          
+          if (file.name.toLowerCase().endsWith('.vcf')) {
+              parsedContacts = parseVCF(text);
+          } else if (file.name.toLowerCase().endsWith('.csv')) {
+              parsedContacts = parseCSV(text);
+          } else {
+              alert('Hệ thống chỉ hỗ trợ định dạng file .vcf hoặc .csv');
+              return;
+          }
+          
+          if (parsedContacts.length > 0) {
+              // Tái sử dụng quy trình xếp nhóm của tính năng bung danh bạ
+              tempImportedContacts = parsedContacts;
+              document.getElementById('import-count').innerText = parsedContacts.length;
+              document.getElementById('import-contact-group').value = '';
+              
+              let modal = document.getElementById('import-group-modal');
+              modal.style.display = 'flex';
+              setTimeout(() => modal.classList.add('show'), 10);
+          } else {
+              alert('Không bóc tách được liên hệ hợp lệ nào trong file! Vui lòng kiểm tra lại định dạng.');
+          }
+      };
+      reader.readAsText(file);
+      event.target.value = ''; // Reset input để có thể tải lại cùng 1 file
+  }
+
+  // Hàm bóc tách file .VCF (vCard)
+  function parseVCF(text) {
+      let contacts = [];
+      let vcards = text.split('BEGIN:VCARD');
+      for (let vcard of vcards) {
+          if (!vcard.trim()) continue;
+          
+          // Tìm Tên (Bắt các dòng bắt đầu bằng FN: hoặc FN;CHARSET=...:)
+          let nameMatch = vcard.match(/^FN[^:]*:(.*)$/im) || vcard.match(/^N[^:]*:(.*)$/im);
+          // Tìm Số điện thoại
+          let phoneMatch = vcard.match(/^TEL[^:]*:(.*)$/im);
+          
+          if (nameMatch && phoneMatch) {
+              let name = nameMatch[1].trim().replace(/;/g, ' '); // Loại bỏ dấu chấm phẩy trong cấu trúc N:
+              let phone = phoneMatch[1].trim().replace(/[\s\-()]/g, '');
+              if (name && phone) {
+                  // Format giống hệt Navigator Contacts API để dùng chung hàm saveImportedContacts
+                  contacts.push({ name: [name], tel: [phone] });
+              }
+          }
+      }
+      return contacts;
+  }
+
+  // Hàm bóc tách file .CSV
+  function parseCSV(text) {
+      let contacts = [];
+      let lines = text.split(/\r?\n/);
+      if (lines.length === 0) return contacts;
+      
+      // Helper tách dòng CSV (để bỏ qua dấu phẩy nằm trong ngoặc kép)
+      const splitCSV = (str) => {
+          let result = [], insideQuote = false, currentStr = "";
+          for (let i = 0; i < str.length; i++) {
+              let char = str[i];
+              if (char === '"') insideQuote = !insideQuote;
+              else if (char === ',' && !insideQuote) { result.push(currentStr); currentStr = ""; }
+              else currentStr += char;
+          }
+          result.push(currentStr);
+          return result;
+      };
+
+      let headers = splitCSV(lines[0]).map(h => h.trim().toLowerCase());
+      
+      // Cố gắng dò tìm tự động cột chứa Tên và cột chứa Số điện thoại
+      let nameIdx = headers.findIndex(h => h.includes('name') || h.includes('tên'));
+      let phoneIdx = headers.findIndex(h => h.includes('phone') || h.includes('điện thoại') || h.includes('sđt'));
+      
+      // Nếu không tìm thấy header khớp, giả định Cột 1 là Tên, Cột 2 là Số
+      if (nameIdx === -1) nameIdx = 0;
+      if (phoneIdx === -1) phoneIdx = 1;
+
+      // Đọc từ dòng 2 (bỏ qua header)
+      for (let i = 1; i < lines.length; i++) {
+          if (!lines[i].trim()) continue;
+          
+          let cols = splitCSV(lines[i]);
+          if (cols.length > Math.max(nameIdx, phoneIdx)) {
+              let name = cols[nameIdx] ? cols[nameIdx].trim() : '';
+              let phone = cols[phoneIdx] ? cols[phoneIdx].replace(/[\s\-()]/g, '').trim() : '';
+              
+              if (name && phone && /\d/.test(phone)) {
+                  contacts.push({ name: [name], tel: [phone] });
+              }
+          }
+      }
+      return contacts;
+  }
+
+  // Đóng modal cảnh báo iOS
+  function closeIosWarningModal() {
+      let modal = document.getElementById('ios-warning-modal');
+      modal.classList.remove('show');
+      setTimeout(() => modal.style.display = 'none', 300);
   }
 </script>
 </body>
