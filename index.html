@@ -1,192 +1,79 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Quản Lý Tài Chính (iOS Pro)</title>
-  
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Danh Bạ Nội Bộ</title>
   <style>
-    /* ================= CƠ BẢN ================= */
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    /* ================== CƠ BẢN ================== */
+    * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
     body { 
-      margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-      background-color: #F2F2F7; 
-      color: #1C1C1E; padding-bottom: 60px;
+      margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+      background: #eaf6ff; padding-bottom: 30px; 
     }
 
-    /* ================= TOP DASHBOARD (TỔNG NỢ & ĐIỀU KHIỂN) ================= */
-    .header-title { 
-      padding: 16px 16px 4px 16px; 
+    .container { max-width: 600px; margin: 0 auto; padding: 15px; }
+    .dash-header { padding: 20px 0; text-align: center; }
+    .dash-header h2 { color: #1976d2; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: 1px; }
+
+    /* ================== TÌM KIẾM & NÚT THÊM ================== */
+    .search-bar-container { display: flex; gap: 8px; margin-bottom: 20px; }
+    .search-input { 
+      flex: 1; padding: 14px 15px; font-size: 16px; border-radius: 12px; 
+      border: 1px solid #ddd; background: #fff; outline: none; 
+    }
+    .search-input:focus { border: 2px solid #1976d2; }
+    .btn-add { 
+      display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; 
+      background: #4caf50; color: white; border-radius: 12px; font-size: 24px; font-weight: bold;
+      border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(76,175,80,0.3); transition: 0.2s;
+    }
+    .btn-add:active { transform: scale(0.95); }
+
+    /* ================== DANH SÁCH LIÊN HỆ THEO ĐƠN VỊ ================== */
+    .unit-card {
+      background: #FFFFFF; border-radius: 16px; padding: 16px 20px; margin-bottom: 12px;
       display: flex; justify-content: space-between; align-items: center;
-      position: sticky; top: 0; z-index: 50;
-      background: rgba(242, 242, 247, 0.85);
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.02);
+      cursor: pointer; font-weight: 800; color: #1976d2; font-size: 16px; transition: 0.2s;
     }
-    .header-title h2 { margin: 0; font-size: 26px; font-weight: 900; color: #1C1C1E; letter-spacing: -0.5px; }
-
-    .btn-icon-ios {
-      width: 38px; height: 38px;
-      background: #FFFFFF; border: none; border-radius: 50%;
-      font-size: 16px; display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04); color: #007AFF;
-    }
-    .btn-icon-ios:active { transform: scale(0.9); background: #E5E5EA; }
-
-    .top-dashboard {
-      display: flex; gap: 12px; margin: 12px 16px 20px 16px; align-items: stretch;
-    }
-
-    /* Cột Trái: Thẻ Nợ (Co gọn) */
-    .hero-card-sm {
-      flex: 1.2;
-      background: linear-gradient(135deg, #007AFF 0%, #0056b3 100%);
-      border-radius: 20px; padding: 16px;
-      display: flex; flex-direction: column; justify-content: space-between;
-      color: white; box-shadow: 0 6px 15px rgba(0, 122, 255, 0.25);
-      position: relative; overflow: hidden;
-    }
-    .hero-card-sm::after {
-      content: ''; position: absolute; top: -30px; right: -30px;
-      width: 90px; height: 90px; background: rgba(255,255,255,0.1);
-      border-radius: 50%; filter: blur(15px); pointer-events: none;
-    }
-    .hero-top { display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 2;}
-    .hero-label { font-size: 15px; font-weight: 900; opacity: 0.95; text-transform: uppercase; line-height: 1.3;}
-    .btn-eye-sm { 
-      background: rgba(255,255,255,0.2); border: none; border-radius: 50%; 
-      width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; 
-      color: white; cursor: pointer; transition: 0.2s;
-    }
-    .btn-eye-sm:active { transform: scale(0.9); background: rgba(255,255,255,0.3); }
-    .hero-amount-sm { font-size: 26px; font-weight: 900; margin-top: 12px; letter-spacing: -0.5px; position: relative; z-index: 2;}
-
-    /* Cột Phải: Các nút điều khiển */
-    .controls-col {
-      flex: 0.8; display: flex; flex-direction: column; justify-content: space-between;
+    .unit-card:active { transform: scale(0.98); background: #f0f7ff; }
+    .unit-count { 
+      background: #eaf6ff; padding: 4px 10px; border-radius: 20px; 
+      font-size: 13px; color: #1976d2; font-weight: bold;
     }
     
-    .ios-select {
-      background-color: #FFFFFF;
-      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%238E8E93%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-      background-repeat: no-repeat; background-position: right 8px center; background-size: 10px auto;
-      border: 1px solid rgba(0,0,0,0.05); outline: none;
-      padding: 0 24px 0 12px; border-radius: 14px;
-      font-size: 13px; font-weight: 800; color: #1C1C1E;
-      appearance: none; -webkit-appearance: none;
-      cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.02); height: 100%; width: 100%; min-height: 40px;
-    }
+    .unit-content { display: none; padding: 0 5px; margin-bottom: 20px; }
+    .unit-content.open { display: block; animation: fadeIn 0.2s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
-    @keyframes spin { 100% { transform: rotate(360deg); } }
-    .spin { display: inline-block; animation: spin 1s linear infinite; color: #007AFF !important; }
-
-    /* ================= NGÂN SÁCH & DỰ CHI ================= */
-    .budget-card {
-      background: #FFFFFF; border-radius: 20px; padding: 16px;
-      margin: 0 16px 14px 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-      border: 1px solid rgba(0,0,0,0.03);
-    }
-    .budget-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; }
-    .budget-label { font-size: 12px; font-weight: 800; color: #8E8E93; text-transform: uppercase; letter-spacing: 0.5px; }
-    .budget-total { font-size: 24px; font-weight: 900; color: #1C1C1E; line-height: 1; }
-    
-    .progress-bg { width: 100%; height: 8px; background: #F2F2F7; border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
-    .progress-fill { height: 100%; background: #34C759; border-radius: 4px; transition: width 0.5s ease, background-color 0.5s ease; }
-    
-    .budget-footer { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 700; }
-    .budget-limit { color: #8E8E93; }
-    .budget-left { color: #34C759; }
-
-    /* ================= 2 Ô CÁ NHÂN & CHI CHUNG ================= */
-    .expense-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
-      margin: 0 16px 20px 16px;
-    }
-    .expense-card {
-      background: #FFFFFF; border-radius: 20px; padding: 14px 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-      display: flex; flex-direction: column; justify-content: center;
-      border: 1px solid rgba(0,0,0,0.03); cursor: pointer; transition: 0.2s ease;
-    }
-    .expense-card:active { transform: scale(0.96); background: #FAFAFA; }
-    
-    .box-content { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-bottom: 12px;}
-    .box-title { font-size: 12px; font-weight: 900; text-transform: uppercase; color: #FF9500; margin: 0; letter-spacing: 0.5px;}
-    .box-title.cc { color: #34C759; }
-    .box-val { font-size: 24px; font-weight: 900; margin: 0; color: #1C1C1E; }
-    .btn-detail { font-size: 12px; background: #F2F2F7; border: none; padding: 8px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; color: #007AFF; transition: 0.2s;}
-
-    /* ================= BIỂU ĐỒ ================= */
-    .chart-container {
-      background: #FFFFFF; border-radius: 24px; padding: 20px;
-      margin: 0 16px 20px 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-    }
-    .section-title { font-size: 16px; font-weight: 800; color: #1C1C1E; margin: 0 0 15px 0; text-transform: uppercase; letter-spacing: 0.5px;}
-
-    /* ================= SỔ NỢ DẠNG CARD RỜI (iOS Style) ================= */
-    .debt-section { margin: 0 16px 20px 16px; }
-    .debt-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    
-    .debt-card-ios {
-      background: #FFFFFF; border-radius: 16px; padding: 16px;
-      margin-bottom: 12px;
+    .contact-card {
+      background: #FFFFFF; border-radius: 16px; padding: 15px; margin-bottom: 10px;
       display: flex; justify-content: space-between; align-items: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-      position: relative; overflow: hidden;
-      cursor: pointer; transition: 0.2s; border: 1px solid rgba(0,0,0,0.02);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03); border-left: 4px solid #4caf50;
     }
-    .debt-card-ios:active { transform: scale(0.97); background: #F9F9F9; }
+    .contact-info { flex: 1; display: flex; flex-direction: column; gap: 4px; cursor: pointer; }
+    .contact-name { font-size: 16px; font-weight: 800; color: #1C1C1E; }
+    .contact-phone { font-size: 14px; color: #007AFF; font-weight: 700; margin-top: 2px; }
     
-    .debt-card-ios::before {
-      content: ''; position: absolute; left: 0; top: 10px; bottom: 10px; width: 5px;
-      background: #FF3B30; border-radius: 0 4px 4px 0;
+    .btn-call {
+      width: 44px; height: 44px; border-radius: 50%; background: #E6F4EA; color: #34C759;
+      display: flex; align-items: center; justify-content: center; font-size: 20px;
+      text-decoration: none; transition: 0.2s; box-shadow: 0 2px 6px rgba(52, 199, 89, 0.25);
     }
-    
-    .debt-name-col { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 800; color: #1C1C1E; }
-    .debt-avatar { font-size: 20px; color: #007AFF; }
-    .debt-amt-col { display: flex; align-items: center; gap: 8px; }
-    .debt-amt-val { font-size: 17px; font-weight: 900; color: #FF3B30; }
-    .debt-amt-arrow { color: #007AFF; font-weight: bold; font-size: 16px; }
+    .btn-call:active { transform: scale(0.9); }
 
-    /* Hộp thông báo ẩn nợ */
-    .hidden-msg {
-      background: #E5E5EA; border-radius: 16px; padding: 24px; text-align: center;
-      color: #8E8E93; font-weight: 700; font-size: 14px;
-    }
-
-    /* ================= GIAO DỊCH GẦN ĐÂY ================= */
-    .recent-tx-section { margin: 0 16px 30px 16px; }
-    .recent-tx-item {
-      background: #FFFFFF; border-radius: 16px; padding: 14px 16px; margin-bottom: 10px;
-      display: flex; justify-content: space-between; align-items: center;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.02);
-    }
-    .rtx-left { display: flex; align-items: center; gap: 12px; }
-    .rtx-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold;}
-    .rtx-icon.cn { background: #FFF0E6; color: #FF9500; }
-    .rtx-icon.cc { background: #E6F4EA; color: #34C759; }
-    .rtx-info { display: flex; flex-direction: column; gap: 2px; }
-    .rtx-title { font-size: 15px; font-weight: 700; color: #1C1C1E; }
-    .rtx-date { font-size: 12px; color: #8E8E93; font-weight: 600; }
-    .rtx-amount { font-size: 16px; font-weight: 800; color: #1C1C1E; }
-
-    /* ================= MODAL & CÀI ĐẶT ================= */
+    /* ================== MODAL THÊM/SỬA ================== */
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.3); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+      background: rgba(0,0,0,0.4); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
       z-index: 1000; display: none; align-items: flex-end; justify-content: center;
       opacity: 0; transition: opacity 0.3s ease;
     }
     .modal-overlay.show { opacity: 1; }
-    
     .modal-content {
-      background: #F2F2F7; width: 100%; max-height: 85vh;
-      border-radius: 24px 24px 0 0; padding: 20px 16px 40px 16px;
-      overflow-y: auto;
+      background: #F2F2F7; width: 100%; max-height: 90vh; max-width: 600px;
+      border-radius: 24px 24px 0 0; padding: 20px 20px 40px 20px; overflow-y: auto;
       transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.1);
       box-shadow: 0 -10px 25px rgba(0,0,0,0.1);
     }
@@ -195,570 +82,515 @@
     .pull-bar { width: 40px; height: 5px; background: #C7C7CC; border-radius: 3px; margin: 0 auto 20px auto; }
     .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .modal-title { font-size: 20px; font-weight: 800; margin: 0; color: #007AFF; }
-    .btn-close-modal { background: #E5E5EA; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 14px; font-weight: bold; color: #8E8E93; cursor: pointer; display: flex; align-items: center; justify-content: center;}
+    .btn-close-modal { background: #E5E5EA; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 14px; font-weight: bold; color: #8E8E93; cursor: pointer; display: flex; align-items: center; justify-content: center;}
 
-    .tx-item {
-      background: #FFFFFF; border-radius: 16px; padding: 14px 16px; margin-bottom: 10px;
-      display: flex; justify-content: space-between; align-items: center;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02);
+    label { display: block; font-size: 14px; font-weight: 800; color: #333; margin-bottom: 8px; }
+    .modal-input {
+      width: 100%; padding: 15px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); 
+      margin-bottom: 20px; font-size: 16px; outline: none; background: #fff;
     }
-    .tx-left { display: flex; flex-direction: column; gap: 4px; flex: 1; padding-right: 10px;}
-    .tx-date { font-size: 12px; font-weight: 800; }
-    .tx-title { font-size: 15px; font-weight: 700; color: #1C1C1E; line-height: 1.3;}
-    .tx-sub { font-size: 12px; color: #8E8E93; }
-    .tx-note { font-size: 11px; font-style: italic; font-weight: bold; color: #FF3B30; margin-top: 2px;}
-    .tx-amount { font-size: 16px; font-weight: 900; white-space: nowrap; }
+    .modal-input:focus { border: 2px solid #007AFF; }
+    
+    .btn { 
+      padding: 16px; font-size: 16px; font-weight: bold; border: none; border-radius: 12px; 
+      color: #fff; cursor: pointer; text-align: center;
+    }
+    .btn:active { transform: scale(0.98); }
 
-    /* Cài đặt input */
-    .input-field {
-      width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); 
-      margin-bottom: 20px; font-size: 14px; outline: none; background: #fff;
+    /* ================== NÚT CÀI ĐẶT NHÓM ================== */
+    .btn-action-sm {
+      width: 32px; height: 32px; border-radius: 8px; border: none; 
+      display: flex; align-items: center; justify-content: center; 
+      font-size: 14px; cursor: pointer; transition: 0.2s; font-weight: bold;
     }
-    .input-field:focus { border-color: #007AFF; }
-    .btn-primary {
-      width: 100%; padding: 16px; background: #007AFF; color: white; border: none; 
-      border-radius: 12px; font-weight: 800; font-size: 16px; cursor: pointer;
-    }
-    .btn-primary:active { background: #0056b3; }
-
+    .btn-up { background: #e8f5e9; color: #2e7d32; }
+    .btn-down { background: #fff3e0; color: #ef6c00; }
+    .btn-del { background: #ffebee; color: #c62828; }
+    .btn-action-sm:active { transform: scale(0.9); }
   </style>
 </head>
 <body>
 
-  <!-- TIÊU ĐỀ TRANG & NÚT CHỨC NĂNG -->
-  <div class="header-title">
-    <h2>Tài chính</h2>
-    <div style="display: flex; gap: 10px;">
-      <button id="btn-update" class="btn-icon-ios" onclick="fetchAllFinanceData()">🔄</button>
-      <button class="btn-icon-ios" onclick="openFinanceSettings()">⚙️</button>
+  <div class="container">
+    <div class="dash-header">
+      <h2>📇 DANH BẠ NỘI BỘ</h2>
+    </div>
+
+    <!-- TÌM KIẾM & NÚT THÊM -->
+    <div class="search-bar-container">
+      <input type="text" id="search-contact" class="search-input" placeholder="Tìm tên, SĐT, nhóm..." onkeyup="searchContacts()">
+      <button class="btn-add" style="background:#ff9800; font-size:22px;" onclick="openGroupSettingsModal()" title="Cài đặt Nhóm">⚙️</button>
+      <button class="btn-add" style="background:#007AFF; font-size:22px;" onclick="importFromContacts()" title="Nhập từ danh bạ thiết bị">📇</button>
+      <button class="btn-add" onclick="openContactModal()" title="Thêm thủ công">+</button>
+    </div>
+
+    <!-- DANH SÁCH LIÊN HỆ -->
+    <div id="contact-list">
+      <!-- Sẽ được render bằng JavaScript -->
     </div>
   </div>
 
-  <!-- TOP DASHBOARD (TỔNG NỢ & BẢNG ĐIỀU KHIỂN) -->
-  <div class="top-dashboard">
-    
-    <!-- Cột Trái: Hero Card Tổng Nợ -->
-    <div class="hero-card-sm">
-      <div class="hero-top">
-        <span class="hero-label">Tổng nợ</span>
-        <button class="btn-eye-sm" onclick="toggleDebt()">👁️</button>
-      </div>
-      <div id="total-debt-lbl" class="hero-amount-sm">0K</div>
-    </div>
-
-    <!-- Cột Phải: Chọn thời gian (Năm trên, Tháng dưới) -->
-    <div class="controls-col">
-      <select id="yearSelect" class="ios-select" onchange="renderUI()"></select>
-      <select id="monthSelect" class="ios-select" onchange="renderUI()">
-        <option value="">Tất cả</option>
-        <option value="1">Tháng 1</option><option value="2">Tháng 2</option>
-        <option value="3">Tháng 3</option><option value="4">Tháng 4</option>
-        <option value="5">Tháng 5</option><option value="6">Tháng 6</option>
-        <option value="7">Tháng 7</option><option value="8">Tháng 8</option>
-        <option value="9">Tháng 9</option><option value="10">Tháng 10</option>
-        <option value="11">Tháng 11</option><option value="12">Tháng 12</option>
-      </select>
-    </div>
-
-  </div>
-
-  <!-- NGÂN SÁCH (DỰ CHI) -->
-  <div id="budget-card" class="budget-card" style="display: none;">
-    <div class="budget-header">
-      <span class="budget-label">TỔNG CHI TIÊU</span>
-      <span id="total-expense-lbl" class="budget-total">0K</span>
-    </div>
-    <div class="progress-bg">
-      <div id="budget-progress-bar" class="progress-fill"></div>
-    </div>
-    <div class="budget-footer">
-      <span id="budget-status-lbl" class="budget-limit">Dự chi: 0K</span>
-      <span id="budget-left-lbl" class="budget-left">Còn lại: 0K</span>
-    </div>
-  </div>
-
-  <!-- CHI TIÊU SUMMARY -->
-  <div class="expense-grid">
-    <div class="expense-card" onclick="openModal('💰 CHI TIẾT CÁ NHÂN', 'caNhan')">
-      <div class="box-content">
-        <span class="box-title">CÁ NHÂN</span>
-        <span id="val-cn" class="box-val">0K</span>
-      </div>
-      <button class="btn-detail">📄 Chi tiết</button>
-    </div>
-    
-    <div class="expense-card" onclick="openModal('👥 CHI TIẾT CHI CHUNG', 'chiChung')">
-      <div class="box-content">
-        <span class="box-title cc">CHI CHUNG</span>
-        <span id="val-cc" class="box-val">0K</span>
-      </div>
-      <button class="btn-detail">📄 Chi tiết</button>
-    </div>
-  </div>
-
-  <!-- BIỂU ĐỒ CÁ NHÂN -->
-  <div class="chart-container">
-    <h3 class="section-title" style="color: #FF9500;">CƠ CẤU CHI CÁ NHÂN</h3>
-    <div style="height: 320px; width: 100%; position: relative;">
-      <canvas id="expenseChart"></canvas>
-    </div>
-  </div>
-
-  <!-- SỔ NỢ DẠNG CARD RỜI -->
-  <div class="debt-section">
-    <div class="debt-header">
-      <h3 class="section-title" style="margin:0;">SỔ CÔNG NỢ</h3>
-    </div>
-    
-    <!-- Thông báo khi Ẩn Nợ -->
-    <div id="debt-hidden-msg" class="hidden-msg" style="display: none;">
-      Danh sách người nợ đang bị ẩn 🔒
-    </div>
-    
-    <!-- Danh sách nợ -->
-    <div id="debt-list-container">
-      <div style="text-align: center; padding: 20px; color: #8E8E93; font-style: italic;">
-        Vui lòng bấm 🔄 để tải dữ liệu...
-      </div>
-    </div>
-  </div>
-
-  <!-- GIAO DỊCH GẦN ĐÂY -->
-  <div class="recent-tx-section">
-    <h3 class="section-title" style="margin-bottom: 12px;">GIAO DỊCH GẦN ĐÂY</h3>
-    <div id="recent-tx-container">
-      <!-- Đổ dữ liệu bằng JS -->
-    </div>
-  </div>
-
-  <!-- MODAL BOTTOM SHEET (Danh sách chi tiết) -->
-  <div id="bottom-modal" class="modal-overlay" onclick="if(event.target === this) closeModal()">
+  <!-- MODAL CHỌN NHÓM CHO LIÊN HỆ ĐÃ NHẬP TỪ DANH BẠ -->
+  <div id="import-group-modal" class="modal-overlay" onclick="if(event.target === this) closeImportGroupModal()">
     <div class="modal-content">
       <div class="pull-bar"></div>
       <div class="modal-head">
-        <h3 id="modal-title" class="modal-title">Chi tiết</h3>
-        <button class="btn-close-modal" onclick="closeModal()">✕</button>
+        <h3 class="modal-title">Xếp Nhóm Liên Hệ</h3>
+        <button class="btn-close-modal" onclick="closeImportGroupModal()">✕</button>
       </div>
-      <div id="modal-body"></div>
+      
+      <div style="margin-bottom: 15px; font-size: 14px; color: #555; line-height: 1.4;">
+        Đã chọn <b id="import-count" style="color:#007AFF; font-size: 16px;">0</b> liên hệ từ điện thoại.<br>Vui lòng chọn hoặc nhập nhóm cho các liên hệ này:
+      </div>
+      
+      <label>Nhóm / Chức vụ:</label>
+      <input type="text" id="import-contact-group" class="modal-input" placeholder="VD: Đội Trực..." list="group-suggestions" />
+
+      <button onclick="saveImportedContacts()" class="btn" style="background:#4caf50; width:100%;">HOÀN TẤT THÊM</button>
     </div>
   </div>
 
-  <!-- MODAL CÀI ĐẶT API -->
-  <div id="settings-modal" class="modal-overlay" onclick="if(event.target === this) closeFinanceSettings()">
-    <div class="modal-content" style="max-height: 75vh;">
+  <!-- MODAL CÀI ĐẶT NHÓM -->
+  <div id="group-settings-modal" class="modal-overlay" onclick="if(event.target === this) closeGroupSettingsModal()">
+    <div class="modal-content">
       <div class="pull-bar"></div>
       <div class="modal-head">
-        <h3 class="modal-title" style="color: #1C1C1E;">⚙️ Cài đặt API</h3>
-        <button class="btn-close-modal" onclick="closeFinanceSettings()">✕</button>
+        <h3 class="modal-title">Cài Đặt Nhóm</h3>
+        <button class="btn-close-modal" onclick="closeGroupSettingsModal()">✕</button>
+      </div>
+
+      <div style="display:flex; gap:8px; margin-bottom:20px;">
+        <input type="text" id="new-group-input" class="modal-input" style="margin-bottom:0; flex:1;" placeholder="Nhập tên nhóm mới...">
+        <button onclick="addNewGroup()" class="btn" style="background:#4caf50; padding:0 20px;">THÊM</button>
+      </div>
+
+      <div style="font-size:13px; color:#1976d2; font-weight:bold; margin-bottom:10px;">DANH SÁCH NHÓM HIỆN TẠI:</div>
+      <div id="group-settings-list" style="max-height:45vh; overflow-y:auto; padding-right:5px; margin-bottom: 20px;">
+        <!-- JS render -->
       </div>
       
-      <label style="font-weight: 800; font-size: 14px; display:block; margin-bottom: 8px;">Link Google Script API:</label>
-      <input type="text" id="gas-url-modal" class="input-field" placeholder="https://script.google.com/.../exec" />
-      
-      <label style="font-weight: 800; font-size: 14px; display:block; margin-bottom: 8px;">Ngân sách Dự Chi / Tháng (K):</label>
-      <input type="number" id="inp-budget" class="input-field" placeholder="VD: 15000" />
-
-      <button onclick="saveFinanceSettings()" class="btn-primary">LƯU CÀI ĐẶT & TẢI DỮ LIỆU</button>
+      <button onclick="closeGroupSettingsModal()" class="btn" style="background:#007AFF; width:100%;">LƯU THAY ĐỔI</button>
     </div>
   </div>
 
-  <script>
-    // ================= KHỞI TẠO =================
-    Chart.register(ChartDataLabels);
-    
-    window.expenseChartInstance = null;
-    window.allFinanceRawData = { listCaNhan: [], listChiChung: [], tongNo: [] }; 
-    let isHidden = false;
+  <!-- MODAL THÊM/SỬA LIÊN HỆ -->
+  <div id="contact-modal" class="modal-overlay" onclick="if(event.target === this) closeContactModal()">
+    <div class="modal-content">
+      <div class="pull-bar"></div>
+      <div class="modal-head">
+        <h3 class="modal-title" id="contact-modal-title">Thêm Liên Hệ</h3>
+        <button class="btn-close-modal" onclick="closeContactModal()">✕</button>
+      </div>
+      
+      <input type="hidden" id="contact-id">
+      
+      <label>Tên liên hệ:</label>
+      <input type="text" id="contact-name" class="modal-input" placeholder="VD: Đ/c Nguyễn Văn A" />
+      
+      <label>Số điện thoại:</label>
+      <input type="tel" id="contact-phone" class="modal-input" placeholder="VD: 0987654321" />
+      
+      <label>Nhóm / Chức vụ:</label>
+      <input type="text" id="contact-group" class="modal-input" placeholder="VD: Ban chỉ huy, Đội trực..." list="group-suggestions" />
+      
+      <!-- Gợi ý nhóm khi gõ -->
+      <datalist id="group-suggestions">
+        <!-- Render động qua JS -->
+      </datalist>
 
-    // Set Default Link API của bạn
-    const DEFAULT_API_URL = "https://script.google.com/macros/s/AKfycbwr7GWM6XzgeA1YUZ9TrFq71ysJpKnGxoaBFCoVW_JG97Mj2ny_o0xleytM_1bkRzpb_A/exec";
-    if (!localStorage.getItem('gasWebAppUrl')) {
-      localStorage.setItem('gasWebAppUrl', DEFAULT_API_URL);
+      <div style="display:flex; gap:10px;">
+        <button id="btn-delete-contact" onclick="deleteContact()" class="btn" style="background:#FF3B30; display:none; flex: 0.4;">XÓA</button>
+        <button onclick="saveContact()" class="btn" style="background:#007AFF; flex: 1;">LƯU LIÊN HỆ</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Quản lý trạng thái (State)
+  const STATE = {
+    contacts: [],
+    groups: []
+  };
+
+  // Khởi tạo khi load trang
+  window.onload = () => {
+    let savedContacts = localStorage.getItem('appContactsStandalone');
+    if (savedContacts) {
+        STATE.contacts = JSON.parse(savedContacts);
+    } else {
+        // Mock data mặc định
+        STATE.contacts = [
+            { id: 1, name: 'Phòng Trực Ban', phone: '113', group: 'Khẩn cấp' },
+            { id: 2, name: 'Bảo vệ Cổng chính', phone: '0123456789', group: 'Khẩn cấp' },
+            { id: 3, name: 'Đ/c Chỉ huy trưởng', phone: '0987654321', group: 'Ban Chỉ Huy' },
+            { id: 4, name: 'Đ/c Kỹ thuật điện', phone: '0912345678', group: 'Bảo Trì / Kỹ Thuật' }
+        ];
+        localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts));
     }
 
-    window.onload = () => {
-      const d = new Date();
-      document.getElementById('monthSelect').value = (d.getMonth() + 1).toString();
+    let savedGroups = localStorage.getItem('appGroupsStandalone');
+    if (savedGroups) {
+        STATE.groups = JSON.parse(savedGroups);
+    } else {
+        STATE.groups = ['Khẩn cấp', 'Ban Chỉ Huy', 'Đội Trực', 'Bảo Trì / Kỹ Thuật'];
+        localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups));
+    }
+
+    renderContacts();
+  };
+
+  // Render danh sách ra HTML
+  function renderContacts(data = STATE.contacts, isSearch = false) {
+      const container = document.getElementById('contact-list');
       
-      const ySel = document.getElementById('yearSelect');
-      for(let i = d.getFullYear() - 2; i <= d.getFullYear() + 2; i++) {
-        ySel.innerHTML += `<option value="${i}" ${i === d.getFullYear() ? 'selected' : ''}>${i}</option>`;
+      // Update Datalist cho Modal Thêm/Sửa
+      const datalist = document.getElementById('group-suggestions');
+      datalist.innerHTML = STATE.groups.map(g => `<option value="${g}">`).join('');
+
+      if (data.length === 0 && !isSearch && STATE.groups.length === 0) {
+          container.innerHTML = '<div style="text-align:center; padding: 30px; color:#8E8E93;">Chưa có liên hệ nào.<br>Bấm dấu <b>+</b> để thêm.</div>';
+          return;
       }
 
-      // Tự động load khi mở app
-      fetchAllFinanceData();
-    };
+      // Nhóm các liên hệ theo 'group' dựa trên thứ tự STATE.groups
+      let grouped = {};
+      STATE.groups.forEach(g => grouped[g] = []);
 
-    // ================= HELPER FUNCTIONS =================
-    function formatMoney(num) {
-      if (!num && num !== 0) return '0K';
-      return Number(Math.round(num)).toLocaleString('vi-VN') + 'K';
-    }
-
-    function parseDateVN(dateStr) {
-      if (!dateStr) return 0;
-      let parts = dateStr.split('/');
-      if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]).getTime();
-      return 0;
-    }
-
-    function getCleanUrl() {
-      let url = localStorage.getItem('gasWebAppUrl');
-      if (!url) return null;
-      url = url.trim();
-      if (!url.startsWith('http')) url = 'https://' + url;
-      if (url.includes('/edit')) url = url.substring(0, url.indexOf('/edit')) + '/exec';
-      return url;
-    }
-
-    // ================= MODAL CÀI ĐẶT =================
-    function openFinanceSettings() {
-      document.getElementById('gas-url-modal').value = localStorage.getItem('gasWebAppUrl') || '';
-      document.getElementById('inp-budget').value = localStorage.getItem('myBudget') || '';
-      let modal = document.getElementById('settings-modal');
-      modal.style.display = 'flex';
-      setTimeout(() => modal.classList.add('show'), 10);
-    }
-
-    function closeFinanceSettings() {
-      let modal = document.getElementById('settings-modal');
-      modal.classList.remove('show');
-      setTimeout(() => modal.style.display = 'none', 300);
-    }
-
-    function saveFinanceSettings() {
-      const url = document.getElementById('gas-url-modal').value.trim();
-      const budget = document.getElementById('inp-budget').value.trim();
-      if(!url) { alert("Vui lòng nhập link!"); return; }
-      
-      localStorage.setItem('gasWebAppUrl', url);
-      localStorage.setItem('myBudget', budget);
-      closeFinanceSettings();
-      fetchAllFinanceData();
-    }
-
-    // ================= API FETCH =================
-    async function fetchAllFinanceData() {
-      let url = getCleanUrl();
-      if (!url) { openFinanceSettings(); return; }
-
-      let iconSpin = document.getElementById('btn-update');
-      iconSpin.classList.add('spin');
-      
-      try {
-        const response = await fetch(`${url}?action=getAllData`);
-        if (!response.ok) throw new Error('HTTP error');
-        const data = await response.json();
-        
-        if (data.status === 'success') {
-          // Gắn thêm originalIndex để biết thứ tự nhập trước/sau (phục vụ sort)
-          if(data.data.listCaNhan) data.data.listCaNhan.forEach((item, idx) => item.originalIndex = idx);
-          if(data.data.listChiChung) data.data.listChiChung.forEach((item, idx) => item.originalIndex = idx);
-          if(data.data.tongNo) {
-             data.data.tongNo.forEach(person => {
-                if(person.loans) person.loans.forEach((l, idx) => l.originalIndex = idx);
-                if(person.commonExpenses) person.commonExpenses.forEach((c, idx) => c.originalIndex = idx);
-             });
+      data.forEach(c => {
+          let g = c.group || 'Khác';
+          if (!grouped[g]) {
+              grouped[g] = [];
+              if (!STATE.groups.includes(g)) {
+                  STATE.groups.push(g);
+                  localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups));
+              }
           }
-          window.allFinanceRawData = data.data;
-          renderUI();
-        } else { 
-          alert("Lỗi từ máy chủ: " + data.message); 
-        }
-      } catch (e) {
-        alert("❌ Lỗi API: Link chưa đúng hoặc Code.gs chưa Deploy bản mới nhất.");
-        console.error(e);
-      } finally {
-        iconSpin.classList.remove('spin');
-      }
-    }
+          grouped[g].push(c);
+      });
 
-    // ================= RENDER GIAO DIỆN CHÍNH =================
-    function renderUI() {
-      if (!window.allFinanceRawData || !window.allFinanceRawData.listCaNhan) return;
+      // Tạo HTML dạng Accordion (Gập/Mở)
+      let html = STATE.groups.map((g, idx) => {
+          let count = grouped[g].length;
+          // Khi tìm kiếm, ẩn các nhóm không có dữ liệu
+          if (isSearch && count === 0) return ''; 
 
-      const selMonth = document.getElementById('monthSelect').value;
-      const selYear = document.getElementById('yearSelect').value;
+          let unitId = 'unit-' + idx;
+          let isOpenClass = isSearch ? 'open' : '';
+          let chevron = isSearch ? '▼' : '▶';
 
-      const isMatch = (dateStr) => {
-         const d = parseDateVN(dateStr);
-         if (!d) return false;
-         const dt = new Date(d);
-         const mMatch = selMonth === "" ? true : (dt.getMonth() + 1).toString() === selMonth;
-         const yMatch = dt.getFullYear().toString() === selYear;
-         return mMatch && yMatch;
-      };
-
-      // 1. Lọc Data
-      const filteredCN = window.allFinanceRawData.listCaNhan.filter(i => isMatch(i.date)).map(i => ({...i, txType: 'Cá nhân'}));
-      const filteredCC = window.allFinanceRawData.listChiChung.filter(i => isMatch(i.date)).map(i => ({...i, txType: 'Chi chung'}));
-
-      const totalCN = filteredCN.reduce((a, b) => a + b.amount, 0);
-      const totalCC = filteredCC.reduce((a, b) => a + b.amount, 0);
-      const totalExpense = totalCN + totalCC;
-      const totalDebt = (window.allFinanceRawData.tongNo || []).reduce((a, b) => a + b.total, 0);
-
-      // Cập nhật text
-      document.getElementById('val-cn').innerText = formatMoney(totalCN);
-      document.getElementById('val-cc').innerText = formatMoney(totalCC);
-      window.trueDebtValue = formatMoney(totalDebt);
-      if (!isHidden) document.getElementById('total-debt-lbl').innerText = window.trueDebtValue;
-
-      // 2. Render Ngân sách (Dự chi)
-      let budget = parseFloat(localStorage.getItem('myBudget')) || 0;
-      let budgetCard = document.getElementById('budget-card');
-      if (budget > 0) {
-          document.getElementById('total-expense-lbl').innerText = formatMoney(totalExpense);
-          let pct = Math.min((totalExpense / budget) * 100, 100);
-          
-          let pBar = document.getElementById('budget-progress-bar');
-          pBar.style.width = pct + '%';
-          pBar.style.backgroundColor = pct >= 100 ? '#FF3B30' : (pct >= 80 ? '#FF9500' : '#34C759');
-          
-          document.getElementById('budget-status-lbl').innerText = `Dự chi: ${formatMoney(budget)}`;
-          
-          let leftLbl = document.getElementById('budget-left-lbl');
-          if (totalExpense > budget) {
-              leftLbl.innerText = `Vượt: ${formatMoney(totalExpense - budget)}`;
-              leftLbl.style.color = '#FF3B30';
-          } else {
-              leftLbl.innerText = `Còn lại: ${formatMoney(budget - totalExpense)}`;
-              leftLbl.style.color = '#8E8E93';
-          }
-          budgetCard.style.display = 'block';
-      } else {
-          budgetCard.style.display = 'none';
-      }
-
-      // 3. Render Sổ Nợ
-      let debtHtml = '';
-      if ((window.allFinanceRawData.tongNo || []).length === 0) {
-        debtHtml = '<div style="text-align:center; padding: 20px; color:#8E8E93;">Không có khoản nợ nào.</div>';
-      } else {
-        window.allFinanceRawData.tongNo.forEach((item, index) => {
-          debtHtml += `
-            <div class="debt-card-ios" onclick="openDebtModal(${index})">
-              <div class="debt-name-col"><span class="debt-avatar">👤</span><span>${item.name}</span></div>
-              <div class="debt-amt-col"><span class="debt-amt-val">${formatMoney(item.total)}</span><span class="debt-amt-arrow">❯</span></div>
-            </div>
-          `;
-        });
-      }
-      document.getElementById('debt-list-container').innerHTML = debtHtml;
-
-      // 4. Render Giao Dịch Gần Đây (Trộn CN & CC)
-      let allRecent = [...filteredCN, ...filteredCC].sort((a, b) => {
-        let diff = parseDateVN(b.date) - parseDateVN(a.date);
-        if (diff !== 0) return diff;
-        return (b.originalIndex || 0) - (a.originalIndex || 0); // Nhập sau lên trên
-      }).slice(0, 5);
-      
-      let rtxHtml = '';
-      if(allRecent.length === 0) {
-          rtxHtml = '<div style="text-align:center; padding:15px; color:#8E8E93;">Chưa có giao dịch nào.</div>';
-      } else {
-          allRecent.forEach(tx => {
-              let isCN = tx.txType === 'Cá nhân';
-              let iconClass = isCN ? 'cn' : 'cc';
-              let iconChar = isCN ? '💸' : '👥';
-              rtxHtml += `
-              <div class="recent-tx-item">
-                  <div class="rtx-left">
-                      <div class="rtx-icon ${iconClass}">${iconChar}</div>
-                      <div class="rtx-info">
-                          <span class="rtx-title">${tx.content || 'Chi tiêu'}</span>
-                          <span class="rtx-date">${tx.date} • ${tx.txType}</span>
-                      </div>
+          let groupHtml = `
+              <div class="unit-card" onclick="toggleUnit('${unitId}')">
+                  <div style="display:flex; align-items:center; gap:10px;">
+                      <span id="icon-${unitId}" style="color:#888; font-size:14px; width:15px; display:inline-block; text-align:center;">${chevron}</span>
+                      <span>🏢 ${g}</span>
                   </div>
-                  <span class="rtx-amount">${formatMoney(tx.amount)}</span>
-              </div>`;
-          });
-      }
-      document.getElementById('recent-tx-container').innerHTML = rtxHtml;
-
-      // 5. Render Biểu Đồ
-      renderChart(filteredCN);
-    }
-
-    // ================= VẼ BIỂU ĐỒ =================
-    function renderChart(cnData) {
-      const ctx = document.getElementById('expenseChart').getContext('2d');
-      if (window.expenseChartInstance) window.expenseChartInstance.destroy();
-      
-      if(cnData.length === 0) {
-        window.expenseChartInstance = new Chart(ctx, {
-          type: 'doughnut',
-          data: { labels: ['Trống'], datasets: [{ data: [1], backgroundColor: ['#E5E5EA'], borderWidth: 0 }] },
-          options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { display: false }, legend: {display:false}, tooltip:{enabled:false} } }
-        });
-        return;
-      }
-
-      let groups = {};
-      cnData.forEach(i => { groups[i.content || 'Khác'] = (groups[i.content || 'Khác'] || 0) + i.amount; });
-      
-      let sortedArr = Object.keys(groups).map(k => ({ label: k, value: groups[k] })).sort((a, b) => b.value - a.value);
-      let labels = [], data = [], otherVal = 0;
-      sortedArr.forEach((item, index) => {
-         if(index < 4) { labels.push(item.label); data.push(item.value); }
-         else { otherVal += item.value; }
-      });
-      if(otherVal > 0) { labels.push('Khác'); data.push(otherVal); }
-
-      window.expenseChartInstance = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: labels,
-          datasets: [{
-            data: data,
-            backgroundColor: ['#007AFF', '#FF3B30', '#34C759', '#FF9500', '#AF52DE'],
-            borderWidth: 2, borderColor: '#fff', hoverOffset: 4
-          }]
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false, cutout: '55%',
-          plugins: {
-            legend: { position: 'bottom', labels: { padding: 20, font: {family: '-apple-system', size: 12, weight: 'bold'} } },
-            datalabels: { 
-              color: '#fff', font: { weight: 'bold', size: 13 }, 
-              formatter: (v, ctx) => {
-                let sum = ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);
-                let pct = Math.round(v/sum*100);
-                return pct >= 5 ? pct + '%' : '';
-              } 
-            }
-          }
-        }
-      });
-    }
-
-    // ================= ĐIỀU KHIỂN NỢ (ẨN/HIỆN ĐỒNG BỘ MỚI) =================
-    function toggleDebt() {
-      isHidden = !isHidden;
-      document.getElementById('total-debt-lbl').innerText = isHidden ? "****** ₫" : (window.trueDebtValue || "0K");
-      
-      if (isHidden) {
-          document.getElementById('debt-list-container').style.display = 'none';
-          document.getElementById('debt-hidden-msg').style.display = 'block';
-      } else {
-          document.getElementById('debt-list-container').style.display = 'block';
-          document.getElementById('debt-hidden-msg').style.display = 'none';
-      }
-    }
-
-    // ================= MODAL XEM CHI TIẾT =================
-    function openModal(title, type) {
-      document.getElementById('modal-title').innerText = title;
-      document.getElementById('modal-title').style.color = type === 'caNhan' ? '#FF9500' : '#34C759';
-
-      const selMonth = document.getElementById('monthSelect').value;
-      const selYear = document.getElementById('yearSelect').value;
-      const isMatch = (dateStr) => {
-         const d = parseDateVN(dateStr); if (!d) return false;
-         const dt = new Date(d);
-         return (selMonth === "" ? true : (dt.getMonth() + 1).toString() === selMonth) && (dt.getFullYear().toString() === selYear);
-      };
-
-      let dataArr = type === 'caNhan' ? window.allFinanceRawData.listCaNhan : window.allFinanceRawData.listChiChung;
-      dataArr = (dataArr || []).filter(i => isMatch(i.date)).sort((a, b) => {
-         let diff = parseDateVN(b.date) - parseDateVN(a.date);
-         if (diff !== 0) return diff;
-         return (b.originalIndex || 0) - (a.originalIndex || 0);
-      });
-
-      let html = '';
-      if(dataArr.length === 0) {
-        html = '<div style="text-align:center; padding: 20px; color:#8E8E93;">Không có giao dịch trong tháng này.</div>';
-      } else {
-        dataArr.forEach(item => {
-          let subText = item.totalBill ? `Tổng bill: ${formatMoney(item.totalBill)} - ${item.participants || 'Bạn'}` : (item.participants || '');
-          let subHtml = subText ? `<div class="tx-sub">${subText}</div>` : '';
-          let noteHtml = item.note ? `<div class="tx-note">${item.note}</div>` : '';
-          let color = type === 'caNhan' ? '#FF9500' : '#34C759';
-          
-          html += `
-            <div class="tx-item">
-              <div class="tx-left">
-                <span class="tx-date" style="color: ${color}">${item.date}</span>
-                <span class="tx-title">${item.content}</span>
-                ${subHtml}
-                ${noteHtml}
+                  <span class="unit-count">${count} người</span>
               </div>
-              <span class="tx-amount" style="color: ${color}">${formatMoney(item.amount)}</span>
-            </div>
           `;
-        });
-      }
-      document.getElementById('modal-body').innerHTML = html;
-      
-      let modal = document.getElementById('bottom-modal');
-      modal.style.display = 'flex';
-      setTimeout(() => modal.classList.add('show'), 10);
-    }
 
-    function openDebtModal(idx) {
-      let person = window.allFinanceRawData.tongNo[idx];
-      if(!person) return;
-
-      document.getElementById('modal-title').innerText = `👤 ${person.name}`;
-      document.getElementById('modal-title').style.color = '#1C1C1E';
-
-      let html = `<div style="color:#FF3B30; font-weight:900; font-size:18px; margin-bottom:15px; padding-bottom:10px; border-bottom:1px solid #E5E5EA;">Tổng nợ: ${formatMoney(person.total)}</div>`;
-      
-      if (person.loans && person.loans.length > 0) {
-          html += `<div style="font-size: 13px; font-weight: 800; color: #007AFF; margin-bottom: 8px;">💸 TIỀN VAY (${formatMoney(person.totalLoan)})</div>`;
-          let sortedLoans = [...person.loans].sort((a, b) => {
-             let diff = parseDateVN(b.time) - parseDateVN(a.time);
-             if (diff !== 0) return diff;
-             return (b.originalIndex || 0) - (a.originalIndex || 0);
-          });
-          sortedLoans.forEach(l => {
-              html += `
-              <div class="tx-item">
-                  <div class="tx-left">
-                      <span class="tx-date" style="color:#007AFF">${l.time || 'N/A'}</span>
-                      <span class="tx-title">Cho vay</span>
+          let itemsHtml = `<div id="${unitId}" class="unit-content ${isOpenClass}">`;
+          if (count === 0) {
+              itemsHtml += `<div style="padding:10px; color:#888; font-size:13px; text-align:center; font-style:italic;">Nhóm trống</div>`;
+          } else {
+              itemsHtml += grouped[g].map(c => `
+                  <div class="contact-card">
+                      <div class="contact-info" onclick="openContactModal(${c.id})">
+                          <span class="contact-name">${c.name}</span>
+                          <span class="contact-phone">${c.phone}</span>
+                      </div>
+                      <a href="tel:${c.phone}" class="btn-call">📞</a>
                   </div>
-                  <span class="tx-amount" style="color:#007AFF">${formatMoney(l.amount)}</span>
-              </div>`;
-          });
-      }
+              `).join('');
+          }
+          itemsHtml += `</div>`;
+          
+          return groupHtml + itemsHtml;
+      }).join('');
       
-      if (person.commonExpenses && person.commonExpenses.length > 0) {
-          html += `<div style="font-size: 13px; font-weight: 800; color: #34C759; margin-bottom: 8px; margin-top: 15px;">👥 CHI CHUNG (${formatMoney(person.totalCommon)})</div>`;
-          let sortedCommon = [...person.commonExpenses].sort((a, b) => {
-             let diff = parseDateVN(b.time) - parseDateVN(a.time);
-             if (diff !== 0) return diff;
-             return (b.originalIndex || 0) - (a.originalIndex || 0);
-          });
-          sortedCommon.forEach(c => {
-              let subText = c.total ? `Tổng bill: ${formatMoney(c.total)} - ${c.participants || ''}` : (c.participants || '');
-              let subHtml = subText ? `<div class="tx-sub">${subText}</div>` : '';
-              let noteHtml = c.payerNote ? `<div class="tx-note">${c.payerNote}</div>` : '';
-              html += `
-              <div class="tx-item">
-                  <div class="tx-left">
-                      <span class="tx-date" style="color:#34C759">${c.time || ''}</span>
-                      <span class="tx-title">${c.content || 'Chi tiêu'}</span>
-                      ${subHtml}
-                      ${noteHtml}
-                  </div>
-                  <span class="tx-amount" style="color:#34C759">${formatMoney(c.amount)}</span>
-              </div>`;
-          });
+      if(data.length === 0 && isSearch) {
+          container.innerHTML = '<div style="text-align:center; padding: 30px; color:#8E8E93;">Không tìm thấy kết quả.</div>';
+      } else {
+          container.innerHTML = html;
       }
-      
-      document.getElementById('modal-body').innerHTML = html;
-      let modal = document.getElementById('bottom-modal');
-      modal.style.display = 'flex';
-      setTimeout(() => modal.classList.add('show'), 10);
-    }
+  }
 
-    function closeModal() {
-      let modal = document.getElementById('bottom-modal');
+  // Đóng/Mở danh sách đơn vị
+  function toggleUnit(unitId) {
+      let content = document.getElementById(unitId);
+      let icon = document.getElementById('icon-' + unitId);
+      if (content.classList.contains('open')) {
+          content.classList.remove('open');
+          icon.innerText = '▶';
+      } else {
+          content.classList.add('open');
+          icon.innerText = '▼';
+      }
+  }
+
+  // Tìm kiếm
+  function searchContacts() {
+      let keyword = document.getElementById('search-contact').value.toLowerCase();
+      if (!keyword) {
+          renderContacts(STATE.contacts, false); // false = Đóng tất cả các thư mục
+          return;
+      }
+      let filtered = STATE.contacts.filter(c => 
+          (c.name && c.name.toLowerCase().includes(keyword)) ||
+          (c.phone && c.phone.includes(keyword)) ||
+          (c.group && c.group.toLowerCase().includes(keyword))
+      );
+      renderContacts(filtered, true); // true = Tự động mở tung thư mục chứa kết quả
+  }
+
+  // Mở Modal (Thêm hoặc Sửa)
+  function openContactModal(id = null) {
+      let title = document.getElementById('contact-modal-title');
+      let inputId = document.getElementById('contact-id');
+      let inputName = document.getElementById('contact-name');
+      let inputPhone = document.getElementById('contact-phone');
+      let inputGroup = document.getElementById('contact-group');
+      let btnDelete = document.getElementById('btn-delete-contact');
+
+      if (id) {
+          // Chế độ Sửa
+          let c = STATE.contacts.find(x => x.id === id);
+          if(c) {
+              title.innerText = 'Sửa Liên Hệ';
+              inputId.value = c.id;
+              inputName.value = c.name || '';
+              inputPhone.value = c.phone || '';
+              inputGroup.value = c.group || '';
+              btnDelete.style.display = 'block';
+          }
+      } else {
+          // Chế độ Thêm mới
+          title.innerText = 'Thêm Liên Hệ';
+          inputId.value = '';
+          inputName.value = '';
+          inputPhone.value = '';
+          inputGroup.value = '';
+          btnDelete.style.display = 'none';
+      }
+
+      let modal = document.getElementById('contact-modal');
+      modal.style.display = 'flex';
+      setTimeout(() => modal.classList.add('show'), 10); // Hiệu ứng trượt
+  }
+
+  // Đóng Modal
+  function closeContactModal() {
+      let modal = document.getElementById('contact-modal');
       modal.classList.remove('show');
       setTimeout(() => modal.style.display = 'none', 300);
-    }
-  </script>
+  }
+
+  // Lưu dữ liệu
+  function saveContact() {
+      let id = document.getElementById('contact-id').value;
+      let name = document.getElementById('contact-name').value.trim();
+      let phone = document.getElementById('contact-phone').value.trim();
+      let group = document.getElementById('contact-group').value.trim();
+
+      if(!name || !phone) {
+          alert('Vui lòng nhập Tên và Số điện thoại!');
+          return;
+      }
+
+      if (id) { 
+          // Cập nhật
+          let idx = STATE.contacts.findIndex(x => x.id == parseInt(id));
+          if(idx !== -1) {
+              STATE.contacts[idx] = { id: parseInt(id), name, phone, group };
+          }
+      } else { 
+          // Thêm mới
+          STATE.contacts.push({ id: Date.now(), name, phone, group });
+      }
+
+      // Lưu vào Local Storage
+      localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts));
+      
+      closeContactModal();
+      renderContacts();
+      
+      // Xóa chữ đang tìm kiếm nếu có
+      document.getElementById('search-contact').value = '';
+  }
+
+  // Xóa dữ liệu
+  function deleteContact() {
+      let id = document.getElementById('contact-id').value;
+      if(confirm('Bạn có chắc muốn xóa liên hệ này?')) {
+          STATE.contacts = STATE.contacts.filter(x => x.id != parseInt(id));
+          localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts));
+          closeContactModal();
+          renderContacts();
+          document.getElementById('search-contact').value = '';
+      }
+  }
+
+  // ================== QUẢN LÝ NHÓM (THÊM, XÓA, SẮP XẾP) ==================
+  function openGroupSettingsModal() {
+      renderGroupSettingsList();
+      let modal = document.getElementById('group-settings-modal');
+      modal.style.display = 'flex';
+      setTimeout(() => modal.classList.add('show'), 10);
+  }
+
+  function closeGroupSettingsModal() {
+      let modal = document.getElementById('group-settings-modal');
+      modal.classList.remove('show');
+      setTimeout(() => modal.style.display = 'none', 300);
+      renderContacts(STATE.contacts, false); 
+  }
+
+  function renderGroupSettingsList() {
+      let listDiv = document.getElementById('group-settings-list');
+      if(STATE.groups.length === 0) {
+          listDiv.innerHTML = '<div style="text-align:center; color:#888; font-size:13px; padding:10px;">Chưa có nhóm nào.</div>';
+          return;
+      }
+
+      listDiv.innerHTML = STATE.groups.map((g, i) => `
+          <div style="background:#fff; border-radius:12px; padding:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; border:1px solid #eee; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+              <span style="font-weight:800; font-size:15px; color:#333;">${g}</span>
+              <div style="display:flex; gap:5px;">
+                  <button class="btn-action-sm btn-up" onclick="moveGroupUp(${i})" ${i===0 ? 'style="opacity:0.3; cursor:not-allowed;"' : ''}>▲</button>
+                  <button class="btn-action-sm btn-down" onclick="moveGroupDown(${i})" ${i===STATE.groups.length-1 ? 'style="opacity:0.3; cursor:not-allowed;"' : ''}>▼</button>
+                  <button class="btn-action-sm btn-del" onclick="deleteGroupItem(${i})">✕</button>
+              </div>
+          </div>
+      `).join('');
+  }
+
+  function addNewGroup() {
+      let input = document.getElementById('new-group-input');
+      let val = input.value.trim();
+      if(!val) { alert("Vui lòng nhập tên nhóm!"); return; }
+      if(STATE.groups.includes(val)) { alert("Nhóm này đã tồn tại!"); return; }
+      
+      STATE.groups.push(val);
+      localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups));
+      input.value = '';
+      renderGroupSettingsList();
+  }
+
+  function moveGroupUp(idx) {
+      if(idx <= 0) return;
+      let temp = STATE.groups[idx];
+      STATE.groups[idx] = STATE.groups[idx-1];
+      STATE.groups[idx-1] = temp;
+      localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups));
+      renderGroupSettingsList();
+  }
+
+  function moveGroupDown(idx) {
+      if(idx >= STATE.groups.length - 1) return;
+      let temp = STATE.groups[idx];
+      STATE.groups[idx] = STATE.groups[idx+1];
+      STATE.groups[idx+1] = temp;
+      localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups));
+      renderGroupSettingsList();
+  }
+
+  function deleteGroupItem(idx) {
+      let g = STATE.groups[idx];
+      let count = STATE.contacts.filter(c => c.group === g).length;
+      
+      let msg = `Bạn có chắc muốn xóa nhóm "${g}"?`;
+      if(count > 0) {
+          msg += `\n\nCẢNH BÁO: ${count} liên hệ trong nhóm này sẽ tự động chuyển sang nhóm "Khác".`;
+      }
+
+      if(confirm(msg)) {
+          STATE.groups.splice(idx, 1);
+          
+          // Chuyển các liên hệ mồ côi sang nhóm Khác
+          if(count > 0) {
+              STATE.contacts.forEach(c => {
+                  if(c.group === g) c.group = 'Khác';
+              });
+              localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts));
+              
+              if(!STATE.groups.includes('Khác')) {
+                  STATE.groups.push('Khác');
+              }
+          }
+          
+          localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups));
+          renderGroupSettingsList();
+      }
+  }
+
+  // ================== NHẬP TỪ DANH BẠ ĐIỆN THOẠI ==================
+  let tempImportedContacts = [];
+
+  async function importFromContacts() {
+      // Kiểm tra xem trình duyệt có hỗ trợ Web Contact Picker API không
+      const supported = ('contacts' in navigator && 'ContactsManager' in window);
+      if (!supported) {
+          alert('Rất tiếc, trình duyệt/thiết bị của bạn không hỗ trợ lấy danh bạ tự động (Tính năng này thường bị Apple khóa trên iOS, hoặc chỉ hoạt động trên Android Chrome). Vui lòng dùng nút + màu xanh lá để thêm thủ công!');
+          return;
+      }
+
+      try {
+          const props = ['name', 'tel'];
+          const opts = { multiple: true }; // Cho phép chọn nhiều người cùng lúc
+          const contacts = await navigator.contacts.select(props, opts);
+          
+          if (contacts && contacts.length > 0) {
+              tempImportedContacts = contacts;
+              document.getElementById('import-count').innerText = contacts.length;
+              document.getElementById('import-contact-group').value = '';
+              
+              // Mở modal hỏi Nhóm
+              let modal = document.getElementById('import-group-modal');
+              modal.style.display = 'flex';
+              setTimeout(() => modal.classList.add('show'), 10);
+          }
+      } catch (err) {
+          console.error("Lỗi khi mở danh bạ:", err);
+          // Bỏ qua nếu người dùng chủ động bấm Hủy
+      }
+  }
+
+  function closeImportGroupModal() {
+      let modal = document.getElementById('import-group-modal');
+      modal.classList.remove('show');
+      setTimeout(() => modal.style.display = 'none', 300);
+      tempImportedContacts = [];
+  }
+
+  function saveImportedContacts() {
+      let group = document.getElementById('import-contact-group').value.trim() || 'Khác';
+      let addedCount = 0;
+
+      // Xử lý và làm sạch dữ liệu danh bạ thô
+      tempImportedContacts.forEach(c => {
+          let name = c.name && c.name.length > 0 ? c.name[0] : 'Không tên';
+          let phone = c.tel && c.tel.length > 0 ? c.tel[0] : '';
+          
+          // Làm sạch số điện thoại (xóa khoảng trắng, dấu gạch ngang, dấu ngoặc)
+          phone = phone.replace(/[\s\-()]/g, '');
+          
+          if (phone) {
+              // Thêm số ngẫu nhiên vào Date.now() để tránh trùng ID nếu vòng lặp chạy quá nhanh
+              STATE.contacts.push({ id: Date.now() + Math.random(), name, phone, group });
+              addedCount++;
+          }
+      });
+
+      if (addedCount > 0) {
+          localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts));
+          renderContacts();
+          document.getElementById('search-contact').value = '';
+          alert(`Đã thêm thành công ${addedCount} liên hệ vào nhóm "${group}"!`);
+      } else {
+          alert('Không tìm thấy số điện thoại hợp lệ trong các liên hệ đã chọn!');
+      }
+      
+      closeImportGroupModal();
+  }
+</script>
 </body>
 </html>
