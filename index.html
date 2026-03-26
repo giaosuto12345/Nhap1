@@ -9,38 +9,62 @@
     * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
     body { 
       margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-      background: #eaf6ff; padding-bottom: 30px; 
+      background: #F4F5F7; padding-bottom: 40px; color: #333;
     }
 
     .container { max-width: 600px; margin: 0 auto; padding: 15px; }
-    .dash-header { padding: 20px 0; text-align: center; }
-    .dash-header h2 { color: #1976d2; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: 1px; }
+    .dash-header { padding: 10px 0 20px 0; text-align: center; display: flex; justify-content: center; align-items: center; gap: 10px;}
+    .dash-header h2 { color: #1976D2; margin: 0; font-size: 24px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase;}
 
     /* ================== TÌM KIẾM & NÚT THÊM ================== */
-    .search-bar-container { display: flex; gap: 8px; margin-bottom: 20px; }
+    .top-controls { margin-bottom: 25px; }
+    
+    .search-row { margin-bottom: 12px; }
     .search-input { 
-      flex: 1; padding: 14px 15px; font-size: 16px; border-radius: 12px; 
-      border: 1px solid #ddd; background: #fff; outline: none; 
+      width: 100%; padding: 15px 20px; font-size: 16px; border-radius: 16px; 
+      border: 1px solid #E0E0E0; background: #fff; outline: none;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02); transition: 0.2s;
     }
-    .search-input:focus { border: 2px solid #1976d2; }
-    .btn-add { 
-      display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; 
-      background: #4caf50; color: white; border-radius: 12px; font-size: 24px; font-weight: bold;
-      border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(76,175,80,0.3); transition: 0.2s;
-    }
-    .btn-add:active { transform: scale(0.95); }
+    .search-input:focus { border-color: #1976D2; box-shadow: 0 4px 12px rgba(25,118,210,0.1); }
 
-    /* ================== DANH SÁCH LIÊN HỆ THEO ĐƠN VỊ ================== */
-    .unit-card {
-      background: #FFFFFF; border-radius: 16px; padding: 16px 20px; margin-bottom: 12px;
-      display: flex; justify-content: space-between; align-items: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.02);
-      cursor: pointer; font-weight: 800; color: #1976d2; font-size: 16px; transition: 0.2s;
+    .action-buttons-row { display: flex; gap: 10px; justify-content: space-between; align-items: center; }
+    .btn-act {
+      flex: 1; height: 50px; border-radius: 14px; border: none; font-size: 22px; 
+      cursor: pointer; display: flex; align-items: center; justify-content: center; 
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.2s; font-weight: bold;
     }
-    .unit-card:active { transform: scale(0.98); background: #f0f7ff; }
+    .btn-act:active { transform: scale(0.92); }
+
+    .btn-setting { background: #FFFFFF; color: #555; border: 1px solid #E0E0E0; }
+    .btn-pending { background: #E3F2FD; color: #1976D2; position: relative; }
+    .btn-file { background: #9C27B0; color: white; }
+    .btn-device { background: #1976D2; color: white; }
+    .btn-add-manual { background: #4CAF50; color: white; }
+
+    /* ================== BADGE KHO CHỜ ================== */
+    .pending-badge {
+      position: absolute; top: -6px; right: -6px; background: #FF3B30; color: white;
+      font-size: 11px; font-weight: bold; padding: 2px 7px; border-radius: 10px;
+      border: 2px solid #fff; display: none; pointer-events: none; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    /* ================== DANH SÁCH LIÊN HỆ ================== */
+    .unit-card {
+      background: #FFFFFF; border-radius: 18px; padding: 16px 20px; margin-bottom: 12px;
+      display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03); cursor: pointer; transition: 0.2s; border: 1px solid #F0F0F0;
+    }
+    .unit-card:active { transform: scale(0.98); background: #F9F9F9; }
+    
+    .unit-left-info { display: flex; align-items: center; gap: 12px; }
+    .unit-icon-play { color: #1976D2; font-size: 11px; font-weight: 900; width: 12px; text-align: center;}
+    .unit-icon-build { font-size: 18px; }
+    .unit-name { font-size: 16px; font-weight: 800; color: #333; }
+    
     .unit-count { 
-      background: #eaf6ff; padding: 4px 10px; border-radius: 20px; 
-      font-size: 13px; color: #1976d2; font-weight: bold;
+      background: #F0F0F5; padding: 4px; border-radius: 50%; 
+      font-size: 13px; color: #888; font-weight: 800;
+      width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
     }
     
     .unit-content { display: none; padding: 0 5px; margin-bottom: 20px; }
@@ -50,20 +74,20 @@
     .contact-card {
       background: #FFFFFF; border-radius: 16px; padding: 15px; margin-bottom: 10px;
       display: flex; justify-content: space-between; align-items: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.03); border-left: 4px solid #4caf50;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03); border-left: 4px solid #4CAF50;
     }
     .contact-info { flex: 1; display: flex; flex-direction: column; gap: 4px; cursor: pointer; }
-    .contact-name { font-size: 16px; font-weight: 800; color: #1C1C1E; }
-    .contact-phone { font-size: 14px; color: #007AFF; font-weight: 700; margin-top: 2px; }
+    .contact-name { font-size: 16px; font-weight: 800; color: #222; }
+    .contact-phone { font-size: 14px; color: #1976D2; font-weight: 700; margin-top: 2px; }
     
     .btn-call {
-      width: 44px; height: 44px; border-radius: 50%; background: #E6F4EA; color: #34C759;
+      width: 42px; height: 42px; border-radius: 50%; background: #E8F5E9; color: #2E7D32;
       display: flex; align-items: center; justify-content: center; font-size: 20px;
-      text-decoration: none; transition: 0.2s; box-shadow: 0 2px 6px rgba(52, 199, 89, 0.25);
+      text-decoration: none; transition: 0.2s; box-shadow: 0 2px 6px rgba(76, 175, 80, 0.2);
     }
     .btn-call:active { transform: scale(0.9); }
 
-    /* ================== MODAL THÊM/SỬA ================== */
+    /* ================== MODAL CHUNG ================== */
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.4); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
@@ -72,130 +96,247 @@
     }
     .modal-overlay.show { opacity: 1; }
     .modal-content {
-      background: #F2F2F7; width: 100%; max-height: 90vh; max-width: 600px;
-      border-radius: 24px 24px 0 0; padding: 20px 20px 40px 20px; overflow-y: auto;
+      background: #F4F5F7; width: 100%; max-height: 92vh; max-width: 600px;
+      border-radius: 24px 24px 0 0; padding: 15px 20px 30px 20px; overflow-y: auto;
       transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.1);
-      box-shadow: 0 -10px 25px rgba(0,0,0,0.1);
+      box-shadow: 0 -10px 25px rgba(0,0,0,0.1); display: flex; flex-direction: column;
     }
     .modal-overlay.show .modal-content { transform: translateY(0); }
     
-    .pull-bar { width: 40px; height: 5px; background: #C7C7CC; border-radius: 3px; margin: 0 auto 20px auto; }
-    .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .modal-title { font-size: 20px; font-weight: 800; margin: 0; color: #007AFF; }
-    .btn-close-modal { background: #E5E5EA; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 14px; font-weight: bold; color: #8E8E93; cursor: pointer; display: flex; align-items: center; justify-content: center;}
+    .pull-bar { width: 40px; height: 5px; background: #D1D1D6; border-radius: 3px; margin: 0 auto 15px auto; }
+    .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;}
+    .modal-title { font-size: 20px; font-weight: 800; margin: 0; color: #1976D2; }
+    .btn-close-modal { background: #E5E5EA; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 14px; font-weight: bold; color: #555; cursor: pointer; display: flex; align-items: center; justify-content: center;}
 
-    label { display: block; font-size: 14px; font-weight: 800; color: #333; margin-bottom: 8px; }
-    .modal-input {
-      width: 100%; padding: 15px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); 
-      margin-bottom: 20px; font-size: 16px; outline: none; background: #fff;
+    /* ================== UI CÀI ĐẶT NHÓM ================== */
+    .group-input-wrapper { 
+      display: flex; background: #fff; border-radius: 12px; border: 1px solid #E0E0E0; 
+      overflow: hidden; margin-bottom: 20px;
     }
-    .modal-input:focus { border: 2px solid #007AFF; }
+    .group-input-wrapper input { 
+      border: none; padding: 14px 15px; font-size: 15px; flex: 1; outline: none; background: transparent;
+    }
+    .group-input-wrapper button { 
+      background: #4CAF50; color: white; border: none; padding: 0 20px; 
+      font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.2s;
+    }
+    .group-input-wrapper button:active { background: #388E3C; }
     
-    .btn { 
-      padding: 16px; font-size: 16px; font-weight: bold; border: none; border-radius: 12px; 
-      color: #fff; cursor: pointer; text-align: center;
+    .setting-list-box {
+      background: #FFFFFF; border-radius: 16px; border: 1px solid #E0E0E0;
+      overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
     }
-    .btn:active { transform: scale(0.98); }
-
-    /* ================== NÚT CÀI ĐẶT NHÓM ================== */
-    .btn-action-sm {
+    
+    .group-item-card {
+      padding: 12px 15px; display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid #F0F0F0;
+    }
+    .group-item-card:last-child { border-bottom: none; }
+    
+    .group-item-name { font-weight: 800; font-size: 15px; color: #333; }
+    
+    .group-actions { display: flex; gap: 6px; }
+    .btn-sq {
       width: 32px; height: 32px; border-radius: 8px; border: none; 
       display: flex; align-items: center; justify-content: center; 
-      font-size: 14px; cursor: pointer; transition: 0.2s; font-weight: bold;
+      font-size: 12px; cursor: pointer; transition: 0.2s; font-weight: 900;
     }
-    .btn-up { background: #e8f5e9; color: #2e7d32; }
-    .btn-down { background: #fff3e0; color: #ef6c00; }
-    .btn-del { background: #ffebee; color: #c62828; }
-    .btn-action-sm:active { transform: scale(0.9); }
+    .btn-up { background: #F0F0F5; color: #555; }
+    .btn-down { background: #F0F0F5; color: #555; }
+    .btn-edit { background: #FFF3E0; color: #FF9800; font-size: 14px;}
+    .btn-del { background: #FFEBEE; color: #FF3B30; font-size: 14px;}
+    .btn-sq:active { transform: scale(0.9); }
+
+    /* ================== KHO CHỜ DUYỆT ================== */
+    .pending-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 5px; border-bottom: 1px solid #E0E0E0; padding-bottom: 15px;}
+    .custom-checkbox {
+      appearance: none; width: 22px; height: 22px; border: 2px solid #C7C7CC; border-radius: 6px;
+      outline: none; cursor: pointer; position: relative; background: #fff; transition: 0.2s; margin:0;
+    }
+    .custom-checkbox:checked { background: #1976D2; border-color: #1976D2; }
+    .custom-checkbox:checked::after {
+      content: '✔'; position: absolute; color: white; font-size: 14px;
+      top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold;
+    }
+    
+    .text-blue-bold { color: #1976D2; font-weight: 800; font-size: 15px; cursor: pointer; }
+    .text-red-bold { color: #FF3B30; font-weight: 800; font-size: 14px; cursor: pointer; background: none; border: none; }
+
+    .pending-list { flex: 1; overflow-y: auto; padding-bottom: 10px; margin-bottom: 10px; }
+    .pending-card {
+      background: #fff; border-radius: 14px; padding: 15px; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 15px; border: 1px solid #E0E0E0; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .p-name { font-weight: 800; color: #222; font-size: 15px; margin-bottom: 4px; display: block;}
+    .p-phone { font-weight: 700; color: #1976D2; font-size: 14px; display: block;}
+
+    .bottom-action-card {
+      background: #fff; padding: 15px; border-radius: 16px; margin-top: 5px;
+      box-shadow: 0 -4px 15px rgba(0,0,0,0.05); border: 1px solid #E0E0E0;
+    }
+    .bottom-action-title { font-size: 14px; font-weight: 800; color: #333; margin-bottom: 10px; }
+
+    /* ================== Ô NHẬP LIỆU CHUNG & DROPDOWN ================== */
+    .smart-input-container { position: relative; margin-bottom: 15px; }
+    .smart-input {
+      width: 100%; padding: 15px; font-size: 16px; border: 1px solid #E0E0E0; border-radius: 12px;
+      outline: none; box-sizing: border-box; background: #fff; transition: 0.2s;
+    }
+    .smart-input:focus { border-color: #4CAF50; box-shadow: 0 0 0 3px rgba(76,175,80,0.1);}
+    
+    .smart-dropdown {
+      position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #ddd;
+      border-radius: 12px; max-height: 180px; overflow-y: auto; z-index: 100; display: none;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15); margin-top: 5px;
+    }
+    .smart-dropdown-item {
+      padding: 12px 15px; border-bottom: 1px solid #eee; cursor: pointer; 
+      font-size: 15px; font-weight: 700; color: #333;
+    }
+    .smart-dropdown-item:last-child { border-bottom: none; }
+    .smart-dropdown-item:active { background: #F0F7FF; }
+    
+    .btn-green-large {
+      width: 100%; background: #4CAF50; color: white; padding: 16px; border: none;
+      border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 5px; transition: 0.2s;
+    }
+    .btn-green-large:active { background: #388E3C; transform: scale(0.98);}
+
+    .btn-blue-large {
+      width: 100%; background: #1976D2; color: white; padding: 16px; border: none;
+      border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s;
+    }
+    .btn-blue-large:active { background: #1565C0; transform: scale(0.98);}
+
+    .input-label { font-size: 14px; font-weight: 800; color: #555; margin-bottom: 8px; display: block;}
+
+    /* ================== THÔNG BÁO TỰ TẠO (THAY THẾ ALERT/CONFIRM) ================== */
+    .custom-dialog-box {
+      background: #fff; width: 85%; max-width: 320px; border-radius: 20px; padding: 25px 20px 20px 20px;
+      text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transform: scale(0.9); opacity: 0;
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); margin: auto;
+    }
+    #custom-dialog-wrapper.show .custom-dialog-box { transform: scale(1); opacity: 1; }
+    .dialog-title { font-size: 18px; font-weight: 800; color: #1C1C1E; margin: 0 0 10px 0; }
+    .dialog-message { font-size: 15px; color: #555; margin: 0 0 20px 0; line-height: 1.4; }
+    .dialog-buttons { display: flex; gap: 10px; }
+    .btn-dialog { flex: 1; padding: 12px; border-radius: 10px; font-weight: bold; border: none; font-size: 15px; cursor: pointer;}
   </style>
 </head>
 <body>
 
+  <!-- DATALIST ẨN (Dự phòng cho autocomplete) -->
+  <datalist id="group-suggestions"></datalist>
+
   <div class="container">
     <div class="dash-header">
-      <h2>📇 DANH BẠ NỘI BỘ</h2>
+      <span style="font-size: 28px;">📇</span>
+      <h2>DANH BẠ NỘI BỘ</h2>
     </div>
 
-    <!-- TÌM KIẾM & NÚT THÊM -->
-    <div class="search-bar-container">
-      <input type="text" id="search-contact" class="search-input" placeholder="Tìm tên, SĐT, nhóm..." onkeyup="searchContacts()">
-      <button class="btn-add" style="background:#ff9800; font-size:22px;" onclick="openGroupSettingsModal()" title="Cài đặt Nhóm">⚙️</button>
-      <button class="btn-add" style="background:#8e44ad; font-size:20px;" onclick="document.getElementById('contact-file-upload').click()" title="Nhập từ file CSV/VCF">📁</button>
-      <button class="btn-add" style="background:#007AFF; font-size:22px;" onclick="importFromContacts()" title="Nhập từ danh bạ thiết bị">📇</button>
-      <button class="btn-add" onclick="openContactModal()" title="Thêm thủ công">+</button>
+    <!-- TÌM KIẾM & NÚT THÊM (Cấu trúc mới theo ảnh 3) -->
+    <div class="top-controls">
+      <!-- Dòng 1: Tìm kiếm -->
+      <div class="search-row">
+        <input type="text" id="search-contact" class="search-input" placeholder="🔍 Tìm kiếm tên, SĐT..." onkeyup="searchContacts()">
+      </div>
       
-      <!-- Nơi nhận file ẩn -->
+      <!-- Dòng 2: Các nút thao tác -->
+      <div class="action-buttons-row">
+        <button class="btn-act btn-setting" onclick="openGroupSettingsModal()" title="Cài đặt Nhóm">⚙️</button>
+        
+        <div style="position: relative; flex: 1;">
+          <button class="btn-act btn-pending" style="width:100%;" onclick="openPendingModal()" title="Kho chờ duyệt">📥</button>
+          <span id="pending-badge" class="pending-badge">0</span>
+        </div>
+
+        <button class="btn-act btn-file" onclick="document.getElementById('contact-file-upload').click()" title="Nhập từ file CSV/VCF">📁</button>
+        <button class="btn-act btn-device" onclick="importFromContacts()" title="Nhập từ điện thoại">📇</button>
+        <button class="btn-act btn-add-manual" onclick="openContactModal()" title="Thêm thủ công">+</button>
+      </div>
+      
       <input type="file" id="contact-file-upload" style="display:none;" accept=".csv, .vcf, text/csv, text/vcard" onchange="handleContactFileUpload(event)">
     </div>
 
-    <!-- DANH SÁCH LIÊN HỆ -->
+    <!-- DANH SÁCH LIÊN HỆ CHÍNH -->
     <div id="contact-list">
-      <!-- Sẽ được render bằng JavaScript -->
+      <!-- Render bằng JavaScript -->
     </div>
   </div>
 
-  <!-- MODAL CHỌN NHÓM CHO LIÊN HỆ ĐÃ NHẬP TỪ DANH BẠ -->
-  <div id="import-group-modal" class="modal-overlay" onclick="if(event.target === this) closeImportGroupModal()">
-    <div class="modal-content">
-      <div class="pull-bar"></div>
-      <div class="modal-head">
-        <h3 class="modal-title">Xếp Nhóm Liên Hệ</h3>
-        <button class="btn-close-modal" onclick="closeImportGroupModal()">✕</button>
-      </div>
-      
-      <div style="margin-bottom: 15px; font-size: 14px; color: #555; line-height: 1.4;">
-        Đã chọn <b id="import-count" style="color:#007AFF; font-size: 16px;">0</b> liên hệ từ điện thoại.<br>Vui lòng chọn hoặc nhập nhóm cho các liên hệ này:
-      </div>
-      
-      <label>Nhóm / Chức vụ:</label>
-      <input type="text" id="import-contact-group" class="modal-input" placeholder="VD: Đội Trực..." list="group-suggestions" />
-
-      <button onclick="saveImportedContacts()" class="btn" style="background:#4caf50; width:100%;">HOÀN TẤT THÊM</button>
-    </div>
-  </div>
-
-  <!-- MODAL CẢNH BÁO IOS (MỚI THÊM) -->
-  <div id="ios-warning-modal" class="modal-overlay" onclick="if(event.target === this) closeIosWarningModal()">
-    <div class="modal-content" style="text-align: center;">
-      <div class="pull-bar"></div>
-      <div style="font-size: 50px; margin-bottom: 10px;">🍎</div>
-      <h3 style="color: #1C1C1E; margin: 0 0 15px 0; font-size: 20px; font-weight: 800;">Hạn Chế Của iOS</h3>
-      <p style="color: #555; font-size: 15px; line-height: 1.5; margin-bottom: 25px; padding: 0 10px;">
-        Hệ điều hành iOS (iPhone/iPad) hiện <b>chưa cho phép</b> các trang Web truy cập tự động vào Danh bạ để bảo vệ quyền riêng tư.<br><br>
-        Bạn có thể tải lên tệp <b>.VCF / .CSV</b> hoặc thêm liên hệ theo cách thủ công!
-      </p>
-      <div style="display:flex; gap:8px; flex-wrap: wrap; justify-content: center;">
-        <button onclick="closeIosWarningModal()" class="btn" style="background:#E5E5EA; color: #333; flex: 1;">ĐÓNG</button>
-        <button onclick="closeIosWarningModal(); document.getElementById('contact-file-upload').click();" class="btn" style="background:#8e44ad; flex: 1;">📁 TẢI FILE VCF</button>
-        <button onclick="closeIosWarningModal(); openContactModal();" class="btn" style="background:#4caf50; flex: 1; min-width: 100%;">+ THÊM THỦ CÔNG</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL CÀI ĐẶT NHÓM -->
+  <!-- ======================================================= -->
+  <!-- MODAL CÀI ĐẶT NHÓM (CÓ SỬA, XÓA, SẮP XẾP) -->
+  <!-- ======================================================= -->
   <div id="group-settings-modal" class="modal-overlay" onclick="if(event.target === this) closeGroupSettingsModal()">
     <div class="modal-content">
       <div class="pull-bar"></div>
       <div class="modal-head">
-        <h3 class="modal-title">Cài Đặt Nhóm</h3>
+        <h3 class="modal-title">Cài Đặt Hệ Thống</h3>
         <button class="btn-close-modal" onclick="closeGroupSettingsModal()">✕</button>
       </div>
 
-      <div style="display:flex; gap:8px; margin-bottom:20px;">
-        <input type="text" id="new-group-input" class="modal-input" style="margin-bottom:0; flex:1;" placeholder="Nhập tên nhóm mới...">
-        <button onclick="addNewGroup()" class="btn" style="background:#4caf50; padding:0 20px;">THÊM</button>
+      <div style="font-size:13px; color:#1976D2; font-weight:800; margin-bottom:10px; text-transform: uppercase;">⚡ TẠO NHÓM MỚI</div>
+      <div class="group-input-wrapper">
+        <input type="text" id="new-group-input" placeholder="Tên nhóm công việc...">
+        <button onclick="addNewGroup()">THÊM</button>
       </div>
 
-      <div style="font-size:13px; color:#1976d2; font-weight:bold; margin-bottom:10px;">DANH SÁCH NHÓM HIỆN TẠI:</div>
-      <div id="group-settings-list" style="max-height:45vh; overflow-y:auto; padding-right:5px; margin-bottom: 20px;">
-        <!-- JS render -->
+      <div style="font-size:13px; color:#1976D2; font-weight:800; margin-bottom:10px; text-transform: uppercase;">📂 QUẢN LÝ DANH SÁCH</div>
+      <div class="setting-list-box">
+        <div id="group-settings-list" style="max-height:45vh; overflow-y:auto;">
+          <!-- JS render ở đây -->
+        </div>
       </div>
       
-      <button onclick="closeGroupSettingsModal()" class="btn" style="background:#007AFF; width:100%;">LƯU THAY ĐỔI</button>
     </div>
   </div>
 
-  <!-- MODAL THÊM/SỬA LIÊN HỆ -->
+  <!-- ======================================================= -->
+  <!-- MODAL KHO CHỜ DUYỆT -->
+  <div id="pending-modal" class="modal-overlay" onclick="if(event.target === this) closePendingModal()">
+    <div class="modal-content" style="max-height: 95vh; padding-bottom: 20px;">
+      <div class="pull-bar"></div>
+      <div class="modal-head">
+        <h3 class="modal-title" style="display:flex; align-items:center; gap:8px;">📥 Kho Chờ Duyệt</h3>
+        <button class="btn-close-modal" onclick="closePendingModal()">✕</button>
+      </div>
+
+      <!-- Đã khôi phục thanh tìm kiếm bị mất -->
+      <input type="text" id="search-pending" class="smart-input" style="margin-bottom: 15px; padding: 10px 15px;" placeholder="🔍 Tìm tên hoặc số điện thoại..." onkeyup="searchPending()">
+      
+      <div class="pending-header-row">
+        <label style="display:flex; align-items:center; cursor:pointer; gap:10px;">
+          <input type="checkbox" id="chk-select-all-pending" class="custom-checkbox" onchange="toggleSelectAllPending()"> 
+          <span class="text-blue-bold">Chọn tất cả</span>
+        </label>
+        <button onclick="deleteSelectedPending()" class="text-red-bold">Xóa đã chọn</button>
+      </div>
+
+      <!-- Danh sách -->
+      <div id="pending-list-container" class="pending-list">
+        <!-- JS Render -->
+      </div>
+      
+      <!-- Box Nhập nhóm có Select thông minh -->
+      <div class="bottom-action-card">
+        <div class="bottom-action-title">Xếp các số ĐÃ CHỌN vào Nhóm:</div>
+        
+        <div class="smart-input-container" style="margin-bottom: 10px;">
+          <input type="text" id="pending-group-input" class="smart-input" placeholder="Gõ tìm hoặc tạo nhóm mới..." 
+                 onfocus="showGroupDropdown('pending-dropdown', 'pending-group-input')" 
+                 onkeyup="filterGroupDropdown(this.value, 'pending-dropdown', 'pending-group-input')"
+                 autocomplete="off">
+          <div id="pending-dropdown" class="smart-dropdown"></div>
+        </div>
+
+        <button onclick="saveSelectedPendingToMain()" class="btn-green-large">XÁC NHẬN ĐƯA VÀO DANH BẠ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- MODAL THÊM/SỬA LIÊN HỆ THỦ CÔNG -->
+  <!-- ======================================================= -->
   <div id="contact-modal" class="modal-overlay" onclick="if(event.target === this) closeContactModal()">
     <div class="modal-content">
       <div class="pull-bar"></div>
@@ -206,75 +347,222 @@
       
       <input type="hidden" id="contact-id">
       
-      <label>Tên liên hệ:</label>
-      <input type="text" id="contact-name" class="modal-input" placeholder="VD: Đ/c Nguyễn Văn A" />
+      <label class="input-label">Tên liên hệ:</label>
+      <input type="text" id="contact-name" class="smart-input" style="margin-bottom:15px;" placeholder="VD: Nguyễn Văn A" />
       
-      <label>Số điện thoại:</label>
-      <input type="tel" id="contact-phone" class="modal-input" placeholder="VD: 0987654321" />
+      <label class="input-label">Số điện thoại:</label>
+      <input type="tel" id="contact-phone" class="smart-input" style="margin-bottom:15px;" placeholder="VD: 0987654321" />
       
-      <label>Nhóm / Chức vụ:</label>
-      <input type="text" id="contact-group" class="modal-input" placeholder="VD: Ban chỉ huy, Đội trực..." list="group-suggestions" />
-      
-      <!-- Gợi ý nhóm khi gõ -->
-      <datalist id="group-suggestions">
-        <!-- Render động qua JS -->
-      </datalist>
+      <label class="input-label">Nhóm / Chức vụ:</label>
+      <div class="smart-input-container" style="margin-bottom:0;">
+        <input type="text" id="manual-group-input" class="smart-input" style="margin-bottom:0;" placeholder="Gõ tìm hoặc tạo nhóm mới..." 
+               onfocus="showGroupDropdown('manual-dropdown', 'manual-group-input')" 
+               onkeyup="filterGroupDropdown(this.value, 'manual-dropdown', 'manual-group-input')"
+               autocomplete="off">
+        <div id="manual-dropdown" class="smart-dropdown"></div>
+      </div>
 
-      <div style="display:flex; gap:10px;">
-        <button id="btn-delete-contact" onclick="deleteContact()" class="btn" style="background:#FF3B30; display:none; flex: 0.4;">XÓA</button>
-        <button onclick="saveContact()" class="btn" style="background:#007AFF; flex: 1;">LƯU LIÊN HỆ</button>
+      <div style="display:flex; gap:10px; margin-top: 20px;">
+        <button id="btn-delete-contact" onclick="deleteContact()" style="background:#FFEBEE; color:#FF3B30; display:none; flex: 0.4; padding: 16px; border-radius: 12px; font-weight: bold; border: none; cursor: pointer;">XÓA</button>
+        <button onclick="saveContact()" class="btn-blue-large" style="margin-top:0; flex: 1;">LƯU LIÊN HỆ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- MODAL CẢNH BÁO IOS -->
+  <!-- ======================================================= -->
+  <div id="ios-warning-modal" class="modal-overlay" onclick="if(event.target === this) closeIosWarningModal()">
+    <div class="modal-content" style="text-align: center;">
+      <div class="pull-bar"></div>
+      <div style="font-size: 50px; margin-bottom: 10px;">🍎</div>
+      <h3 style="color: #1C1C1E; margin: 0 0 15px 0; font-size: 20px; font-weight: 800;">Hạn Chế Của iOS</h3>
+      <p style="color: #555; font-size: 15px; line-height: 1.5; margin-bottom: 25px; padding: 0 10px;">
+        Apple hiện <b>chưa cho phép</b> các trang Web truy cập tự động vào Danh bạ thiết bị để bảo vệ quyền riêng tư.<br><br>
+        Vui lòng tải tệp <b>.VCF / .CSV</b> lên hoặc thêm thủ công!
+      </p>
+      <div style="display:flex; gap:8px; flex-wrap: wrap; justify-content: center;">
+        <button onclick="closeIosWarningModal()" class="btn-blue-large" style="background:#E5E5EA; color: #333; flex: 1; margin-top:0;">ĐÓNG</button>
+        <button onclick="closeIosWarningModal(); document.getElementById('contact-file-upload').click();" class="btn-blue-large" style="background:#9C27B0; flex: 1; margin-top:0;">📁 TẢI FILE</button>
+        <button onclick="closeIosWarningModal(); openContactModal();" class="btn-green-large" style="min-width: 100%; margin-top:0;">+ THÊM THỦ CÔNG</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- HỘP THOẠI THÔNG BÁO TỰ TẠO (THAY THẾ ALERT/CONFIRM/PROMPT) -->
+  <div id="custom-dialog-wrapper" class="modal-overlay" style="z-index: 10005;">
+    <div class="custom-dialog-box">
+      <h3 id="dialog-title" class="dialog-title">Thông báo</h3>
+      <p id="dialog-message" class="dialog-message">Nội dung</p>
+      <!-- Khung nhập tên mới thay thế cho prompt() bị lỗi -->
+      <input type="text" id="dialog-prompt-input" style="display:none; width: 100%; padding: 12px; font-size: 16px; border: 1px solid #E0E0E0; border-radius: 10px; outline: none; box-sizing: border-box; background: #F9F9F9; text-align: center; margin-bottom: 20px;">
+      <div id="dialog-buttons" class="dialog-buttons">
+        <!-- JS Render -->
       </div>
     </div>
   </div>
 
 <script>
-  // Quản lý trạng thái (State)
+  // ================== CƠ CHẾ SINH ID NGẪU NHIÊN ==================
+  function genId() {
+      return Date.now().toString() + Math.floor(Math.random() * 1000).toString();
+  }
+
+  // ================== STATE MANAGEMENT ==================
   const STATE = {
     contacts: [],
-    groups: []
+    groups: [],
+    pending: [],
+    selectedPendingIds: [], 
+    activeDropdownId: null
   };
 
-  // Khởi tạo khi load trang
+  // Khởi tạo ứng dụng
   window.onload = () => {
     let savedContacts = localStorage.getItem('appContactsStandalone');
-    if (savedContacts) {
-        STATE.contacts = JSON.parse(savedContacts);
-    } else {
-        // Mock data mặc định
-        STATE.contacts = [
-            { id: 1, name: 'Phòng Trực Ban', phone: '113', group: 'Khẩn cấp' },
-            { id: 2, name: 'Bảo vệ Cổng chính', phone: '0123456789', group: 'Khẩn cấp' },
-            { id: 3, name: 'Đ/c Chỉ huy trưởng', phone: '0987654321', group: 'Ban Chỉ Huy' },
-            { id: 4, name: 'Đ/c Kỹ thuật điện', phone: '0912345678', group: 'Bảo Trì / Kỹ Thuật' }
-        ];
-        localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts));
-    }
+    STATE.contacts = savedContacts ? JSON.parse(savedContacts) : [];
 
     let savedGroups = localStorage.getItem('appGroupsStandalone');
     if (savedGroups) {
         STATE.groups = JSON.parse(savedGroups);
     } else {
-        STATE.groups = ['Khẩn cấp', 'Ban Chỉ Huy', 'Đội Trực', 'Bảo Trì / Kỹ Thuật'];
+        STATE.groups = ['Ban Chỉ Huy', 'Khẩn cấp', 'Đội Trực', 'Bảo Trì / Kỹ Thuật'];
         localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups));
     }
 
+    let savedPending = localStorage.getItem('appPendingContacts');
+    if (savedPending) {
+        STATE.pending = JSON.parse(savedPending);
+    }
+
+    updateDataLists(); 
     renderContacts();
+    updatePendingBadge();
+    
+    // Đóng dropdown khi click ra ngoài
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.smart-input-container')) {
+            hideAllDropdowns();
+        }
+    });
   };
 
-  // Render danh sách ra HTML
-  function renderContacts(data = STATE.contacts, isSearch = false) {
+  // ================== CUSTOM DIALOG (GIẢI QUYẾT LỖI BỊ ĐƠ TRÊN IOS/ZALO) ==================
+  window.showDialog = function(title, message, type, confirmCallback, defaultValue = '') {
+      document.getElementById('dialog-title').innerText = title;
+      document.getElementById('dialog-message').innerHTML = message; 
+      
+      let btnContainer = document.getElementById('dialog-buttons');
+      let promptInput = document.getElementById('dialog-prompt-input');
+      
+      if (type === 'prompt') {
+          promptInput.style.display = 'block';
+          promptInput.value = defaultValue;
+      } else {
+          promptInput.style.display = 'none';
+      }
+      
+      btnContainer.innerHTML = '';
+
+      let wrapper = document.getElementById('custom-dialog-wrapper');
+      wrapper.style.display = 'flex';
+      setTimeout(() => wrapper.classList.add('show'), 10);
+
+      window.closeDialog = function() {
+          wrapper.classList.remove('show');
+          setTimeout(() => wrapper.style.display = 'none', 300);
+      };
+
+      if (type === 'alert') {
+          btnContainer.innerHTML = `<button onclick="closeDialog()" class="btn-dialog" style="background:#1976D2; color:white;">ĐÓNG</button>`;
+      } else if (type === 'confirm') {
+          btnContainer.innerHTML = `
+              <button onclick="closeDialog()" class="btn-dialog" style="background:#E5E5EA; color:#333;">HỦY</button>
+              <button id="dialog-confirm-btn" class="btn-dialog" style="background:#FF3B30; color:white;">ĐỒNG Ý</button>
+          `;
+          document.getElementById('dialog-confirm-btn').onclick = function() {
+              closeDialog();
+              if(confirmCallback) confirmCallback();
+          };
+      } else if (type === 'prompt') {
+          btnContainer.innerHTML = `
+              <button onclick="closeDialog()" class="btn-dialog" style="background:#E5E5EA; color:#333;">HỦY</button>
+              <button id="dialog-confirm-btn" class="btn-dialog" style="background:#4CAF50; color:white;">LƯU</button>
+          `;
+          document.getElementById('dialog-confirm-btn').onclick = function() {
+              let val = promptInput.value;
+              closeDialog();
+              if(confirmCallback) confirmCallback(val);
+          };
+      }
+  }
+
+  // ================== UPDATE HỖ TRỢ DỮ LIỆU ==================
+  window.updateDataLists = function() {
+      const datalist = document.getElementById('group-suggestions');
+      if(datalist) datalist.innerHTML = STATE.groups.map(g => `<option value="${g}">`).join('');
+  }
+
+  window.updatePendingBadge = function() {
+      let badge = document.getElementById('pending-badge');
+      if (STATE.pending.length > 0) {
+          badge.innerText = STATE.pending.length > 99 ? '99+' : STATE.pending.length;
+          badge.style.display = 'block';
+      } else {
+          badge.style.display = 'none';
+      }
+  }
+
+  // ================== DROPDOWN NHÓM THÔNG MINH ==================
+  window.showGroupDropdown = function(dropdownId, inputId) {
+      hideAllDropdowns();
+      let dropdown = document.getElementById(dropdownId);
+      if(!dropdown) return;
+      dropdown.style.display = 'block';
+      STATE.activeDropdownId = dropdownId;
+      
+      let html = STATE.groups.map(g => `<div class="smart-dropdown-item" onclick="selectGroupItem('${g}', '${inputId}')">${g}</div>`).join('');
+      if(STATE.groups.length === 0) html = `<div style="padding:10px; color:#888; font-size:13px; text-align:center;">Chưa có nhóm nào.</div>`;
+      dropdown.innerHTML = html;
+  }
+
+  window.filterGroupDropdown = function(keyword, dropdownId, inputId) {
+      let dropdown = document.getElementById(dropdownId);
+      if(!dropdown) return;
+      dropdown.style.display = 'block';
+      
+      let filtered = STATE.groups.filter(g => g.toLowerCase().includes(keyword.toLowerCase()));
+      let html = filtered.map(g => `<div class="smart-dropdown-item" onclick="selectGroupItem('${g}', '${inputId}')">${g}</div>`).join('');
+      
+      if (keyword.trim() && !STATE.groups.some(g => g.toLowerCase() === keyword.toLowerCase())) {
+          html += `<div class="smart-dropdown-item" style="color:#007AFF;" onclick="selectGroupItem('${keyword.trim()}', '${inputId}')">➕ Tạo nhóm mới: "${keyword.trim()}"</div>`;
+      }
+      
+      if(!html) html = `<div style="padding:10px; color:#888; font-size:13px; text-align:center;">Nhập để tạo mới...</div>`;
+      dropdown.innerHTML = html;
+  }
+
+  window.selectGroupItem = function(val, inputId) {
+      let input = document.getElementById(inputId);
+      if(input) input.value = val;
+      hideAllDropdowns();
+  }
+
+  window.hideAllDropdowns = function() {
+      document.querySelectorAll('.smart-dropdown').forEach(el => el.style.display = 'none');
+      STATE.activeDropdownId = null;
+  }
+
+  // ================== RENDER TRANG CHỦ ==================
+  window.renderContacts = function(data = STATE.contacts, isSearch = false) {
       const container = document.getElementById('contact-list');
       
-      // Update Datalist cho Modal Thêm/Sửa
-      const datalist = document.getElementById('group-suggestions');
-      datalist.innerHTML = STATE.groups.map(g => `<option value="${g}">`).join('');
-
       if (data.length === 0 && !isSearch && STATE.groups.length === 0) {
-          container.innerHTML = '<div style="text-align:center; padding: 30px; color:#8E8E93;">Chưa có liên hệ nào.<br>Bấm dấu <b>+</b> để thêm.</div>';
+          container.innerHTML = '<div style="text-align:center; padding: 40px 20px; color:#8E8E93; line-height: 1.5;">Chưa có liên hệ nào.<br>Hãy thêm hoặc đồng bộ danh bạ.</div>';
           return;
       }
 
-      // Nhóm các liên hệ theo 'group' dựa trên thứ tự STATE.groups
       let grouped = {};
       STATE.groups.forEach(g => grouped[g] = []);
 
@@ -283,17 +571,16 @@
           if (!grouped[g]) {
               grouped[g] = [];
               if (!STATE.groups.includes(g)) {
-                  STATE.groups.push(g);
+                  STATE.groups.unshift(g);
                   localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups));
+                  updateDataLists();
               }
           }
           grouped[g].push(c);
       });
 
-      // Tạo HTML dạng Accordion (Gập/Mở)
       let html = STATE.groups.map((g, idx) => {
           let count = grouped[g].length;
-          // Khi tìm kiếm, ẩn các nhóm không có dữ liệu
           if (isSearch && count === 0) return ''; 
 
           let unitId = 'unit-' + idx;
@@ -302,21 +589,22 @@
 
           let groupHtml = `
               <div class="unit-card" onclick="toggleUnit('${unitId}')">
-                  <div style="display:flex; align-items:center; gap:10px;">
-                      <span id="icon-${unitId}" style="color:#888; font-size:14px; width:15px; display:inline-block; text-align:center;">${chevron}</span>
-                      <span>🏢 ${g}</span>
+                  <div class="unit-left-info">
+                      <span id="icon-${unitId}" class="unit-icon-play">${chevron}</span>
+                      <span class="unit-icon-build">🏢</span>
+                      <span class="unit-name">${g}</span>
                   </div>
-                  <span class="unit-count">${count} người</span>
+                  <span class="unit-count">${count}</span>
               </div>
           `;
 
           let itemsHtml = `<div id="${unitId}" class="unit-content ${isOpenClass}">`;
           if (count === 0) {
-              itemsHtml += `<div style="padding:10px; color:#888; font-size:13px; text-align:center; font-style:italic;">Nhóm trống</div>`;
+              itemsHtml += `<div style="padding:10px; color:#8E8E93; font-size:13px; text-align:center; font-style:italic;">Chưa có người</div>`;
           } else {
               itemsHtml += grouped[g].map(c => `
                   <div class="contact-card">
-                      <div class="contact-info" onclick="openContactModal(${c.id})">
+                      <div class="contact-info" onclick="openContactModal('${c.id}')">
                           <span class="contact-name">${c.name}</span>
                           <span class="contact-phone">${c.phone}</span>
                       </div>
@@ -330,16 +618,17 @@
       }).join('');
       
       if(data.length === 0 && isSearch) {
-          container.innerHTML = '<div style="text-align:center; padding: 30px; color:#8E8E93;">Không tìm thấy kết quả.</div>';
+          container.innerHTML = '<div style="text-align:center; padding: 40px; color:#8E8E93;">Không tìm thấy kết quả.</div>';
       } else {
           container.innerHTML = html;
       }
   }
 
-  // Đóng/Mở danh sách đơn vị
-  function toggleUnit(unitId) {
+  window.toggleUnit = function(unitId) {
       let content = document.getElementById(unitId);
       let icon = document.getElementById('icon-' + unitId);
+      if(!content || !icon) return;
+
       if (content.classList.contains('open')) {
           content.classList.remove('open');
           icon.innerText = '▶';
@@ -349,11 +638,10 @@
       }
   }
 
-  // Tìm kiếm
-  function searchContacts() {
+  window.searchContacts = function() {
       let keyword = document.getElementById('search-contact').value.toLowerCase();
       if (!keyword) {
-          renderContacts(STATE.contacts, false); // false = Đóng tất cả các thư mục
+          renderContacts(STATE.contacts, false);
           return;
       }
       let filtered = STATE.contacts.filter(c => 
@@ -361,21 +649,306 @@
           (c.phone && c.phone.includes(keyword)) ||
           (c.group && c.group.toLowerCase().includes(keyword))
       );
-      renderContacts(filtered, true); // true = Tự động mở tung thư mục chứa kết quả
+      renderContacts(filtered, true); 
   }
 
-  // Mở Modal (Thêm hoặc Sửa)
-  function openContactModal(id = null) {
+
+  // ================== CÀI ĐẶT NHÓM (SỬA, XÓA MƯỢT MÀ) ==================
+  window.openGroupSettingsModal = function() {
+      renderGroupSettingsList();
+      let modal = document.getElementById('group-settings-modal');
+      modal.style.display = 'flex';
+      setTimeout(() => modal.classList.add('show'), 10);
+  }
+
+  window.closeGroupSettingsModal = function() {
+      let modal = document.getElementById('group-settings-modal');
+      modal.classList.remove('show');
+      setTimeout(() => modal.style.display = 'none', 300);
+      renderContacts(STATE.contacts, false); 
+  }
+
+  window.renderGroupSettingsList = function() {
+      let listDiv = document.getElementById('group-settings-list');
+      if(STATE.groups.length === 0) {
+          listDiv.innerHTML = '<div style="text-align:center; color:#888; font-size:13px; padding:20px;">Chưa có nhóm nào.</div>';
+          return;
+      }
+
+      listDiv.innerHTML = STATE.groups.map((g, i) => `
+          <div class="group-item-card">
+              <span class="group-item-name">${g}</span>
+              <div class="group-actions">
+                  <button class="btn-sq btn-up" onclick="moveGroupUp(${i})" ${i===0 ? 'style="opacity:0.3; pointer-events:none;"' : ''}>▲</button>
+                  <button class="btn-sq btn-down" onclick="moveGroupDown(${i})" ${i===STATE.groups.length-1 ? 'style="opacity:0.3; pointer-events:none;"' : ''}>▼</button>
+                  <button class="btn-sq btn-edit" onclick="editGroupItem(${i})">✏️</button>
+                  <button class="btn-sq btn-del" onclick="deleteGroupItem(${i})">✖</button>
+              </div>
+          </div>
+      `).join('');
+  }
+
+  window.addNewGroup = function() {
+      let input = document.getElementById('new-group-input');
+      let val = input.value.trim();
+      if(!val) { showDialog("Lỗi", "Vui lòng nhập tên nhóm!", "alert"); return; }
+      if(STATE.groups.includes(val)) { showDialog("Lỗi", "Nhóm này đã tồn tại!", "alert"); return; }
+      
+      STATE.groups.unshift(val); 
+      localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups));
+      updateDataLists();
+      input.value = '';
+      renderGroupSettingsList();
+      renderContacts();
+  }
+
+  window.moveGroupUp = function(idx) {
+      idx = parseInt(idx);
+      if(idx <= 0) return;
+      let temp = STATE.groups[idx];
+      STATE.groups[idx] = STATE.groups[idx-1];
+      STATE.groups[idx-1] = temp;
+      localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups));
+      renderGroupSettingsList();
+      renderContacts();
+  }
+
+  window.moveGroupDown = function(idxStr) {
+      let idx = parseInt(idxStr);
+      if(idx >= STATE.groups.length - 1) return;
+      let temp = STATE.groups[idx];
+      STATE.groups[idx] = STATE.groups[idx+1];
+      STATE.groups[idx+1] = temp;
+      localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups));
+      renderGroupSettingsList();
+      renderContacts();
+  }
+
+  // HÀM SỬA TÊN NHÓM (SỬ DỤNG CUSTOM PROMPT ĐỂ FIX LỖI IOS)
+  window.editGroupItem = function(idx) {
+      idx = parseInt(idx);
+      let oldName = STATE.groups[idx];
+      
+      showDialog('Đổi tên nhóm', `Nhập tên mới cho nhóm "<b>${oldName}</b>":`, 'prompt', (newName) => {
+          if (!newName || newName.trim() === '' || newName.trim() === oldName) return;
+          newName = newName.trim();
+
+          if (STATE.groups.includes(newName)) {
+              showDialog("Lỗi", "Tên nhóm này đã tồn tại!", "alert"); return;
+          }
+
+          // Cập nhật mảng
+          STATE.groups[idx] = newName;
+
+          // Cập nhật toàn bộ người thuộc nhóm cũ
+          STATE.contacts.forEach(c => {
+              if (c.group === oldName) c.group = newName;
+          });
+
+          localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups));
+          localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts));
+          
+          updateDataLists();
+          renderGroupSettingsList();
+          renderContacts();
+      }, oldName);
+  }
+
+  // HÀM XÓA NHÓM LÕI MỚI (CHẮC CHẮN HOẠT ĐỘNG, DÙNG CUSTOM DIALOG)
+  window.deleteGroupItem = function(idx) {
+      idx = parseInt(idx);
+      let groupName = STATE.groups[idx];
+      if(!groupName) return;
+
+      let orphanedContacts = STATE.contacts.filter(c => c.group === groupName);
+      let count = orphanedContacts.length;
+      
+      let msg = `Bạn có chắc chắn muốn xóa nhóm "<b>${groupName}</b>"?`;
+      if(count > 0) {
+          msg += `<br><br><span style="color:#FF3B30;">⚠️ ${count} người sẽ bị đẩy về Kho Chờ (📥).</span>`;
+      }
+
+      showDialog('Xóa Nhóm', msg, 'confirm', () => {
+          // 1. Xóa khỏi mảng nhóm
+          STATE.groups.splice(idx, 1);
+          
+          if(count > 0) {
+              // 2. Rút người khỏi danh bạ chính
+              let remainingContacts = [];
+              STATE.contacts.forEach(c => {
+                  if(c.group === groupName) {
+                      c.group = ''; 
+                      STATE.pending.push(c);
+                  } else {
+                      remainingContacts.push(c);
+                  }
+              });
+              STATE.contacts = remainingContacts;
+              
+              localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts));
+              localStorage.setItem('appPendingContacts', JSON.stringify(STATE.pending));
+              updatePendingBadge();
+          }
+          
+          localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups));
+          updateDataLists();
+          
+          // 3. Cập nhật lại UI lập tức
+          renderGroupSettingsList();
+          renderContacts();
+      });
+  }
+
+
+  // ================== KHO CHỜ DUYỆT ==================
+  window.openPendingModal = function() {
+      STATE.selectedPendingIds = []; 
+      document.getElementById('search-pending').value = ''; 
+      document.getElementById('pending-group-input').value = '';
+      renderPendingList(STATE.pending);
+      
+      let modal = document.getElementById('pending-modal');
+      modal.style.display = 'flex';
+      setTimeout(() => modal.classList.add('show'), 10);
+  }
+
+  window.closePendingModal = function() {
+      let modal = document.getElementById('pending-modal');
+      modal.classList.remove('show');
+      setTimeout(() => modal.style.display = 'none', 300);
+      document.getElementById('chk-select-all-pending').checked = false;
+      hideAllDropdowns();
+  }
+
+  window.renderPendingList = function(dataArr) {
+      const container = document.getElementById('pending-list-container');
+      if (dataArr.length === 0) {
+          container.innerHTML = '<div style="text-align:center; padding:30px; color:#8E8E93; font-style:italic;">Kho chờ đang trống.</div>';
+          document.getElementById('chk-select-all-pending').checked = false;
+          return;
+      }
+
+      let html = dataArr.map(p => {
+          let isChecked = STATE.selectedPendingIds.includes(p.id.toString()) ? 'checked' : '';
+          return `
+          <label class="pending-card">
+              <input type="checkbox" class="custom-checkbox chk-pending-item" value="${p.id}" onchange="handlePendingCheck('${p.id}', this.checked)" ${isChecked}>
+              <div style="flex:1;">
+                  <span class="p-name">${p.name}</span>
+                  <span class="p-phone">${p.phone}</span>
+              </div>
+          </label>
+      `}).join('');
+      
+      container.innerHTML = html;
+      
+      let allCheckedInView = dataArr.every(p => STATE.selectedPendingIds.includes(p.id.toString()));
+      document.getElementById('chk-select-all-pending').checked = allCheckedInView;
+  }
+
+  window.handlePendingCheck = function(id, isChecked) {
+      id = id.toString();
+      if (isChecked) {
+          if (!STATE.selectedPendingIds.includes(id)) STATE.selectedPendingIds.push(id);
+      } else {
+          STATE.selectedPendingIds = STATE.selectedPendingIds.filter(x => x !== id);
+      }
+  }
+
+  window.toggleSelectAllPending = function() {
+      let isChecked = document.getElementById('chk-select-all-pending').checked;
+      let checkboxes = document.querySelectorAll('.chk-pending-item');
+      STATE.selectedPendingIds = [];
+      checkboxes.forEach(chk => {
+          chk.checked = isChecked;
+          if (isChecked) {
+              STATE.selectedPendingIds.push(chk.value.toString());
+          }
+      });
+  }
+
+  window.searchPending = function() {
+      let kw = document.getElementById('search-pending').value.toLowerCase();
+      if (!kw) {
+          renderPendingList(STATE.pending);
+          return;
+      }
+      let filtered = STATE.pending.filter(p => 
+          (p.name && p.name.toLowerCase().includes(kw)) ||
+          (p.phone && p.phone.includes(kw))
+      );
+      renderPendingList(filtered);
+  }
+
+  window.deleteSelectedPending = function() {
+      if (STATE.selectedPendingIds.length === 0) {
+          showDialog('Lỗi', 'Vui lòng tick chọn ít nhất 1 liên hệ để xóa!', 'alert');
+          return;
+      }
+
+      showDialog('Xác nhận', `Xóa vĩnh viễn ${STATE.selectedPendingIds.length} liên hệ khỏi kho chờ?`, 'confirm', () => {
+          STATE.pending = STATE.pending.filter(p => !STATE.selectedPendingIds.includes(p.id.toString()));
+          localStorage.setItem('appPendingContacts', JSON.stringify(STATE.pending));
+          
+          STATE.selectedPendingIds = [];
+          document.getElementById('search-pending').value = ''; 
+          renderPendingList(STATE.pending);
+          updatePendingBadge();
+      });
+  }
+
+  window.saveSelectedPendingToMain = function() {
+      if (STATE.selectedPendingIds.length === 0) {
+          showDialog('Lỗi', 'Vui lòng tick chọn các số liên hệ cần lưu!', 'alert');
+          return;
+      }
+
+      let finalGroup = document.getElementById('pending-group-input').value.trim() || 'Khác';
+      
+      if (finalGroup !== 'Khác' && !STATE.groups.includes(finalGroup)) {
+          STATE.groups.unshift(finalGroup);
+          localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups));
+          updateDataLists();
+      }
+
+      let selectedContacts = STATE.pending.filter(p => STATE.selectedPendingIds.includes(p.id.toString()));
+      
+      selectedContacts.forEach(c => {
+          c.group = finalGroup;
+          STATE.contacts.push(c);
+      });
+
+      STATE.pending = STATE.pending.filter(p => !STATE.selectedPendingIds.includes(p.id.toString()));
+
+      localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts));
+      localStorage.setItem('appPendingContacts', JSON.stringify(STATE.pending));
+
+      STATE.selectedPendingIds = [];
+      document.getElementById('chk-select-all-pending').checked = false;
+      document.getElementById('search-pending').value = '';
+      document.getElementById('pending-group-input').value = '';
+      hideAllDropdowns();
+      
+      renderContacts();
+      updatePendingBadge();
+      
+      showDialog('Thành công', `Đã lưu ${selectedContacts.length} số vào nhóm "${finalGroup}"!`, 'alert');
+      
+      if (STATE.pending.length === 0) closePendingModal();
+      else renderPendingList(STATE.pending);
+  }
+
+  // ================== THÊM/SỬA LIÊN HỆ THỦ CÔNG ==================
+  window.openContactModal = function(id = null) {
       let title = document.getElementById('contact-modal-title');
       let inputId = document.getElementById('contact-id');
       let inputName = document.getElementById('contact-name');
       let inputPhone = document.getElementById('contact-phone');
-      let inputGroup = document.getElementById('contact-group');
+      let inputGroup = document.getElementById('manual-group-input');
       let btnDelete = document.getElementById('btn-delete-contact');
 
       if (id) {
-          // Chế độ Sửa
-          let c = STATE.contacts.find(x => x.id === id);
+          let c = STATE.contacts.find(x => x.id.toString() === id.toString());
           if(c) {
               title.innerText = 'Sửa Liên Hệ';
               inputId.value = c.id;
@@ -385,7 +958,6 @@
               btnDelete.style.display = 'block';
           }
       } else {
-          // Chế độ Thêm mới
           title.innerText = 'Thêm Liên Hệ';
           inputId.value = '';
           inputName.value = '';
@@ -396,294 +968,123 @@
 
       let modal = document.getElementById('contact-modal');
       modal.style.display = 'flex';
-      setTimeout(() => modal.classList.add('show'), 10); // Hiệu ứng trượt
-  }
-
-  // Đóng Modal
-  function closeContactModal() {
-      let modal = document.getElementById('contact-modal');
-      modal.classList.remove('show');
-      setTimeout(() => modal.style.display = 'none', 300);
-  }
-
-  // Lưu dữ liệu
-  function saveContact() {
-      let id = document.getElementById('contact-id').value;
-      let name = document.getElementById('contact-name').value.trim();
-      let phone = document.getElementById('contact-phone').value.trim();
-      let group = document.getElementById('contact-group').value.trim();
-
-      if(!name || !phone) {
-          alert('Vui lòng nhập Tên và Số điện thoại!');
-          return;
-      }
-
-      if (id) { 
-          // Cập nhật
-          let idx = STATE.contacts.findIndex(x => x.id == parseInt(id));
-          if(idx !== -1) {
-              STATE.contacts[idx] = { id: parseInt(id), name, phone, group };
-          }
-      } else { 
-          // Thêm mới
-          STATE.contacts.push({ id: Date.now(), name, phone, group });
-      }
-
-      // Lưu vào Local Storage
-      localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts));
-      
-      closeContactModal();
-      renderContacts();
-      
-      // Xóa chữ đang tìm kiếm nếu có
-      document.getElementById('search-contact').value = '';
-  }
-
-  // Xóa dữ liệu
-  function deleteContact() {
-      let id = document.getElementById('contact-id').value;
-      if(confirm('Bạn có chắc muốn xóa liên hệ này?')) {
-          STATE.contacts = STATE.contacts.filter(x => x.id != parseInt(id));
-          localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts));
-          closeContactModal();
-          renderContacts();
-          document.getElementById('search-contact').value = '';
-      }
-  }
-
-  // ================== QUẢN LÝ NHÓM (THÊM, XÓA, SẮP XẾP) ==================
-  function openGroupSettingsModal() {
-      renderGroupSettingsList();
-      let modal = document.getElementById('group-settings-modal');
-      modal.style.display = 'flex';
       setTimeout(() => modal.classList.add('show'), 10);
   }
 
-  function closeGroupSettingsModal() {
-      let modal = document.getElementById('group-settings-modal');
+  window.closeContactModal = function() {
+      let modal = document.getElementById('contact-modal');
       modal.classList.remove('show');
       setTimeout(() => modal.style.display = 'none', 300);
-      renderContacts(STATE.contacts, false); 
+      hideAllDropdowns();
   }
 
-  function renderGroupSettingsList() {
-      let listDiv = document.getElementById('group-settings-list');
-      if(STATE.groups.length === 0) {
-          listDiv.innerHTML = '<div style="text-align:center; color:#888; font-size:13px; padding:10px;">Chưa có nhóm nào.</div>';
-          return;
-      }
-
-      listDiv.innerHTML = STATE.groups.map((g, i) => `
-          <div style="background:#fff; border-radius:12px; padding:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; border:1px solid #eee; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-              <span style="font-weight:800; font-size:15px; color:#333;">${g}</span>
-              <div style="display:flex; gap:5px;">
-                  <button class="btn-action-sm btn-up" onclick="moveGroupUp(${i})" ${i===0 ? 'style="opacity:0.3; cursor:not-allowed;"' : ''}>▲</button>
-                  <button class="btn-action-sm btn-down" onclick="moveGroupDown(${i})" ${i===STATE.groups.length-1 ? 'style="opacity:0.3; cursor:not-allowed;"' : ''}>▼</button>
-                  <button class="btn-action-sm btn-del" onclick="deleteGroupItem(${i})">✕</button>
-              </div>
-          </div>
-      `).join('');
-  }
-
-  function addNewGroup() {
-      let input = document.getElementById('new-group-input');
-      let val = input.value.trim();
-      if(!val) { alert("Vui lòng nhập tên nhóm!"); return; }
-      if(STATE.groups.includes(val)) { alert("Nhóm này đã tồn tại!"); return; }
+  window.saveContact = function() {
+      let id = document.getElementById('contact-id').value;
+      let name = document.getElementById('contact-name').value.trim();
+      let phone = document.getElementById('contact-phone').value.trim();
+      let finalGroup = document.getElementById('manual-group-input').value.trim() || 'Khác';
       
-      STATE.groups.push(val);
-      localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups));
-      input.value = '';
-      renderGroupSettingsList();
-  }
+      if(!name || !phone) { showDialog("Lỗi", "Vui lòng nhập Tên và Số điện thoại!", "alert"); return; }
 
-  function moveGroupUp(idx) {
-      if(idx <= 0) return;
-      let temp = STATE.groups[idx];
-      STATE.groups[idx] = STATE.groups[idx-1];
-      STATE.groups[idx-1] = temp;
-      localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups));
-      renderGroupSettingsList();
-  }
-
-  function moveGroupDown(idx) {
-      if(idx >= STATE.groups.length - 1) return;
-      let temp = STATE.groups[idx];
-      STATE.groups[idx] = STATE.groups[idx+1];
-      STATE.groups[idx+1] = temp;
-      localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups));
-      renderGroupSettingsList();
-  }
-
-  function deleteGroupItem(idx) {
-      let g = STATE.groups[idx];
-      let count = STATE.contacts.filter(c => c.group === g).length;
-      
-      let msg = `Bạn có chắc muốn xóa nhóm "${g}"?`;
-      if(count > 0) {
-          msg += `\n\nCẢNH BÁO: ${count} liên hệ trong nhóm này sẽ tự động chuyển sang nhóm "Khác".`;
-      }
-
-      if(confirm(msg)) {
-          STATE.groups.splice(idx, 1);
-          
-          // Chuyển các liên hệ mồ côi sang nhóm Khác
-          if(count > 0) {
-              STATE.contacts.forEach(c => {
-                  if(c.group === g) c.group = 'Khác';
-              });
-              localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts));
-              
-              if(!STATE.groups.includes('Khác')) {
-                  STATE.groups.push('Khác');
-              }
-          }
-          
+      if (finalGroup !== 'Khác' && !STATE.groups.includes(finalGroup)) {
+          STATE.groups.unshift(finalGroup);
           localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups));
-          renderGroupSettingsList();
+          updateDataLists();
       }
+
+      if (id) { 
+          let idx = STATE.contacts.findIndex(x => x.id.toString() === id.toString());
+          if(idx !== -1) STATE.contacts[idx] = { id: id, name, phone, group: finalGroup };
+      } else { 
+          STATE.contacts.push({ id: genId(), name, phone, group: finalGroup });
+      }
+
+      localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts));
+      closeContactModal();
+      renderContacts();
+      document.getElementById('search-contact').value = '';
   }
 
-  // ================== NHẬP TỪ DANH BẠ ĐIỆN THOẠI ==================
-  let tempImportedContacts = [];
+  window.deleteContact = function() {
+      let id = document.getElementById('contact-id').value;
+      showDialog('Xác nhận xóa', 'Bạn có chắc chắn muốn xóa liên hệ này?', 'confirm', () => {
+          STATE.contacts = STATE.contacts.filter(x => x.id.toString() !== id.toString());
+          localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts));
+          closeContactModal();
+          renderContacts();
+      });
+  }
 
-  async function importFromContacts() {
-      // Kiểm tra xem trình duyệt có hỗ trợ Web Contact Picker API không
+  // ================== NHẬP TỪ THIẾT BỊ / FILE ==================
+  window.importFromContacts = async function() {
       const supported = ('contacts' in navigator && 'ContactsManager' in window);
       if (!supported) {
-          // Bỏ alert(), gọi Modal iOS thân thiện
           let modal = document.getElementById('ios-warning-modal');
           modal.style.display = 'flex';
           setTimeout(() => modal.classList.add('show'), 10);
           return;
       }
-
       try {
-          const props = ['name', 'tel'];
-          const opts = { multiple: true }; // Cho phép chọn nhiều người cùng lúc
-          const contacts = await navigator.contacts.select(props, opts);
-          
-          if (contacts && contacts.length > 0) {
-              tempImportedContacts = contacts;
-              document.getElementById('import-count').innerText = contacts.length;
-              document.getElementById('import-contact-group').value = '';
-              
-              // Mở modal hỏi Nhóm
-              let modal = document.getElementById('import-group-modal');
-              modal.style.display = 'flex';
-              setTimeout(() => modal.classList.add('show'), 10);
-          }
-      } catch (err) {
-          console.error("Lỗi khi mở danh bạ:", err);
-          // Bỏ qua nếu người dùng chủ động bấm Hủy
-      }
+          const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: true });
+          if (contacts && contacts.length > 0) pushToPending(contacts, 'device');
+      } catch (err) { console.log(err); }
   }
 
-  function closeImportGroupModal() {
-      let modal = document.getElementById('import-group-modal');
-      modal.classList.remove('show');
-      setTimeout(() => modal.style.display = 'none', 300);
-      tempImportedContacts = [];
-  }
-
-  function saveImportedContacts() {
-      let group = document.getElementById('import-contact-group').value.trim() || 'Khác';
+  function pushToPending(rawContacts, source) {
       let addedCount = 0;
-
-      // Xử lý và làm sạch dữ liệu danh bạ thô
-      tempImportedContacts.forEach(c => {
-          let name = c.name && c.name.length > 0 ? c.name[0] : 'Không tên';
-          let phone = c.tel && c.tel.length > 0 ? c.tel[0] : '';
-          
-          // Làm sạch số điện thoại (xóa khoảng trắng, dấu gạch ngang, dấu ngoặc)
+      rawContacts.forEach(c => {
+          let name = 'Không tên', phone = '';
+          if (source === 'device' || source === 'file') { 
+              name = c.name && c.name.length > 0 ? c.name[0] : 'Không tên';
+              phone = c.tel && c.tel.length > 0 ? c.tel[0] : '';
+          }
           phone = phone.replace(/[\s\-()]/g, '');
-          
           if (phone) {
-              // Thêm số ngẫu nhiên vào Date.now() để tránh trùng ID nếu vòng lặp chạy quá nhanh
-              STATE.contacts.push({ id: Date.now() + Math.random(), name, phone, group });
+              STATE.pending.push({ id: genId(), name, phone, group: '' });
               addedCount++;
           }
       });
-
       if (addedCount > 0) {
-          localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts));
-          renderContacts();
-          document.getElementById('search-contact').value = '';
-          alert(`Đã thêm thành công ${addedCount} liên hệ vào nhóm "${group}"!`);
-      } else {
-          alert('Không tìm thấy số điện thoại hợp lệ trong các liên hệ đã chọn!');
+          localStorage.setItem('appPendingContacts', JSON.stringify(STATE.pending));
+          updatePendingBadge();
+          showDialog('Thành công', `Đã đưa ${addedCount} liên hệ vào Kho chờ 📥.`, 'alert');
       }
-      
-      closeImportGroupModal();
   }
 
-  // ================== XỬ LÝ NHẬP TỪ FILE (.CSV / .VCF) ==================
-  function handleContactFileUpload(event) {
+  window.handleContactFileUpload = function(event) {
       let file = event.target.files[0];
       if (!file) return;
-      
       let reader = new FileReader();
       reader.onload = function(e) {
-          let text = e.target.result;
-          let parsedContacts = [];
-          
-          if (file.name.toLowerCase().endsWith('.vcf')) {
-              parsedContacts = parseVCF(text);
-          } else if (file.name.toLowerCase().endsWith('.csv')) {
-              parsedContacts = parseCSV(text);
-          } else {
-              alert('Hệ thống chỉ hỗ trợ định dạng file .vcf hoặc .csv');
-              return;
-          }
-          
-          if (parsedContacts.length > 0) {
-              // Tái sử dụng quy trình xếp nhóm của tính năng bung danh bạ
-              tempImportedContacts = parsedContacts;
-              document.getElementById('import-count').innerText = parsedContacts.length;
-              document.getElementById('import-contact-group').value = '';
-              
-              let modal = document.getElementById('import-group-modal');
-              modal.style.display = 'flex';
-              setTimeout(() => modal.classList.add('show'), 10);
-          } else {
-              alert('Không bóc tách được liên hệ hợp lệ nào trong file! Vui lòng kiểm tra lại định dạng.');
-          }
+          let parsedContacts = file.name.toLowerCase().endsWith('.vcf') ? parseVCF(e.target.result) : (file.name.toLowerCase().endsWith('.csv') ? parseCSV(e.target.result) : []);
+          if (parsedContacts.length > 0) pushToPending(parsedContacts, 'file');
+          else showDialog("Lỗi", "Hệ thống không bóc tách được liên hệ hợp lệ nào từ tệp này!", "alert");
       };
       reader.readAsText(file);
-      event.target.value = ''; // Reset input để có thể tải lại cùng 1 file
+      event.target.value = ''; 
   }
 
-  // Hàm bóc tách file .VCF (vCard)
   function parseVCF(text) {
       let contacts = [];
       let vcards = text.split('BEGIN:VCARD');
       for (let vcard of vcards) {
           if (!vcard.trim()) continue;
-          
-          // Tìm Tên (Bắt các dòng bắt đầu bằng FN: hoặc FN;CHARSET=...:)
           let nameMatch = vcard.match(/^FN[^:]*:(.*)$/im) || vcard.match(/^N[^:]*:(.*)$/im);
-          // Tìm Số điện thoại
           let phoneMatch = vcard.match(/^TEL[^:]*:(.*)$/im);
-          
           if (nameMatch && phoneMatch) {
-              let name = nameMatch[1].trim().replace(/;/g, ' '); // Loại bỏ dấu chấm phẩy trong cấu trúc N:
+              let name = nameMatch[1].trim().replace(/;/g, ' '); 
               let phone = phoneMatch[1].trim().replace(/[\s\-()]/g, '');
-              if (name && phone) {
-                  // Format giống hệt Navigator Contacts API để dùng chung hàm saveImportedContacts
-                  contacts.push({ name: [name], tel: [phone] });
-              }
+              if (name && phone) contacts.push({ name: [name], tel: [phone] });
           }
       }
       return contacts;
   }
 
-  // Hàm bóc tách file .CSV
   function parseCSV(text) {
       let contacts = [];
       let lines = text.split(/\r?\n/);
       if (lines.length === 0) return contacts;
       
-      // Helper tách dòng CSV (để bỏ qua dấu phẩy nằm trong ngoặc kép)
       const splitCSV = (str) => {
           let result = [], insideQuote = false, currentStr = "";
           for (let i = 0; i < str.length; i++) {
@@ -697,34 +1098,25 @@
       };
 
       let headers = splitCSV(lines[0]).map(h => h.trim().toLowerCase());
-      
-      // Cố gắng dò tìm tự động cột chứa Tên và cột chứa Số điện thoại
       let nameIdx = headers.findIndex(h => h.includes('name') || h.includes('tên'));
       let phoneIdx = headers.findIndex(h => h.includes('phone') || h.includes('điện thoại') || h.includes('sđt'));
       
-      // Nếu không tìm thấy header khớp, giả định Cột 1 là Tên, Cột 2 là Số
       if (nameIdx === -1) nameIdx = 0;
       if (phoneIdx === -1) phoneIdx = 1;
 
-      // Đọc từ dòng 2 (bỏ qua header)
       for (let i = 1; i < lines.length; i++) {
           if (!lines[i].trim()) continue;
-          
           let cols = splitCSV(lines[i]);
           if (cols.length > Math.max(nameIdx, phoneIdx)) {
               let name = cols[nameIdx] ? cols[nameIdx].trim() : '';
               let phone = cols[phoneIdx] ? cols[phoneIdx].replace(/[\s\-()]/g, '').trim() : '';
-              
-              if (name && phone && /\d/.test(phone)) {
-                  contacts.push({ name: [name], tel: [phone] });
-              }
+              if (name && phone && /\d/.test(phone)) contacts.push({ name: [name], tel: [phone] });
           }
       }
       return contacts;
   }
 
-  // Đóng modal cảnh báo iOS
-  function closeIosWarningModal() {
+  window.closeIosWarningModal = function() {
       let modal = document.getElementById('ios-warning-modal');
       modal.classList.remove('show');
       setTimeout(() => modal.style.display = 'none', 300);
