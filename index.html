@@ -9,11 +9,11 @@
     * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
     body { 
       margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-      background: #F4F5F7; padding-bottom: 40px; color: #333;
+      background: #F4F5F7; padding-bottom: 40px; color: #1C1C1E;
     }
 
     .container { max-width: 600px; margin: 0 auto; padding: 15px; }
-    .dash-header { padding: 10px 0 20px 0; text-align: center; display: flex; justify-content: center; align-items: center; gap: 10px;}
+    .dash-header { padding: 10px 0 20px 0; text-align: center; display: flex; justify-content: center; align-items: center; gap: 8px;}
     .dash-header h2 { color: #1976D2; margin: 0; font-size: 24px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase;}
 
     /* ================== TÌM KIẾM & NÚT THÊM ================== */
@@ -21,17 +21,17 @@
     
     .search-row { margin-bottom: 12px; }
     .search-input { 
-      width: 100%; padding: 15px 20px; font-size: 16px; border-radius: 16px; 
+      width: 100%; padding: 14px 20px; font-size: 16px; border-radius: 12px; 
       border: 1px solid #E0E0E0; background: #fff; outline: none;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.02); transition: 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: 0.2s;
     }
     .search-input:focus { border-color: #1976D2; box-shadow: 0 4px 12px rgba(25,118,210,0.1); }
 
     .action-buttons-row { display: flex; gap: 10px; justify-content: space-between; align-items: center; }
     .btn-act {
-      flex: 1; height: 50px; border-radius: 14px; border: none; font-size: 22px; 
+      flex: 1; height: 50px; border-radius: 12px; border: none; font-size: 22px; 
       cursor: pointer; display: flex; align-items: center; justify-content: center; 
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.2s; font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06); transition: 0.2s; font-weight: bold;
     }
     .btn-act:active { transform: scale(0.92); }
 
@@ -50,7 +50,7 @@
 
     /* ================== DANH SÁCH LIÊN HỆ ================== */
     .unit-card {
-      background: #FFFFFF; border-radius: 18px; padding: 16px 20px; margin-bottom: 12px;
+      background: #FFFFFF; border-radius: 16px; padding: 16px 20px; margin-bottom: 12px;
       display: flex; justify-content: space-between; align-items: center;
       box-shadow: 0 2px 8px rgba(0,0,0,0.03); cursor: pointer; transition: 0.2s; border: 1px solid #F0F0F0;
     }
@@ -59,10 +59,10 @@
     .unit-left-info { display: flex; align-items: center; gap: 12px; }
     .unit-icon-play { color: #1976D2; font-size: 11px; font-weight: 900; width: 12px; text-align: center;}
     .unit-icon-build { font-size: 18px; }
-    .unit-name { font-size: 16px; font-weight: 800; color: #333; }
+    .unit-name { font-size: 16px; font-weight: 800; color: #1C1C1E; }
     
     .unit-count { 
-      background: #F0F0F5; padding: 4px; border-radius: 50%; 
+      background: #F4F5F7; padding: 4px; border-radius: 50%; 
       font-size: 13px; color: #888; font-weight: 800;
       width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
     }
@@ -72,16 +72,16 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
     .contact-card {
-      background: #FFFFFF; border-radius: 16px; padding: 15px; margin-bottom: 10px;
+      background: #FFFFFF; border-radius: 14px; padding: 15px; margin-bottom: 10px;
       display: flex; justify-content: space-between; align-items: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.03); border-left: 4px solid #4CAF50;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03); border-left: 4px solid #4CAF50;
     }
     .contact-info { flex: 1; display: flex; flex-direction: column; gap: 4px; cursor: pointer; }
-    .contact-name { font-size: 16px; font-weight: 800; color: #222; }
+    .contact-name { font-size: 16px; font-weight: 800; color: #1C1C1E; }
     .contact-phone { font-size: 14px; color: #1976D2; font-weight: 700; margin-top: 2px; }
     
     .btn-call {
-      width: 42px; height: 42px; border-radius: 50%; background: #E8F5E9; color: #2E7D32;
+      width: 44px; height: 44px; border-radius: 50%; background: #E8F5E9; color: #2E7D32;
       display: flex; align-items: center; justify-content: center; font-size: 20px;
       text-decoration: none; transition: 0.2s; box-shadow: 0 2px 6px rgba(76, 175, 80, 0.2);
     }
@@ -104,18 +104,16 @@
     .modal-overlay.show .modal-content { transform: translateY(0); }
     
     .pull-bar { width: 40px; height: 5px; background: #D1D1D6; border-radius: 3px; margin: 0 auto 15px auto; }
-    .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;}
+    .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative;}
     .modal-title { font-size: 20px; font-weight: 800; margin: 0; color: #1976D2; }
-    .btn-close-modal { background: #E5E5EA; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 14px; font-weight: bold; color: #555; cursor: pointer; display: flex; align-items: center; justify-content: center;}
+    .btn-close-modal { background: #E5E5EA; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 14px; font-weight: bold; color: #8E8E93; cursor: pointer; display: flex; align-items: center; justify-content: center;}
 
     /* ================== UI CÀI ĐẶT NHÓM ================== */
     .group-input-wrapper { 
       display: flex; background: #fff; border-radius: 12px; border: 1px solid #E0E0E0; 
-      overflow: hidden; margin-bottom: 20px;
+      overflow: hidden; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);
     }
-    .group-input-wrapper input { 
-      border: none; padding: 14px 15px; font-size: 15px; flex: 1; outline: none; background: transparent;
-    }
+    .group-input-wrapper input { border: none; padding: 14px 15px; font-size: 15px; flex: 1; outline: none; background: transparent; }
     .group-input-wrapper button { 
       background: #4CAF50; color: white; border: none; padding: 0 20px; 
       font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.2s;
@@ -126,23 +124,20 @@
       background: #FFFFFF; border-radius: 16px; border: 1px solid #E0E0E0;
       overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
     }
-    
     .group-item-card {
       padding: 12px 15px; display: flex; justify-content: space-between; align-items: center;
       border-bottom: 1px solid #F0F0F0;
     }
     .group-item-card:last-child { border-bottom: none; }
-    
     .group-item-name { font-weight: 800; font-size: 15px; color: #333; }
-    
     .group-actions { display: flex; gap: 6px; }
+    
     .btn-sq {
       width: 32px; height: 32px; border-radius: 8px; border: none; 
       display: flex; align-items: center; justify-content: center; 
       font-size: 12px; cursor: pointer; transition: 0.2s; font-weight: 900;
     }
-    .btn-up { background: #F0F0F5; color: #555; }
-    .btn-down { background: #F0F0F5; color: #555; }
+    .btn-up, .btn-down { background: #F0F0F5; color: #555; }
     .btn-edit { background: #FFF3E0; color: #FF9800; font-size: 14px;}
     .btn-del { background: #FFEBEE; color: #FF3B30; font-size: 14px;}
     .btn-sq:active { transform: scale(0.9); }
@@ -210,7 +205,7 @@
 
     .input-label { font-size: 14px; font-weight: 800; color: #555; margin-bottom: 8px; display: block;}
 
-    /* ================== THÔNG BÁO TỰ TẠO (THAY THẾ ALERT/CONFIRM) ================== */
+    /* ================== THÔNG BÁO TỰ TẠO (CUSTOM DIALOG) ================== */
     .custom-dialog-box {
       background: #fff; width: 85%; max-width: 320px; border-radius: 20px; padding: 25px 20px 20px 20px;
       text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transform: scale(0.9); opacity: 0;
@@ -225,7 +220,7 @@
 </head>
 <body>
 
-  <!-- DATALIST ẨN (Dự phòng cho autocomplete) -->
+  <!-- DATALIST ẨN ĐỂ GỢI Ý MẶC ĐỊNH TRÌNH DUYỆT -->
   <datalist id="group-suggestions"></datalist>
 
   <div class="container">
@@ -234,22 +229,18 @@
       <h2>DANH BẠ NỘI BỘ</h2>
     </div>
 
-    <!-- TÌM KIẾM & NÚT THÊM (Cấu trúc mới theo ảnh 3) -->
+    <!-- TÌM KIẾM & NÚT THÊM -->
     <div class="top-controls">
-      <!-- Dòng 1: Tìm kiếm -->
       <div class="search-row">
         <input type="text" id="search-contact" class="search-input" placeholder="🔍 Tìm kiếm tên, SĐT..." onkeyup="searchContacts()">
       </div>
       
-      <!-- Dòng 2: Các nút thao tác -->
       <div class="action-buttons-row">
         <button class="btn-act btn-setting" onclick="openGroupSettingsModal()" title="Cài đặt Nhóm">⚙️</button>
-        
         <div style="position: relative; flex: 1;">
           <button class="btn-act btn-pending" style="width:100%;" onclick="openPendingModal()" title="Kho chờ duyệt">📥</button>
           <span id="pending-badge" class="pending-badge">0</span>
         </div>
-
         <button class="btn-act btn-file" onclick="document.getElementById('contact-file-upload').click()" title="Nhập từ file CSV/VCF">📁</button>
         <button class="btn-act btn-device" onclick="importFromContacts()" title="Nhập từ điện thoại">📇</button>
         <button class="btn-act btn-add-manual" onclick="openContactModal()" title="Thêm thủ công">+</button>
@@ -259,13 +250,11 @@
     </div>
 
     <!-- DANH SÁCH LIÊN HỆ CHÍNH -->
-    <div id="contact-list">
-      <!-- Render bằng JavaScript -->
-    </div>
+    <div id="contact-list"></div>
   </div>
 
   <!-- ======================================================= -->
-  <!-- MODAL CÀI ĐẶT NHÓM (CÓ SỬA, XÓA, SẮP XẾP) -->
+  <!-- MODAL CÀI ĐẶT NHÓM -->
   <!-- ======================================================= -->
   <div id="group-settings-modal" class="modal-overlay" onclick="if(event.target === this) closeGroupSettingsModal()">
     <div class="modal-content">
@@ -287,12 +276,12 @@
           <!-- JS render ở đây -->
         </div>
       </div>
-      
     </div>
   </div>
 
   <!-- ======================================================= -->
   <!-- MODAL KHO CHỜ DUYỆT -->
+  <!-- ======================================================= -->
   <div id="pending-modal" class="modal-overlay" onclick="if(event.target === this) closePendingModal()">
     <div class="modal-content" style="max-height: 95vh; padding-bottom: 20px;">
       <div class="pull-bar"></div>
@@ -301,7 +290,6 @@
         <button class="btn-close-modal" onclick="closePendingModal()">✕</button>
       </div>
 
-      <!-- Đã khôi phục thanh tìm kiếm bị mất -->
       <input type="text" id="search-pending" class="smart-input" style="margin-bottom: 15px; padding: 10px 15px;" placeholder="🔍 Tìm tên hoặc số điện thoại..." onkeyup="searchPending()">
       
       <div class="pending-header-row">
@@ -312,15 +300,10 @@
         <button onclick="deleteSelectedPending()" class="text-red-bold">Xóa đã chọn</button>
       </div>
 
-      <!-- Danh sách -->
-      <div id="pending-list-container" class="pending-list">
-        <!-- JS Render -->
-      </div>
+      <div id="pending-list-container" class="pending-list"></div>
       
-      <!-- Box Nhập nhóm có Select thông minh -->
       <div class="bottom-action-card">
         <div class="bottom-action-title">Xếp các số ĐÃ CHỌN vào Nhóm:</div>
-        
         <div class="smart-input-container" style="margin-bottom: 10px;">
           <input type="text" id="pending-group-input" class="smart-input" placeholder="Gõ tìm hoặc tạo nhóm mới..." 
                  onfocus="showGroupDropdown('pending-dropdown', 'pending-group-input')" 
@@ -328,7 +311,6 @@
                  autocomplete="off">
           <div id="pending-dropdown" class="smart-dropdown"></div>
         </div>
-
         <button onclick="saveSelectedPendingToMain()" class="btn-green-large">XÁC NHẬN ĐƯA VÀO DANH BẠ</button>
       </div>
     </div>
@@ -390,65 +372,24 @@
   </div>
 
   <!-- ======================================================= -->
-  <!-- HỘP THOẠI THÔNG BÁO TỰ TẠO (THAY THẾ ALERT/CONFIRM/PROMPT) -->
+  <!-- HỘP THOẠI THÔNG BÁO TỰ TẠO (CUSTOM DIALOG) -->
+  <!-- ======================================================= -->
   <div id="custom-dialog-wrapper" class="modal-overlay" style="z-index: 10005;">
     <div class="custom-dialog-box">
       <h3 id="dialog-title" class="dialog-title">Thông báo</h3>
       <p id="dialog-message" class="dialog-message">Nội dung</p>
-      <!-- Khung nhập tên mới thay thế cho prompt() bị lỗi -->
       <input type="text" id="dialog-prompt-input" style="display:none; width: 100%; padding: 12px; font-size: 16px; border: 1px solid #E0E0E0; border-radius: 10px; outline: none; box-sizing: border-box; background: #F9F9F9; text-align: center; margin-bottom: 20px;">
-      <div id="dialog-buttons" class="dialog-buttons">
-        <!-- JS Render -->
-      </div>
+      <div id="dialog-buttons" class="dialog-buttons"></div>
     </div>
   </div>
 
 <script>
-  // ================== CƠ CHẾ SINH ID NGẪU NHIÊN ==================
+  // ================== HÀM TIỆN ÍCH ==================
   function genId() {
       return Date.now().toString() + Math.floor(Math.random() * 1000).toString();
   }
 
-  // ================== STATE MANAGEMENT ==================
-  const STATE = {
-    contacts: [],
-    groups: [],
-    pending: [],
-    selectedPendingIds: [], 
-    activeDropdownId: null
-  };
-
-  // Khởi tạo ứng dụng
-  window.onload = () => {
-    let savedContacts = localStorage.getItem('appContactsStandalone');
-    STATE.contacts = savedContacts ? JSON.parse(savedContacts) : [];
-
-    let savedGroups = localStorage.getItem('appGroupsStandalone');
-    if (savedGroups) {
-        STATE.groups = JSON.parse(savedGroups);
-    } else {
-        STATE.groups = ['Ban Chỉ Huy', 'Khẩn cấp', 'Đội Trực', 'Bảo Trì / Kỹ Thuật'];
-        localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups));
-    }
-
-    let savedPending = localStorage.getItem('appPendingContacts');
-    if (savedPending) {
-        STATE.pending = JSON.parse(savedPending);
-    }
-
-    updateDataLists(); 
-    renderContacts();
-    updatePendingBadge();
-    
-    // Đóng dropdown khi click ra ngoài
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.smart-input-container')) {
-            hideAllDropdowns();
-        }
-    });
-  };
-
-  // ================== CUSTOM DIALOG (GIẢI QUYẾT LỖI BỊ ĐƠ TRÊN IOS/ZALO) ==================
+  // Cải tiến Custom Dialog hoạt động mượt mà hơn
   window.showDialog = function(title, message, type, confirmCallback, defaultValue = '') {
       document.getElementById('dialog-title').innerText = title;
       document.getElementById('dialog-message').innerHTML = message; 
@@ -464,7 +405,6 @@
       }
       
       btnContainer.innerHTML = '';
-
       let wrapper = document.getElementById('custom-dialog-wrapper');
       wrapper.style.display = 'flex';
       setTimeout(() => wrapper.classList.add('show'), 10);
@@ -498,7 +438,43 @@
       }
   }
 
-  // ================== UPDATE HỖ TRỢ DỮ LIỆU ==================
+  // ================== STATE MANAGEMENT ==================
+  const STATE = {
+    contacts: [],
+    groups: [],
+    pending: [],
+    selectedPendingIds: [], 
+    activeDropdownId: null
+  };
+
+  window.onload = () => {
+    let savedContacts = localStorage.getItem('appContactsStandalone');
+    STATE.contacts = savedContacts ? JSON.parse(savedContacts) : [];
+
+    let savedGroups = localStorage.getItem('appGroupsStandalone');
+    if (savedGroups) {
+        STATE.groups = JSON.parse(savedGroups);
+    } else {
+        STATE.groups = ['Ban Chỉ Huy', 'Khẩn cấp', 'Đội Trực', 'Bảo Trì / Kỹ Thuật'];
+        localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups));
+    }
+
+    let savedPending = localStorage.getItem('appPendingContacts');
+    if (savedPending) {
+        STATE.pending = JSON.parse(savedPending);
+    }
+
+    updateDataLists(); 
+    renderContacts();
+    updatePendingBadge();
+    
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.smart-input-container')) {
+            hideAllDropdowns();
+        }
+    });
+  };
+
   window.updateDataLists = function() {
       const datalist = document.getElementById('group-suggestions');
       if(datalist) datalist.innerHTML = STATE.groups.map(g => `<option value="${g}">`).join('');
@@ -559,7 +535,7 @@
       const container = document.getElementById('contact-list');
       
       if (data.length === 0 && !isSearch && STATE.groups.length === 0) {
-          container.innerHTML = '<div style="text-align:center; padding: 40px 20px; color:#8E8E93; line-height: 1.5;">Chưa có liên hệ nào.<br>Hãy thêm hoặc đồng bộ danh bạ.</div>';
+          container.innerHTML = '<div style="text-align:center; padding: 40px 20px; color:#8E8E93; line-height: 1.5;">Chưa có liên hệ nào.<br>Hãy thêm hoặc tải lên file danh bạ.</div>';
           return;
       }
 
@@ -652,8 +628,7 @@
       renderContacts(filtered, true); 
   }
 
-
-  // ================== CÀI ĐẶT NHÓM (SỬA, XÓA MƯỢT MÀ) ==================
+  // ================== CÀI ĐẶT NHÓM (FIX LỖI XÓA VÀ SỬA) ==================
   window.openGroupSettingsModal = function() {
       renderGroupSettingsList();
       let modal = document.getElementById('group-settings-modal');
@@ -713,8 +688,8 @@
       renderContacts();
   }
 
-  window.moveGroupDown = function(idxStr) {
-      let idx = parseInt(idxStr);
+  window.moveGroupDown = function(idx) {
+      idx = parseInt(idx);
       if(idx >= STATE.groups.length - 1) return;
       let temp = STATE.groups[idx];
       STATE.groups[idx] = STATE.groups[idx+1];
@@ -724,7 +699,7 @@
       renderContacts();
   }
 
-  // HÀM SỬA TÊN NHÓM (SỬ DỤNG CUSTOM PROMPT ĐỂ FIX LỖI IOS)
+  // Dùng Dialog Custom thay vì prompt mặc định dễ lỗi trên iOS
   window.editGroupItem = function(idx) {
       idx = parseInt(idx);
       let oldName = STATE.groups[idx];
@@ -737,10 +712,7 @@
               showDialog("Lỗi", "Tên nhóm này đã tồn tại!", "alert"); return;
           }
 
-          // Cập nhật mảng
           STATE.groups[idx] = newName;
-
-          // Cập nhật toàn bộ người thuộc nhóm cũ
           STATE.contacts.forEach(c => {
               if (c.group === oldName) c.group = newName;
           });
@@ -754,7 +726,6 @@
       }, oldName);
   }
 
-  // HÀM XÓA NHÓM LÕI MỚI (CHẮC CHẮN HOẠT ĐỘNG, DÙNG CUSTOM DIALOG)
   window.deleteGroupItem = function(idx) {
       idx = parseInt(idx);
       let groupName = STATE.groups[idx];
@@ -763,17 +734,15 @@
       let orphanedContacts = STATE.contacts.filter(c => c.group === groupName);
       let count = orphanedContacts.length;
       
-      let msg = `Bạn có chắc chắn muốn xóa nhóm "<b>${groupName}</b>"?`;
+      let msg = `Xóa nhóm "<b>${groupName}</b>"?`;
       if(count > 0) {
-          msg += `<br><br><span style="color:#FF3B30;">⚠️ ${count} người sẽ bị đẩy về Kho Chờ (📥).</span>`;
+          msg += `<br><br><span style="color:#FF3B30;">⚠️ ${count} người sẽ bị đẩy về Kho Chờ (📥) để không mất dữ liệu.</span>`;
       }
 
       showDialog('Xóa Nhóm', msg, 'confirm', () => {
-          // 1. Xóa khỏi mảng nhóm
           STATE.groups.splice(idx, 1);
           
           if(count > 0) {
-              // 2. Rút người khỏi danh bạ chính
               let remainingContacts = [];
               STATE.contacts.forEach(c => {
                   if(c.group === groupName) {
@@ -792,13 +761,10 @@
           
           localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups));
           updateDataLists();
-          
-          // 3. Cập nhật lại UI lập tức
           renderGroupSettingsList();
           renderContacts();
       });
   }
-
 
   // ================== KHO CHỜ DUYỆT ==================
   window.openPendingModal = function() {
@@ -1056,9 +1022,20 @@
       if (!file) return;
       let reader = new FileReader();
       reader.onload = function(e) {
-          let parsedContacts = file.name.toLowerCase().endsWith('.vcf') ? parseVCF(e.target.result) : (file.name.toLowerCase().endsWith('.csv') ? parseCSV(e.target.result) : []);
-          if (parsedContacts.length > 0) pushToPending(parsedContacts, 'file');
-          else showDialog("Lỗi", "Hệ thống không bóc tách được liên hệ hợp lệ nào từ tệp này!", "alert");
+          let text = e.target.result;
+          let parsedContacts = [];
+          
+          if (file.name.toLowerCase().endsWith('.vcf')) {
+              parsedContacts = parseVCF(text);
+          } else if (file.name.toLowerCase().endsWith('.csv')) {
+              parsedContacts = parseCSV(text);
+          }
+          
+          if (parsedContacts.length > 0) {
+              pushToPending(parsedContacts, 'file');
+          } else {
+              showDialog("Lỗi", "Hệ thống không tìm thấy số điện thoại hợp lệ nào trong tệp này!", "alert");
+          }
       };
       reader.readAsText(file);
       event.target.value = ''; 
@@ -1080,6 +1057,7 @@
       return contacts;
   }
 
+  // TỐI ƯU HÀM ĐỌC CSV GOOGLE CONTACTS
   function parseCSV(text) {
       let contacts = [];
       let lines = text.split(/\r?\n/);
@@ -1098,19 +1076,44 @@
       };
 
       let headers = splitCSV(lines[0]).map(h => h.trim().toLowerCase());
-      let nameIdx = headers.findIndex(h => h.includes('name') || h.includes('tên'));
-      let phoneIdx = headers.findIndex(h => h.includes('phone') || h.includes('điện thoại') || h.includes('sđt'));
       
+      // Tìm cột Tên thông minh hơn
+      let nameIdx = headers.findIndex(h => h === 'name' || h === 'first name' || h === 'tên' || h === 'họ tên' || h === 'họ và tên');
+      if (nameIdx === -1) nameIdx = headers.findIndex(h => h.includes('name') && !h.includes('phonetic') && !h.includes('file as'));
       if (nameIdx === -1) nameIdx = 0;
+
+      // Tìm cột Điện thoại
+      let phoneIdx = headers.findIndex(h => h === 'phone 1 - value' || h === 'phone' || h === 'số điện thoại' || h === 'sđt' || h === 'điện thoại');
+      if (phoneIdx === -1) phoneIdx = headers.findIndex(h => (h.includes('phone') || h.includes('tel') || h.includes('mobile')) && !h.includes('label'));
       if (phoneIdx === -1) phoneIdx = 1;
 
       for (let i = 1; i < lines.length; i++) {
           if (!lines[i].trim()) continue;
           let cols = splitCSV(lines[i]);
+          
           if (cols.length > Math.max(nameIdx, phoneIdx)) {
               let name = cols[nameIdx] ? cols[nameIdx].trim() : '';
+              
+              // Xử lý riêng cho Google Contacts (Nó tách Tên ra First, Middle, Last Name ở đầu file)
+              if (headers[0] === 'first name' && headers[1] === 'middle name' && headers[2] === 'last name') {
+                  let fullName = [];
+                  if(cols[0]) fullName.push(cols[0].trim());
+                  if(cols[1]) fullName.push(cols[1].trim());
+                  if(cols[2]) fullName.push(cols[2].trim());
+                  if(fullName.length > 0) name = fullName.join(' ');
+              }
+
               let phone = cols[phoneIdx] ? cols[phoneIdx].replace(/[\s\-()]/g, '').trim() : '';
-              if (name && phone && /\d/.test(phone)) contacts.push({ name: [name], tel: [phone] });
+              
+              // Nếu số điện thoại 1 trống, lấy thử số 2
+              if (!phone && headers.includes('phone 2 - value')) {
+                  let phone2Idx = headers.indexOf('phone 2 - value');
+                  phone = cols[phone2Idx] ? cols[phone2Idx].replace(/[\s\-()]/g, '').trim() : '';
+              }
+
+              if (name && phone && /\d/.test(phone)) {
+                  contacts.push({ name: [name], tel: [phone] });
+              }
           }
       }
       return contacts;
