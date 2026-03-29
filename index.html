@@ -821,7 +821,6 @@
       } 
   }
   
-  // TÍNH NĂNG NÂNG CẤP: GHI SỔ GIỮ LẠI XE VÀ LỆNH
   function xuLyGhiXe() {
       haptic();
       let xe = document.getElementById('th-xe').value.trim(); let ngay = document.getElementById('th-ngay').value;
@@ -843,15 +842,12 @@
           huySuaThucHien();
       } else {
           STATE.thucHien.push({ id: generateID(), lenhId: idLenh, soLenh: lenhGoc.soLenh, xe, ngay, ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap, sl: parseFloat(sl) });
-          // THAY ĐỔI Ở ĐÂY: KHÔNG XÓA SỐ XE, KHÔNG XÓA SỐ LỆNH
           // Chỉ xóa Loại Đạn, Cấp và SL để tiếp tục nhập cho xe đó
           document.getElementById('th-cap').value = ''; 
           document.getElementById('th-sl').value = ''; 
           document.getElementById('th-chon-dan').value = ''; 
           
           showDialog("Đã lưu sổ", `Xuất ${sl} ${lenhGoc.dvt} đạn ${lenhGoc.ten}\nCho Xe: ${xe}`, "alert");
-          
-          // Load lại đạn theo lệnh để cập nhật số "Còn lại" vào danh sách xổ xuống ngay lập tức
           loadDanTheoLenh(); 
       }
       safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien)); 
@@ -901,7 +897,6 @@
 
   // ==================== TAB 4: BÁO CÁO KẾT QUẢ & TÌNH TRẠNG LỆNH ====================
   
-  // Hàm chuyển đổi chế độ báo cáo
   function chuyenLoaiBaoCao(mode) {
       haptic();
       currentBaoCaoMode = mode;
@@ -929,7 +924,6 @@
       }
   }
 
-  // BÁO CÁO NGÀY (Cũ, đã tối ưu gộp STT)
   function renderBaoCaoNgay() {
       let locNgay = document.getElementById('bc-ngay').value; 
       let locXe = document.getElementById('bc-xe').value.toLowerCase().trim();
@@ -983,7 +977,7 @@
       `}).join('');
   }
 
-  // TÍNH NĂNG MỚI: BÁO CÁO TÌNH TRẠNG LỆNH (Macro View)
+  // BÁO CÁO TÌNH TRẠNG LỆNH (ĐÃ CẬP NHẬT SCROLL VÀ TÁCH CỘT)
   function renderTinhTrangLenh() {
       document.getElementById('bc-tieu-de-anh').innerText = `BÁO CÁO TÌNH TRẠNG LỆNH TỔNG QUÁT`;
       let container = document.getElementById('danh-sach-tinh-trang-lenh');
@@ -993,15 +987,13 @@
           return; 
       }
 
-      // Nhóm tất cả các Lệnh theo Số Lệnh
       let groups = {};
       STATE.lenh.forEach(item => {
           if(!groups[item.soLenh]) groups[item.soLenh] = { items: [], tongTanLenh: 0, tongTanDaXuat: 0 };
           
-          let klr = layKLRTuTenDan(item.ten); // Khối lượng riêng (kg)
+          let klr = layKLRTuTenDan(item.ten);
           let slDaXuat = STATE.thucHien.filter(t => t.lenhId === item.id).reduce((sum, curr) => sum + curr.sl, 0);
           
-          // Tính Tấn (1 tấn = 1000 kg)
           let tanLenh = (item.sl * klr) / 1000;
           let tanDaXuat = (slDaXuat * klr) / 1000;
 
@@ -1021,54 +1013,55 @@
           let formatTanDaXuat = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(g.tongTanDaXuat);
           let formatTanConLai = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(g.tongTanLenh - g.tongTanDaXuat);
           
-          // Thanh tiến độ phần trăm
           let percent = g.tongTanLenh > 0 ? (g.tongTanDaXuat / g.tongTanLenh) * 100 : 0;
           if(percent > 100) percent = 100;
 
           html += `
           <div style="background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-light); margin-bottom: 15px; overflow:hidden;">
-              <!-- Header của Lệnh -->
               <div style="background: var(--input-bg); padding: 12px; border-bottom: 2px solid var(--border-light);">
                   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;">
                       <span style="color: var(--primary-color); font-weight: 800; font-size: 16px;">MÃ LỆNH: ${escapeHTML(soLenh)}</span>
                       <span style="color: var(--text-main); font-weight: bold; font-size: 13px;">${formatTanDaXuat} / ${formatTanLenh} Tấn</span>
                   </div>
-                  <!-- Progress Bar -->
                   <div style="width:100%; height:8px; background:#E5E5EA; border-radius:4px; overflow:hidden; margin-bottom:5px;">
                       <div style="height:100%; width:${percent}%; background:${percent >= 100 ? 'var(--success-color)' : 'var(--primary-color)'}; transition:0.3s;"></div>
                   </div>
                   <div style="font-size:11px; color:var(--text-sub); text-align:right;">Còn nợ: <b>${formatTanConLai} Tấn</b></div>
               </div>
               
-              <!-- Bảng chi tiết đạn trong lệnh -->
-              <table style="width:100%; font-size:12px; text-align:center; border-collapse: collapse;">
-                  <tr style="color:var(--text-sub); background: white;">
-                    <th style="padding:8px 4px; text-align:left; width: 45%;">Tên đạn</th>
-                    <th style="padding:8px 4px; width: 15%;">Kế Hoạch</th>
-                    <th style="padding:8px 4px; width: 15%;">Đã Cấp</th>
-                    <th style="padding:8px 4px; width: 15%;">Còn Lại</th>
-                  </tr>
-                  ${g.items.map(i => {
-                      let colorConLai = i.conLai < 0 ? 'var(--danger-color)' : (i.conLai === 0 ? 'var(--success-color)' : 'var(--text-main)');
-                      return `
-                      <tr style="border-top:1px dotted var(--border-light); background: white;">
-                          <td style="padding:8px 4px; text-align:left;">
-                              <div style="font-weight:bold; color:var(--text-main); line-height: 1.2;">${escapeHTML(i.ten)}</div>
-                              <div style="font-size:10px; color:var(--text-sub); margin-top:2px;">Cấp: ${escapeHTML(i.cap)} | ĐVT: ${escapeHTML(i.dvt)}</div>
-                          </td>
-                          <td style="padding:8px 4px; font-weight:bold; color:var(--primary-color);">${i.slLenh}</td>
-                          <td style="padding:8px 4px; font-weight:bold; color:var(--warning-color);">${i.slDaXuat}</td>
-                          <td style="padding:8px 4px; font-weight:bold; color:${colorConLai};">${i.conLai}</td>
+              <!-- ĐÃ THÊM WRAPPER table-container ĐỂ CÓ THỂ VUỐT NGANG -->
+              <div class="table-container" style="border: none; border-radius: 0; max-height: none;">
+                  <table style="width:100%; min-width: 600px; font-size:12px; text-align:center; border-collapse: collapse;">
+                      <tr style="color:var(--text-sub); background: white;">
+                        <th style="padding:8px 4px; text-align:left; width: 180px;">Tên đạn</th>
+                        <th style="padding:8px 4px; width: 50px;">ĐVT</th> <!-- TÁCH CỘT ĐVT -->
+                        <th style="padding:8px 4px; width: 40px;">Cấp</th> <!-- TÁCH CỘT CẤP -->
+                        <th style="padding:8px 4px; width: 70px;">Kế Hoạch</th>
+                        <th style="padding:8px 4px; width: 70px;">Đã Cấp</th>
+                        <th style="padding:8px 4px; width: 70px;">Còn Lại</th>
                       </tr>
-                      `;
-                  }).join('')}
-              </table>
+                      ${g.items.map(i => {
+                          let colorConLai = i.conLai < 0 ? 'var(--danger-color)' : (i.conLai === 0 ? 'var(--success-color)' : 'var(--text-main)');
+                          return `
+                          <tr style="border-top:1px dotted var(--border-light); background: white;">
+                              <td style="padding:8px 4px; text-align:left; font-weight:bold; color:var(--text-main); line-height: 1.2;">
+                                  ${escapeHTML(i.ten)}
+                              </td>
+                              <td style="padding:8px 4px; color:var(--text-sub);">${escapeHTML(i.dvt)}</td>
+                              <td style="padding:8px 4px;">${escapeHTML(i.cap)}</td>
+                              <td style="padding:8px 4px; font-weight:bold; color:var(--primary-color);">${i.slLenh}</td>
+                              <td style="padding:8px 4px; font-weight:bold; color:var(--warning-color);">${i.slDaXuat}</td>
+                              <td style="padding:8px 4px; font-weight:bold; color:${colorConLai};">${i.conLai}</td>
+                          </tr>
+                          `;
+                      }).join('')}
+                  </table>
+              </div>
           </div>`;
       }
       container.innerHTML = html;
   }
 
-  // TÍNH NĂNG: CHI TIẾT TẢI TRỌNG TỪNG XE THEO NGÀY
   function moModalXemChiTietXe() {
       haptic();
       let locNgay = document.getElementById('bc-ngay').value;
@@ -1124,19 +1117,43 @@
       let target = document.getElementById('khu-vuc-chup-anh');
       let scrollBox = document.getElementById('table-bao-cao-scroll');
       
-      let oldMaxHeight = scrollBox.style.maxHeight; let oldOverflowY = scrollBox.style.overflowY; let oldOverflowX = scrollBox.style.overflowX; let oldWidth = target.style.width;
-      scrollBox.style.maxHeight = 'none'; scrollBox.style.overflowY = 'visible'; scrollBox.style.overflowX = 'visible'; target.style.width = '800px'; 
+      let oldMaxHeight = scrollBox ? scrollBox.style.maxHeight : ''; 
+      let oldOverflowY = scrollBox ? scrollBox.style.overflowY : ''; 
+      let oldOverflowX = scrollBox ? scrollBox.style.overflowX : ''; 
+      let oldWidth = target.style.width;
+
+      if(scrollBox) {
+          scrollBox.style.maxHeight = 'none'; scrollBox.style.overflowY = 'visible'; scrollBox.style.overflowX = 'visible'; 
+      }
+      
+      // Mở rộng tất cả các table con trong chế độ Báo Cáo Lệnh để chụp đủ
+      if(currentBaoCaoMode === 'lenh') {
+          let innerTables = document.querySelectorAll('#danh-sach-tinh-trang-lenh .table-container');
+          innerTables.forEach(el => { el.style.overflowX = 'visible'; });
+      }
+
+      target.style.width = '800px'; 
       showDialog("Đang xử lý", "Hệ thống đang tạo ảnh báo cáo...", "alert");
 
       setTimeout(() => {
           html2canvas(target, { scale: 2, backgroundColor: "#F2F2F7", useCORS: true, windowWidth: 800 }).then(canvas => {
-              scrollBox.style.maxHeight = oldMaxHeight; scrollBox.style.overflowY = oldOverflowY; scrollBox.style.overflowX = oldOverflowX; target.style.width = oldWidth;
+              if(scrollBox) {
+                  scrollBox.style.maxHeight = oldMaxHeight; scrollBox.style.overflowY = oldOverflowY; scrollBox.style.overflowX = oldOverflowX; 
+              }
+              if(currentBaoCaoMode === 'lenh') {
+                  let innerTables = document.querySelectorAll('#danh-sach-tinh-trang-lenh .table-container');
+                  innerTables.forEach(el => { el.style.overflowX = 'auto'; }); // Khôi phục trạng thái cũ
+              }
+              target.style.width = oldWidth;
+              
               let link = document.createElement('a'); 
               let prefix = currentBaoCaoMode === 'ngay' ? 'BaoCao_Ngay_' : 'BaoCao_TienDo_Lenh_';
               link.download = prefix + getTodayString() + '.jpg';
               link.href = canvas.toDataURL("image/jpeg", 0.9); link.click(); closeDialog();
           }).catch(err => {
-              console.error(err); scrollBox.style.maxHeight = oldMaxHeight; scrollBox.style.overflowY = oldOverflowY; scrollBox.style.overflowX = oldOverflowX; target.style.width = oldWidth;
+              console.error(err); 
+              if(scrollBox) { scrollBox.style.maxHeight = oldMaxHeight; scrollBox.style.overflowY = oldOverflowY; scrollBox.style.overflowX = oldOverflowX; }
+              target.style.width = oldWidth;
               showDialog("Lỗi", "Trình duyệt đang chặn tạo ảnh, hoặc màn hình quá hẹp.", "alert");
           });
       }, 800); 
