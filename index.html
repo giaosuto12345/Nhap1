@@ -33,6 +33,7 @@
       --danger-color: #FF3B30;
       --nav-bg: rgba(255, 255, 255, 0.9);
       --header-bg: #ffffff;
+      --info-color: #5856D6; /* Màu mới cho nút Xem Lệnh */
     }
 
     @media (prefers-color-scheme: dark) {
@@ -76,26 +77,16 @@
     .form-group label { display: block; font-size: 13px; font-weight: bold; color: var(--text-sub); margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     
     .form-control { 
-        width: 100%; 
-        height: 46px; 
-        padding: 0 12px; 
-        font-size: 15px; 
-        border-radius: 8px; 
-        border: 1px solid var(--border-light); 
-        background: var(--input-bg); 
-        color: var(--text-main); 
-        -webkit-appearance: none; 
-        appearance: none;
-        font-family: inherit;
+        width: 100%; height: 46px; padding: 0 12px; font-size: 15px; 
+        border-radius: 8px; border: 1px solid var(--border-light); 
+        background: var(--input-bg); color: var(--text-main); 
+        -webkit-appearance: none; appearance: none; font-family: inherit;
     }
     .form-control:focus { outline: none; border-color: var(--primary-color); }
     
     select.form-control {
         background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 12px center;
-        background-size: 16px;
-        padding-right: 36px;
+        background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 36px;
     }
 
     input[type="date"].form-control { text-align: center; }
@@ -112,11 +103,6 @@
     .search-bar-container { display: flex; gap: 8px; margin-bottom: 10px; }
     .search-input { flex: 1; padding: 0 12px !important; height: 46px; font-size: 15px !important; border-radius: 8px !important; border: 1px solid var(--border-light) !important; background: var(--input-bg) !important; color: var(--text-main) !important;}
     .action-btn { display: flex; align-items: center; justify-content: center; width: 46px; height: 46px; color: white; border-radius: 8px; font-size: 20px; border: none; cursor: pointer; flex-shrink:0;}
-    
-    /* PANEL CÀI ĐẶT */
-    .setting-panel { background: var(--input-bg); border: 2px solid var(--warning-color); border-radius: 10px; padding: 15px; margin-bottom: 15px; display: none; }
-    .set-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; font-size: 14px; font-weight: bold; padding-bottom: 8px; border-bottom: 1px solid var(--border-light);}
-    .set-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
     
     /* BẢNG CHUNG */
     .table-container { overflow-x: auto; max-height: 60vh; overflow-y: auto; border-radius: 10px; border: 1px solid var(--border-light); -webkit-overflow-scrolling: touch; }
@@ -137,7 +123,7 @@
     .tab-content.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* MODALS */
+    /* ================== MODALS ================== */
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 10000; display: none; align-items: center; justify-content: center; opacity: 0; transition: 0.3s; }
     .modal-overlay.show { opacity: 1; }
     .custom-dialog-box { background: var(--bg-card); width: 90%; max-width: 350px; border-radius: 16px; padding: 20px; text-align: center; box-shadow: var(--card-shadow); transform: scale(0.9); opacity: 0; transition: 0.3s; border: 1px solid var(--border-light); display: flex; flex-direction: column; }
@@ -145,15 +131,29 @@
     .dialog-buttons { display: flex; gap: 10px; margin-top: 20px;}
     .btn-dialog { flex: 1; padding: 12px; border-radius: 8px; font-weight: bold; border: none; cursor: pointer; background: var(--primary-color); color: white;}
     
-    /* MODAL DANH SÁCH (Fix lỗi ẩn thanh tìm kiếm) */
+    /* MODAL DANH SÁCH (Fix lỗi ẩn thanh tìm kiếm và nút Hủy khổng lồ) */
     .modal-full { width: 95%; max-width: 600px; height: 85vh; padding: 15px; display: flex; flex-direction: column; justify-content: flex-start; }
     .modal-full h3 { margin: 0 0 15px 0; flex-shrink: 0; }
-    #search-modal-dan { flex-shrink: 0; margin-bottom: 10px; } /* Đảm bảo ô input không bị bóp méo */
-    .modal-list-container { flex: 1; overflow-y: auto; text-align: left; border: 1px solid var(--border-light); border-radius: 8px; min-height: 0; /* Sửa lỗi scroll trên iOS */ }
+    #search-modal-dan { flex-shrink: 0; margin-bottom: 10px; } 
+    .modal-list-container { flex: 1; overflow-y: auto; text-align: left; border: 1px solid var(--border-light); border-radius: 8px; min-height: 0; }
     .modal-list-item { padding: 12px; border-bottom: 1px solid var(--border-light); font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
     .modal-list-item:active { background: var(--input-bg); }
     .text-dan-name { font-weight:bold; color:var(--primary-color); white-space: normal; word-break: break-word; line-height: 1.3; margin-bottom: 4px;}
     
+    /* FIX NÚT HỦY BỎ (Ép không được giãn ra) */
+    .btn-modal-cancel {
+        flex: 0 0 auto; /* Cấm co giãn */
+        height: 48px;
+        width: 100%;
+        margin-top: 15px;
+        background: var(--text-sub);
+        color: white;
+        border-radius: 8px;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+    }
+
     /* BÁO CÁO TAB */
     .tong-hop-box { background: var(--input-bg); border: 1px solid var(--border-light); padding: 15px; border-radius: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;}
     .tong-hop-so { font-size: 24px; font-weight: bold; color: var(--primary-color); }
@@ -173,20 +173,8 @@
       <div class="card" style="margin-top: 5px;">
         <div class="search-bar-container">
           <input type="text" id="search-danh-muc" class="search-input" placeholder="Tìm kiếm danh mục..." onkeyup="debounceTimKiem()">
-          <button class="action-btn" style="background:var(--warning-color)" onclick="toggleCaiDatDanhMuc(); haptic();" title="Cài đặt cột">⚙️</button>
           <button class="action-btn" style="background:var(--success-color)" onclick="document.getElementById('excel-upload').click(); haptic();" title="Tải Excel mới">📂</button>
           <input type="file" id="excel-upload" style="display:none;" accept=".xlsx, .xls, .csv" onchange="xuLyFileExcel(event)">
-        </div>
-        
-        <div id="panel-cai-dat-danh-muc" class="setting-panel">
-          <div style="text-align: center; color: var(--warning-color); font-weight: 800; margin-bottom: 15px;">CÀI ĐẶT BẢNG EXCEL</div>
-          <div class="set-row">
-            <span>Cỡ chữ (px):</span>
-            <input type="number" id="set-fontsize" step="1" style="width: 80px !important; height: 36px; padding: 6px !important; font-size: 15px; border-radius:6px; background:var(--bg-body); border: 1px solid var(--border-light); color:var(--text-main); text-align:center;" value="14">
-          </div>
-          <div style="font-size: 12px; color: var(--text-sub); margin: 10px 0 5px 0; text-transform: uppercase;">Chọn cột hiển thị:</div>
-          <div id="danh-sach-cot-cai-dat" style="max-height: 200px; overflow-y: auto; background: var(--bg-body); padding: 10px; border-radius: 8px;"></div>
-          <button onclick="luuCaiDatDanhMuc()" class="btn" style="background:var(--warning-color); padding:10px; margin-bottom:0; margin-top:15px;">LƯU VÀ ÁP DỤNG</button>
         </div>
         <div style="font-size: 12px; color: var(--text-sub); text-align: center;">Vuốt ngang bảng để xem các cột bị che khuất</div>
       </div>
@@ -204,6 +192,10 @@
     <!-- ==================== TAB 2: LỆNH XUẤT ==================== -->
     <div id="tab-lenh" class="tab-content">
       <div class="card" style="margin-top: 5px;">
+        <!-- NÚT MỚI: XEM TỔNG HỢP LỆNH -->
+        <button class="btn" style="background: var(--info-color); margin-bottom: 15px;" onclick="moModalXemLenh()">📊 XEM TỔNG KHỐI LƯỢNG LỆNH (TẤN)</button>
+        <hr style="border: 0; border-top: 1px dashed var(--border-light); margin: 0 0 15px 0;">
+
         <div class="form-group" style="margin-bottom:0;">
           <label>Số Lệnh / Phiếu xuất</label>
           <input type="text" id="lenh-so" class="form-control" placeholder="VD: Số 01/PX" style="border-color: var(--primary-color); font-weight:bold;">
@@ -389,12 +381,24 @@
     </div>
   </div>
 
+  <!-- MODAL CHỌN ĐẠN (Đã sửa nút Hủy bỏ) -->
   <div id="modal-chon-dan" class="modal-overlay">
     <div class="custom-dialog-box modal-full">
       <h3>Tìm và Chọn Đạn</h3>
       <input type="text" id="search-modal-dan" class="form-control" placeholder="Tìm tên đạn..." onkeyup="timKiemModalDan()">
       <div class="modal-list-container" id="modal-danh-sach-dan"></div>
-      <button class="btn-dialog" style="margin-top:15px; background:var(--text-sub); flex-shrink:0;" onclick="dongModalChonDan()">HỦY BỎ</button>
+      <button class="btn-modal-cancel" onclick="dongModalChonDan()">HỦY BỎ</button>
+    </div>
+  </div>
+
+  <!-- MODAL XEM TỔNG HỢP LỆNH (MỚI) -->
+  <div id="modal-xem-lenh" class="modal-overlay">
+    <div class="custom-dialog-box modal-full" style="max-height: 80vh;">
+      <h3>Tổng Hợp Khối Lượng Lệnh</h3>
+      <div class="modal-list-container" id="noidung-xem-lenh" style="background: var(--bg-body); padding: 10px;">
+        <!-- Dữ liệu render ra đây -->
+      </div>
+      <button class="btn-modal-cancel" onclick="dongModalXemLenh()">ĐÓNG BẢNG</button>
     </div>
   </div>
 
@@ -414,7 +418,7 @@
       <hr style="border:0; border-top:1px solid var(--border-light); margin: 15px 0; width:100%;">
       <button class="btn" style="background:var(--danger-color);" onclick="xoaToanBoDuLieu()">🗑 XÓA TRẮNG DỮ LIỆU</button>
       
-      <button class="btn-dialog" style="width:100%; margin-top:10px; background:var(--text-sub)" onclick="dongMenuHeThong()">ĐÓNG</button>
+      <button class="btn-modal-cancel" onclick="dongMenuHeThong()">ĐÓNG</button>
     </div>
   </div>
 
@@ -424,17 +428,12 @@
   function generateID() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
   
   function getTodayString() {
-      const d = new Date();
-      const year = d.getFullYear();
+      const d = new Date(); const year = d.getFullYear();
       const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
+      const day = String(d.getDate()).padStart(2, '0'); return `${year}-${month}-${day}`;
   }
   function formatShortDate(dateStr) {
-      if(!dateStr) return '';
-      let parts = dateStr.split('-');
-      if(parts.length !== 3) return dateStr;
-      return `${parts[2]}/${parts[1]}`;
+      if(!dateStr) return ''; let parts = dateStr.split('-'); if(parts.length !== 3) return dateStr; return `${parts[2]}/${parts[1]}`;
   }
 
   const STATE = { excel: { data: [], config: { fontSize: 14, cot: {} } }, lenh: [], thucHien: [] };
@@ -445,8 +444,7 @@
   document.addEventListener('DOMContentLoaded', () => { 
       try {
           let today = getTodayString();
-          document.getElementById('th-ngay').value = today;
-          document.getElementById('bc-ngay').value = today;
+          document.getElementById('th-ngay').value = today; document.getElementById('bc-ngay').value = today;
 
           let savedExcel = localStorage.getItem('duLieuExcelOffline'); 
           if (savedExcel) { 
@@ -455,31 +453,22 @@
               if (savedConfig) STATE.excel.config = JSON.parse(savedConfig); else taoCauHinhMacDinh();
               hienThiBangDanhMuc(STATE.excel.data); 
           }
-          let savedLenh = localStorage.getItem('duLieuLenh');
-          if (savedLenh) STATE.lenh = JSON.parse(savedLenh);
-          
-          let savedThucHien = localStorage.getItem('duLieuThucHien');
-          if (savedThucHien) STATE.thucHien = JSON.parse(savedThucHien);
-
+          let savedLenh = localStorage.getItem('duLieuLenh'); if (savedLenh) STATE.lenh = JSON.parse(savedLenh);
+          let savedThucHien = localStorage.getItem('duLieuThucHien'); if (savedThucHien) STATE.thucHien = JSON.parse(savedThucHien);
           STATE.thucHien.forEach(th => { if(!th.ngay) th.ngay = today; });
 
-          renderBangLenh();
-          renderBangThucHien();
-          capNhatDropdownSoLenh();
+          renderBangLenh(); renderBangThucHien(); capNhatDropdownSoLenh();
       } catch (e) { console.error("Lỗi parse:", e); }
   });
 
   window.showDialog = function(title, message, type = 'alert', confirmFn = null) {
-      document.getElementById('dialog-title').innerText = title; 
-      document.getElementById('dialog-message').innerHTML = message; 
-      let btnContainer = document.getElementById('dialog-buttons');
-      let wrapper = document.getElementById('custom-dialog-wrapper'); 
+      document.getElementById('dialog-title').innerText = title; document.getElementById('dialog-message').innerHTML = message; 
+      let btnContainer = document.getElementById('dialog-buttons'); let wrapper = document.getElementById('custom-dialog-wrapper'); 
       wrapper.style.display = 'flex'; setTimeout(() => wrapper.classList.add('show'), 10);
       window.closeDialog = function() { wrapper.classList.remove('show'); setTimeout(() => wrapper.style.display = 'none', 300); };
 
-      if (type === 'alert') {
-          btnContainer.innerHTML = `<button onclick="closeDialog()" class="btn-dialog">ĐÓNG</button>`;
-      } else if (type === 'confirm') {
+      if (type === 'alert') { btnContainer.innerHTML = `<button onclick="closeDialog()" class="btn-dialog">ĐÓNG</button>`; } 
+      else if (type === 'confirm') {
           window.execConfirm = function() { closeDialog(); if(confirmFn) confirmFn(); }
           btnContainer.innerHTML = `<button onclick="closeDialog()" class="btn-dialog" style="background:var(--text-sub)">HỦY</button><button onclick="execConfirm()" class="btn-dialog" style="background:var(--danger-color)">ĐỒNG Ý</button>`;
       }
@@ -489,28 +478,20 @@
       haptic();
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      document.getElementById(navId).classList.add('active');
-      document.getElementById('app-title').innerText = title;
-      
-      if(tabId === 'tab-thuc-hien') capNhatDropdownSoLenh();
-      if(tabId === 'tab-bao-cao') renderBaoCao();
+      document.getElementById(tabId).classList.add('active'); document.getElementById(navId).classList.add('active'); document.getElementById('app-title').innerText = title;
+      if(tabId === 'tab-thuc-hien') capNhatDropdownSoLenh(); if(tabId === 'tab-bao-cao') renderBaoCao();
   }
 
-  // --- HỆ THỐNG SAO LƯU & CẬP NHẬT ---
-  function moMenuHeThong() { haptic(); document.getElementById('modal-he-thong').style.display = 'flex'; setTimeout(() => document.getElementById('modal-he-thong').classList.add('show'), 10); }
-  function dongMenuHeThong() { document.getElementById('modal-he-thong').classList.remove('show'); setTimeout(() => document.getElementById('modal-he-thong').style.display = 'none', 300); }
-  
+  // --- HỆ THỐNG ---
+  function moMenuHeThong() { haptic(); let m = document.getElementById('modal-he-thong'); m.style.display = 'flex'; setTimeout(() => m.classList.add('show'), 10); }
+  function dongMenuHeThong() { let m = document.getElementById('modal-he-thong'); m.classList.remove('show'); setTimeout(() => m.style.display = 'none', 300); }
   function capNhatPhienBanApp() {
-      haptic();
-      showDialog("Đang cập nhật", "Hệ thống sẽ ép Safari tải bản code mới. Vui lòng chờ...", "alert");
+      haptic(); showDialog("Đang cập nhật", "Hệ thống sẽ ép Safari tải bản code mới. Vui lòng chờ...", "alert");
       setTimeout(() => { window.location.href = window.location.pathname + "?v=" + new Date().getTime(); }, 1500);
   }
-
   function xuatDuLieu() {
       let dataStr = JSON.stringify({ excel: STATE.excel, lenh: STATE.lenh, thucHien: STATE.thucHien });
-      let dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-      let linkElement = document.createElement('a');
+      let dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr); let linkElement = document.createElement('a');
       let date = new Date(); let dStr = `${date.getDate()}_${date.getMonth()+1}_${date.getFullYear()}`;
       linkElement.setAttribute('href', dataUri); linkElement.setAttribute('download', `SaoLuu_QuanLyDan_${dStr}.json`);
       linkElement.click(); showDialog("Thành công", "Đã tải file dữ liệu xuống máy.", "alert");
@@ -530,53 +511,31 @@
   function xoaToanBoDuLieu() { showDialog("Cảnh báo", "Xóa toàn bộ dữ liệu?", "confirm", () => { localStorage.clear(); location.reload(); }); }
 
   // --- TAB 1: DANH MỤC ---
-  let timeoutTimKiem = null;
-  function debounceTimKiem() { if (timeoutTimKiem) clearTimeout(timeoutTimKiem); timeoutTimKiem = setTimeout(() => timKiemDanhMuc(), 300); }
+  let timeoutTimKiem = null; function debounceTimKiem() { if (timeoutTimKiem) clearTimeout(timeoutTimKiem); timeoutTimKiem = setTimeout(() => timKiemDanhMuc(), 300); }
   function xuLyFileExcel(e) { 
-      haptic(); let file = e.target.files[0]; if (!file) return; 
-      let reader = new FileReader(); 
+      haptic(); let file = e.target.files[0]; if (!file) return; let reader = new FileReader(); 
       reader.onload = function(evt) { 
           let data = new Uint8Array(evt.target.result); let workbook = XLSX.read(data, {type: 'array'}); 
           let json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {defval: ""}); 
           if(json.length === 0) { showDialog("Lỗi", "File rỗng!", "alert"); e.target.value = ''; return; } 
           STATE.excel.data = json.map(row => { let newRow = {}; for (let k in row) { if (!k.startsWith('__EMPTY')) newRow[k] = row[k]; } return newRow; }); 
           try { localStorage.setItem('duLieuExcelOffline', JSON.stringify(STATE.excel.data)); } catch (e) { }
-          taoCauHinhMacDinh(); hienThiBangDanhMuc(STATE.excel.data); 
-          showDialog("Thành công", "Đã tải danh mục.", "alert"); e.target.value = ''; 
+          taoCauHinhMacDinh(); hienThiBangDanhMuc(STATE.excel.data); showDialog("Thành công", "Đã tải danh mục.", "alert"); e.target.value = ''; 
       }; reader.readAsArrayBuffer(file); 
   }
   function taoCauHinhMacDinh() { 
-      if (STATE.excel.data.length === 0) return;
-      STATE.excel.config.cot = {}; 
+      if (STATE.excel.data.length === 0) return; STATE.excel.config.cot = {}; 
       Object.keys(STATE.excel.data[0]).forEach(c => { STATE.excel.config.cot[c] = { show: true }; }); 
       try { localStorage.setItem('cauHinhBangExcel', JSON.stringify(STATE.excel.config)); } catch(e) {}
-  }
-  function toggleCaiDatDanhMuc() { 
-      haptic(); let panel = document.getElementById('panel-cai-dat-danh-muc'); 
-      if(panel.style.display === 'block') { panel.style.display = 'none'; return; } 
-      if(STATE.excel.data.length === 0) { showDialog("Lỗi", "Tải file Excel lên trước!", "alert"); return; } 
-      document.getElementById('set-fontsize').value = STATE.excel.config.fontSize || 14; 
-      document.getElementById('danh-sach-cot-cai-dat').innerHTML = Object.keys(STATE.excel.config.cot).map(tenCot => { 
-          return `<div class="set-row"><label style="margin:0; display:flex; align-items:center; flex:1; cursor:pointer;"><input type="checkbox" id="chk-col-${tenCot}" style="transform:scale(1.3); margin-right:10px;" ${STATE.excel.config.cot[tenCot].show ? "checked" : ""}> ${escapeHTML(tenCot)}</label></div>`; 
-      }).join(''); 
-      panel.style.display = 'block'; 
-  }
-  function luuCaiDatDanhMuc() { 
-      haptic(); STATE.excel.config.fontSize = parseInt(document.getElementById('set-fontsize').value) || 14; 
-      Object.keys(STATE.excel.config.cot).forEach(t => { let el = document.getElementById(`chk-col-${t}`); if(el) STATE.excel.config.cot[t].show = el.checked; }); 
-      try { localStorage.setItem('cauHinhBangExcel', JSON.stringify(STATE.excel.config)); } catch(e) {}
-      document.getElementById('panel-cai-dat-danh-muc').style.display = 'none'; timKiemDanhMuc(); 
   }
   function hienThiBangDanhMuc(data) { 
       let thead = document.getElementById('dm-header'); let tbody = document.getElementById('dm-body'); 
       if (!data || data.length === 0) { thead.innerHTML = "<th>DỮ LIỆU</th>"; tbody.innerHTML = "<tr><td style='padding: 30px;'>Trống.</td></tr>"; return; } 
-      let cotHienThi = Object.keys(STATE.excel.config.cot).filter(c => STATE.excel.config.cot[c].show);
-      if(cotHienThi.length === 0) { thead.innerHTML = "<th>LỖI</th>"; tbody.innerHTML = "<tr><td style='padding: 30px;'>Đã ẩn hết cột.</td></tr>"; return; }
+      let cotHienThi = Object.keys(STATE.excel.config.cot || {}).filter(c => STATE.excel.config.cot[c].show);
+      if(cotHienThi.length === 0) cotHienThi = Object.keys(data[0]); // Fallback an toàn
       let fz = (STATE.excel.config.fontSize || 14) + "px";
       thead.innerHTML = cotHienThi.map(c => `<th>${escapeHTML(c)}</th>`).join(''); 
-      tbody.innerHTML = data.map(h => { 
-          return `<tr>${cotHienThi.map((c, i) => `<td style="text-align: ${i===0?"left":"center"}; font-size: ${fz};">${escapeHTML(h[c] !== undefined ? h[c] : '')}</td>`).join('')}</tr>`; 
-      }).join(''); 
+      tbody.innerHTML = data.map(h => `<tr>${cotHienThi.map((c, i) => `<td style="text-align: ${i===0?"left":"center"}; font-size: ${fz};">${escapeHTML(h[c] !== undefined ? h[c] : '')}</td>`).join('')}</tr>`).join(''); 
   }
   function timKiemDanhMuc() { 
       let tk = document.getElementById('search-danh-muc').value.toLowerCase(); 
@@ -584,7 +543,7 @@
       hienThiBangDanhMuc(STATE.excel.data.filter(h => Object.values(h).some(v => String(v).toLowerCase().includes(tk)))); 
   }
 
-  // --- TRÍCH XUẤT ĐẠN ---
+  // --- TRÍCH XUẤT ĐẠN THÔNG MINH ---
   function trichXuatThongTinDan(hang) {
       let keys = Object.keys(hang); let tenCol = '', dvtCol = '', klrCol = '';
       for(let k of keys) { let lk = k.toLowerCase().trim(); if(['tên đạn dược', 'tên đạn', 'tên'].includes(lk)) { tenCol = k; break; } }
@@ -599,13 +558,26 @@
       return { ten: hang[tenCol] ? String(hang[tenCol]) : 'N/A', dvt: dvtCol && hang[dvtCol] ? String(hang[dvtCol]) : '', klr: klrCol && hang[klrCol] ? String(hang[klrCol]) : '' };
   }
 
+  // Hàm nội bộ tìm KLR từ tên đạn
+  function layKLRTuTenDan(tenDan) {
+      for(let hang of STATE.excel.data) {
+          let info = trichXuatThongTinDan(hang);
+          if(info.ten === tenDan) {
+              let val = parseFloat(String(info.klr).replace(',', '.'));
+              return isNaN(val) ? 0 : val;
+          }
+      }
+      return 0;
+  }
+
   // --- TAB 2: LỆNH XUẤT ---
   function moModalChonDan() {
       haptic(); if(STATE.excel.data.length === 0) { showDialog("Lỗi", "Tải File Excel trước.", "alert"); return; }
       document.getElementById('search-modal-dan').value = ''; renderListModalDan(STATE.excel.data);
       let wrapper = document.getElementById('modal-chon-dan'); wrapper.style.display = 'flex'; setTimeout(() => wrapper.classList.add('show'), 10);
   }
-  function dongModalChonDan() { document.getElementById('modal-chon-dan').classList.remove('show'); setTimeout(() => document.getElementById('modal-chon-dan').style.display = 'none', 300); }
+  function dongModalChonDan() { let w = document.getElementById('modal-chon-dan'); w.classList.remove('show'); setTimeout(() => w.style.display = 'none', 300); }
+  
   function renderListModalDan(data) {
       let c = document.getElementById('modal-danh-sach-dan'); if(data.length === 0) { c.innerHTML = '<div style="padding:20px; text-align:center;">Trống.</div>'; return; }
       c.innerHTML = data.slice(0, 100).map(hang => {
@@ -682,6 +654,63 @@
       `).join('');
   }
 
+  // --- TÍNH NĂNG MỚI: XEM TỔNG HỢP LỆNH ---
+  function moModalXemLenh() {
+      haptic();
+      if(STATE.lenh.length === 0) { showDialog("Trống", "Chưa có dữ liệu lệnh nào để tính toán.", "alert"); return; }
+      
+      // Nhóm đạn theo số Lệnh
+      let groups = {};
+      STATE.lenh.forEach(item => {
+          if(!groups[item.soLenh]) groups[item.soLenh] = { items: [], tongKL: 0 };
+          groups[item.soLenh].items.push(item);
+          
+          let klr = layKLRTuTenDan(item.ten);
+          groups[item.soLenh].tongKL += (item.sl * klr); // sl * klr
+      });
+
+      let html = '';
+      for(let soLenh in groups) {
+          let g = groups[soLenh];
+          // Tính Tấn = / 1000, format theo chuẩn VN
+          let tan = g.tongKL / 1000;
+          let formatTan = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(tan);
+          
+          html += `
+          <div style="background: var(--bg-card); border-radius: 10px; padding: 12px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border-light); padding-bottom: 10px; margin-bottom: 10px;">
+                  <span style="color: var(--primary-color); font-weight: 800; font-size: 15px;">MÃ: ${escapeHTML(soLenh)}</span>
+                  <span style="color: var(--danger-color); font-weight: 800; font-size: 15px;">Tổng: ${formatTan} Tấn</span>
+              </div>
+              <table style="width:100%; font-size:12px; text-align:left; border-collapse: collapse;">
+                  <tr style="color:var(--text-sub);">
+                    <th style="padding-bottom:5px;">Tên đạn</th>
+                    <th style="width:40px; padding-bottom:5px;">SL</th>
+                    <th style="width:50px; padding-bottom:5px; text-align:right;">KLR</th>
+                  </tr>
+                  ${g.items.map(i => `
+                      <tr>
+                          <td style="padding:6px 0; border-top:1px dotted #E5E5EA;">${escapeHTML(i.ten)}</td>
+                          <td style="padding:6px 0; border-top:1px dotted #E5E5EA; font-weight:bold;">${i.sl}</td>
+                          <td style="padding:6px 0; border-top:1px dotted #E5E5EA; text-align:right;">${layKLRTuTenDan(i.ten)}</td>
+                      </tr>
+                  `).join('')}
+              </table>
+          </div>`;
+      }
+
+      document.getElementById('noidung-xem-lenh').innerHTML = html;
+      let w = document.getElementById('modal-xem-lenh');
+      w.style.display = 'flex';
+      setTimeout(() => w.classList.add('show'), 10);
+  }
+
+  function dongModalXemLenh() {
+      let w = document.getElementById('modal-xem-lenh');
+      w.classList.remove('show');
+      setTimeout(() => w.style.display = 'none', 300);
+  }
+
   // --- TAB 3: THỰC HIỆN ---
   function capNhatDropdownSoLenh() {
       let select = document.getElementById('th-so-lenh');
@@ -691,7 +720,6 @@
       document.getElementById('th-chon-dan').innerHTML = '<option value="">-- Vui lòng chọn Lệnh trước --</option>';
   }
 
-  // CẬP NHẬT: THÊM TÍNH TOÁN SỐ LƯỢNG CÒN LẠI VÀO DROPDOWN CHỌN ĐẠN
   function loadDanTheoLenh() {
       let soLenhChon = document.getElementById('th-so-lenh').value; let selectDan = document.getElementById('th-chon-dan');
       if(!soLenhChon) { selectDan.innerHTML = '<option value="">-- Vui lòng chọn Lệnh trước --</option>'; return; }
@@ -699,60 +727,37 @@
       let danTrongLenh = STATE.lenh.filter(l => l.soLenh === soLenhChon);
       
       selectDan.innerHTML = '<option value="">-- Chọn loại đạn --</option>' + danTrongLenh.map(l => { 
-          // Tính tổng số lượng đã xuất cho Lệnh này
           let daXuat = STATE.thucHien.filter(t => t.lenhId === l.id).reduce((sum, current) => sum + current.sl, 0);
           let conLai = l.sl - daXuat;
-          
           return `<option value="${l.id}" data-conlai="${conLai}">${escapeHTML(l.ten)} - (Còn: ${conLai} ${escapeHTML(l.dvt)})</option>`; 
       }).join('');
   }
 
-  // CẬP NHẬT: TỰ ĐỘNG ĐIỀN CẢ CẤP VÀ SỐ LƯỢNG CÒN LẠI
   function tuDongDienCapTuLenh() {
-      let selectEl = document.getElementById('th-chon-dan');
-      let idLenh = selectEl.value; 
-      
-      if(!idLenh) {
-          document.getElementById('th-cap').value = '';
-          document.getElementById('th-sl').value = '';
-          return;
-      }
+      let selectEl = document.getElementById('th-chon-dan'); let idLenh = selectEl.value; 
+      if(!idLenh) { document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; return; }
       
       let lenhGoc = STATE.lenh.find(l => l.id === idLenh); 
       if(lenhGoc) {
           document.getElementById('th-cap').value = lenhGoc.cap || ''; 
-          
-          // Lấy số lượng còn lại từ option data để điền tự động
           let selectedOption = selectEl.options[selectEl.selectedIndex];
           let conLai = selectedOption.getAttribute('data-conlai');
-          if(conLai && parseFloat(conLai) > 0) {
-              document.getElementById('th-sl').value = conLai;
-          } else {
-              document.getElementById('th-sl').value = '';
-          }
+          if(conLai && parseFloat(conLai) > 0) { document.getElementById('th-sl').value = conLai; } else { document.getElementById('th-sl').value = ''; }
       } 
   }
 
   function xuLyGhiXe() {
       haptic();
-      let xe = document.getElementById('th-xe').value.trim();
-      let ngay = document.getElementById('th-ngay').value;
-      let idLenh = document.getElementById('th-chon-dan').value;
-      let cap = document.getElementById('th-cap').value.trim();
+      let xe = document.getElementById('th-xe').value.trim(); let ngay = document.getElementById('th-ngay').value;
+      let idLenh = document.getElementById('th-chon-dan').value; let cap = document.getElementById('th-cap').value.trim();
       let sl = document.getElementById('th-sl').value.trim();
 
       if(!idLenh || !sl || !ngay) { showDialog("Lỗi", "Vui lòng điền đủ Ngày, Chọn đạn và Số lượng.", "alert"); return; }
       
       if (!xe) {
-          if (idThucHienDangSua) {
-              showDialog("Lỗi", "Vui lòng nhập số xe khi đang sửa.", "alert"); return;
-          }
-          let maxNum = 0;
-          let uniqueXeToday = [...new Set(STATE.thucHien.filter(t => t.ngay === ngay).map(t => t.xe))];
-          uniqueXeToday.forEach(x => {
-              let num = parseInt(x, 10);
-              if (!isNaN(num) && String(num) === x.trim()) { if (num > maxNum) maxNum = num; }
-          });
+          if (idThucHienDangSua) { showDialog("Lỗi", "Vui lòng nhập số xe khi đang sửa.", "alert"); return; }
+          let maxNum = 0; let uniqueXeToday = [...new Set(STATE.thucHien.filter(t => t.ngay === ngay).map(t => t.xe))];
+          uniqueXeToday.forEach(x => { let num = parseInt(x, 10); if (!isNaN(num) && String(num) === x.trim()) { if (num > maxNum) maxNum = num; } });
           xe = String(maxNum + 1); 
       }
 
@@ -766,7 +771,6 @@
           STATE.thucHien.push({ id: generateID(), lenhId: idLenh, soLenh: lenhGoc.soLenh, xe, ngay, ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap, sl: parseFloat(sl) });
           showDialog("Ghi sổ", `Đã ghi xuất ${sl} ${lenhGoc.dvt} cho Xe ${xe}`, "alert");
           document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; document.getElementById('th-xe').value = '';
-          // Cập nhật lại dropdown để số Còn Lại được tính toán lại ngay lập tức
           loadDanTheoLenh();
       }
 
@@ -777,7 +781,6 @@
       haptic(); let item = STATE.thucHien.find(t => t.id === id); if(!item) return;
       document.getElementById('th-xe').value = item.xe; document.getElementById('th-ngay').value = item.ngay || getTodayString();
       document.getElementById('th-so-lenh').value = item.soLenh; loadDanTheoLenh();
-      
       setTimeout(() => { document.getElementById('th-chon-dan').value = item.lenhId; document.getElementById('th-cap').value = item.cap; document.getElementById('th-sl').value = item.sl; }, 50);
 
       idThucHienDangSua = id;
@@ -793,11 +796,8 @@
 
   function xoaThucHien(id) { 
       showDialog("Xác nhận", "Xóa lịch sử xuất của xe này?", "confirm", () => { 
-          STATE.thucHien = STATE.thucHien.filter(i => i.id !== id); 
-          localStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien)); 
-          renderBangThucHien(); 
-          // Tính toán lại menu chọn đạn nếu có xoá
-          if(document.getElementById('tab-thuc-hien').classList.contains('active')) loadDanTheoLenh();
+          STATE.thucHien = STATE.thucHien.filter(i => i.id !== id); localStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien)); 
+          renderBangThucHien(); if(document.getElementById('tab-thuc-hien').classList.contains('active')) loadDanTheoLenh();
       }); 
   }
 
@@ -819,17 +819,12 @@
 
   // --- TAB 4: BÁO CÁO ---
   function renderBaoCao() {
-      let locNgay = document.getElementById('bc-ngay').value;
-      let locXe = document.getElementById('bc-xe').value.toLowerCase().trim();
+      let locNgay = document.getElementById('bc-ngay').value; let locXe = document.getElementById('bc-xe').value.toLowerCase().trim();
       let dataLoc = STATE.thucHien.filter(item => { return (!locNgay || item.ngay === locNgay) && (!locXe || item.xe.toLowerCase().includes(locXe)); });
 
       let tbody = document.getElementById('tbody-bao-cao');
-      if(dataLoc.length === 0) { 
-          tbody.innerHTML = `<tr><td colspan="6" style="padding:20px;">Không có dữ liệu xuất trong ngày này.</td></tr>`; 
-          document.getElementById('bc-tong-luot').innerText = "0"; return; 
-      }
-      document.getElementById('bc-tong-luot').innerText = dataLoc.length;
-      dataLoc.sort((a,b) => a.xe.localeCompare(b.xe));
+      if(dataLoc.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="padding:20px;">Không có dữ liệu xuất trong ngày này.</td></tr>`; document.getElementById('bc-tong-luot').innerText = "0"; return; }
+      document.getElementById('bc-tong-luot').innerText = dataLoc.length; dataLoc.sort((a,b) => a.xe.localeCompare(b.xe));
 
       tbody.innerHTML = dataLoc.map(item => `
           <tr>
