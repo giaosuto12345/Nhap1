@@ -261,11 +261,13 @@
         <div class="form-row" style="flex-wrap: nowrap;">
             <div class="form-group" style="flex:1.2;">
                 <label>Xe nhận</label>
-                <input type="text" id="th-xe" class="form-control" placeholder="Trống = tự tăng">
+                <!-- Thêm list để gợi ý số xe -->
+                <input type="text" id="th-xe" list="ds-xe-thuc-hien" class="form-control" placeholder="Nhập hoặc chọn xe">
+                <datalist id="ds-xe-thuc-hien"></datalist>
             </div>
             <div class="form-group">
                 <label>Ngày xuất</label>
-                <input type="date" id="th-ngay" class="form-control" style="font-weight:bold; padding: 0 5px;">
+                <input type="date" id="th-ngay" class="form-control" style="font-weight:bold; padding: 0 5px;" onchange="capNhatGoiYXe()">
             </div>
         </div>
         
@@ -326,17 +328,19 @@
           <div class="form-row" style="margin-bottom:0;">
               <div class="form-group">
                   <label style="color:rgba(255,255,255,0.8)">Ngày xuất (Trong kỳ)</label>
-                  <input type="date" id="bc-ngay" class="form-control" onchange="renderBaoCao()" style="padding:0 5px;">
+                  <input type="date" id="bc-ngay" class="form-control" onchange="capNhatGoiYXe(); renderBaoCao();" style="padding:0 5px;">
               </div>
               <div class="form-group">
                   <label style="color:rgba(255,255,255,0.8)">Lọc Số Xe</label>
-                  <input type="text" id="bc-xe" class="form-control" placeholder="Tất cả xe..." onkeyup="renderBaoCao()">
+                  <input type="text" id="bc-xe" list="ds-xe-bao-cao" class="form-control" placeholder="Tất cả xe..." onkeyup="renderBaoCao()" onchange="renderBaoCao()">
+                  <datalist id="ds-xe-bao-cao"></datalist>
               </div>
           </div>
       </div>
 
       <div style="display:flex; gap:10px;">
-          <button class="btn" style="background:#0A84FF; margin:10px 0; width:100%;" onclick="xuatAnhBaoCao()">📸 XUẤT ẢNH BÁO CÁO</button>
+          <button class="btn" style="background:var(--success-color); margin:10px 0; width:50%;" onclick="xuatAnhBaoCao()">📸 XUẤT ẢNH</button>
+          <button class="btn" style="background:var(--warning-color); margin:10px 0; width:50%;" onclick="moModalXemChiTietXe()">🚚 TẢI TRỌNG XE</button>
       </div>
 
       <div class="tong-hop-box">
@@ -356,7 +360,7 @@
               <table style="min-width: 600px;">
                 <thead>
                   <tr>
-                    <th style="width: 40px;">Xe</th>
+                    <th style="width: 40px;">STT</th> <!-- Đã đổi Xe thành STT -->
                     <th style="width: 140px;">Tên đạn</th>
                     <th style="width: 30px;">Cấp</th>
                     <th style="width: 40px;">Lệnh</th>
@@ -416,6 +420,15 @@
     </div>
   </div>
 
+  <!-- Modal Chi Tiết Xe (Mới Thêm) -->
+  <div id="modal-chi-tiet-xe" class="modal-overlay">
+    <div class="custom-dialog-box modal-full" style="max-height: 85vh;">
+      <h3 id="tieu-de-chi-tiet-xe">Chi Tiết Tải Trọng Xe</h3>
+      <div class="modal-list-container" id="noidung-chi-tiet-xe" style="background: var(--bg-body); padding: 10px; border:none;"></div>
+      <button class="btn-modal-cancel" onclick="dongModalXemChiTietXe()">ĐÓNG BẢNG</button>
+    </div>
+  </div>
+
   <div id="modal-he-thong" class="modal-overlay">
     <div class="custom-dialog-box" style="justify-content:center;">
       <h3 style="margin-top:0; color:var(--primary-color);">Hệ Thống</h3>
@@ -437,7 +450,6 @@
 
 <script>
   // ==================== BỘ NHỚ AN TOÀN (SAFE STORAGE) ====================
-  // Fix lỗi hộp cát (Sandbox/Preview) chặn truy cập localStorage làm JS chết ngầm
   const safeStorage = {
       getItem: function(key) { 
           try { return window.localStorage.getItem(key); } catch(e) { return null; } 
@@ -469,8 +481,6 @@
   const STATE = { excel: { data: [], config: { fontSize: 14, cot: {} } }, lenh: [], thucHien: [] };
   let idLenhDangSua = null;
   let idThucHienDangSua = null;
-
-  // Biến cache để lưu trữ key của các cột quan trọng (tránh lặp lại việc tìm kiếm)
   let cacheCotExcel = { tenCol: null, dvtCol: null, klrCol: null };
 
   // ==================== KHỞI TẠO APP ====================
@@ -497,10 +507,10 @@
           }
       } catch (e) { console.warn("Dữ liệu trống hoặc Sandbox chặn khởi tạo:", e); }
       
-      // Đảm bảo giao diện luôn được vẽ ra kể cả khi không đọc được LocalStorage
       renderBangLenh(); 
       renderBangThucHien(); 
       capNhatDropdownSoLenh();
+      capNhatGoiYXe(); // Khởi tạo gợi ý xe ban đầu
   });
 
   // ==================== UI DIALOG ====================
@@ -527,19 +537,14 @@
       document.getElementById(navId).classList.add('active'); 
       document.getElementById('app-title').innerText = title;
       
-      if(tabId === 'tab-thuc-hien') capNhatDropdownSoLenh(); 
-      if(tabId === 'tab-bao-cao') renderBaoCao();
+      if(tabId === 'tab-thuc-hien') { capNhatDropdownSoLenh(); capNhatGoiYXe(); }
+      if(tabId === 'tab-bao-cao') { capNhatGoiYXe(); renderBaoCao(); }
   }
 
   // ==================== HỆ THỐNG (BACKUP / RESTORE) ====================
   function moMenuHeThong() { haptic(); let m = document.getElementById('modal-he-thong'); m.style.display = 'flex'; setTimeout(() => m.classList.add('show'), 10); }
   function dongMenuHeThong() { let m = document.getElementById('modal-he-thong'); m.classList.remove('show'); setTimeout(() => m.style.display = 'none', 300); }
-  
-  function capNhatPhienBanApp() {
-      haptic(); showDialog("Đang cập nhật", "Đang tải lại trang...", "alert");
-      setTimeout(() => { try { window.location.reload(); } catch(e) {} }, 1500);
-  }
-
+  function capNhatPhienBanApp() { haptic(); showDialog("Đang cập nhật", "Đang tải lại trang...", "alert"); setTimeout(() => { try { window.location.reload(); } catch(e) {} }, 1500); }
   function xuatDuLieu() {
       let dataStr = JSON.stringify({ excel: STATE.excel, lenh: STATE.lenh, thucHien: STATE.thucHien });
       let dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr); 
@@ -549,7 +554,6 @@
       linkElement.click(); 
       showDialog("Thành công", "Đã tải file dữ liệu xuống máy.", "alert");
   }
-
   function nhapDuLieu(event) {
       let file = event.target.files[0]; if(!file) return; let reader = new FileReader();
       reader.onload = function(e) {
@@ -562,11 +566,21 @@
           } catch(err) { showDialog("Lỗi", "File không hợp lệ!", "alert"); }
       }; reader.readAsText(file); event.target.value = '';
   }
-
   function xoaToanBoDuLieu() { 
-      showDialog("Cảnh báo", "Hành động này sẽ xóa sạch dữ liệu trên trình duyệt. Bạn có chắc chắn?", "confirm", () => { 
-          safeStorage.clear(); try { location.reload(); } catch(e){} 
-      }); 
+      showDialog("Cảnh báo", "Hành động này sẽ xóa sạch dữ liệu trên trình duyệt. Bạn có chắc chắn?", "confirm", () => { safeStorage.clear(); try { location.reload(); } catch(e){} }); 
+  }
+
+  // ==================== CẬP NHẬT GỢI Ý XE ====================
+  function capNhatGoiYXe() {
+      // Lấy danh sách xe duy nhất xuất hiện trong ngày
+      let ngayThucHien = document.getElementById('th-ngay').value;
+      let ngayBaoCao = document.getElementById('bc-ngay').value;
+
+      let dsXeThucHien = [...new Set(STATE.thucHien.filter(t => t.ngay === ngayThucHien && t.xe).map(t => t.xe))].sort();
+      let dsXeBaoCao = [...new Set(STATE.thucHien.filter(t => t.ngay === ngayBaoCao && t.xe).map(t => t.xe))].sort();
+
+      document.getElementById('ds-xe-thuc-hien').innerHTML = dsXeThucHien.map(x => `<option value="${escapeHTML(x)}">`).join('');
+      document.getElementById('ds-xe-bao-cao').innerHTML = dsXeBaoCao.map(x => `<option value="${escapeHTML(x)}">`).join('');
   }
 
   // ==================== TAB 1: DANH MỤC EXCEL ====================
@@ -575,119 +589,83 @@
   
   function xuLyFileExcel(e) { 
       haptic(); let file = e.target.files[0]; if (!file) return; 
-      
-      // Xoá bộ đệm Caching (Tối ưu hóa performance) khi tải file mới để các key được quét lại chính xác
       cacheCotExcel = { tenCol: null, dvtCol: null, klrCol: null };
-      
       let reader = new FileReader(); 
       reader.onload = function(evt) { 
           try {
               let data = new Uint8Array(evt.target.result); let workbook = XLSX.read(data, {type: 'array'}); 
               let json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {defval: ""}); 
               if(json.length === 0) { showDialog("Lỗi", "File rỗng!", "alert"); e.target.value = ''; return; } 
-              
               STATE.excel.data = json.map(row => { let newRow = {}; for (let k in row) { if (!k.startsWith('__EMPTY')) newRow[k] = row[k]; } return newRow; }); 
-              
               safeStorage.setItem('duLieuExcelOffline', JSON.stringify(STATE.excel.data));
-              taoCauHinhMacDinh(); 
-              hienThiBangDanhMuc(STATE.excel.data); 
+              taoCauHinhMacDinh(); hienThiBangDanhMuc(STATE.excel.data); 
               showDialog("Thành công", "Đã nạp file Excel vào bộ nhớ.", "alert"); 
-          } catch (err) {
-              showDialog("Lỗi", "Không thể đọc định dạng file này.", "alert");
-          }
+          } catch (err) { showDialog("Lỗi", "Không thể đọc định dạng file này.", "alert"); }
           e.target.value = ''; 
-      }; 
-      reader.readAsArrayBuffer(file); 
+      }; reader.readAsArrayBuffer(file); 
   }
-
   function taoCauHinhMacDinh() { 
       if (STATE.excel.data.length === 0) return; STATE.excel.config.cot = {}; 
       Object.keys(STATE.excel.data[0]).forEach(c => { STATE.excel.config.cot[c] = { show: true }; }); 
       safeStorage.setItem('cauHinhBangExcel', JSON.stringify(STATE.excel.config));
   }
-
   function toggleCaiDatDanhMuc() { 
       haptic(); let panel = document.getElementById('panel-cai-dat-danh-muc'); 
       if(panel.style.display === 'block') { panel.style.display = 'none'; return; } 
       if(STATE.excel.data.length === 0) { showDialog("Lỗi", "Hãy tải file Excel lên trước!", "alert"); return; } 
-      
       document.getElementById('set-fontsize').value = STATE.excel.config.fontSize || 14; 
       document.getElementById('danh-sach-cot-cai-dat').innerHTML = Object.keys(STATE.excel.config.cot).map(tenCot => { 
           return `<div class="set-row"><label style="margin:0; display:flex; align-items:center; flex:1; cursor:pointer;"><input type="checkbox" id="chk-col-${tenCot}" style="transform:scale(1.3); margin-right:10px;" ${STATE.excel.config.cot[tenCot].show ? "checked" : ""}> ${escapeHTML(tenCot)}</label></div>`; 
       }).join(''); 
       panel.style.display = 'block'; 
   }
-
   function luuCaiDatDanhMuc() { 
       haptic(); STATE.excel.config.fontSize = parseInt(document.getElementById('set-fontsize').value) || 14; 
       Object.keys(STATE.excel.config.cot).forEach(t => { 
-          let el = document.getElementById(`chk-col-${t}`); 
-          if(el) STATE.excel.config.cot[t].show = el.checked; 
+          let el = document.getElementById(`chk-col-${t}`); if(el) STATE.excel.config.cot[t].show = el.checked; 
       }); 
       safeStorage.setItem('cauHinhBangExcel', JSON.stringify(STATE.excel.config));
-      document.getElementById('panel-cai-dat-danh-muc').style.display = 'none'; 
-      timKiemDanhMuc(); 
+      document.getElementById('panel-cai-dat-danh-muc').style.display = 'none'; timKiemDanhMuc(); 
   }
-
   function hienThiBangDanhMuc(data) { 
       let thead = document.getElementById('dm-header'); let tbody = document.getElementById('dm-body'); 
       if (!data || data.length === 0) { thead.innerHTML = "<th>DỮ LIỆU</th>"; tbody.innerHTML = "<tr><td style='padding: 30px;'>Trống.</td></tr>"; return; } 
-      
       let cotHienThi = Object.keys(STATE.excel.config.cot || {}).filter(c => STATE.excel.config.cot[c].show);
       if(cotHienThi.length === 0) cotHienThi = Object.keys(data[0]); 
       let fz = (STATE.excel.config.fontSize || 14) + "px";
-      
       thead.innerHTML = cotHienThi.map(c => `<th>${escapeHTML(c)}</th>`).join(''); 
       tbody.innerHTML = data.map(h => `<tr>${cotHienThi.map((c, i) => `<td style="text-align: ${i===0?"left":"center"}; font-size: ${fz};">${escapeHTML(h[c] !== undefined ? h[c] : '')}</td>`).join('')}</tr>`).join(''); 
   }
-
   function timKiemDanhMuc() { 
       let tk = document.getElementById('search-danh-muc').value.toLowerCase(); 
       if (!tk) { hienThiBangDanhMuc(STATE.excel.data); return; } 
       hienThiBangDanhMuc(STATE.excel.data.filter(h => Object.values(h).some(v => String(v).toLowerCase().includes(tk)))); 
   }
-
-  // Thuật toán tìm đúng cột Tên và ĐVT đã được tối ưu hiệu năng với Cache
   function trichXuatThongTinDan(hang) {
       let keys = Object.keys(hang);
-      
-      // Nếu chưa có cache, thực hiện tìm kiếm key 1 lần duy nhất
       if (!cacheCotExcel.tenCol) {
           let tenCol = '', dvtCol = '', klrCol = '';
-          
-          for(let k of keys) { 
-              let lk = k.toLowerCase().trim(); 
-              if(['tên đạn dược', 'tên đạn', 'tên'].includes(lk)) { tenCol = k; break; } 
-          }
+          for(let k of keys) { let lk = k.toLowerCase().trim(); if(['tên đạn dược', 'tên đạn', 'tên'].includes(lk)) { tenCol = k; break; } }
           if(!tenCol) { for(let k of keys) { let lk = k.toLowerCase(); if(lk.includes('tên') && lk.includes('đạn')) { tenCol = k; break; } } }
           if(!tenCol) { for(let k of keys) { let lk = k.toLowerCase(); if(!lk.includes('stt') && !lk.includes('số tt') && !lk.includes('tt')) { tenCol = k; break; } } }
-          if(!tenCol) tenCol = keys[0]; // fallback an toàn
-
+          if(!tenCol) tenCol = keys[0]; 
           for(let k of keys) {
               let lk = k.toLowerCase();
               if(lk.includes('đvt') || lk.includes('đơn vị') || lk.includes('tính')) dvtCol = k;
               if(lk.includes('klr') || lk.includes('khối lượng') || lk.includes('trọng')) klrCol = k;
           }
-
-          // Lưu vào cache để dùng cho hàng ngàn object sau này (Độ phức tạp chuyển từ O(N) xuống O(1))
           cacheCotExcel = { tenCol, dvtCol, klrCol };
       }
-
-      // Sử dụng trực tiếp key từ cache
       return { 
           ten: hang[cacheCotExcel.tenCol] ? String(hang[cacheCotExcel.tenCol]) : 'N/A', 
           dvt: cacheCotExcel.dvtCol && hang[cacheCotExcel.dvtCol] ? String(hang[cacheCotExcel.dvtCol]) : '', 
           klr: cacheCotExcel.klrCol && hang[cacheCotExcel.klrCol] ? String(hang[cacheCotExcel.klrCol]) : '' 
       };
   }
-
   function layKLRTuTenDan(tenDan) {
       for(let hang of STATE.excel.data) {
           let info = trichXuatThongTinDan(hang);
-          if(info.ten === tenDan) {
-              let valStr = String(info.klr).replace(',', '.'); let val = parseFloat(valStr); 
-              return isNaN(val) ? 0 : val;
-          }
+          if(info.ten === tenDan) { let valStr = String(info.klr).replace(',', '.'); let val = parseFloat(valStr); return isNaN(val) ? 0 : val; }
       } 
       return 0;
   }
@@ -701,9 +679,7 @@
       renderListModalDan(dataToRender);
       let wrapper = document.getElementById('modal-chon-dan'); wrapper.style.display = 'flex'; setTimeout(() => wrapper.classList.add('show'), 10);
   }
-
   function dongModalChonDan() { let w = document.getElementById('modal-chon-dan'); w.classList.remove('show'); setTimeout(() => w.style.display = 'none', 300); }
-  
   function renderListModalDan(data) {
       let c = document.getElementById('modal-danh-sach-dan'); if(data.length === 0) { c.innerHTML = '<div style="padding:20px; text-align:center;">Không tìm thấy.</div>'; return; }
       c.innerHTML = data.slice(0, 100).map(hang => {
@@ -712,7 +688,6 @@
           return `<div class="modal-list-item" onclick="chonDanTuModal(${STATE.excel.data.indexOf(hang)})"><div style="flex:1; padding-right: 10px;"><div class="text-dan-name">${escapeHTML(info.ten)}</div><div style="font-size:12px; color:var(--text-sub)">${extra.join(' | ')}</div></div><div style="font-size:24px; color:var(--success-color);">+</div></div>`;
       }).join('');
   }
-
   let timeoutModal = null;
   function timKiemModalDan() {
       if(timeoutModal) clearTimeout(timeoutModal);
@@ -722,22 +697,17 @@
           renderListModalDan(STATE.excel.data.filter(h => trichXuatThongTinDan(h).ten.toLowerCase().includes(tk)));
       }, 300);
   }
-
   function chonDanTuModal(index) {
       haptic(); let info = trichXuatThongTinDan(STATE.excel.data[index]);
       document.getElementById('lenh-ten').value = info.ten; document.getElementById('lenh-dvt').value = info.dvt; dongModalChonDan();
   }
-
   function xuLyLuuLenh() {
       haptic();
-      let soLenh = document.getElementById('lenh-so').value.trim();
-      let ten = document.getElementById('lenh-ten').value.trim();
-      let dvt = document.getElementById('lenh-dvt').value.trim();
-      let cap = document.getElementById('lenh-cap').value.trim();
+      let soLenh = document.getElementById('lenh-so').value.trim(); let ten = document.getElementById('lenh-ten').value.trim();
+      let dvt = document.getElementById('lenh-dvt').value.trim(); let cap = document.getElementById('lenh-cap').value.trim();
       let sl = document.getElementById('lenh-sl').value.trim();
 
       if(!soLenh || !ten || !sl) { showDialog("Lỗi", "Vui lòng nhập đủ Số Lệnh, Chọn Đạn và Số lượng.", "alert"); return; }
-
       if (idLenhDangSua) {
           let index = STATE.lenh.findIndex(l => l.id === idLenhDangSua);
           if (index !== -1) STATE.lenh[index] = { id: idLenhDangSua, soLenh, ten, dvt, cap, sl: parseFloat(sl), time: STATE.lenh[index].time };
@@ -746,46 +716,28 @@
           STATE.lenh.push({ id: generateID(), soLenh, ten, dvt, cap, sl: parseFloat(sl), time: Date.now() });
           document.getElementById('lenh-cap').value = ''; document.getElementById('lenh-sl').value = '';
       }
-      safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh)); 
-      renderBangLenh();
+      safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh)); renderBangLenh();
   }
-
   function batDauSuaLenh(id) {
       haptic(); let item = STATE.lenh.find(l => l.id === id); if(!item) return;
-      document.getElementById('lenh-so').value = item.soLenh; document.getElementById('lenh-ten').value = item.ten;
-      document.getElementById('lenh-dvt').value = item.dvt; 
-      
-      let capSelect = document.getElementById('lenh-cap');
-      let optionExists = Array.from(capSelect.options).some(opt => opt.value == item.cap);
-      capSelect.value = optionExists ? item.cap : '';
-      
-      document.getElementById('lenh-sl').value = item.sl;
-      idLenhDangSua = id;
+      document.getElementById('lenh-so').value = item.soLenh; document.getElementById('lenh-ten').value = item.ten; document.getElementById('lenh-dvt').value = item.dvt; 
+      let capSelect = document.getElementById('lenh-cap'); let optionExists = Array.from(capSelect.options).some(opt => opt.value == item.cap); capSelect.value = optionExists ? item.cap : '';
+      document.getElementById('lenh-sl').value = item.sl; idLenhDangSua = id;
       document.getElementById('btn-luu-lenh').innerText = "💾 CẬP NHẬT LỆNH"; document.getElementById('btn-luu-lenh').style.background = "var(--primary-color)";
       document.getElementById('btn-huy-lenh').style.display = "block"; window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-
   function huySuaLenh() {
-      idLenhDangSua = null; document.getElementById('lenh-ten').value = ''; document.getElementById('lenh-dvt').value = '';
-      document.getElementById('lenh-cap').value = ''; document.getElementById('lenh-sl').value = '';
+      idLenhDangSua = null; document.getElementById('lenh-ten').value = ''; document.getElementById('lenh-dvt').value = ''; document.getElementById('lenh-cap').value = ''; document.getElementById('lenh-sl').value = '';
       document.getElementById('btn-luu-lenh').innerText = "+ THÊM LỆNH"; document.getElementById('btn-luu-lenh').style.background = "var(--success-color)";
       document.getElementById('btn-huy-lenh').style.display = "none";
   }
-
   function xoaLenh(id) { 
-      showDialog("Xác nhận", "Xóa loại đạn này khỏi lệnh?", "confirm", () => { 
-          STATE.lenh = STATE.lenh.filter(i => i.id !== id); 
-          safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh)); 
-          renderBangLenh(); 
-      }); 
+      showDialog("Xác nhận", "Xóa loại đạn này khỏi lệnh?", "confirm", () => { STATE.lenh = STATE.lenh.filter(i => i.id !== id); safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh)); renderBangLenh(); }); 
   }
-
   function renderBangLenh() {
       let tbody = document.getElementById('tbody-lenh');
       if(STATE.lenh.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="padding:20px;">Chưa có lệnh.</td></tr>`; return; }
-      
       let reversedLenh = [...STATE.lenh].reverse();
-      
       tbody.innerHTML = reversedLenh.map(item => `
           <tr style="${idLenhDangSua === item.id ? 'background-color: #E3F2FD;' : ''}">
               <td style="font-weight:bold; color:var(--primary-color)">${escapeHTML(item.soLenh)}</td>
@@ -796,26 +748,17 @@
           </tr>
       `).join('');
   }
-
-  // ==================== TỔNG HỢP KHỐI LƯỢNG LỆNH ====================
   function moModalXemLenh() {
-      haptic();
-      if(STATE.lenh.length === 0) { showDialog("Trống", "Chưa có lệnh nào.", "alert"); return; }
-      
+      haptic(); if(STATE.lenh.length === 0) { showDialog("Trống", "Chưa có lệnh nào.", "alert"); return; }
       let groups = {};
       STATE.lenh.forEach(item => {
           if(!groups[item.soLenh]) groups[item.soLenh] = { items: [], tongKL: 0 };
           groups[item.soLenh].items.push(item);
-          let klr = layKLRTuTenDan(item.ten);
-          groups[item.soLenh].tongKL += (item.sl * klr);
+          let klr = layKLRTuTenDan(item.ten); groups[item.soLenh].tongKL += (item.sl * klr);
       });
-
       let html = '';
       for(let soLenh in groups) {
-          let g = groups[soLenh];
-          let tan = g.tongKL / 1000;
-          let formatTan = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(tan);
-          
+          let g = groups[soLenh]; let tan = g.tongKL / 1000; let formatTan = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(tan);
           html += `
           <div style="background: var(--bg-card); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
               <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid var(--border-light); padding-bottom: 8px; margin-bottom: 8px;">
@@ -824,86 +767,60 @@
               </div>
               <table style="width:100%; font-size:13px; text-align:center; border-collapse: collapse;">
                   <tr style="color:var(--text-sub);">
-                    <th style="width:30px; padding:6px 2px;">STT</th>
-                    <th style="text-align:left; padding:6px 2px;">Tên đạn</th>
-                    <th style="width:45px; padding:6px 2px;">SL</th>
-                    <th style="width:45px; padding:6px 2px;">KLR</th>
+                    <th style="width:30px; padding:6px 2px;">STT</th><th style="text-align:left; padding:6px 2px;">Tên đạn</th>
+                    <th style="width:45px; padding:6px 2px;">SL</th><th style="width:45px; padding:6px 2px;">KLR</th>
                   </tr>
                   ${g.items.map((i, idx) => `
                       <tr style="border-bottom:1px dotted var(--border-light);">
-                          <td style="padding:8px 2px; font-weight:bold;">${idx + 1}</td>
-                          <td style="padding:8px 2px; text-align:left;">${escapeHTML(i.ten)}</td>
-                          <td style="padding:8px 2px; font-weight:bold; color:var(--primary-color);">${i.sl}</td>
-                          <td style="padding:8px 2px;">${layKLRTuTenDan(i.ten)}</td>
+                          <td style="padding:8px 2px; font-weight:bold;">${idx + 1}</td><td style="padding:8px 2px; text-align:left;">${escapeHTML(i.ten)}</td>
+                          <td style="padding:8px 2px; font-weight:bold; color:var(--primary-color);">${i.sl}</td><td style="padding:8px 2px;">${layKLRTuTenDan(i.ten)}</td>
                       </tr>
                   `).join('')}
               </table>
           </div>`;
       }
-
-      document.getElementById('noidung-xem-lenh').innerHTML = html;
-      let w = document.getElementById('modal-xem-lenh'); w.style.display = 'flex'; setTimeout(() => w.classList.add('show'), 10);
+      document.getElementById('noidung-xem-lenh').innerHTML = html; let w = document.getElementById('modal-xem-lenh'); w.style.display = 'flex'; setTimeout(() => w.classList.add('show'), 10);
   }
   function dongModalXemLenh() { let w = document.getElementById('modal-xem-lenh'); w.classList.remove('show'); setTimeout(() => w.style.display = 'none', 300); }
 
   // ==================== TAB 3: THỰC HIỆN ====================
   function capNhatDropdownSoLenh() {
-      let select = document.getElementById('th-so-lenh');
-      let uniqueLenh = [...new Set(STATE.lenh.map(l => l.soLenh))];
+      let select = document.getElementById('th-so-lenh'); let uniqueLenh = [...new Set(STATE.lenh.map(l => l.soLenh))];
       if(uniqueLenh.length === 0) { select.innerHTML = '<option value="">-- Trống --</option>'; return; }
       select.innerHTML = '<option value="">-- Chọn Số Lệnh --</option>' + uniqueLenh.map(sl => `<option value="${escapeHTML(sl)}">${escapeHTML(sl)}</option>`).join('');
       document.getElementById('th-chon-dan').innerHTML = '<option value="">-- Vui lòng chọn Lệnh trước --</option>';
   }
-
   function loadDanTheoLenh() {
       let soLenhChon = document.getElementById('th-so-lenh').value; let selectDan = document.getElementById('th-chon-dan');
       if(!soLenhChon) { selectDan.innerHTML = '<option value="">-- Vui lòng chọn Lệnh trước --</option>'; return; }
-      
       let danTrongLenh = STATE.lenh.filter(l => l.soLenh === soLenhChon);
-      
       let danKemConLai = danTrongLenh.map(l => {
           let daXuat = STATE.thucHien.filter(t => t.lenhId === l.id).reduce((sum, current) => sum + current.sl, 0);
-          let conLai = l.sl - daXuat;
-          return { ...l, conLai: conLai };
+          let conLai = l.sl - daXuat; return { ...l, conLai: conLai };
       });
-
-      danKemConLai.sort((a, b) => {
-          let aHet = a.conLai <= 0 ? 1 : 0;
-          let bHet = b.conLai <= 0 ? 1 : 0;
-          return aHet - bHet; 
-      });
-      
+      danKemConLai.sort((a, b) => { let aHet = a.conLai <= 0 ? 1 : 0; let bHet = b.conLai <= 0 ? 1 : 0; return aHet - bHet; });
       selectDan.innerHTML = '<option value="">-- Chọn loại đạn --</option>' + danKemConLai.map(l => { 
-          let textDisplay = `${escapeHTML(l.ten)} - (Còn: ${l.conLai} ${escapeHTML(l.dvt)})`;
-          if (l.conLai <= 0) { textDisplay = `[ĐÃ ĐỦ] ` + textDisplay; }
+          let textDisplay = `${escapeHTML(l.ten)} - (Còn: ${l.conLai} ${escapeHTML(l.dvt)})`; if (l.conLai <= 0) { textDisplay = `[ĐÃ ĐỦ] ` + textDisplay; }
           return `<option value="${l.id}" data-conlai="${l.conLai}">${textDisplay}</option>`; 
       }).join('');
   }
-
   function tuDongDienCapTuLenh() {
       let selectEl = document.getElementById('th-chon-dan'); let idLenh = selectEl.value; 
       if(!idLenh) { document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; return; }
-      
       let lenhGoc = STATE.lenh.find(l => l.id === idLenh); 
       if(lenhGoc) {
-          let capSelect = document.getElementById('th-cap');
-          let optionExists = Array.from(capSelect.options).some(opt => opt.value == lenhGoc.cap);
+          let capSelect = document.getElementById('th-cap'); let optionExists = Array.from(capSelect.options).some(opt => opt.value == lenhGoc.cap);
           capSelect.value = optionExists ? lenhGoc.cap : '';
-          
-          let selectedOption = selectEl.options[selectEl.selectedIndex];
-          let conLai = selectedOption.getAttribute('data-conlai');
+          let selectedOption = selectEl.options[selectEl.selectedIndex]; let conLai = selectedOption.getAttribute('data-conlai');
           if(conLai && parseFloat(conLai) > 0) { document.getElementById('th-sl').value = conLai; } else { document.getElementById('th-sl').value = ''; }
       } 
   }
-
   function xuLyGhiXe() {
       haptic();
       let xe = document.getElementById('th-xe').value.trim(); let ngay = document.getElementById('th-ngay').value;
-      let idLenh = document.getElementById('th-chon-dan').value; let cap = document.getElementById('th-cap').value.trim();
-      let sl = document.getElementById('th-sl').value.trim();
+      let idLenh = document.getElementById('th-chon-dan').value; let cap = document.getElementById('th-cap').value.trim(); let sl = document.getElementById('th-sl').value.trim();
 
       if(!idLenh || !sl || !ngay) { showDialog("Lỗi", "Vui lòng điền đủ Ngày, Chọn Đạn và Số lượng.", "alert"); return; }
-      
       if (!xe) {
           if (idThucHienDangSua) { showDialog("Lỗi", "Vui lòng nhập số xe khi đang sửa.", "alert"); return; }
           let maxNum = 0; let uniqueXeToday = [...new Set(STATE.thucHien.filter(t => t.ngay === ngay).map(t => t.xe))];
@@ -925,40 +842,32 @@
       }
       safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien)); 
       renderBangThucHien();
+      capNhatGoiYXe(); // Update list xe
   }
-
   function batDauSuaThucHien(id) {
       haptic(); let item = STATE.thucHien.find(t => t.id === id); if(!item) return;
       document.getElementById('th-xe').value = item.xe; document.getElementById('th-ngay').value = item.ngay || getTodayString();
       document.getElementById('th-so-lenh').value = item.soLenh; loadDanTheoLenh();
-      
       setTimeout(() => { 
           document.getElementById('th-chon-dan').value = item.lenhId; 
-          let capSelect = document.getElementById('th-cap');
-          let optionExists = Array.from(capSelect.options).some(opt => opt.value == item.cap);
-          capSelect.value = optionExists ? item.cap : '';
+          let capSelect = document.getElementById('th-cap'); let optionExists = Array.from(capSelect.options).some(opt => opt.value == item.cap); capSelect.value = optionExists ? item.cap : '';
           document.getElementById('th-sl').value = item.sl; 
       }, 50);
       idThucHienDangSua = id; 
       document.getElementById('btn-ghi-xe').innerText = "💾 CẬP NHẬT SỔ"; document.getElementById('btn-ghi-xe').style.background = "var(--primary-color)";
       document.getElementById('btn-huy-xe').style.display = "block"; window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-
   function huySuaThucHien() {
       idThucHienDangSua = null; document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; document.getElementById('th-xe').value = '';
-      document.getElementById('btn-ghi-xe').innerText = "+ GHI SỔ XE"; document.getElementById('btn-ghi-xe').style.background = "var(--warning-color)";
-      document.getElementById('btn-huy-xe').style.display = "none";
+      document.getElementById('btn-ghi-xe').innerText = "+ GHI SỔ XE"; document.getElementById('btn-ghi-xe').style.background = "var(--warning-color)"; document.getElementById('btn-huy-xe').style.display = "none";
   }
-
   function xoaThucHien(id) { 
       showDialog("Xác nhận", "Xóa lịch sử xuất của xe này?", "confirm", () => { 
-          STATE.thucHien = STATE.thucHien.filter(i => i.id !== id); 
-          safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien)); 
-          renderBangThucHien(); 
+          STATE.thucHien = STATE.thucHien.filter(i => i.id !== id); safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien)); 
+          renderBangThucHien(); capNhatGoiYXe();
           if(document.getElementById('tab-thuc-hien').classList.contains('active')) loadDanTheoLenh();
       }); 
   }
-
   function renderBangThucHien() {
       let tbody = document.getElementById('tbody-thuc-hien');
       if(STATE.thucHien.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="padding:20px;">Trống.</td></tr>`; return; }
@@ -979,6 +888,8 @@
   function renderBaoCao() {
       let locNgay = document.getElementById('bc-ngay').value; 
       let locXe = document.getElementById('bc-xe').value.toLowerCase().trim();
+      
+      // Lọc dữ liệu theo Ngày và Số Xe
       let dataLoc = STATE.thucHien.filter(item => { return (!locNgay || item.ngay === locNgay) && (!locXe || item.xe.toLowerCase().includes(locXe)); });
 
       document.getElementById('bc-tieu-de-anh').innerText = `BÁO CÁO XUẤT KHO ${locNgay ? '(' + formatShortDate(locNgay) + ')' : ''}`;
@@ -988,27 +899,45 @@
           tbody.innerHTML = `<tr><td colspan="7" style="padding:20px;">Không có dữ liệu xuất trong kỳ.</td></tr>`; 
           document.getElementById('bc-tong-luot').innerText = "0"; return; 
       }
-      document.getElementById('bc-tong-luot').innerText = dataLoc.length; 
-      
-      dataLoc.sort((a,b) => a.xe.localeCompare(b.xe));
 
-      tbody.innerHTML = dataLoc.map(item => {
-          let indexInThucHien = STATE.thucHien.findIndex(t => t.id === item.id);
-          let daCapTruocDo = 0;
-          
-          for(let i = 0; i < indexInThucHien; i++) {
-              if(STATE.thucHien[i].lenhId === item.lenhId) { daCapTruocDo += STATE.thucHien[i].sl; }
+      // THUẬT TOÁN: Gom nhóm (Cộng dồn) các lượt xuất nếu trùng Lệnh và Cấp
+      let groupedData = {};
+      dataLoc.forEach(item => {
+          let key = item.lenhId + "_" + item.cap; // Khóa duy nhất để nhóm
+          if (!groupedData[key]) {
+              groupedData[key] = { ...item, slGroup: 0 }; // Tạo mới object nhóm
           }
+          groupedData[key].slGroup += item.sl; // Cộng dồn số lượng
+      });
+
+      let finalData = Object.values(groupedData);
+      
+      // Đếm số mục sau khi gom nhóm
+      document.getElementById('bc-tong-luot').innerText = finalData.length; 
+      
+      tbody.innerHTML = finalData.map((item, index) => {
+          // Tính số lượng đã cấp TRƯỚC ngày lọc
+          let daCapTruocDo = 0;
+          STATE.thucHien.forEach(t => {
+              if (t.lenhId === item.lenhId) {
+                  // Chỉ cộng dồn những ngày trước ngày đang xem
+                  if (locNgay && t.ngay < locNgay) {
+                      daCapTruocDo += t.sl;
+                  } else if (!locNgay) {
+                      daCapTruocDo = 0; // Nếu không chọn ngày, coi như xem tổng nên đã cấp trước đó là 0
+                  }
+              }
+          });
           
           let lenhGoc = STATE.lenh.find(l => l.id === item.lenhId);
           let slLenh = lenhGoc ? lenhGoc.sl : 0;
           
-          let tongDaCap = daCapTruocDo + item.sl; 
+          let tongDaCap = daCapTruocDo + item.slGroup; 
           let conLai = slLenh - tongDaCap;
 
           return `
           <tr>
-              <td style="font-weight:bold; color:var(--warning-color); font-size:12px;">${escapeHTML(item.xe)}</td>
+              <td style="font-weight:bold; color:var(--text-sub); font-size:12px;">${index + 1}</td> <!-- Hiển thị STT thay vì Xe -->
               <td style="text-align:left;">
                 <div style="font-size:12px; font-weight:bold;">${escapeHTML(item.ten)}</div>
                 <div style="font-size:10px; color:var(--text-sub);">ĐVT: ${escapeHTML(item.dvt)}</div>
@@ -1016,11 +945,76 @@
               <td style="font-size:12px;">${escapeHTML(item.cap)}</td>
               <td style="color:var(--primary-color); font-weight:bold; font-size:12px;">${slLenh}</td>
               <td style="color:var(--text-sub); font-size:12px; font-weight:bold;">${tongDaCap}</td>
-              <td style="color:var(--success-color); font-weight:bold; font-size:13px;">${item.sl}</td>
+              <td style="color:var(--success-color); font-weight:bold; font-size:13px;">${item.slGroup}</td> <!-- Hiện số lượng đã cộng dồn -->
               <td style="color:${conLai < 0 ? 'var(--danger-color)' : 'var(--text-main)'}; font-weight:bold; font-size:12px;">${conLai}</td>
           </tr>
       `}).join('');
   }
+
+  function moModalXemChiTietXe() {
+      haptic();
+      let locNgay = document.getElementById('bc-ngay').value;
+      if (!locNgay) { showDialog("Lưu ý", "Vui lòng chọn Ngày xuất ở tab Báo Cáo để xem tải trọng xe.", "alert"); return; }
+
+      let dataTrongNgay = STATE.thucHien.filter(t => t.ngay === locNgay);
+      if (dataTrongNgay.length === 0) { showDialog("Trống", "Không có xe nào xuất trong ngày này.", "alert"); return; }
+
+      document.getElementById('tieu-de-chi-tiet-xe').innerText = "Tải Trọng Xe Ngày " + formatShortDate(locNgay);
+
+      let xeGroups = {};
+      dataTrongNgay.forEach(item => {
+          if (!xeGroups[item.xe]) xeGroups[item.xe] = { items: [], tongKL: 0 };
+          xeGroups[item.xe].items.push(item);
+          let klr = layKLRTuTenDan(item.ten);
+          xeGroups[item.xe].tongKL += (item.sl * klr);
+      });
+
+      let html = '';
+      // Sắp xếp danh sách xe
+      let dsXe = Object.keys(xeGroups).sort((a,b) => a.localeCompare(b));
+
+      dsXe.forEach(xe => {
+          let g = xeGroups[xe];
+          let tan = g.tongKL / 1000;
+          let formatTan = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(tan);
+          
+          html += `
+          <div style="background: var(--bg-card); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid var(--border-light); padding-bottom: 8px; margin-bottom: 8px;">
+                  <span style="color: var(--warning-color); font-weight: 800; font-size: 16px;">XE SỐ: ${escapeHTML(xe)}</span>
+                  <span style="color: var(--danger-color); font-weight: 800; font-size: 15px;">Tổng tải: ${formatTan} Tấn</span>
+              </div>
+              <table style="width:100%; font-size:13px; text-align:center; border-collapse: collapse;">
+                  <tr style="color:var(--text-sub);">
+                    <th style="width:30px; padding:6px 2px;">STT</th>
+                    <th style="text-align:left; padding:6px 2px;">Tên đạn</th>
+                    <th style="width:45px; padding:6px 2px;">SL</th>
+                    <th style="width:45px; padding:6px 2px;">KLR</th>
+                  </tr>
+                  ${g.items.map((i, idx) => `
+                      <tr style="border-bottom:1px dotted var(--border-light);">
+                          <td style="padding:8px 2px; font-weight:bold;">${idx + 1}</td>
+                          <td style="padding:8px 2px; text-align:left;">${escapeHTML(i.ten)}</td>
+                          <td style="padding:8px 2px; font-weight:bold; color:var(--primary-color);">${i.sl}</td>
+                          <td style="padding:8px 2px;">${layKLRTuTenDan(i.ten)}</td>
+                      </tr>
+                  `).join('')}
+              </table>
+          </div>`;
+      });
+
+      document.getElementById('noidung-chi-tiet-xe').innerHTML = html; 
+      let w = document.getElementById('modal-chi-tiet-xe'); 
+      w.style.display = 'flex'; 
+      setTimeout(() => w.classList.add('show'), 10);
+  }
+
+  function dongModalXemChiTietXe() { 
+      let w = document.getElementById('modal-chi-tiet-xe'); 
+      w.classList.remove('show'); 
+      setTimeout(() => w.style.display = 'none', 300); 
+  }
+
 
   function xuatAnhBaoCao() {
       haptic();
