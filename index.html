@@ -171,7 +171,6 @@
           <input type="file" id="excel-upload" style="display:none;" accept=".xlsx, .xls, .csv" onchange="xuLyFileExcel(event)">
         </div>
         
-        <!-- BẢN VÁ LỖI 1: Thêm HTML Panel Cài Đặt Danh Mục -->
         <div id="panel-cai-dat-danh-muc" class="setting-panel">
             <div style="margin-bottom: 10px; color: var(--primary-color); font-weight: bold;">Cài đặt bảng Danh Mục</div>
             <div class="form-group">
@@ -179,11 +178,9 @@
                 <input type="number" id="set-fontsize" class="form-control" value="14" style="width: 100px;">
             </div>
             <div id="danh-sach-cot-cai-dat" style="max-height: 200px; overflow-y: auto; margin-bottom: 10px; border: 1px solid var(--border-light); padding: 5px; border-radius: 8px;">
-                <!-- Render từ JS -->
             </div>
             <button class="btn" style="background: var(--primary-color);" onclick="luuCaiDatDanhMuc()">💾 LƯU CÀI ĐẶT</button>
         </div>
-        <!-- KẾT THÚC BẢN VÁ 1 -->
 
         <div style="font-size: 12px; color: var(--text-sub); text-align: center;">Vuốt ngang bảng để xem các cột bị che khuất</div>
       </div>
@@ -394,7 +391,6 @@
   </div>
 
   <!-- ==================== MODALS (HỘP THOẠI) ==================== -->
-  <!-- MODAL THÔNG BÁO CHUNG -->
   <div id="custom-dialog-wrapper" class="modal-overlay">
     <div class="custom-dialog-box" style="justify-content:center;">
       <h3 id="dialog-title" style="margin-top:0">Thông báo</h3>
@@ -403,7 +399,6 @@
     </div>
   </div>
 
-  <!-- MODAL CHỌN ĐẠN -->
   <div id="modal-chon-dan" class="modal-overlay">
     <div class="custom-dialog-box modal-full">
       <h3>Tìm và Chọn Đạn</h3>
@@ -413,7 +408,6 @@
     </div>
   </div>
 
-  <!-- MODAL XEM TỔNG HỢP LỆNH -->
   <div id="modal-xem-lenh" class="modal-overlay">
     <div class="custom-dialog-box modal-full" style="max-height: 85vh;">
       <h3>Tổng Hợp Lệnh (Tấn)</h3>
@@ -422,7 +416,6 @@
     </div>
   </div>
 
-  <!-- MENU HỆ THỐNG -->
   <div id="modal-he-thong" class="modal-overlay">
     <div class="custom-dialog-box" style="justify-content:center;">
       <h3 style="margin-top:0; color:var(--primary-color);">Hệ Thống</h3>
@@ -443,6 +436,21 @@
   </div>
 
 <script>
+  // ==================== BỘ NHỚ AN TOÀN (SAFE STORAGE) ====================
+  // Fix lỗi hộp cát (Sandbox/Preview) chặn truy cập localStorage làm JS chết ngầm
+  const safeStorage = {
+      getItem: function(key) { 
+          try { return window.localStorage.getItem(key); } catch(e) { return null; } 
+      },
+      setItem: function(key, value) { 
+          try { window.localStorage.setItem(key, value); } 
+          catch(e) { console.warn("Môi trường Preview chặn lưu trữ. Chỉ chạy trên RAM tạm thời."); } 
+      },
+      clear: function() { 
+          try { window.localStorage.clear(); } catch(e) { } 
+      }
+  };
+
   // ==================== CÁC HÀM TIỆN ÍCH (UTILS) ====================
   function haptic() { if (navigator.vibrate) navigator.vibrate(15); }
   function escapeHTML(str) { if (str == null) return ''; return String(str).replace(/[&<>'"]/g, tag => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'}[tag] || tag)); }
@@ -459,38 +467,37 @@
 
   // ==================== QUẢN LÝ STATE TOÀN CỤC ====================
   const STATE = { excel: { data: [], config: { fontSize: 14, cot: {} } }, lenh: [], thucHien: [] };
-
   let idLenhDangSua = null;
   let idThucHienDangSua = null;
 
   // ==================== KHỞI TẠO APP ====================
   document.addEventListener('DOMContentLoaded', () => { 
+      let today = getTodayString();
       try {
-          let today = getTodayString();
           document.getElementById('th-ngay').value = today; document.getElementById('bc-ngay').value = today;
-
-          // Load dữ liệu Excel từ LocalStorage
-          let savedExcel = localStorage.getItem('duLieuExcelOffline'); 
+          
+          let savedExcel = safeStorage.getItem('duLieuExcelOffline'); 
           if (savedExcel) { 
               STATE.excel.data = JSON.parse(savedExcel); 
-              let savedConfig = localStorage.getItem('cauHinhBangExcel');
+              let savedConfig = safeStorage.getItem('cauHinhBangExcel');
               if (savedConfig) STATE.excel.config = JSON.parse(savedConfig); else taoCauHinhMacDinh();
               hienThiBangDanhMuc(STATE.excel.data); 
           }
 
-          // Load dữ liệu Lệnh Xuất
-          let savedLenh = localStorage.getItem('duLieuLenh'); 
+          let savedLenh = safeStorage.getItem('duLieuLenh'); 
           if (savedLenh) { STATE.lenh = JSON.parse(savedLenh); }
 
-          // Load dữ liệu Thực Hiện
-          let savedThucHien = localStorage.getItem('duLieuThucHien'); 
+          let savedThucHien = safeStorage.getItem('duLieuThucHien'); 
           if (savedThucHien) {
              STATE.thucHien = JSON.parse(savedThucHien);
              STATE.thucHien.forEach(th => { if(!th.ngay) th.ngay = today; });
           }
-
-          renderBangLenh(); renderBangThucHien(); capNhatDropdownSoLenh();
-      } catch (e) { console.error("Lỗi parse dữ liệu từ thiết bị:", e); }
+      } catch (e) { console.warn("Dữ liệu trống hoặc Sandbox chặn khởi tạo:", e); }
+      
+      // Đảm bảo giao diện luôn được vẽ ra kể cả khi không đọc được LocalStorage
+      renderBangLenh(); 
+      renderBangThucHien(); 
+      capNhatDropdownSoLenh();
   });
 
   // ==================== UI DIALOG ====================
@@ -527,7 +534,7 @@
   
   function capNhatPhienBanApp() {
       haptic(); showDialog("Đang cập nhật", "Đang tải lại trang...", "alert");
-      setTimeout(() => { window.location.reload(); }, 1500);
+      setTimeout(() => { try { window.location.reload(); } catch(e) {} }, 1500);
   }
 
   function xuatDuLieu() {
@@ -545,18 +552,17 @@
       reader.onload = function(e) {
           try {
               let imp = JSON.parse(e.target.result);
-              if(imp.excel) { STATE.excel = imp.excel; localStorage.setItem('duLieuExcelOffline', JSON.stringify(STATE.excel.data)); localStorage.setItem('cauHinhBangExcel', JSON.stringify(STATE.excel.config));}
-              if(imp.lenh) { STATE.lenh = imp.lenh; localStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh)); }
-              if(imp.thucHien) { STATE.thucHien = imp.thucHien; localStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien)); }
-              showDialog("Hoàn tất", "Khôi phục thành công! Trang sẽ tải lại.", "alert", () => location.reload()); 
-              setTimeout(()=>location.reload(), 2000);
+              if(imp.excel) { STATE.excel = imp.excel; safeStorage.setItem('duLieuExcelOffline', JSON.stringify(STATE.excel.data)); safeStorage.setItem('cauHinhBangExcel', JSON.stringify(STATE.excel.config));}
+              if(imp.lenh) { STATE.lenh = imp.lenh; safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh)); }
+              if(imp.thucHien) { STATE.thucHien = imp.thucHien; safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien)); }
+              showDialog("Hoàn tất", "Khôi phục thành công! Trang sẽ tải lại.", "alert", () => { try { location.reload() } catch(e) {} }); 
           } catch(err) { showDialog("Lỗi", "File không hợp lệ!", "alert"); }
       }; reader.readAsText(file); event.target.value = '';
   }
 
   function xoaToanBoDuLieu() { 
       showDialog("Cảnh báo", "Hành động này sẽ xóa sạch dữ liệu trên trình duyệt. Bạn có chắc chắn?", "confirm", () => { 
-          localStorage.clear(); location.reload(); 
+          safeStorage.clear(); try { location.reload(); } catch(e){} 
       }); 
   }
 
@@ -574,7 +580,7 @@
               
               STATE.excel.data = json.map(row => { let newRow = {}; for (let k in row) { if (!k.startsWith('__EMPTY')) newRow[k] = row[k]; } return newRow; }); 
               
-              localStorage.setItem('duLieuExcelOffline', JSON.stringify(STATE.excel.data));
+              safeStorage.setItem('duLieuExcelOffline', JSON.stringify(STATE.excel.data));
               taoCauHinhMacDinh(); 
               hienThiBangDanhMuc(STATE.excel.data); 
               showDialog("Thành công", "Đã nạp file Excel vào bộ nhớ.", "alert"); 
@@ -589,7 +595,7 @@
   function taoCauHinhMacDinh() { 
       if (STATE.excel.data.length === 0) return; STATE.excel.config.cot = {}; 
       Object.keys(STATE.excel.data[0]).forEach(c => { STATE.excel.config.cot[c] = { show: true }; }); 
-      try { localStorage.setItem('cauHinhBangExcel', JSON.stringify(STATE.excel.config)); } catch(e) {}
+      safeStorage.setItem('cauHinhBangExcel', JSON.stringify(STATE.excel.config));
   }
 
   function toggleCaiDatDanhMuc() { 
@@ -610,7 +616,7 @@
           let el = document.getElementById(`chk-col-${t}`); 
           if(el) STATE.excel.config.cot[t].show = el.checked; 
       }); 
-      try { localStorage.setItem('cauHinhBangExcel', JSON.stringify(STATE.excel.config)); } catch(e) {}
+      safeStorage.setItem('cauHinhBangExcel', JSON.stringify(STATE.excel.config));
       document.getElementById('panel-cai-dat-danh-muc').style.display = 'none'; 
       timKiemDanhMuc(); 
   }
@@ -633,7 +639,7 @@
       hienThiBangDanhMuc(STATE.excel.data.filter(h => Object.values(h).some(v => String(v).toLowerCase().includes(tk)))); 
   }
 
-  // Thuật toán tìm đúng cột Tên và ĐVT từ file Excel người dùng up lên
+  // Thuật toán tìm đúng cột Tên và ĐVT
   function trichXuatThongTinDan(hang) {
       let keys = Object.keys(hang); let tenCol = '', dvtCol = '', klrCol = '';
       for(let k of keys) { let lk = k.toLowerCase().trim(); if(['tên đạn dược', 'tên đạn', 'tên'].includes(lk)) { tenCol = k; break; } }
@@ -717,7 +723,7 @@
           STATE.lenh.push({ id: generateID(), soLenh, ten, dvt, cap, sl: parseFloat(sl), time: Date.now() });
           document.getElementById('lenh-cap').value = ''; document.getElementById('lenh-sl').value = '';
       }
-      localStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh)); 
+      safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh)); 
       renderBangLenh();
   }
 
@@ -746,7 +752,7 @@
   function xoaLenh(id) { 
       showDialog("Xác nhận", "Xóa loại đạn này khỏi lệnh?", "confirm", () => { 
           STATE.lenh = STATE.lenh.filter(i => i.id !== id); 
-          localStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh)); 
+          safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh)); 
           renderBangLenh(); 
       }); 
   }
@@ -832,14 +838,12 @@
       
       let danTrongLenh = STATE.lenh.filter(l => l.soLenh === soLenhChon);
       
-      // Tính toán số lượng còn lại cho từng đạn
       let danKemConLai = danTrongLenh.map(l => {
           let daXuat = STATE.thucHien.filter(t => t.lenhId === l.id).reduce((sum, current) => sum + current.sl, 0);
           let conLai = l.sl - daXuat;
           return { ...l, conLai: conLai };
       });
 
-      // Đẩy các đạn đã hết xuống cuối danh sách
       danKemConLai.sort((a, b) => {
           let aHet = a.conLai <= 0 ? 1 : 0;
           let bHet = b.conLai <= 0 ? 1 : 0;
@@ -877,7 +881,6 @@
 
       if(!idLenh || !sl || !ngay) { showDialog("Lỗi", "Vui lòng điền đủ Ngày, Chọn Đạn và Số lượng.", "alert"); return; }
       
-      // Tự động tăng số xe nếu bỏ trống
       if (!xe) {
           if (idThucHienDangSua) { showDialog("Lỗi", "Vui lòng nhập số xe khi đang sửa.", "alert"); return; }
           let maxNum = 0; let uniqueXeToday = [...new Set(STATE.thucHien.filter(t => t.ngay === ngay).map(t => t.xe))];
@@ -897,7 +900,7 @@
           document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; document.getElementById('th-xe').value = '';
           loadDanTheoLenh();
       }
-      localStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien)); 
+      safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien)); 
       renderBangThucHien();
   }
 
@@ -906,7 +909,6 @@
       document.getElementById('th-xe').value = item.xe; document.getElementById('th-ngay').value = item.ngay || getTodayString();
       document.getElementById('th-so-lenh').value = item.soLenh; loadDanTheoLenh();
       
-      // Delay nhẹ để DOM select render xong các option
       setTimeout(() => { 
           document.getElementById('th-chon-dan').value = item.lenhId; 
           let capSelect = document.getElementById('th-cap');
@@ -928,7 +930,7 @@
   function xoaThucHien(id) { 
       showDialog("Xác nhận", "Xóa lịch sử xuất của xe này?", "confirm", () => { 
           STATE.thucHien = STATE.thucHien.filter(i => i.id !== id); 
-          localStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien)); 
+          safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien)); 
           renderBangThucHien(); 
           if(document.getElementById('tab-thuc-hien').classList.contains('active')) loadDanTheoLenh();
       }); 
@@ -965,10 +967,8 @@
       }
       document.getElementById('bc-tong-luot').innerText = dataLoc.length; 
       
-      // Gom nhóm/sắp xếp theo xe
       dataLoc.sort((a,b) => a.xe.localeCompare(b.xe));
 
-      // BẢN VÁ LỖI 2: Xử lý logic tính toán tổng lượng đạn chính xác để tránh lỗi ReferenceError
       tbody.innerHTML = dataLoc.map(item => {
           let indexInThucHien = STATE.thucHien.findIndex(t => t.id === item.id);
           let daCapTruocDo = 0;
@@ -980,8 +980,8 @@
           let lenhGoc = STATE.lenh.find(l => l.id === item.lenhId);
           let slLenh = lenhGoc ? lenhGoc.sl : 0;
           
-          let tongDaCap = daCapTruocDo + item.sl; // Tính tổng đã cấp hiện tại
-          let conLai = slLenh - tongDaCap; // Tính số dư còn lại
+          let tongDaCap = daCapTruocDo + item.sl; 
+          let conLai = slLenh - tongDaCap;
 
           return `
           <tr>
@@ -997,7 +997,6 @@
               <td style="color:${conLai < 0 ? 'var(--danger-color)' : 'var(--text-main)'}; font-weight:bold; font-size:12px;">${conLai}</td>
           </tr>
       `}).join('');
-      // KẾT THÚC BẢN VÁ LỖI 2
   }
 
   function xuatAnhBaoCao() {
@@ -1005,23 +1004,20 @@
       let target = document.getElementById('khu-vuc-chup-anh');
       let scrollBox = document.getElementById('table-bao-cao-scroll');
       
-      // Sao lưu style cũ
       let oldMaxHeight = scrollBox.style.maxHeight;
       let oldOverflowY = scrollBox.style.overflowY;
       let oldOverflowX = scrollBox.style.overflowX;
       let oldWidth = target.style.width;
 
-      // Mở rộng bảng để chụp full
       scrollBox.style.maxHeight = 'none';
       scrollBox.style.overflowY = 'visible';
       scrollBox.style.overflowX = 'visible';
       target.style.width = '800px'; 
       
-      showDialog("Đang xử lý", "Hệ thống đang tạo ảnh báo cáo chất lượng cao...", "alert");
+      showDialog("Đang xử lý", "Hệ thống đang tạo ảnh báo cáo...", "alert");
 
       setTimeout(() => {
           html2canvas(target, { scale: 2, backgroundColor: "#F2F2F7", useCORS: true, windowWidth: 800 }).then(canvas => {
-              // Trả lại style
               scrollBox.style.maxHeight = oldMaxHeight; scrollBox.style.overflowY = oldOverflowY; scrollBox.style.overflowX = oldOverflowX; target.style.width = oldWidth;
               
               let link = document.createElement('a');
@@ -1030,7 +1026,7 @@
           }).catch(err => {
               console.error(err); 
               scrollBox.style.maxHeight = oldMaxHeight; scrollBox.style.overflowY = oldOverflowY; scrollBox.style.overflowX = oldOverflowX; target.style.width = oldWidth;
-              showDialog("Lỗi", "Thiết bị không đủ bộ nhớ để tạo ảnh hoặc file quá dài.", "alert");
+              showDialog("Lỗi", "Trình duyệt đang chặn tạo ảnh, hoặc màn hình quá hẹp.", "alert");
           });
       }, 800); 
   }
