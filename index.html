@@ -60,7 +60,7 @@
     
     /* HEADER KÈM NÚT HỆ THỐNG */
     .dash-header { padding: 15px; display: flex; justify-content: space-between; align-items: center; background: var(--header-bg); box-shadow: 0 1px 5px rgba(0,0,0,0.05); position: sticky; top:0; z-index: 50;}
-    .dash-header h2 { color: var(--primary-color); margin: 0; font-size: 20px; font-weight: 800; letter-spacing: 0.5px; }
+    .dash-header h2 { color: var(--primary-color); margin: 0; font-size: 20px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;}
     .sys-btn { background: var(--warning-color); color: white; border: none; border-radius: 8px; padding: 8px 12px; font-weight: bold; cursor: pointer; font-size: 14px;}
 
     .card { background: var(--bg-card); border-radius: 14px; padding: 14px; box-shadow: var(--card-shadow); margin-top: 15px; border: 1px solid var(--border-light); }
@@ -82,11 +82,15 @@
     .search-bar-container { display: flex; gap: 8px; margin-bottom: 10px; }
     .search-input { flex: 1; padding: 12px !important; font-size: 15px !important; border-radius: 8px !important; border: 1px solid var(--border-light) !important; background: var(--input-bg) !important; color: var(--text-main) !important;}
     .action-btn { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; color: white; border-radius: 8px; font-size: 20px; border: none; cursor: pointer; flex-shrink:0;}
+    
+    /* PANEL CÀI ĐẶT */
     .setting-panel { background: var(--input-bg); border: 2px solid var(--warning-color); border-radius: 10px; padding: 15px; margin-bottom: 15px; display: none; }
+    .set-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; font-size: 14px; font-weight: bold; padding-bottom: 8px; border-bottom: 1px solid var(--border-light);}
+    .set-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
     
     /* BẢNG CHUNG (Hỗ trợ cuộn ngang để không mất cột) */
     .table-container { overflow-x: auto; max-height: 60vh; overflow-y: auto; border-radius: 10px; border: 1px solid var(--border-light); -webkit-overflow-scrolling: touch; }
-    table { table-layout: auto; width: 100%; border-collapse: collapse; min-width: 700px; } /* Min-width để không bị ép nhỏ */
+    table { table-layout: auto; width: 100%; border-collapse: collapse; min-width: 500px; }
     th { background: var(--primary-color); color: #fff; position: sticky; top: 0; z-index: 10; font-weight: bold; font-size: 14px; padding: 10px 8px; border-right: 1px solid rgba(255, 255, 255, 0.2); white-space: nowrap; }
     td { padding: 10px 8px; border-bottom: 1px solid var(--border-light); border-right: 1px solid var(--border-light); word-wrap: break-word; white-space: normal; text-align: center; font-size: 14px; }
     
@@ -111,18 +115,17 @@
     .dialog-buttons { display: flex; gap: 10px; margin-top: 20px;}
     .btn-dialog { flex: 1; padding: 12px; border-radius: 8px; font-weight: bold; border: none; cursor: pointer; background: var(--primary-color); color: white;}
     
-    /* MODAL DANH SÁCH (Sửa lỗi cắt chữ) */
+    /* MODAL DANH SÁCH */
     .modal-full { width: 95%; max-width: 600px; max-height: 85vh; padding: 15px; display: flex; flex-direction: column; }
     .modal-list-container { flex: 1; overflow-y: auto; text-align: left; margin-top: 10px; border: 1px solid var(--border-light); border-radius: 8px; }
     .modal-list-item { padding: 12px; border-bottom: 1px solid var(--border-light); font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
     .modal-list-item:active { background: var(--input-bg); }
-    /* Quan trọng: Cho phép tên đạn dài được xuống dòng */
     .text-dan-name { font-weight:bold; color:var(--primary-color); white-space: normal; word-break: break-word; line-height: 1.3; margin-bottom: 4px;}
   </style>
 </head>
 <body>
 
-  <!-- HEADER GẮN NÚT HỆ THỐNG -->
+  <!-- HEADER -->
   <div class="dash-header">
     <h2 id="app-title">DANH MỤC ĐẠN</h2>
     <button class="sys-btn" onclick="moMenuHeThong()">⚙️ Hệ Thống</button>
@@ -134,9 +137,26 @@
       <div class="card" style="margin-top: 5px;">
         <div class="search-bar-container">
           <input type="text" id="search-danh-muc" class="search-input" placeholder="Tìm kiếm danh mục..." onkeyup="debounceTimKiem()">
+          <!-- NÚT CÀI ĐẶT ĐÃ ĐƯỢC KHÔI PHỤC -->
+          <button class="action-btn" style="background:var(--warning-color)" onclick="toggleCaiDatDanhMuc(); haptic();" title="Cài đặt cột">⚙️</button>
           <button class="action-btn" style="background:var(--success-color)" onclick="document.getElementById('excel-upload').click(); haptic();" title="Tải Excel mới">📂</button>
           <input type="file" id="excel-upload" style="display:none;" accept=".xlsx, .xls, .csv" onchange="xuLyFileExcel(event)">
         </div>
+        
+        <!-- PANEL CÀI ĐẶT BẢNG (KHÔI PHỤC VÀ TỐI ƯU) -->
+        <div id="panel-cai-dat-danh-muc" class="setting-panel">
+          <div style="text-align: center; color: var(--warning-color); font-weight: 800; margin-bottom: 15px;">CÀI ĐẶT BẢNG EXCEL</div>
+          <div class="set-row">
+            <span>Cỡ chữ hiển thị (px):</span>
+            <input type="number" id="set-fontsize" step="1" placeholder="VD: 14" style="width: 80px !important; padding: 6px !important; font-size: 15px !important; border-radius:6px; background:var(--bg-body); border: 1px solid var(--border-light); color:var(--text-main); text-align:center;" value="14">
+          </div>
+          <div style="font-size: 12px; color: var(--text-sub); margin: 10px 0 5px 0; text-transform: uppercase;">Chọn các cột muốn hiển thị:</div>
+          <div id="danh-sach-cot-cai-dat" style="max-height: 200px; overflow-y: auto; background: var(--bg-body); padding: 10px; border-radius: 8px;">
+            <!-- Danh sách checkbox cột sẽ render ở đây -->
+          </div>
+          <button onclick="luuCaiDatDanhMuc()" class="btn" style="background:var(--warning-color); padding:10px; margin-bottom:0; margin-top:15px;">LƯU VÀ ÁP DỤNG</button>
+        </div>
+
         <div style="font-size: 12px; color: var(--text-sub); text-align: center;">Vuốt ngang bảng để xem các cột ĐVT, KLR...</div>
       </div>
 
@@ -150,7 +170,7 @@
       </div>
     </div>
 
-    <!-- ==================== TAB 2: LỆNH XUẤT (CÓ SỐ LỆNH) ==================== -->
+    <!-- ==================== TAB 2: LỆNH XUẤT ==================== -->
     <div id="tab-lenh" class="tab-content">
       <div class="card" style="margin-top: 5px;">
         <div class="form-group">
@@ -288,20 +308,16 @@
     </div>
   </div>
 
-  <!-- MENU HỆ THỐNG (SAO LƯU/PHỤC HỒI CHO PWA) -->
+  <!-- MENU HỆ THỐNG -->
   <div id="modal-he-thong" class="modal-overlay">
     <div class="custom-dialog-box">
       <h3 style="margin-top:0; color:var(--primary-color);">Cài Đặt Hệ Thống</h3>
       <p style="font-size:13px; color:var(--text-sub); margin-bottom: 15px;">Dùng để đồng bộ dữ liệu khi bạn thêm app vào Màn hình chính.</p>
-      
       <button class="btn" style="background:var(--success-color);" onclick="xuatDuLieu()">📥 TẢI XUỐNG DỮ LIỆU (BACKUP)</button>
-      
       <button class="btn" style="background:var(--warning-color);" onclick="document.getElementById('import-file').click()">📤 NHẬP DỮ LIỆU (RESTORE)</button>
       <input type="file" id="import-file" style="display:none;" accept=".json" onchange="nhapDuLieu(event)">
-      
       <hr style="border:0; border-top:1px solid var(--border-light); margin: 15px 0;">
       <button class="btn" style="background:var(--danger-color);" onclick="xoaToanBoDuLieu()">🗑 XÓA TRẮNG DỮ LIỆU</button>
-      
       <button class="btn-dialog" style="width:100%; margin-top:10px; background:var(--text-sub)" onclick="dongMenuHeThong()">ĐÓNG</button>
     </div>
   </div>
@@ -314,18 +330,31 @@
   }
   function generateID() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
 
-  const STATE = { excel: { data: [] }, lenh: [], thucHien: [] };
+  // STATE MANAGEMENT ĐÃ KHÔI PHỤC CONFIG
+  const STATE = { 
+      excel: { data: [], config: { fontSize: 14, cot: {} } }, 
+      lenh: [], 
+      thucHien: [] 
+  };
 
   document.addEventListener('DOMContentLoaded', () => { 
       try {
           let savedExcel = localStorage.getItem('duLieuExcelOffline'); 
-          if (savedExcel) { STATE.excel.data = JSON.parse(savedExcel); hienThiBangDanhMuc(STATE.excel.data); }
+          if (savedExcel) { 
+              STATE.excel.data = JSON.parse(savedExcel); 
+              let savedConfig = localStorage.getItem('cauHinhBangExcel');
+              if (savedConfig) {
+                  STATE.excel.config = JSON.parse(savedConfig);
+              } else {
+                  taoCauHinhMacDinh();
+              }
+              hienThiBangDanhMuc(STATE.excel.data); 
+          }
           let savedLenh = localStorage.getItem('duLieuLenh');
           if (savedLenh) STATE.lenh = JSON.parse(savedLenh);
           let savedThucHien = localStorage.getItem('duLieuThucHien');
           if (savedThucHien) STATE.thucHien = JSON.parse(savedThucHien);
 
-          // Cập nhật cấu trúc cũ nếu có (Migration)
           STATE.lenh.forEach(l => { if(!l.soLenh) l.soLenh = "Lệnh Khác"; });
 
           renderBangLenh();
@@ -360,7 +389,7 @@
       if(tabId === 'tab-thuc-hien') capNhatDropdownSoLenh();
   }
 
-  // --- HỆ THỐNG SAO LƯU (Giải quyết PWA) ---
+  // --- HỆ THỐNG SAO LƯU ---
   function moMenuHeThong() { haptic(); document.getElementById('modal-he-thong').style.display = 'flex'; setTimeout(() => document.getElementById('modal-he-thong').classList.add('show'), 10); }
   function dongMenuHeThong() { document.getElementById('modal-he-thong').classList.remove('show'); setTimeout(() => document.getElementById('modal-he-thong').style.display = 'none', 300); }
   
@@ -372,7 +401,7 @@
       let dStr = `${date.getDate()}_${date.getMonth()+1}_${date.getFullYear()}`;
       linkElement.setAttribute('href', dataUri); linkElement.setAttribute('download', `SaoLuu_QuanLyDan_${dStr}.json`);
       linkElement.click();
-      showDialog("Thành công", "Đã tải file dữ liệu xuống máy. Bạn có thể mang file này lên app ở Màn hình chính để Nhập (Restore).", "alert");
+      showDialog("Thành công", "Đã tải file dữ liệu xuống máy.", "alert");
   }
 
   function nhapDuLieu(event) {
@@ -381,7 +410,7 @@
       reader.onload = function(e) {
           try {
               let imported = JSON.parse(e.target.result);
-              if(imported.excel) { STATE.excel = imported.excel; localStorage.setItem('duLieuExcelOffline', JSON.stringify(STATE.excel.data)); }
+              if(imported.excel) { STATE.excel = imported.excel; localStorage.setItem('duLieuExcelOffline', JSON.stringify(STATE.excel.data)); localStorage.setItem('cauHinhBangExcel', JSON.stringify(STATE.excel.config));}
               if(imported.lenh) { STATE.lenh = imported.lenh; localStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh)); }
               if(imported.thucHien) { STATE.thucHien = imported.thucHien; localStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien)); }
               dongMenuHeThong();
@@ -399,7 +428,7 @@
       });
   }
 
-  // --- TAB 1: DANH MỤC ---
+  // --- TAB 1: DANH MỤC & CÀI ĐẶT BẢNG ---
   let timeoutTimKiem = null;
   function debounceTimKiem() { if (timeoutTimKiem) clearTimeout(timeoutTimKiem); timeoutTimKiem = setTimeout(() => timKiemDanhMuc(), 300); }
   
@@ -415,11 +444,64 @@
               let newRow = {}; for (let key in row) { if (!key.startsWith('__EMPTY')) { newRow[key] = row[key]; } } return newRow; 
           }); 
           try { localStorage.setItem('duLieuExcelOffline', JSON.stringify(STATE.excel.data)); } catch (e) { }
+          
+          taoCauHinhMacDinh();
           hienThiBangDanhMuc(STATE.excel.data); 
-          showDialog("Thành công", "Đã tải danh mục. Các cột ĐVT, KLR sẽ tự động hiển thị đầy đủ.", "alert"); 
+          showDialog("Thành công", "Đã tải danh mục.", "alert"); 
           e.target.value = ''; 
       }; 
       reader.readAsArrayBuffer(file); 
+  }
+
+  function taoCauHinhMacDinh() { 
+      if (STATE.excel.data.length === 0) return;
+      let cacCot = Object.keys(STATE.excel.data[0]); 
+      STATE.excel.config.cot = {}; 
+      // Mặc định cho hiện tất cả các cột
+      cacCot.forEach(c => { STATE.excel.config.cot[c] = { show: true }; }); 
+      try { localStorage.setItem('cauHinhBangExcel', JSON.stringify(STATE.excel.config)); } catch(e) {}
+  }
+
+  // KHÔI PHỤC TÍNH NĂNG CÀI ĐẶT CỘT
+  function toggleCaiDatDanhMuc() { 
+      haptic(); 
+      let panel = document.getElementById('panel-cai-dat-danh-muc'); 
+      if(panel.style.display === 'block') { panel.style.display = 'none'; return; } 
+      if(STATE.excel.data.length === 0) { showDialog("Lỗi", "Vui lòng tải file Excel lên trước!", "alert"); return; } 
+      
+      document.getElementById('set-fontsize').value = STATE.excel.config.fontSize || 14; 
+      
+      // Render danh sách checkbox để Ẩn/Hiện cột
+      let htmlCaiDatCot = Object.keys(STATE.excel.config.cot).map(tenCot => { 
+          let isChecked = STATE.excel.config.cot[tenCot].show ? "checked" : ""; 
+          return `
+          <div class="set-row">
+              <label style="margin:0; display:flex; align-items:center; flex:1; cursor:pointer;">
+                  <input type="checkbox" id="chk-col-${tenCot}" style="transform:scale(1.3); margin-right:10px;" ${isChecked}> 
+                  ${escapeHTML(tenCot)}
+              </label>
+          </div>`; 
+      }).join(''); 
+      
+      document.getElementById('danh-sach-cot-cai-dat').innerHTML = htmlCaiDatCot; 
+      panel.style.display = 'block'; 
+  }
+
+  function luuCaiDatDanhMuc() { 
+      haptic(); 
+      let rawFontSize = document.getElementById('set-fontsize').value;
+      STATE.excel.config.fontSize = parseInt(rawFontSize) || 14; 
+      
+      Object.keys(STATE.excel.config.cot).forEach(tenCot => { 
+          let el = document.getElementById(`chk-col-${tenCot}`); 
+          if(el) { 
+              STATE.excel.config.cot[tenCot].show = el.checked; 
+          } 
+      }); 
+      try { localStorage.setItem('cauHinhBangExcel', JSON.stringify(STATE.excel.config)); } catch(e) {}
+      
+      document.getElementById('panel-cai-dat-danh-muc').style.display = 'none'; 
+      timKiemDanhMuc(); // Render lại bảng
   }
 
   function hienThiBangDanhMuc(data) { 
@@ -427,33 +509,71 @@
       if (!data || data.length === 0) { 
           thead.innerHTML = "<th>DỮ LIỆU</th>"; tbody.innerHTML = "<tr><td style='padding: 30px;'>Trống.</td></tr>"; return; 
       } 
-      let cotHienThi = Object.keys(data[0]);
+      
+      // Chỉ lấy những cột được phép hiển thị trong config
+      let cotHienThi = Object.keys(STATE.excel.config.cot).filter(c => STATE.excel.config.cot[c].show);
+      if(cotHienThi.length === 0) {
+          thead.innerHTML = "<th>LỖI</th>"; tbody.innerHTML = "<tr><td style='padding: 30px;'>Bạn đã ẩn tất cả các cột. Vui lòng vào Cài đặt ⚙️ để bật lại.</td></tr>"; return;
+      }
+
+      let fontSize = (STATE.excel.config.fontSize || 14) + "px";
+
       thead.innerHTML = cotHienThi.map(cot => `<th>${escapeHTML(cot)}</th>`).join(''); 
       tbody.innerHTML = data.map(hang => { 
           let cacOCuaHang = cotHienThi.map((cot, i) => { 
               let align = i === 0 ? "left" : "center"; 
-              return `<td style="text-align: ${align};">${escapeHTML(hang[cot] !== undefined ? hang[cot] : '')}</td>`; 
+              return `<td style="text-align: ${align}; font-size: ${fontSize};">${escapeHTML(hang[cot] !== undefined ? hang[cot] : '')}</td>`; 
           }).join(''); 
           return `<tr>${cacOCuaHang}</tr>`; 
       }).join(''); 
   }
+
   function timKiemDanhMuc() { 
       let tk = document.getElementById('search-danh-muc').value.toLowerCase(); 
       if (!tk) { hienThiBangDanhMuc(STATE.excel.data); return; } 
       hienThiBangDanhMuc(STATE.excel.data.filter(h => Object.values(h).some(v => String(v).toLowerCase().includes(tk)))); 
   }
 
-  // --- HÀM TRÍCH XUẤT THÔNG MINH CHO MODAL (Lấy Tên, ĐVT, KLR) ---
+  // ==========================================================
+  // HÀM TRÍCH XUẤT THÔNG MINH CHO MODAL (NÂNG CẤP ĐỘ CHÍNH XÁC CAO)
+  // ==========================================================
   function trichXuatThongTinDan(hang) {
       let keys = Object.keys(hang);
-      let tenCol = keys[0], dvtCol = '', klrCol = '';
+      let tenCol = '', dvtCol = '', klrCol = '';
+
+      // ƯU TIÊN 1: Tìm đúng chuẩn xác cột mang tên "Tên đạn dược" hoặc "Tên đạn"
+      for(let key of keys) {
+          let lk = key.toLowerCase().trim();
+          if(lk === 'tên đạn dược' || lk === 'tên đạn' || lk === 'tên') {
+              tenCol = key; break; 
+          }
+      }
+
+      // ƯU TIÊN 2: Nếu không có chuẩn xác, tìm cột có chữ "tên" và "đạn"
+      if(!tenCol) {
+          for(let key of keys) {
+              let lk = key.toLowerCase();
+              if(lk.includes('tên') && lk.includes('đạn')) { tenCol = key; break; }
+          }
+      }
+
+      // ƯU TIÊN 3: Nếu bảng không có Header chuẩn, lấy đại cột đầu tiên KHÔNG PHẢI LÀ SỐ TT (STT)
+      if(!tenCol) {
+          for(let key of keys) {
+              let lk = key.toLowerCase();
+              if(!lk.includes('stt') && !lk.includes('số tt') && !lk.includes('tt')) { tenCol = key; break; }
+          }
+      }
+      // Khắc phục lỗi nếu vẫn ko tìm ra
+      if(!tenCol) tenCol = keys[0];
+
+      // Tìm ĐVT và KLR (Không thay đổi)
       for(let key of keys) {
           let lk = key.toLowerCase();
-          if(lk.includes('tên') || lk.includes('đạn') || lk.includes('dược')) tenCol = key;
           if(lk.includes('đvt') || lk.includes('đơn vị') || lk.includes('tính')) dvtCol = key;
           if(lk.includes('klr') || lk.includes('khối lượng') || lk.includes('trọng')) klrCol = key;
       }
-      if(!dvtCol && keys.length > 1) dvtCol = keys[1]; // Dùng tạm cột 2 nếu ko thấy
+
       return { 
           ten: hang[tenCol] ? String(hang[tenCol]) : 'N/A', 
           dvt: dvtCol && hang[dvtCol] ? String(hang[dvtCol]) : '',
