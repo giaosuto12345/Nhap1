@@ -14,7 +14,7 @@
 
   <title>Quản lý Xuất Đạn Dược</title>
 
-  <!-- Thư viện đọc Excel và Thư viện chụp ảnh màn hình -->
+  <!-- Thư viện -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -73,7 +73,7 @@
     .btn { margin: 5px 0 10px 0; width: 100%; padding: 14px; font-size: 15px; font-weight: bold; border: none; border-radius: 10px; background: var(--success-color); color: #fff; cursor: pointer; transition: 0.2s; display:flex; justify-content:center; align-items:center; gap:8px;}
     .btn:active { transform: scale(0.98); opacity: 0.8;}
 
-    /* ================== FORM COMPONENTS (ĐÃ FIX LỖI TRÀN Ô) ================== */
+    /* FORM COMPONENTS */
     .form-group { margin-bottom: 12px; display: flex; flex-direction: column; }
     .form-group label { display: block; font-size: 13px; font-weight: bold; color: var(--text-sub); margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     
@@ -92,7 +92,6 @@
 
     input[type="date"].form-control { text-align: center; }
 
-    /* Fix Flexbox cực mạnh cho Safari để không bao giờ bị lồi ô */
     .form-row { display: flex; gap: 8px; width: 100%; align-items: flex-end; }
     .form-row .form-group { flex: 1 1 0%; min-width: 0; margin-bottom: 12px; }
 
@@ -127,7 +126,7 @@
     .tab-content.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* ================== MODALS ================== */
+    /* MODALS */
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 10000; display: none; align-items: center; justify-content: center; opacity: 0; transition: 0.3s; }
     .modal-overlay.show { opacity: 1; }
     .custom-dialog-box { background: var(--bg-card); width: 90%; max-width: 350px; border-radius: 16px; padding: 20px; text-align: center; box-shadow: var(--card-shadow); transform: scale(0.9); opacity: 0; transition: 0.3s; border: 1px solid var(--border-light); display: flex; flex-direction: column; }
@@ -143,12 +142,14 @@
     .modal-list-item:active { background: var(--input-bg); }
     .text-dan-name { font-weight:bold; color:var(--primary-color); white-space: normal; word-break: break-word; line-height: 1.3; margin-bottom: 4px;}
     
-    /* FIX NÚT HỦY BỎ (Ép không được giãn ra) */
     .btn-modal-cancel { flex: 0 0 auto; height: 48px; width: 100%; margin-top: 15px; background: var(--text-sub); color: white; border-radius: 8px; font-weight: bold; border: none; cursor: pointer; }
 
     /* BÁO CÁO TAB */
     .tong-hop-box { background: var(--input-bg); border: 1px solid var(--border-light); padding: 15px; border-radius: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;}
     .tong-hop-so { font-size: 24px; font-weight: bold; color: var(--primary-color); }
+    
+    /* STYLE Ô TÊN ĐẠN CLICKABLE */
+    .input-clickable { cursor: pointer; background-color: #E3F2FD; color: var(--primary-color); font-weight: bold; }
   </style>
 </head>
 <body>
@@ -185,23 +186,25 @@
     <!-- ==================== TAB 2: LỆNH XUẤT ==================== -->
     <div id="tab-lenh" class="tab-content">
       <div class="card" style="margin-top: 5px;">
-        <button class="btn" style="background: var(--info-color); margin-bottom: 15px;" onclick="moModalXemLenh()">📊 XEM TỔNG KHỐI LƯỢNG LỆNH (TẤN)</button>
+        
+        <div style="display:flex; gap:10px; margin-bottom: 15px;">
+             <button class="btn" style="background: var(--info-color); margin: 0; flex: 1;" onclick="moModalXemLenh()">📊 TỔNG TẤN LỆNH</button>
+             <button class="btn" style="background: #E91E63; margin: 0; flex: 1;" onclick="document.getElementById('ai-upload').click()">📷 QUÉT ẢNH (AI)</button>
+             <input type="file" id="ai-upload" accept="image/*" multiple style="display:none;" onchange="xuLyQuetAnh(event)">
+        </div>
         <hr style="border: 0; border-top: 1px dashed var(--border-light); margin: 0 0 15px 0;">
 
-        <div class="form-group" style="margin-bottom:0;">
+        <div class="form-group" style="margin-bottom:15px;">
           <label>Số Lệnh / Phiếu xuất</label>
           <input type="text" id="lenh-so" class="form-control" placeholder="VD: Số 01/PX" style="border-color: var(--primary-color); font-weight:bold;">
         </div>
-        <hr style="border: 0; border-top: 1px dashed var(--border-light); margin: 15px 0;">
 
-        <button class="btn" style="background: var(--primary-color); margin-bottom: 12px;" onclick="moModalChonDan()">🔍 Chọn đạn cho Lệnh này</button>
-        
         <div class="form-group">
-          <label>Tên đạn dược</label>
-          <input type="text" id="lenh-ten" class="form-control" placeholder="Tự động điền..." readonly>
+          <label>Tên đạn dược (Bấm vào để chọn)</label>
+          <!-- Ô Nhập Gộp Nút Tìm Kiếm -->
+          <input type="text" id="lenh-ten" class="form-control input-clickable" placeholder="🔍 Bấm vào đây để tìm và chọn đạn..." readonly onclick="moModalChonDan()">
         </div>
         
-        <!-- ÉP FLEXBOX 1 1 0% CHỐNG TRÀN -->
         <div class="form-row" style="margin-bottom:0; flex-wrap: nowrap;">
           <div class="form-group" style="flex: 1 1 30%;">
             <label>ĐVT</label>
@@ -269,7 +272,7 @@
         
         <div class="form-row" style="margin-bottom:0; flex-wrap: nowrap;">
           <div class="form-group" style="flex: 1 1 40%;">
-            <label>Cấp</label>
+            <label>Cấp (Thực tế)</label>
             <input type="number" id="th-cap" class="form-control" style="text-align:center;">
           </div>
           <div class="form-group" style="flex: 1 1 60%;">
@@ -306,7 +309,6 @@
     <!-- ==================== TAB 4: BÁO CÁO ==================== -->
     <div id="tab-bao-cao" class="tab-content">
       
-      <!-- KHU VỰC NÀY SẼ ĐƯỢC CHỤP ẢNH -->
       <div id="khu-vuc-chup-anh" style="background: var(--bg-body); padding: 5px; border-radius: 12px;">
           
           <div class="card" style="margin-top: 5px; background:var(--primary-color); color:white; border:none;" data-html2canvas-ignore="true">
@@ -324,7 +326,7 @@
           </div>
 
           <div style="display:flex; gap:10px;" data-html2canvas-ignore="true">
-              <button class="btn" style="background:#0A84FF; margin:10px 0;" onclick="xuatAnhBaoCao()">📸 XUẤT ẢNH BÁO CÁO</button>
+              <button class="btn" style="background:#0A84FF; margin:10px 0; width:100%;" onclick="xuatAnhBaoCao()">📸 XUẤT ẢNH BÁO CÁO</button>
           </div>
 
           <div class="tong-hop-box" data-html2canvas-ignore="true">
@@ -335,7 +337,7 @@
               <div class="tong-hop-so" id="bc-tong-luot">0</div>
           </div>
 
-          <!-- PHẦN HIỂN THỊ CHỤP ẢNH CÓ NỀN TRẮNG -->
+          <!-- BẢNG BÁO CÁO ĐỂ CHỤP ẢNH -->
           <div style="background: var(--bg-card); border-radius: 12px; padding: 10px; border: 1px solid var(--border-light);">
               <div style="text-align:center; font-size:18px; font-weight:bold; color:var(--primary-color); margin-bottom:10px; text-transform:uppercase;" id="bc-tieu-de-anh">BÁO CÁO XUẤT KHO</div>
               
@@ -392,19 +394,17 @@
   <div id="modal-chon-dan" class="modal-overlay">
     <div class="custom-dialog-box modal-full">
       <h3>Tìm và Chọn Đạn</h3>
-      <input type="text" id="search-modal-dan" class="form-control" placeholder="Tìm tên đạn..." onkeyup="timKiemModalDan()">
+      <input type="text" id="search-modal-dan" class="form-control" placeholder="Gõ tên đạn để lọc..." onkeyup="timKiemModalDan()">
       <div class="modal-list-container" id="modal-danh-sach-dan"></div>
       <button class="btn-modal-cancel" onclick="dongModalChonDan()">HỦY BỎ</button>
     </div>
   </div>
 
-  <!-- MODAL XEM TỔNG HỢP LỆNH (ĐÃ CĂN CHỈNH) -->
+  <!-- MODAL XEM TỔNG HỢP LỆNH -->
   <div id="modal-xem-lenh" class="modal-overlay">
     <div class="custom-dialog-box modal-full" style="max-height: 85vh;">
       <h3>Tổng Hợp Lệnh (Tấn)</h3>
-      <div class="modal-list-container" id="noidung-xem-lenh" style="background: var(--bg-body); padding: 10px; border:none;">
-        <!-- Dữ liệu render ra đây -->
-      </div>
+      <div class="modal-list-container" id="noidung-xem-lenh" style="background: var(--bg-body); padding: 10px; border:none;"></div>
       <button class="btn-modal-cancel" onclick="dongModalXemLenh()">ĐÓNG BẢNG</button>
     </div>
   </div>
@@ -430,6 +430,9 @@
   </div>
 
 <script>
+  // CẤU HÌNH API AI (Gemini)
+  const apiKey = ""; 
+
   function haptic() { if (navigator.vibrate) navigator.vibrate(15); }
   function escapeHTML(str) { if (str == null) return ''; return String(str).replace(/[&<>'"]/g, tag => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'}[tag] || tag)); }
   function generateID() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
@@ -460,7 +463,12 @@
               if (savedConfig) STATE.excel.config = JSON.parse(savedConfig); else taoCauHinhMacDinh();
               hienThiBangDanhMuc(STATE.excel.data); 
           }
-          let savedLenh = localStorage.getItem('duLieuLenh'); if (savedLenh) STATE.lenh = JSON.parse(savedLenh);
+          let savedLenh = localStorage.getItem('duLieuLenh'); 
+          if (savedLenh) {
+              STATE.lenh = JSON.parse(savedLenh);
+              // Bổ sung thuộc tính time cho dữ liệu cũ để sắp xếp Mới Nhất lên đầu
+              STATE.lenh.forEach(l => { if(!l.time) l.time = 0; });
+          }
           let savedThucHien = localStorage.getItem('duLieuThucHien'); if (savedThucHien) STATE.thucHien = JSON.parse(savedThucHien);
           STATE.thucHien.forEach(th => { if(!th.ngay) th.ngay = today; });
 
@@ -585,21 +593,127 @@
       for(let hang of STATE.excel.data) {
           let info = trichXuatThongTinDan(hang);
           if(info.ten === tenDan) {
-              // Convert comma to dot for parsing
-              let valStr = String(info.klr).replace(',', '.');
-              let val = parseFloat(valStr);
-              return isNaN(val) ? 0 : val;
+              let valStr = String(info.klr).replace(',', '.'); let val = parseFloat(valStr); return isNaN(val) ? 0 : val;
+          }
+      } return 0;
+  }
+
+  // --- GIAO TIẾP API OCR (AI VISION) ---
+  async function fetchWithRetry(url, options, retries = 3) {
+      const delays = [2000, 4000, 8000];
+      for (let i = 0; i < retries; i++) {
+          try {
+              const response = await fetch(url, options);
+              if (!response.ok) throw new Error(`HTTP ${response.status}`);
+              return await response.json();
+          } catch (error) {
+              if (i === retries - 1) throw error;
+              await new Promise(res => setTimeout(res, delays[i]));
           }
       }
-      return 0;
   }
+
+  async function xuLyQuetAnh(event) {
+      let files = event.target.files; if (!files || files.length === 0) return;
+      let file = files[0];
+      
+      showDialog("Đang quét ảnh (AI)", "Trí tuệ nhân tạo đang phân tích bảng Lệnh Phải Xuất. Vui lòng giữ mạng ổn định...", "alert");
+      
+      try {
+          let base64Image = await new Promise((resolve) => {
+              let reader = new FileReader();
+              reader.onload = (e) => resolve(e.target.result.split(',')[1]);
+              reader.readAsDataURL(file);
+          });
+
+          const promptText = `Analyze this military supply table image. Extract the "Phải xuất" (Command/Required) data ONLY. Return a JSON ARRAY of objects. Keys: "ten" (string, ammo name), "dvt" (string, unit), "cap" (number, "Phân cấp" column under "Phải xuất"), "sl" (number, "Số lượng" column under "Phải xuất"). Ignore empty rows. DO NOT wrap the output in markdown code blocks like \`\`\`json. Return strictly the raw JSON array.`;
+
+          const payload = {
+              contents: [{
+                  role: "user",
+                  parts: [
+                      { text: promptText },
+                      { inlineData: { mimeType: file.type, data: base64Image } }
+                  ]
+              }],
+              generationConfig: {
+                  responseMimeType: "application/json",
+                  responseSchema: {
+                      type: "ARRAY",
+                      items: {
+                          type: "OBJECT",
+                          properties: {
+                              ten: { type: "STRING" },
+                              dvt: { type: "STRING" },
+                              cap: { type: "NUMBER" },
+                              sl: { type: "NUMBER" }
+                          }
+                      }
+                  }
+              }
+          };
+
+          const result = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+          });
+
+          if(result.error) throw new Error(result.error.message);
+
+          let textResponse = result.candidates?.[0]?.content?.parts?.[0]?.text;
+          if(!textResponse) throw new Error("AI không trả về kết quả.");
+          
+          let parsedData = JSON.parse(textResponse);
+          
+          if (parsedData && parsedData.length > 0) {
+               let currentSoLenh = document.getElementById('lenh-so').value.trim() || "Lệnh (Từ Ảnh)";
+               let timeNow = Date.now();
+               
+               parsedData.forEach(item => {
+                   STATE.lenh.push({
+                       id: generateID(),
+                       soLenh: currentSoLenh,
+                       ten: item.ten || "Không rõ",
+                       dvt: item.dvt || "Viên",
+                       cap: item.cap || "",
+                       sl: parseFloat(item.sl) || 0,
+                       time: timeNow
+                   });
+               });
+               
+               localStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh));
+               renderBangLenh();
+               closeDialog();
+               showDialog("Thành công", `AI đã trích xuất tự động ${parsedData.length} loại đạn từ ảnh và lưu vào Lệnh.`, "alert");
+          } else {
+               throw new Error("Không phát hiện được dữ liệu dạng bảng.");
+          }
+
+      } catch (err) {
+          console.error(err);
+          closeDialog();
+          showDialog("Lỗi OCR", "Quá trình đọc ảnh bằng AI thất bại. Ảnh mờ hoặc máy chủ bận.", "alert");
+      }
+      event.target.value = '';
+  }
+
 
   // --- TAB 2: LỆNH XUẤT ---
   function moModalChonDan() {
       haptic(); if(STATE.excel.data.length === 0) { showDialog("Lỗi", "Tải File Excel trước.", "alert"); return; }
-      document.getElementById('search-modal-dan').value = ''; renderListModalDan(STATE.excel.data);
+      
+      // KHÔNG RESET VALUE ĐỂ GIỮ LẠI TỪ KHOÁ CŨ
+      let currentSearch = document.getElementById('search-modal-dan').value.toLowerCase();
+      let dataToRender = STATE.excel.data;
+      if(currentSearch) {
+          dataToRender = STATE.excel.data.filter(h => trichXuatThongTinDan(h).ten.toLowerCase().includes(currentSearch));
+      }
+      
+      renderListModalDan(dataToRender);
       let wrapper = document.getElementById('modal-chon-dan'); wrapper.style.display = 'flex'; setTimeout(() => wrapper.classList.add('show'), 10);
   }
+  
   function dongModalChonDan() { let w = document.getElementById('modal-chon-dan'); w.classList.remove('show'); setTimeout(() => w.style.display = 'none', 300); }
   
   function renderListModalDan(data) {
@@ -610,6 +724,7 @@
           return `<div class="modal-list-item" onclick="chonDanTuModal(${STATE.excel.data.indexOf(hang)})"><div style="flex:1; padding-right: 10px;"><div class="text-dan-name">${escapeHTML(info.ten)}</div><div style="font-size:12px; color:var(--text-sub)">${extra.join(' | ')}</div></div><div style="font-size:24px; color:var(--success-color);">+</div></div>`;
       }).join('');
   }
+  
   let timeoutModal = null;
   function timKiemModalDan() {
       if(timeoutModal) clearTimeout(timeoutModal);
@@ -636,10 +751,11 @@
 
       if (idLenhDangSua) {
           let index = STATE.lenh.findIndex(l => l.id === idLenhDangSua);
-          if (index !== -1) STATE.lenh[index] = { id: idLenhDangSua, soLenh, ten, dvt, cap, sl: parseFloat(sl) };
+          // Giữ lại time cũ khi update
+          if (index !== -1) STATE.lenh[index] = { id: idLenhDangSua, soLenh, ten, dvt, cap, sl: parseFloat(sl), time: STATE.lenh[index].time };
           huySuaLenh();
       } else {
-          STATE.lenh.push({ id: generateID(), soLenh, ten, dvt, cap, sl: parseFloat(sl) });
+          STATE.lenh.push({ id: generateID(), soLenh, ten, dvt, cap, sl: parseFloat(sl), time: Date.now() });
           document.getElementById('lenh-cap').value = ''; document.getElementById('lenh-sl').value = '';
       }
       localStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh)); renderBangLenh();
@@ -666,8 +782,11 @@
   function renderBangLenh() {
       let tbody = document.getElementById('tbody-lenh');
       if(STATE.lenh.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="padding:20px;">Chưa có lệnh.</td></tr>`; return; }
-      STATE.lenh.sort((a,b) => a.soLenh.localeCompare(b.soLenh));
-      tbody.innerHTML = STATE.lenh.map(item => `
+      
+      // SẮP XẾP: Thời gian mới nhất (lớn nhất) lên đầu
+      let sortedLenh = [...STATE.lenh].sort((a,b) => (b.time || 0) - (a.time || 0));
+      
+      tbody.innerHTML = sortedLenh.map(item => `
           <tr style="${idLenhDangSua === item.id ? 'background-color: #E3F2FD;' : ''}">
               <td style="font-weight:bold; color:var(--primary-color)">${escapeHTML(item.soLenh)}</td>
               <td style="text-align:left; font-weight:bold; font-size:12px;">${escapeHTML(item.ten)}</td>
@@ -744,7 +863,7 @@
       selectDan.innerHTML = '<option value="">-- Chọn loại đạn --</option>' + danTrongLenh.map(l => { 
           let daXuat = STATE.thucHien.filter(t => t.lenhId === l.id).reduce((sum, current) => sum + current.sl, 0);
           let conLai = l.sl - daXuat;
-          return `<option value="${l.id}" data-conlai="${conLai}">${escapeHTML(l.ten)} (Còn: ${conLai} ${escapeHTML(l.dvt)})</option>`; 
+          return `<option value="${l.id}" data-conlai="${conLai}">${escapeHTML(l.ten)} - (Còn: ${conLai} ${escapeHTML(l.dvt)})</option>`; 
       }).join('');
   }
 
@@ -835,7 +954,6 @@
       let locXe = document.getElementById('bc-xe').value.toLowerCase().trim();
       let dataLoc = STATE.thucHien.filter(item => { return (!locNgay || item.ngay === locNgay) && (!locXe || item.xe.toLowerCase().includes(locXe)); });
 
-      // Cập nhật tiêu đề xuất ảnh
       document.getElementById('bc-tieu-de-anh').innerText = `BÁO CÁO XUẤT KHO ${locNgay ? '(' + formatShortDate(locNgay) + ')' : ''}`;
 
       let tbody = document.getElementById('tbody-bao-cao');
@@ -847,7 +965,6 @@
       dataLoc.sort((a,b) => a.xe.localeCompare(b.xe));
 
       tbody.innerHTML = dataLoc.map(item => {
-          // Tính toán siêu logic: Lấy tổng "Đã Cấp" của các lần xuất TRƯỚC ĐÓ trong cùng 1 Lệnh
           let indexInThucHien = STATE.thucHien.findIndex(t => t.id === item.id);
           let daCapTruocDo = 0;
           for(let i = 0; i < indexInThucHien; i++) {
@@ -874,12 +991,9 @@
       `}).join('');
   }
 
-  // Hàm Xuất Ảnh cực mượt
   function xuatAnhBaoCao() {
       haptic();
       let target = document.getElementById('khu-vuc-chup-anh');
-      
-      // Tạm thời mở scroll ra để chụp được tất cả các hàng nếu bảng quá dài
       let scrollBox = document.getElementById('table-bao-cao-scroll');
       let oldMaxHeight = scrollBox.style.maxHeight;
       let oldOverflow = scrollBox.style.overflowY;
@@ -889,26 +1003,16 @@
       showDialog("Đang xử lý", "Hệ thống đang render ảnh báo cáo, vui lòng chờ...", "alert");
 
       setTimeout(() => {
-          html2canvas(target, { 
-              scale: 2, // Chụp nét gấp đôi
-              backgroundColor: "#F2F2F7" // Màu nền chuẩn iOS
-          }).then(canvas => {
-              // Trả lại scroll như cũ
-              scrollBox.style.maxHeight = oldMaxHeight;
-              scrollBox.style.overflowY = oldOverflow;
-              
+          html2canvas(target, { scale: 2, backgroundColor: "#F2F2F7" }).then(canvas => {
+              scrollBox.style.maxHeight = oldMaxHeight; scrollBox.style.overflowY = oldOverflow;
               let link = document.createElement('a');
               link.download = 'BaoCao_DanDuoc_' + getTodayString() + '.jpg';
-              link.href = canvas.toDataURL("image/jpeg", 0.9);
-              link.click();
-              closeDialog();
+              link.href = canvas.toDataURL("image/jpeg", 0.9); link.click(); closeDialog();
           }).catch(err => {
-              console.error(err);
-              scrollBox.style.maxHeight = oldMaxHeight;
-              scrollBox.style.overflowY = oldOverflow;
+              console.error(err); scrollBox.style.maxHeight = oldMaxHeight; scrollBox.style.overflowY = oldOverflow;
               showDialog("Lỗi", "Không thể tạo ảnh do bộ nhớ thiết bị đầy.", "alert");
           });
-      }, 500); // Chờ 0.5s cho UI bung hết ra mới chụp
+      }, 500); 
   }
 </script>
 </body>
