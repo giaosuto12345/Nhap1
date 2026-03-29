@@ -2,1228 +2,774 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="Danh Bạ" />
+  <meta name="apple-mobile-web-app-title" content="Quản Lý Đạn" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <title>Danh Bạ Nội Bộ</title>
-  
-  <!-- Thư viện Kéo thả -->
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-  <!-- Thư viện tạo mã QR Code -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+
+  <title>Quản lý Xuất Đạn Dược</title>
+
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <style>
-    /* ================== BIẾN MÀU SẮC (HỖ TRỢ DARK MODE TỰ ĐỘNG) ================== */
+    /* ================== BIẾN MÀU SẮC TỰ ĐỘNG ================== */
     :root {
-      --bg-body: #F4F5F7;
+      --bg-body: #F2F2F7;
       --bg-card: #FFFFFF;
-      --bg-hover: #F9F9F9;
       --text-main: #1C1C1E;
-      --text-sub: #555555;
-      --text-muted: #8E8E93;
-      --border: #E0E0E0;
-      --border-light: #F0F0F0;
-      --bg-input: #FFFFFF;
-      --shadow: rgba(0,0,0,0.03);
+      --text-sub: #8E8E93;
+      --border-light: #E5E5EA;
+      --input-bg: #F9F9F9;
+      --card-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      --primary-color: #007AFF;
+      --success-color: #34C759;
+      --warning-color: #FF9500;
+      --danger-color: #FF3B30;
+      --nav-bg: rgba(255, 255, 255, 0.9);
     }
 
     @media (prefers-color-scheme: dark) {
       :root {
         --bg-body: #000000;
         --bg-card: #1C1C1E;
-        --bg-hover: #2C2C2E;
-        --text-main: #F2F2F7;
+        --text-main: #FFFFFF;
         --text-sub: #EBEBF5;
-        --text-muted: #8E8E93;
-        --border: #38383A;
-        --border-light: #2C2C2E;
-        --bg-input: #1C1C1E;
-        --shadow: rgba(0,0,0,0.3);
+        --border-light: #38383A;
+        --input-bg: #2C2C2E;
+        --card-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        --primary-color: #0A84FF;
+        --success-color: #30D158;
+        --warning-color: #FF9F0A;
+        --danger-color: #FF453A;
+        --nav-bg: rgba(28, 28, 30, 0.9);
       }
     }
 
-    /* ================== CƠ BẢN ================== */
     * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
     body { 
-      margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-      background: var(--bg-body); padding-bottom: 40px; color: var(--text-main);
+      margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif; 
+      background: var(--bg-body); color: var(--text-main);
+      padding-bottom: 80px; /* Nhường chỗ cho Bottom Nav */
+      overflow-x: hidden; transition: background 0.3s, color 0.3s;
     }
 
-    .container { max-width: 600px; margin: 0 auto; padding: 15px; }
-    .dash-header { padding: 10px 0 20px 0; text-align: center; display: flex; justify-content: center; align-items: center; gap: 8px;}
-    .dash-header h2 { color: #0A84FF; margin: 0; font-size: 24px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase;}
-
-    /* ================== TÌM KIẾM & NÚT THÊM ================== */
-    .top-controls { margin-bottom: 20px; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 15px; }
     
-    .search-row { display: flex; gap: 8px; margin-bottom: 15px; }
-    .search-input { 
-      flex: 1; padding: 14px 20px; font-size: 16px; border-radius: 12px; 
-      border: 1px solid var(--border); background: var(--bg-input); color: var(--text-main);
-      outline: none; box-shadow: 0 2px 8px var(--shadow); transition: 0.2s;
-    }
-    .search-input:focus { border-color: #0A84FF; box-shadow: 0 4px 12px rgba(10,132,255,0.1); }
+    .dash-header { padding: 15px 15px 10px 15px; text-align: center; }
+    .dash-header h2 { color: var(--primary-color); margin: 0; font-size: 22px; font-weight: 800; letter-spacing: 1px; }
 
-    .action-buttons-row { 
-      display: flex; gap: 10px; justify-content: space-between; align-items: center;
-      transition: all 0.3s ease; overflow: hidden; max-height: 100px; margin-bottom: 20px;
-    }
-    .btn-act {
-      flex: 1; height: 50px; border-radius: 12px; border: none; font-size: 22px; 
-      cursor: pointer; display: flex; align-items: center; justify-content: center; 
-      box-shadow: 0 4px 10px var(--shadow); transition: 0.2s; font-weight: bold;
-    }
-    .btn-act:active { transform: scale(0.92); }
+    .card { background: var(--bg-card); border-radius: 18px; padding: 14px; box-shadow: var(--card-shadow); margin-bottom: 15px; border: 1px solid var(--border-light); }
+    .btn { margin: 5px 0 15px 0; width: 100%; padding: 14px; font-size: 16px; font-weight: bold; border: none; border-radius: 12px; background: var(--success-color); color: #fff; cursor: pointer; transition: 0.2s; }
+    .btn:active { transform: scale(0.98); opacity: 0.8;}
 
-    .btn-setting { background: var(--bg-card); color: var(--text-sub); border: 1px solid var(--border); }
-    .btn-pending { background: #E3F2FD; color: #0A84FF; position: relative; }
-    .btn-file { background: #9C27B0; color: white; }
-    .btn-device { background: #0A84FF; color: white; }
-    .btn-add-manual { background: #34C759; color: white; }
-    .btn-toggle-menu { width: 52px; border-radius: 12px; font-size: 24px; font-weight: bold; color: #0A84FF; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid var(--border); background: var(--bg-card); }
+    /* FORM & INPUTS */
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 13px; font-weight: bold; color: var(--text-sub); margin-bottom: 5px; }
+    .form-control { width: 100%; padding: 12px; font-size: 16px; border-radius: 10px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--text-main); }
+    .form-control:focus { outline: none; border-color: var(--primary-color); }
+    .form-row { display: flex; gap: 10px; }
+    .form-row .form-group { flex: 1; }
 
-    @media (prefers-color-scheme: dark) {
-      .btn-pending { background: #0A84FF; color: white; }
-    }
-
-    /* ================== BADGE KHO CHỜ ================== */
-    .pending-badge {
-      position: absolute; top: -6px; right: -6px; background: #FF3B30; color: white;
-      font-size: 11px; font-weight: bold; padding: 2px 7px; border-radius: 10px;
-      border: 2px solid var(--bg-body); display: none; pointer-events: none; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-
-    /* ================== DANH SÁCH THƯ MỤC ================== */
-    .unit-card {
-      background: var(--bg-card); border-radius: 16px; padding: 16px 20px; margin-bottom: 12px;
-      display: flex; justify-content: space-between; align-items: center;
-      box-shadow: 0 2px 8px var(--shadow); cursor: pointer; transition: 0.2s; border: 1px solid var(--border-light);
-    }
-    .unit-card:active { transform: scale(0.98); background: var(--bg-hover); }
-    .unit-left-info { display: flex; align-items: center; gap: 12px; }
-    .unit-icon-build { font-size: 20px; }
-    .unit-name { font-size: 16px; font-weight: 800; color: var(--text-main); }
-    .unit-right-info { display: flex; align-items: center; gap: 10px; }
-    .unit-count { 
-      background: var(--bg-hover); padding: 4px; border-radius: 20px; border: 1px solid var(--border-light);
-      font-size: 13px; color: var(--text-sub); font-weight: 800; min-width: 28px; text-align: center;
-    }
-    .unit-chevron { color: var(--text-muted); font-weight: 900; font-size: 14px;}
-
-    /* ================== CHI TIẾT THƯ MỤC ================== */
-    .back-header {
-      display: flex; align-items: center; justify-content: space-between; padding: 10px 0 20px 0;
-      border-bottom: 1px solid var(--border); margin-bottom: 15px;
-    }
-    .back-btn-text { color: #0A84FF; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 5px;}
-    .back-btn-text:active { opacity: 0.7; }
-    .inner-folder-title { font-size: 18px; font-weight: 800; margin: 0; color: var(--text-main); text-align: center; flex: 1;}
-    .btn-sort-az { background: none; border: none; color: #0A84FF; font-size: 14px; font-weight: 800; cursor: pointer; padding: 5px 10px; background: rgba(10,132,255,0.1); border-radius: 8px; transition: 0.2s;}
-    .btn-sort-az:active { transform: scale(0.95); }
-
-    .contact-card {
-      background: var(--bg-card); border-radius: 14px; padding: 12px 10px 12px 15px; margin-bottom: 10px;
-      display: flex; justify-content: space-between; align-items: center; gap: 10px;
-      box-shadow: 0 2px 6px var(--shadow); border-left: 4px solid #34C759;
-    }
+    /* NÚT ACTION NHỎ */
+    .btn-sm { padding: 8px 12px; font-size: 13px; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; color: white; }
+    .btn-del { background: var(--danger-color); }
     
-    .contact-avatar {
-      width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      color: #fff; font-weight: 800; font-size: 15px; text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-    }
+    /* DANH MỤC EXCEL COMPONENT */
+    .search-bar-container { display: flex; gap: 8px; margin-bottom: 10px; }
+    .search-input { flex: 1; padding: 12px 15px !important; font-size: 16px !important; border-radius: 12px !important; border: 1px solid var(--border-light) !important; background: var(--input-bg) !important; color: var(--text-main) !important;}
+    .search-input:focus { outline: none; border: 2px solid var(--primary-color) !important; }
+    .action-btn { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; color: white; border-radius: 50%; font-size: 22px; border: none; cursor: pointer; transition: 0.2s; flex-shrink:0;}
+    .action-btn:active { transform: scale(0.9); }
     
-    .contact-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-    .contact-name { font-size: 16px; font-weight: 800; color: var(--text-main); line-height: 1.2;}
-    .contact-phone { font-size: 14px; color: #0A84FF; font-weight: 700; }
-    .contact-group-label { font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;}
+    .setting-panel { background: var(--input-bg); border: 2px solid var(--warning-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; display: none; }
+    .set-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; font-size: 14px; font-weight: bold; }
     
-    .action-buttons-card { display: flex; align-items: center; gap: 5px; flex-shrink: 0;}
-    .btn-action-circle {
-      width: 36px; height: 36px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center; font-size: 16px;
-      text-decoration: none; transition: 0.2s; border: none; cursor: pointer; font-weight: bold;
-    }
+    /* BẢNG CHUNG */
+    .table-container { overflow-x: auto; max-height: 60vh; overflow-y: auto; border-radius: 12px; border: 1px solid var(--border-light); }
+    table { table-layout: fixed; width: 100%; border-collapse: collapse; min-width: 500px; }
+    th { background: var(--primary-color); color: #fff; position: sticky; top: 0; z-index: 10; font-weight: 800; font-size: 14px; padding: 12px 5px; border-right: 1px solid rgba(255, 255, 255, 0.3); }
+    th:last-child { border-right: none; }
+    td { padding: 12px 5px; border-bottom: 1px solid var(--border-light); border-right: 1px solid var(--border-light); word-wrap: break-word; overflow-wrap: break-word; white-space: normal; text-align: center; }
+    td:last-child { border-right: none; }
     
-    /* Màu nút gọi theo DarkMode/LightMode */
-    .btn-zalo { background: #E3F2FD; color: #0A84FF; box-shadow: 0 2px 4px rgba(10,132,255,0.15); font-family: Arial, sans-serif;}
-    .btn-sms { background: #F0F0F5; color: #555; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    .btn-call { background: #E8F5E9; color: #34C759; box-shadow: 0 2px 4px rgba(52,199,89,0.15); }
-    
-    @media (prefers-color-scheme: dark) {
-      .btn-zalo { background: #004499; color: #81D4FA; box-shadow: none; }
-      .btn-sms { background: #38383A; color: #EBEBF5; box-shadow: none;}
-      .btn-call { background: #1B5E20; color: #A5D6A7; box-shadow: none;}
-    }
+    /* Cố định cột đầu cho bảng Excel (Danh mục) */
+    #bang-danh-muc th:first-child { position: sticky; left: 0; z-index: 12; }
+    #bang-danh-muc td:first-child { position: sticky; left: 0; z-index: 11; background: var(--bg-card); font-weight: bold; }
 
-    .btn-action-circle:active { transform: scale(0.9); }
+    /* BOTTOM NAVIGATION BAR */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 10px 0 20px 0; border-top: 1px solid var(--border-light); z-index: 9000; }
+    .nav-item { flex: 1; text-align: center; font-size: 12px; font-weight: bold; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: 0.2s;}
+    .nav-item.active { color: var(--primary-color); }
+    .nav-icon { font-size: 22px; }
 
-    .drag-handle {
-      padding: 5px 2px; color: var(--text-muted); font-size: 24px; font-weight: 300;
-      cursor: grab; display: flex; align-items: center; justify-content: center; touch-action: none; width: 30px;
-    }
-    .drag-handle:active { cursor: grabbing; color: #0A84FF; }
-    .sortable-ghost { opacity: 0.5; background: var(--bg-hover); border: 1px dashed #0A84FF; }
-    .sortable-chosen { transform: scale(1.02); box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10; border-left: 4px solid #0A84FF !important; background: var(--bg-card); }
+    /* TAB CONTENT */
+    .tab-content { display: none; animation: fadeIn 0.3s ease; }
+    .tab-content.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* ================== MODAL CHUNG ================== */
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.4); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
-      z-index: 1000; display: none; align-items: flex-end; justify-content: center;
-      opacity: 0; transition: opacity 0.3s ease;
-    }
+    /* CUSTOM DIALOG & MODAL */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 10000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; }
     .modal-overlay.show { opacity: 1; }
-    .modal-content {
-      background: var(--bg-body); width: 100%; max-height: 92vh; max-width: 600px;
-      border-radius: 24px 24px 0 0; padding: 15px 20px 30px 20px; overflow-y: auto;
-      transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.1);
-      box-shadow: 0 -10px 25px rgba(0,0,0,0.2); display: flex; flex-direction: column;
-    }
-    .modal-overlay.show .modal-content { transform: translateY(0); }
+    .custom-dialog-box { background: var(--bg-card); width: 85%; max-width: 320px; border-radius: 20px; padding: 25px 20px 20px 20px; text-align: center; box-shadow: var(--card-shadow); transform: scale(0.9); opacity: 0; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid var(--border-light); }
+    .modal-overlay.show .custom-dialog-box { transform: scale(1); opacity: 1; }
+    .dialog-title { font-size: 18px; font-weight: 800; margin: 0 0 10px 0; }
+    .dialog-message { font-size: 15px; color: var(--text-sub); margin: 0 0 20px 0; line-height: 1.4; }
+    .dialog-buttons { display: flex; gap: 10px; margin-top: 20px;}
+    .btn-dialog { flex: 1; padding: 12px; border-radius: 10px; font-weight: bold; border: none; font-size: 15px; cursor: pointer; background: var(--primary-color); color: white;}
     
-    .pull-bar { width: 40px; height: 5px; background: #8E8E93; border-radius: 3px; margin: 0 auto 15px auto; }
-    .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative;}
-    .modal-title { font-size: 20px; font-weight: 800; margin: 0; color: #0A84FF; }
-    .btn-close-modal { background: var(--bg-hover); border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 14px; font-weight: bold; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border);}
-
-    /* ================== UI CÀI ĐẶT NHÓM ================== */
-    .group-input-wrapper { 
-      display: flex; background: var(--bg-input); border-radius: 12px; border: 1px solid var(--border); 
-      overflow: hidden; margin-bottom: 20px; box-shadow: 0 2px 6px var(--shadow);
-    }
-    .group-input-wrapper input { border: none; padding: 14px 15px; font-size: 15px; flex: 1; outline: none; background: transparent; color: var(--text-main); }
-    .group-input-wrapper button { 
-      background: #34C759; color: white; border: none; padding: 0 20px; 
-      font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.2s;
-    }
-    .group-input-wrapper button:active { background: #2E7D32; }
-    
-    .setting-list-box {
-      background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border);
-      overflow: hidden; box-shadow: 0 2px 8px var(--shadow); margin-bottom: 20px;
-    }
-    .group-item-card {
-      padding: 12px 15px; display: flex; justify-content: space-between; align-items: center;
-      border-bottom: 1px solid var(--border-light); background: var(--bg-card);
-    }
-    .group-item-card:last-child { border-bottom: none; }
-    .group-item-name { font-weight: 800; font-size: 15px; color: var(--text-main); }
-    .group-actions { display: flex; gap: 6px; align-items: center; }
-    
-    .btn-sq {
-      width: 32px; height: 32px; border-radius: 8px; border: none; 
-      display: flex; align-items: center; justify-content: center; 
-      font-size: 14px; cursor: pointer; transition: 0.2s; font-weight: 900;
-    }
-    .btn-edit { background: rgba(255,149,0,0.15); color: #FF9500;}
-    .btn-del { background: rgba(255,59,48,0.15); color: #FF3B30;}
-    .btn-sq:active { transform: scale(0.9); }
-
-    /* ================== KHO CHỜ DUYỆT ================== */
-    .pending-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 5px; border-bottom: 1px solid var(--border); padding-bottom: 15px;}
-    .custom-checkbox {
-      appearance: none; width: 24px; height: 24px; border: 2px solid var(--border); border-radius: 6px;
-      outline: none; cursor: pointer; position: relative; background: var(--bg-input); transition: 0.2s; margin:0;
-    }
-    .custom-checkbox:checked { background: #0A84FF; border-color: #0A84FF; }
-    .custom-checkbox:checked::after {
-      content: '✔'; position: absolute; color: white; font-size: 15px;
-      top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold;
-    }
-    
-    .text-blue-bold { color: #0A84FF; font-weight: 800; font-size: 15px; cursor: pointer; }
-    .text-red-bold { color: #FF3B30; font-weight: 800; font-size: 14px; cursor: pointer; background: none; border: none; }
-
-    .pending-list { flex: 1; overflow-y: auto; padding-bottom: 10px; margin-bottom: 10px; }
-    .pending-card {
-      background: var(--bg-card); border-radius: 14px; padding: 15px; margin-bottom: 10px;
-      display: flex; align-items: center; gap: 15px; border: 1px solid var(--border); box-shadow: 0 2px 4px var(--shadow);
-    }
-    .p-name { font-weight: 800; color: var(--text-main); font-size: 15px; margin-bottom: 4px; display: block;}
-    .p-phone { font-weight: 700; color: #0A84FF; font-size: 14px; display: block;}
-
-    .bottom-action-card {
-      background: var(--bg-card); padding: 15px; border-radius: 16px; margin-top: 5px;
-      box-shadow: 0 -4px 15px var(--shadow); border: 1px solid var(--border);
-    }
-    .bottom-action-title { font-size: 14px; font-weight: 800; color: var(--text-main); margin-bottom: 10px; }
-
-    /* ================== Ô NHẬP LIỆU CHUNG & DROPDOWN ================== */
-    .smart-input-container { position: relative; margin-bottom: 15px; }
-    .smart-input {
-      width: 100%; padding: 15px; font-size: 16px; border: 1px solid var(--border); border-radius: 12px;
-      outline: none; box-sizing: border-box; background: var(--bg-input); color: var(--text-main); transition: 0.2s;
-    }
-    .smart-input:focus { border-color: #34C759; box-shadow: 0 0 0 3px rgba(52,199,89,0.1);}
-    
-    .smart-dropdown {
-      position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 12px; max-height: 180px; overflow-y: auto; z-index: 100; display: none;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.2); margin-top: 5px;
-    }
-    .smart-dropdown-item {
-      padding: 12px 15px; border-bottom: 1px solid var(--border-light); cursor: pointer; 
-      font-size: 15px; font-weight: 700; color: var(--text-main); text-align: left;
-    }
-    .smart-dropdown-item:last-child { border-bottom: none; }
-    .smart-dropdown-item:active { background: var(--bg-hover); }
-    
-    .btn-green-large {
-      width: 100%; background: #34C759; color: white; padding: 16px; border: none;
-      border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.2s;
-    }
-    .btn-green-large:active { background: #2E7D32; transform: scale(0.98);}
-
-    .btn-blue-large {
-      width: 100%; background: #0A84FF; color: white; padding: 16px; border: none;
-      border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.2s;
-    }
-    .btn-blue-large:active { background: #0056b3; transform: scale(0.98);}
-
-    .input-label { font-size: 14px; font-weight: 800; color: var(--text-sub); margin-bottom: 8px; display: block;}
-
-    /* ================== THÔNG BÁO TỰ TẠO (CUSTOM DIALOG) ================== */
-    .custom-dialog-box {
-      background: var(--bg-card); width: 85%; max-width: 320px; border-radius: 20px; padding: 25px 20px 20px 20px;
-      text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); transform: scale(0.9); opacity: 0;
-      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); margin: auto; border: 1px solid var(--border);
-    }
-    #custom-dialog-wrapper.show .custom-dialog-box { transform: scale(1); opacity: 1; }
-    .dialog-title { font-size: 18px; font-weight: 800; color: var(--text-main); margin: 0 0 10px 0; }
-    .dialog-message { font-size: 14px; color: var(--text-sub); margin: 0 0 20px 0; line-height: 1.4; }
-    .dialog-buttons { display: flex; gap: 10px; }
-    .btn-dialog { flex: 1; padding: 12px; border-radius: 10px; font-weight: bold; border: none; font-size: 15px; cursor: pointer; color: white;}
+    /* MODAL CHỌN ĐẠN TỪ DANH MỤC */
+    .modal-full { width: 95%; max-width: 600px; max-height: 85vh; padding: 15px; display: flex; flex-direction: column; }
+    .modal-list-container { flex: 1; overflow-y: auto; text-align: left; margin-top: 10px; border: 1px solid var(--border-light); border-radius: 10px; }
+    .modal-list-item { padding: 12px; border-bottom: 1px solid var(--border-light); font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+    .modal-list-item:active { background: var(--input-bg); }
   </style>
 </head>
 <body>
 
-  <!-- DATALIST ẨN ĐỂ GỢI Ý MẶC ĐỊNH TRÌNH DUYỆT -->
-  <datalist id="group-suggestions"></datalist>
+  <div class="dash-header">
+    <h2 id="app-title">DANH MỤC ĐẠN</h2>
+  </div>
 
   <div class="container">
-    <div class="dash-header">
-      <span style="font-size: 28px;">📇</span>
-      <h2>DANH BẠ NỘI BỘ</h2>
-    </div>
-
-    <!-- TÌM KIẾM & NÚT THÊM -->
-    <div class="top-controls">
-      <div class="search-row">
-        <input type="text" id="search-contact" class="search-input" placeholder="🔍 Tìm kiếm tên, SĐT..." onkeyup="searchContacts()">
-        <!-- NÚT ẨN HIỆN MENU -->
-        <button class="btn-toggle-menu" onclick="toggleContactToolbar()">⚏</button>
-      </div>
-
-      <div class="action-buttons-row" id="contact-action-toolbar">
-        <button class="btn-act btn-setting" onclick="openGroupSettingsModal()" title="Cài đặt Nhóm">⚙️</button>
-        <div style="position: relative; flex: 1;">
-          <button class="btn-act btn-pending" style="width:100%;" onclick="openPendingModal()" title="Kho chờ duyệt">📥</button>
-          <span id="pending-badge" class="pending-badge">0</span>
-        </div>
-        <button class="btn-act btn-file" onclick="document.getElementById('contact-file-upload').click()" title="Nhập từ file CSV/VCF/JSON">📁</button>
-        <button class="btn-act btn-device" onclick="importFromContacts()" title="Nhập từ điện thoại">📇</button>
-        <button class="btn-act btn-add-manual" onclick="openContactModal()" title="Thêm thủ công">+</button>
-      </div>
-      
-      <input type="file" id="contact-file-upload" style="display:none;" accept=".csv, .vcf, text/csv, text/vcard, application/json, .json" onchange="handleContactFileUpload(event)">
-    </div>
-
-    <!-- KHU VỰC HIỂN THỊ ĐỘNG (THƯ MỤC / DANH SÁCH) -->
-    <div id="view-folder-list"></div>
-
-    <div id="view-inner-folder" style="display:none;">
-      <div class="back-header">
-        <div onclick="closeFolderView()" style="display:flex; align-items:center; gap:5px; cursor:pointer;">
-            <span class="back-btn-text">❮ Trở lại</span>
-        </div>
-        <h3 id="inner-folder-title" class="inner-folder-title">Tên Nhóm</h3>
-        <button id="btn-sort-az" class="btn-sort-az" onclick="sortContactsAZ()">A-Z ↓</button>
-      </div>
-      <div id="inner-contact-list"></div>
-    </div>
     
-    <div id="view-search-results" style="display:none;"></div>
-  </div>
-
-  <!-- ======================================================= -->
-  <!-- MODAL CÀI ĐẶT NHÓM & QUẢN TRỊ DỮ LIỆU -->
-  <!-- ======================================================= -->
-  <div id="group-settings-modal" class="modal-overlay" onclick="if(event.target === this) closeGroupSettingsModal()">
-    <div class="modal-content">
-      <div class="pull-bar"></div>
-      <div class="modal-head" style="margin-bottom: 10px;">
-        <h3 class="modal-title">Cài Đặt Hệ Thống</h3>
-        <button class="btn-close-modal" onclick="closeGroupSettingsModal()">✕</button>
+    <!-- ==================== TAB 1: DANH MỤC (GỐC) ==================== -->
+    <div id="tab-danh-muc" class="tab-content active">
+      <div class="search-bar-container">
+        <input type="text" id="search-danh-muc" class="search-input" placeholder="Tìm kiếm danh mục..." onkeyup="debounceTimKiem()">
+        <button class="action-btn" style="background:var(--warning-color)" onclick="toggleCaiDatDanhMuc(); haptic();">⚙️</button>
+        <button class="action-btn" style="background:var(--success-color)" onclick="document.getElementById('excel-upload').click(); haptic();">+</button>
+        <input type="file" id="excel-upload" style="display:none;" accept=".xlsx, .xls, .csv" onchange="xuLyFileExcel(event)">
       </div>
 
-      <!-- Thống kê tổng quan -->
-      <div id="stats-overview" style="text-align:center; padding: 12px; background: var(--bg-hover); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 20px; font-size: 13px; font-weight: 600; color: var(--text-sub);">
-         📊 Đang quản lý <b style="color:#0A84FF; font-size:15px;" id="stat-contacts">0</b> liên hệ / <b style="color:#FF9500; font-size:15px;" id="stat-groups">0</b> nhóm.
-      </div>
-
-      <div style="font-size:12px; color:#1976D2; font-weight:800; margin-bottom:10px; text-transform: uppercase;">⚡ TẠO NHÓM MỚI</div>
-      <div class="group-input-wrapper">
-        <input type="text" id="new-group-input" placeholder="Tên nhóm công việc...">
-        <button onclick="addNewGroup()">THÊM</button>
-      </div>
-
-      <div style="font-size:12px; color:#1976D2; font-weight:800; margin-bottom:10px; text-transform: uppercase;">📂 QUẢN LÝ DANH SÁCH</div>
-      <div class="setting-list-box">
-        <div id="group-settings-list" style="max-height:25vh; overflow-y:auto;"></div>
-      </div>
-
-      <!-- QUẢN TRỊ DỮ LIỆU (Dọn dẹp & Thùng rác) -->
-      <div style="font-size:12px; color:#34C759; font-weight:800; margin-bottom:10px; text-transform: uppercase;">🧹 DỌN DẸP & BẢO VỆ DỮ LIỆU</div>
-      <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-        <button onclick="cleanupContacts()" class="btn-green-large" style="margin:0; background:rgba(52,199,89,0.15); color:#2E7D32; font-size:13px; padding:12px;">🧹 DỌN TRÙNG LẶP</button>
-        <button onclick="openTrashModal()" class="btn-green-large" style="margin:0; background:rgba(255,59,48,0.15); color:#FF3B30; font-size:13px; padding:12px;">🗑️ THÙNG RÁC</button>
-      </div>
-
-      <!-- KHU VỰC XUẤT DỮ LIỆU & CẬP NHẬT -->
-      <div style="font-size:12px; color:#1976D2; font-weight:800; margin-bottom:10px; text-transform: uppercase;">💾 DỮ LIỆU & CẬP NHẬT</div>
-      <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-        <button onclick="exportContactsCSV()" class="btn-green-large" style="margin:0; background:#FF9500; font-size:13px; padding:12px;">📄 XUẤT CSV</button>
-        <button onclick="exportContactsBackup()" class="btn-green-large" style="margin:0; background:#AF52DE; font-size:13px; padding:12px;">📦 XUẤT BẢN SAO LƯU (.JSON)</button>
-      </div>
-      <button onclick="capNhatApp()" class="btn-blue-large" style="margin:0; background:var(--bg-hover); color:#FF3B30; border:1px solid var(--border); font-size:14px; padding:12px; margin-bottom:10px;">♻️ CẬP NHẬT ỨNG DỤNG WEB</button>
-    </div>
-  </div>
-
-  <!-- ======================================================= -->
-  <!-- MODAL THÙNG RÁC -->
-  <!-- ======================================================= -->
-  <div id="trash-modal" class="modal-overlay" onclick="if(event.target === this) closeTrashModal()">
-    <div class="modal-content">
-      <div class="pull-bar"></div>
-      <div class="modal-head">
-        <h3 class="modal-title" style="color: #FF3B30;">🗑️ Thùng Rác</h3>
-        <button class="btn-close-modal" onclick="closeTrashModal()">✕</button>
-      </div>
-      <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center;">
-         <span style="font-size:13px; color:var(--text-sub);">Lưu trữ liên hệ đã xóa.</span>
-         <button onclick="emptyTrash()" style="background:none; border:none; color:#FF3B30; font-weight:bold; cursor:pointer; padding:5px;">Xóa tất cả</button>
-      </div>
-      <div id="trash-list-container" style="flex:1; overflow-y:auto; padding-bottom: 10px;"></div>
-    </div>
-  </div>
-
-  <!-- ======================================================= -->
-  <!-- MODAL MÃ QR CODE -->
-  <!-- ======================================================= -->
-  <div id="qr-modal" class="modal-overlay" onclick="if(event.target === this) closeQRModal()">
-    <div class="modal-content" style="align-items:center; padding-bottom:40px;">
-      <div class="pull-bar"></div>
-      <h3 class="modal-title" id="qr-name" style="margin-bottom:20px; text-align:center; font-size: 22px;">Tên</h3>
-      <div id="qr-code-img" style="background:#fff; padding:15px; border-radius:16px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);"></div>
-      <p style="color:var(--text-sub); margin-top:20px; font-size:14px; text-align:center;">Đưa camera điện thoại quét mã này<br>để lưu nhanh vào danh bạ.</p>
-      <button onclick="closeQRModal()" class="btn-blue-large" style="margin-top:20px; max-width: 250px;">ĐÓNG QUÉT MÃ</button>
-    </div>
-  </div>
-
-  <!-- ======================================================= -->
-  <!-- MODAL KHO CHỜ DUYỆT -->
-  <!-- ======================================================= -->
-  <div id="pending-modal" class="modal-overlay" onclick="if(event.target === this) closePendingModal()">
-    <div class="modal-content" style="max-height: 95vh; padding-bottom: 20px;">
-      <div class="pull-bar"></div>
-      <div class="modal-head">
-        <h3 class="modal-title" style="display:flex; align-items:center; gap:8px;">📥 Kho Chờ Duyệt</h3>
-        <button class="btn-close-modal" onclick="closePendingModal()">✕</button>
-      </div>
-
-      <input type="text" id="search-pending" class="smart-input" style="margin-bottom: 15px; padding: 10px 15px;" placeholder="🔍 Tìm tên hoặc số điện thoại..." onkeyup="searchPending()">
-      
-      <div class="pending-header-row">
-        <label style="display:flex; align-items:center; cursor:pointer; gap:10px;">
-          <input type="checkbox" id="chk-select-all-pending" class="custom-checkbox" onchange="toggleSelectAllPending()"> 
-          <span class="text-blue-bold" id="selected-count-text">Chọn tất cả</span>
-        </label>
-        <button onclick="deleteSelectedPending()" class="text-red-bold">Xóa đã chọn</button>
-      </div>
-
-      <div id="pending-list-container" class="pending-list"></div>
-      
-      <div class="bottom-action-card">
-        <div class="bottom-action-title">Xếp các số ĐÃ CHỌN vào Nhóm:</div>
-        <div class="smart-input-container" style="margin-bottom: 10px;">
-          <input type="text" id="pending-group-input" class="smart-input" placeholder="Gõ tìm hoặc tạo nhóm mới..." 
-                 onfocus="showGroupDropdown('pending-dropdown', 'pending-group-input')" 
-                 onkeyup="filterGroupDropdown(this.value, 'pending-dropdown', 'pending-group-input')"
-                 autocomplete="off">
-          <div id="pending-dropdown" class="smart-dropdown"></div>
+      <div id="panel-cai-dat-danh-muc" class="setting-panel">
+        <div style="text-align: center; color: var(--warning-color); font-weight: 800; margin-bottom: 10px;">CÀI ĐẶT BẢNG</div>
+        <div class="set-row">
+          <span>Cỡ chữ (px):</span>
+          <input type="number" id="set-fontsize" step="0.25" placeholder="VD: 14" style="width: 100px !important; padding: 8px !important; font-size: 16px !important; border-radius:6px; background:var(--input-bg); border: 1px solid var(--border-light); color:var(--text-main);" value="14">
         </div>
-        <button onclick="saveSelectedPendingToMain()" class="btn-green-large">XÁC NHẬN ĐƯA VÀO DANH BẠ</button>
+        <div id="danh-sach-cot-cai-dat"></div>
+        <button onclick="luuCaiDatDanhMuc()" class="btn" style="background:var(--warning-color); padding:12px; margin-bottom:0; margin-top:10px;">LƯU VÀ ÁP DỤNG</button>
       </div>
+
+      <div class="card" style="padding: 0; overflow: hidden; border-radius: 12px; border: none;">
+        <div class="table-container">
+          <table id="bang-danh-muc">
+            <thead><tr id="dm-header"><th>DỮ LIỆU DANH MỤC</th></tr></thead>
+            <tbody id="dm-body"><tr><td style="color:var(--text-sub); padding: 30px;">Chưa có dữ liệu.<br><br>Bấm nút <b>+</b> để tải file Excel.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB 2: LỆNH XUẤT ==================== -->
+    <div id="tab-lenh" class="tab-content">
+      <div class="card">
+        <button class="btn" style="background: var(--primary-color); margin-bottom: 15px;" onclick="moModalChonDan()"><span style="font-size:18px">🔍</span> Chọn đạn từ Danh mục</button>
+        
+        <div class="form-group">
+          <label>Tên đạn dược</label>
+          <input type="text" id="lenh-ten" class="form-control" placeholder="Tự động điền..." readonly>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group" style="flex: 0.8">
+            <label>ĐVT</label>
+            <input type="text" id="lenh-dvt" class="form-control" placeholder="ĐVT" readonly>
+          </div>
+          <div class="form-group" style="flex: 0.8">
+            <label>Cấp</label>
+            <input type="number" id="lenh-cap" class="form-control" placeholder="Cấp">
+          </div>
+          <div class="form-group" style="flex: 1.4">
+            <label>Số lượng (Phải xuất)</label>
+            <input type="number" id="lenh-sl" class="form-control" placeholder="Số lượng">
+          </div>
+        </div>
+        
+        <button class="btn" onclick="themVaoLenh()" style="margin-bottom:0; margin-top: 5px;">+ THÊM VÀO LỆNH XUẤT</button>
+      </div>
+
+      <div class="card" style="padding:0; overflow:hidden; border:none;">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 40px;">STT</th>
+                <th style="width: 150px;">Tên đạn dược</th>
+                <th style="width: 50px;">ĐVT</th>
+                <th style="width: 50px;">Cấp</th>
+                <th style="width: 70px;">Số lượng</th>
+                <th style="width: 60px;">Xóa</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-lenh">
+              <!-- Render logic -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB 3: THỰC HIỆN ==================== -->
+    <div id="tab-thuc-hien" class="tab-content">
+      <div class="card">
+        <div class="form-group">
+          <label>Xe thực hiện (Số xe / Tên xe)</label>
+          <input type="text" id="th-xe" class="form-control" placeholder="VD: Xe 01 hoặc 29A-12345">
+        </div>
+        
+        <div class="form-group">
+          <label>Chọn loại đạn cần xuất (Từ Lệnh)</label>
+          <select id="th-chon-lenh" class="form-control" onchange="tuDongDienCapTuLenh()">
+            <option value="">-- Chưa có Lệnh xuất nào --</option>
+          </select>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Cấp (Thực tế)</label>
+            <input type="number" id="th-cap" class="form-control" placeholder="Cấp">
+          </div>
+          <div class="form-group">
+            <label>Số lượng (Thực xuất)</label>
+            <input type="number" id="th-sl" class="form-control" placeholder="Số lượng">
+          </div>
+        </div>
+        
+        <button class="btn" onclick="themVaoThucHien()" style="margin-bottom:0; margin-top: 5px; background:var(--warning-color)">+ GHI SỔ XE</button>
+      </div>
+
+      <div class="card" style="padding:0; overflow:hidden; border:none;">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 80px;">Xe</th>
+                <th style="width: 150px;">Tên đạn dược</th>
+                <th style="width: 50px;">ĐVT</th>
+                <th style="width: 50px;">Cấp</th>
+                <th style="width: 70px;">SL Giao</th>
+                <th style="width: 60px;">Xóa</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-thuc-hien">
+              <!-- Render logic -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div> <!-- End Container -->
+
+  <!-- ==================== BOTTOM NAVIGATION ==================== -->
+  <div class="bottom-nav">
+    <div class="nav-item active" id="nav-danh-muc" onclick="chuyenTab('tab-danh-muc', 'DANH MỤC ĐẠN', 'nav-danh-muc')">
+      <div class="nav-icon">📋</div>
+      <div>Danh Mục</div>
+    </div>
+    <div class="nav-item" id="nav-lenh" onclick="chuyenTab('tab-lenh', 'LỆNH PHẢI XUẤT', 'nav-lenh')">
+      <div class="nav-icon">📝</div>
+      <div>Lệnh Xuất</div>
+    </div>
+    <div class="nav-item" id="nav-thuc-hien" onclick="chuyenTab('tab-thuc-hien', 'THỰC XUẤT CHO XE', 'nav-thuc-hien')">
+      <div class="nav-icon">🚚</div>
+      <div>Thực Hiện</div>
     </div>
   </div>
 
-  <!-- ======================================================= -->
-  <!-- MODAL THÊM/SỬA LIÊN HỆ THỦ CÔNG -->
-  <!-- ======================================================= -->
-  <div id="contact-modal" class="modal-overlay" onclick="if(event.target === this) closeContactModal()">
-    <div class="modal-content">
-      <div class="pull-bar"></div>
-      <div class="modal-head">
-        <h3 class="modal-title" id="contact-modal-title">Thêm Liên Hệ</h3>
-        <button class="btn-close-modal" onclick="closeContactModal()">✕</button>
-      </div>
-      
-      <input type="hidden" id="contact-id">
-      
-      <label class="input-label">Tên liên hệ:</label>
-      <input type="text" id="contact-name" class="smart-input" style="margin-bottom:15px;" placeholder="VD: Nguyễn Văn A" />
-      
-      <label class="input-label">Số điện thoại:</label>
-      <input type="tel" id="contact-phone" class="smart-input" style="margin-bottom:15px;" placeholder="VD: 0987654321" />
-      
-      <label class="input-label">Nhóm / Chức vụ:</label>
-      <div class="smart-input-container" style="margin-bottom:0;">
-        <input type="text" id="manual-group-input" class="smart-input" style="margin-bottom:0;" placeholder="Gõ tìm hoặc tạo nhóm mới..." 
-               onfocus="showGroupDropdown('manual-dropdown', 'manual-group-input')" 
-               onkeyup="filterGroupDropdown(this.value, 'manual-dropdown', 'manual-group-input')"
-               autocomplete="off">
-        <div id="manual-dropdown" class="smart-dropdown"></div>
-      </div>
-
-      <div style="display:flex; gap:10px; margin-top: 20px;">
-        <button id="btn-delete-contact" onclick="deleteContact()" style="background:rgba(255,59,48,0.15); color:#FF3B30; display:none; flex: 0.4; padding: 16px; border-radius: 12px; font-weight: bold; border: none; cursor: pointer;">XÓA</button>
-        <button onclick="saveContact()" class="btn-blue-large" style="margin-top:0; flex: 1;">LƯU LIÊN HỆ</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ======================================================= -->
-  <!-- HỘP THOẠI THÔNG BÁO TỰ TẠO (CUSTOM DIALOG) -->
-  <!-- ======================================================= -->
-  <div id="custom-dialog-wrapper" class="modal-overlay" style="z-index: 10005;">
+  <!-- Custom Dialog Box Chung -->
+  <div id="custom-dialog-wrapper" class="modal-overlay">
     <div class="custom-dialog-box">
       <h3 id="dialog-title" class="dialog-title">Thông báo</h3>
       <p id="dialog-message" class="dialog-message">Nội dung</p>
-      <input type="text" id="dialog-prompt-input" style="display:none; width: 100%; padding: 12px; font-size: 16px; border: 1px solid var(--border); border-radius: 10px; outline: none; box-sizing: border-box; background: var(--bg-input); color: var(--text-main); text-align: center; margin-bottom: 20px;">
       <div id="dialog-buttons" class="dialog-buttons"></div>
     </div>
   </div>
 
+  <!-- Modal Bảng chọn đạn -->
+  <div id="modal-chon-dan" class="modal-overlay">
+    <div class="custom-dialog-box modal-full">
+      <h3 class="dialog-title">Tìm và Chọn Đạn</h3>
+      <input type="text" id="search-modal-dan" class="form-control" placeholder="Tìm tên đạn..." onkeyup="timKiemModalDan()">
+      <div class="modal-list-container" id="modal-danh-sach-dan">
+        <!-- Render list -->
+      </div>
+      <button class="btn-dialog" style="margin-top:15px; background:var(--text-sub)" onclick="dongModalChonDan()">HỦY BỎ</button>
+    </div>
+  </div>
+
 <script>
-  // ================== HÀM TIỆN ÍCH ==================
-  function genId() { return Date.now().toString() + Math.floor(Math.random() * 1000000).toString(); }
+  function haptic() { if (navigator.vibrate) navigator.vibrate(15); }
 
-  // Mã màu ngẫu nhiên nhưng cố định cho từng Tên
-  window.getAvatarColor = function(str) {
-      let hash = 0;
-      for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
-      let c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
-      return '#' + '00000'.substring(0, 6 - c.length) + c;
-  };
-  
-  // Lấy chữ cái đầu của Tên
-  window.getInitials = function(name) {
-      if(!name) return '?';
-      let parts = name.trim().split(' ');
-      if(parts.length >= 2) return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
-      return name.substring(0, 2).toUpperCase();
+  // 1. STATE MANAGEMENT NÂNG CẤP
+  const STATE = {
+    excel: { data: [], config: { fontSize: 14, cot: {} } },
+    lenh: [],       // Mảng chứa: { id, ten, dvt, cap, sl }
+    thucHien: []    // Mảng chứa: { id, lenhId, xe, ten, dvt, cap, sl }
   };
 
-  // HÀM CHUẨN HÓA SỐ ĐIỆN THOẠI (+84 -> 0) ĐỂ CHỐNG TRÙNG
-  window.normalizePhone = function(phone) {
-      if (!phone) return '';
-      let cleaned = String(phone).replace(/[\s\-().]/g, '');
-      if (cleaned.startsWith('+84')) cleaned = '0' + cleaned.substring(3);
-      else if (cleaned.startsWith('84') && cleaned.length > 9) cleaned = '0' + cleaned.substring(2);
-      return cleaned;
+  // 2. TIỆN ÍCH AN TOÀN
+  function escapeHTML(str) {
+      if (str === null || str === undefined) return '';
+      return String(str).replace(/[&<>'"]/g, tag => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+      }[tag] || tag));
   }
 
-  // Cập nhật App (Bỏ Cache)
-  window.capNhatApp = function() {
-      showDialog("Cập nhật Ứng dụng", "Làm mới ứng dụng để nhận phiên bản Web mới nhất?<br><br>(Quá trình này không làm mất dữ liệu)", "confirm", () => {
-          const url = new URL(window.location.href);
-          url.searchParams.set('v', Date.now()); 
-          window.location.replace(url.toString());
-      });
+  function generateID() {
+      return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
 
-  // Custom Dialog
-  window.showDialog = function(title, message, type, confirmCallback, defaultValue = '') {
-      document.getElementById('dialog-title').innerText = title;
+  // Khởi tạo
+  document.addEventListener('DOMContentLoaded', () => { 
+      try {
+          // Load Danh mục
+          let savedDanhMuc = localStorage.getItem('duLieuExcelOffline'); 
+          if (savedDanhMuc) { 
+              STATE.excel.data = JSON.parse(savedDanhMuc); 
+              let savedConfig = localStorage.getItem('cauHinhBangExcel'); 
+              if (savedConfig) STATE.excel.config = JSON.parse(savedConfig); 
+              else taoCauHinhMacDinh(); 
+              hienThiBangDanhMuc(STATE.excel.data); 
+          }
+
+          // Load Lệnh
+          let savedLenh = localStorage.getItem('duLieuLenh');
+          if (savedLenh) STATE.lenh = JSON.parse(savedLenh);
+
+          // Load Thực hiện
+          let savedThucHien = localStorage.getItem('duLieuThucHien');
+          if (savedThucHien) STATE.thucHien = JSON.parse(savedThucHien);
+
+          renderBangLenh();
+          renderBangThucHien();
+
+      } catch (error) {
+          console.error("Lỗi parse dữ liệu từ LocalStorage:", error);
+          showDialog("Lỗi Dữ Liệu", "Khôi phục dữ liệu thất bại do lỗi cấu trúc.", "alert");
+      }
+  });
+
+  // --- DIALOG CHUNG ---
+  window.showDialog = function(title, message, type = 'alert', confirmFn = null) {
+      haptic();
+      document.getElementById('dialog-title').innerText = title; 
       document.getElementById('dialog-message').innerHTML = message; 
-      
       let btnContainer = document.getElementById('dialog-buttons');
-      let promptInput = document.getElementById('dialog-prompt-input');
-      
-      if (type === 'prompt') { promptInput.style.display = 'block'; promptInput.value = defaultValue; } 
-      else { promptInput.style.display = 'none'; }
-      
       btnContainer.innerHTML = '';
-      let wrapper = document.getElementById('custom-dialog-wrapper');
-      wrapper.style.display = 'flex';
+      
+      let wrapper = document.getElementById('custom-dialog-wrapper'); 
+      wrapper.style.display = 'flex'; 
       setTimeout(() => wrapper.classList.add('show'), 10);
 
-      window.closeDialog = function() {
-          wrapper.classList.remove('show');
-          setTimeout(() => wrapper.style.display = 'none', 300);
+      window.closeDialog = function() { 
+          wrapper.classList.remove('show'); 
+          setTimeout(() => wrapper.style.display = 'none', 300); 
       };
 
       if (type === 'alert') {
-          btnContainer.innerHTML = `<button onclick="closeDialog()" class="btn-dialog" style="background:#0A84FF;">ĐÓNG</button>`;
+          btnContainer.innerHTML = `<button onclick="closeDialog()" class="btn-dialog">ĐÓNG</button>`;
       } else if (type === 'confirm') {
+          window.execConfirm = function() { closeDialog(); if(confirmFn) confirmFn(); }
           btnContainer.innerHTML = `
-              <button onclick="closeDialog()" class="btn-dialog" style="background:var(--bg-hover); color:var(--text-main); border:1px solid var(--border);">HỦY</button>
-              <button id="dialog-confirm-btn" class="btn-dialog" style="background:#FF3B30;">ĐỒNG Ý</button>
+            <button onclick="closeDialog()" class="btn-dialog" style="background:var(--text-sub)">HỦY</button>
+            <button onclick="execConfirm()" class="btn-dialog" style="background:var(--danger-color)">XÓA</button>
           `;
-          document.getElementById('dialog-confirm-btn').onclick = function() { closeDialog(); if(confirmCallback) confirmCallback(); };
-      } else if (type === 'prompt') {
-          btnContainer.innerHTML = `
-              <button onclick="closeDialog()" class="btn-dialog" style="background:var(--bg-hover); color:var(--text-main); border:1px solid var(--border);">HỦY</button>
-              <button id="dialog-confirm-btn" class="btn-dialog" style="background:#34C759;">LƯU</button>
-          `;
-          document.getElementById('dialog-confirm-btn').onclick = function() { let val = promptInput.value; closeDialog(); if(confirmCallback) confirmCallback(val); };
       }
   }
 
-  // ================== STATE MANAGEMENT ==================
-  const STATE = {
-    contacts: [], 
-    groups: [],
-    pending: [],
-    trash: [], // Lưu trữ liên hệ đã xóa (Thùng rác)
-    selectedPendingIds: [], 
-    activeDropdownId: null,
-    currentFolder: null 
-  };
+  // --- LOGIC CHUYỂN TAB ---
+  function chuyenTab(tabId, title, navId) {
+      haptic();
+      // Ẩn tất cả tab
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      
+      // Hiển thị tab được chọn
+      document.getElementById(tabId).classList.add('active');
+      document.getElementById(navId).classList.add('active');
+      document.getElementById('app-title').innerText = title;
 
-  window.onload = () => {
-    let savedContacts = localStorage.getItem('appContactsStandalone');
-    STATE.contacts = savedContacts ? JSON.parse(savedContacts) : [];
-
-    let savedGroups = localStorage.getItem('appGroupsStandalone');
-    if (savedGroups) STATE.groups = JSON.parse(savedGroups);
-    else { STATE.groups = ['Ban Chỉ Huy', 'Khẩn cấp', 'Đội Trực']; localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups)); }
-
-    let savedPending = localStorage.getItem('appPendingContacts');
-    if (savedPending) STATE.pending = JSON.parse(savedPending);
-
-    let savedTrash = localStorage.getItem('appTrashStandalone');
-    if (savedTrash) STATE.trash = JSON.parse(savedTrash);
-
-    updateDataLists(); renderMainView(); updatePendingBadge();
-    document.addEventListener('click', function(e) { if (!e.target.closest('.smart-input-container')) hideAllDropdowns(); });
-  };
-
-  window.updateDataLists = function() {
-      const datalist = document.getElementById('group-suggestions');
-      if(datalist) datalist.innerHTML = STATE.groups.map(g => `<option value="${g}">`).join('');
-  }
-
-  window.updatePendingBadge = function() {
-      let badge = document.getElementById('pending-badge');
-      if (STATE.pending.length > 0) { badge.innerText = STATE.pending.length > 99 ? '99+' : STATE.pending.length; badge.style.display = 'block'; } 
-      else { badge.style.display = 'none'; }
-  }
-
-  window.updateStats = function() {
-      let elC = document.getElementById('stat-contacts');
-      let elG = document.getElementById('stat-groups');
-      if(elC) elC.innerText = STATE.contacts.length;
-      if(elG) elG.innerText = STATE.groups.length;
-  }
-
-  // Ẩn/Hiện thanh công cụ (Toolbar)
-  window.toggleContactToolbar = function() {
-      let tb = document.getElementById('contact-action-toolbar');
-      if(tb.style.maxHeight === '0px' || tb.style.maxHeight === '0') {
-          tb.style.maxHeight = '100px'; tb.style.marginBottom = '20px'; tb.style.opacity = '1';
-      } else {
-          tb.style.maxHeight = '0px'; tb.style.marginBottom = '0px'; tb.style.opacity = '0';
+      // Logic cập nhật UI khi vào tab cụ thể
+      if(tabId === 'tab-thuc-hien') {
+          capNhatDropdownLenh();
       }
   }
 
-  // ================== DROPDOWN NHÓM THÔNG MINH ==================
-  window.showGroupDropdown = function(dropdownId, inputId) {
-      hideAllDropdowns();
-      let dropdown = document.getElementById(dropdownId);
-      if(!dropdown) return;
-      dropdown.style.display = 'block';
-      STATE.activeDropdownId = dropdownId;
-      
-      let html = STATE.groups.map(g => `<div class="smart-dropdown-item" onclick="selectGroupItem('${g}', '${inputId}')">${g}</div>`).join('');
-      if(STATE.groups.length === 0) html = `<div style="padding:10px; color:var(--text-muted); font-size:13px; text-align:center;">Chưa có nhóm nào.</div>`;
-      dropdown.innerHTML = html;
+  // =========================================================
+  // LOGIC TAB 1: DANH MỤC EXCEL (Đã tối ưu & giữ nguyên)
+  // =========================================================
+  let timeoutTimKiem = null;
+  function debounceTimKiem() {
+      if (timeoutTimKiem) clearTimeout(timeoutTimKiem);
+      timeoutTimKiem = setTimeout(() => timKiemDanhMuc(), 300); 
   }
 
-  window.filterGroupDropdown = function(keyword, dropdownId, inputId) {
-      let dropdown = document.getElementById(dropdownId);
-      if(!dropdown) return;
-      dropdown.style.display = 'block';
-      
-      let filtered = STATE.groups.filter(g => g.toLowerCase().includes(keyword.toLowerCase()));
-      let html = filtered.map(g => `<div class="smart-dropdown-item" onclick="selectGroupItem('${g}', '${inputId}')">${g}</div>`).join('');
-      
-      if (keyword.trim() && !STATE.groups.some(g => g.toLowerCase() === keyword.toLowerCase())) {
-          html += `<div class="smart-dropdown-item" style="color:#0A84FF;" onclick="selectGroupItem('${keyword.trim()}', '${inputId}')">➕ Tạo nhóm mới: "${keyword.trim()}"</div>`;
+  function xuLyFileExcel(e) { 
+      haptic(); 
+      let file = e.target.files[0]; 
+      if (!file) return; 
+      let reader = new FileReader(); 
+      reader.onload = function(evt) { 
+          let data = new Uint8Array(evt.target.result); 
+          let workbook = XLSX.read(data, {type: 'array'}); 
+          let json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {defval: ""}); 
+          
+          if(json.length === 0) { 
+              showDialog("Lỗi", "File rỗng hoặc định dạng sai!", "alert"); 
+              e.target.value = ''; return; 
+          } 
+          
+          let cleanedJson = json.map(row => { 
+              let newRow = {}; 
+              for (let key in row) { if (!key.startsWith('__EMPTY')) { newRow[key] = row[key]; } } 
+              return newRow; 
+          }); 
+          STATE.excel.data = cleanedJson; 
+          
+          try { localStorage.setItem('duLieuExcelOffline', JSON.stringify(STATE.excel.data)); } 
+          catch (e) { showDialog("Cảnh báo", "File quá lớn, chỉ xem tạm thời.", "alert"); }
+
+          taoCauHinhMacDinh(); 
+          hienThiBangDanhMuc(STATE.excel.data); 
+          showDialog("Thành công", "Tải danh mục xong! Bạn có thể sang tab Lệnh Xuất.", "alert"); 
+          e.target.value = ''; 
+      }; 
+      reader.readAsArrayBuffer(file); 
+  }
+
+  function taoCauHinhMacDinh() { 
+      if (STATE.excel.data.length === 0) return;
+      let cacCot = Object.keys(STATE.excel.data[0]).filter(c => !c.startsWith('__EMPTY')); 
+      let defaultWidth = Math.floor(100 / cacCot.length); 
+      STATE.excel.config.cot = {}; 
+      cacCot.forEach(c => { STATE.excel.config.cot[c] = { show: true, width: defaultWidth }; }); 
+      if(cacCot[0]) STATE.excel.config.cot[cacCot[0]].width = 50; 
+      try { localStorage.setItem('cauHinhBangExcel', JSON.stringify(STATE.excel.config)); } catch(e) {}
+  }
+
+  function toggleCaiDatDanhMuc() { 
+      haptic(); 
+      let panel = document.getElementById('panel-cai-dat-danh-muc'); 
+      if(panel.style.display === 'block') { panel.style.display = 'none'; return; } 
+      if(STATE.excel.data.length === 0) { showDialog("Lỗi", "Vui lòng tải file Excel lên trước!", "alert"); return; } 
+      document.getElementById('set-fontsize').value = STATE.excel.config.fontSize; 
+      let htmlCaiDatCot = Object.keys(STATE.excel.config.cot).map(tenCot => { 
+          if (tenCot.startsWith('__EMPTY')) return ''; 
+          let isChecked = STATE.excel.config.cot[tenCot].show ? "checked" : ""; 
+          let widthVal = STATE.excel.config.cot[tenCot].width; 
+          return `<div class="set-row"><label style="margin:0; display:flex; align-items:center; flex:1; cursor:pointer;"><input type="checkbox" id="chk-${tenCot}" style="transform:scale(1.3); margin-right:10px;" onchange="chuyenPhanTramTuDong('${tenCot}')" ${isChecked}> ${tenCot}</label><div style="display:flex; align-items:center;"><input type="number" id="width-${tenCot}" value="${widthVal}" style="width:60px; padding:4px; margin-bottom:0;" ${!STATE.excel.config.cot[tenCot].show ? 'disabled style="background:var(--bg-body);"' : ''}> <span style="margin-left:5px;">%</span></div></div>`; 
+      }).join(''); 
+      document.getElementById('danh-sach-cot-cai-dat').innerHTML = htmlCaiDatCot; 
+      panel.style.display = 'block'; 
+  }
+
+  function chuyenPhanTramTuDong(cotNay) { 
+       // Giữ nguyên logic tính % cột
+      let chk = document.getElementById('chk-' + cotNay); 
+      let inp = document.getElementById('width-' + cotNay); 
+      let soPhanTramHienTai = parseInt(inp.value) || 0; 
+      let tatCaCacCot = Object.keys(STATE.excel.config.cot).filter(c => !c.startsWith('__EMPTY')); 
+      let viTriHienTai = tatCaCacCot.indexOf(cotNay); 
+      if (!chk.checked) { 
+          inp.value = 0; inp.disabled = true; inp.style.background = "var(--bg-body)"; 
+          let daTimThayCotNhan = false; 
+          for (let i = viTriHienTai + 1; i < tatCaCacCot.length; i++) { 
+              let chkTiepTheo = document.getElementById('chk-' + tatCaCacCot[i]); 
+              if (chkTiepTheo && chkTiepTheo.checked) { 
+                  let inpTiepTheo = document.getElementById('width-' + tatCaCacCot[i]); 
+                  inpTiepTheo.value = (parseInt(inpTiepTheo.value) || 0) + soPhanTramHienTai; 
+                  daTimThayCotNhan = true; break; 
+              } 
+          } 
+          if (!daTimThayCotNhan) { 
+              for (let i = viTriHienTai - 1; i >= 0; i--) { 
+                  let chkPhiaTruoc = document.getElementById('chk-' + tatCaCacCot[i]); 
+                  if (chkPhiaTruoc && chkPhiaTruoc.checked) { 
+                      let inpPhiaTruoc = document.getElementById('width-' + tatCaCacCot[i]); 
+                      inpPhiaTruoc.value = (parseInt(inpPhiaTruoc.value) || 0) + soPhanTramHienTai; break; 
+                  } 
+              } 
+          } 
+      } else { inp.disabled = false; inp.style.background = "var(--input-bg)"; } 
+  }
+
+  function luuCaiDatDanhMuc() { 
+      haptic(); 
+      let rawFontSize = document.getElementById('set-fontsize').value;
+      STATE.excel.config.fontSize = parseFloat(rawFontSize.toString().replace(',', '.')) || 14; 
+      Object.keys(STATE.excel.config.cot).forEach(tenCot => { 
+          if(tenCot.startsWith('__EMPTY')) return; 
+          let el = document.getElementById(`chk-${tenCot}`); 
+          if(el) { 
+              STATE.excel.config.cot[tenCot].show = el.checked; 
+              let widthInput = parseInt(document.getElementById(`width-${tenCot}`).value); 
+              STATE.excel.config.cot[tenCot].width = isNaN(widthInput) ? 0 : widthInput; 
+          } 
+      }); 
+      try { localStorage.setItem('cauHinhBangExcel', JSON.stringify(STATE.excel.config)); } catch(e) {}
+      document.getElementById('panel-cai-dat-danh-muc').style.display = 'none'; 
+      timKiemDanhMuc(); 
+  }
+
+  function hienThiBangDanhMuc(data) { 
+      let thead = document.getElementById('dm-header'); 
+      let tbody = document.getElementById('dm-body'); 
+      if (!data || data.length === 0) { 
+          thead.innerHTML = "<th>DỮ LIỆU</th>"; 
+          tbody.innerHTML = "<tr><td style='color:var(--text-sub); padding: 30px;'>Không tìm thấy kết quả.</td></tr>"; 
+          return; 
+      } 
+      let cotHienThi = Object.keys(STATE.excel.config.cot).filter(c => STATE.excel.config.cot[c].show && !c.startsWith('__EMPTY')); 
+      thead.innerHTML = cotHienThi.map(cot => `<th style="width: ${STATE.excel.config.cot[cot].width}%;">${cot}</th>`).join(''); 
+      let fontSize = STATE.excel.config.fontSize + "px"; 
+      let htmlNoiDung = data.map(hang => { 
+          let cacOCuaHang = cotHienThi.map(cot => { 
+              let align = cotHienThi.indexOf(cot) === 0 ? "left" : "center"; 
+              return `<td style="text-align: ${align}; font-size: ${fontSize};">${escapeHTML(hang[cot] !== undefined ? hang[cot] : '')}</td>`; 
+          }).join(''); 
+          return `<tr>${cacOCuaHang}</tr>`; 
+      }).join(''); 
+      tbody.innerHTML = htmlNoiDung; 
+  }
+
+  function timKiemDanhMuc() { 
+      let tuKhoa = document.getElementById('search-danh-muc').value.toLowerCase(); 
+      if (!tuKhoa) { hienThiBangDanhMuc(STATE.excel.data); return; } 
+      let ketQua = STATE.excel.data.filter(hang => { 
+          return Object.values(hang).some(giaTri => String(giaTri).toLowerCase().includes(tuKhoa)); 
+      }); 
+      hienThiBangDanhMuc(ketQua); 
+  }
+
+  // =========================================================
+  // LOGIC TAB 2: LỆNH XUẤT (Kèm Auto-Map)
+  // =========================================================
+
+  // Hàm nội bộ: Bóc tách thông minh Tên và ĐVT từ 1 dòng của Excel
+  function trichXuatThongTinDan(hang) {
+      let keys = Object.keys(hang);
+      let tenCol = keys[0]; 
+      let dvtCol = keys.length > 1 ? keys[1] : keys[0];
+
+      for(let key of keys) {
+          let lk = key.toLowerCase();
+          if(lk.includes('tên') || lk.includes('đạn') || lk.includes('loại')) tenCol = key;
+          if(lk.includes('đvt') || lk.includes('đơn vị') || lk.includes('tính')) dvtCol = key;
       }
-      
-      if(!html) html = `<div style="padding:10px; color:var(--text-muted); font-size:13px; text-align:center;">Nhập để tạo mới...</div>`;
-      dropdown.innerHTML = html;
+      return { 
+          ten: hang[tenCol] !== undefined ? String(hang[tenCol]) : 'N/A', 
+          dvt: hang[dvtCol] !== undefined ? String(hang[dvtCol]) : '' 
+      };
   }
 
-  window.selectGroupItem = function(val, inputId) {
-      let input = document.getElementById(inputId);
-      if(input) input.value = val;
-      hideAllDropdowns();
-  }
-
-  window.hideAllDropdowns = function() {
-      document.querySelectorAll('.smart-dropdown').forEach(el => el.style.display = 'none');
-      STATE.activeDropdownId = null;
-  }
-
-  // ================== KIẾN TRÚC ĐIỀU HƯỚNG MỚI (FOLDERS & SEARCH) ==================
-  window.renderMainView = function() {
-      updateStats();
-      STATE.contacts.forEach(c => {
-          let g = c.group || 'Khác';
-          if (!STATE.groups.includes(g)) {
-              STATE.groups.unshift(g);
-              localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups));
-              updateDataLists();
-          }
-      });
-
-      let viewFolders = document.getElementById('view-folder-list');
-      let viewInner = document.getElementById('view-inner-folder');
-      let viewSearch = document.getElementById('view-search-results');
-
-      viewInner.style.display = 'none'; viewSearch.style.display = 'none'; viewFolders.style.display = 'block';
-      STATE.currentFolder = null;
-
-      if (STATE.groups.length === 0 && STATE.contacts.length === 0) {
-          viewFolders.innerHTML = '<div style="text-align:center; padding: 40px 20px; color:var(--text-muted); line-height: 1.5;">Chưa có liên hệ nào.<br>Hãy thêm hoặc tải lên file danh bạ.</div>';
+  function moModalChonDan() {
+      haptic();
+      if(STATE.excel.data.length === 0) {
+          showDialog("Lỗi", "Vui lòng tải File Excel Danh Mục ở tab đầu tiên trước.", "alert");
           return;
       }
+      document.getElementById('search-modal-dan').value = '';
+      renderListModalDan(STATE.excel.data);
+      let wrapper = document.getElementById('modal-chon-dan');
+      wrapper.style.display = 'flex';
+      setTimeout(() => wrapper.classList.add('show'), 10);
+  }
 
-      let html = STATE.groups.map(g => {
-          let count = STATE.contacts.filter(c => c.group === g).length;
+  function dongModalChonDan() {
+      let wrapper = document.getElementById('modal-chon-dan');
+      wrapper.classList.remove('show');
+      setTimeout(() => wrapper.style.display = 'none', 300);
+  }
+
+  function renderListModalDan(data) {
+      let container = document.getElementById('modal-danh-sach-dan');
+      if(data.length === 0) {
+          container.innerHTML = '<div style="padding:20px; text-align:center; color:gray;">Không tìm thấy đạn.</div>';
+          return;
+      }
+      // Chỉ hiển thị tối đa 100 kết quả để tránh lag modal trên mobile
+      let hienThi = data.slice(0, 100); 
+      let html = hienThi.map((hang, index) => {
+          let info = trichXuatThongTinDan(hang);
+          // Truyền object dạng chuỗi base64 hoặc encode để an toàn, ở đây ta dùng index của mảng gốc để tra cứu
+          let realIndex = STATE.excel.data.indexOf(hang);
           return `
-              <div class="unit-card" data-group="${g.replace(/'/g, "\\'")}">
-                  <div class="unit-left-info" style="flex:1; cursor:pointer;" onclick="openFolderView('${g.replace(/'/g, "\\'")}')">
-                      <span class="unit-icon-build">🏢</span>
-                      <span class="unit-name">${g}</span>
-                  </div>
-                  <div class="unit-right-info">
-                      <span class="unit-count" style="cursor:pointer;" onclick="openFolderView('${g.replace(/'/g, "\\'")}')">${count}</span>
-                      <span class="unit-chevron" style="cursor:pointer; margin-right: 5px;" onclick="openFolderView('${g.replace(/'/g, "\\'")}')">❯</span>
-                      <div class="drag-handle drag-handle-group">≡</div>
-                  </div>
-              </div>
-          `;
-      }).join('');
-      
-      viewFolders.innerHTML = html;
-
-      if (window.groupSortableMain) window.groupSortableMain.destroy();
-      window.groupSortableMain = new Sortable(viewFolders, {
-          handle: '.drag-handle-group', delay: 200, delayOnTouchOnly: true, animation: 150, ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen',
-          onEnd: function (evt) {
-              let movedItem = STATE.groups.splice(evt.oldIndex, 1)[0];
-              STATE.groups.splice(evt.newIndex, 0, movedItem);
-              localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups)); updateDataLists();
-          }
-      });
-  }
-
-  // Template render thẻ liên hệ chung
-  function renderContactCardHTML(c, inFolder = false) {
-      let avatarColor = getAvatarColor(c.name);
-      let initials = getInitials(c.name);
-      let folderLabel = !inFolder ? `<span class="contact-group-label">🏢 ${c.group || 'Khác'}</span>` : '';
-      let dragHandle = inFolder ? `<div class="drag-handle">≡</div>` : '';
-      
-      return `
-      <div class="contact-card" data-id="${c.id}">
-          <div style="flex:1; display:flex; align-items:center; gap:12px; cursor:pointer;" onclick="openContactModal('${c.id}')">
-              <div class="contact-avatar" style="background:${avatarColor}" onclick="showQRCode('${c.name.replace(/'/g, "\\'")}', '${c.phone}'); event.stopPropagation();" title="Quét mã QR">${initials}</div>
-              <div class="contact-info">
-                  <span class="contact-name">${c.name}</span>
-                  <span class="contact-phone">${c.phone}</span>
-                  ${folderLabel}
-              </div>
-          </div>
-          <div class="action-buttons-card">
-              <a href="https://zalo.me/${c.phone}" target="_blank" class="btn-action-circle btn-zalo" onclick="event.stopPropagation()">Z</a>
-              <a href="sms:${c.phone}" class="btn-action-circle btn-sms" onclick="event.stopPropagation()">💬</a>
-              <a href="tel:${c.phone}" class="btn-action-circle btn-call" onclick="event.stopPropagation()">📞</a>
-              ${dragHandle}
-          </div>
-      </div>`;
-  }
-
-  window.openFolderView = function(groupName) {
-      STATE.currentFolder = groupName;
-      document.getElementById('view-folder-list').style.display = 'none'; document.getElementById('view-search-results').style.display = 'none';
-      let viewInner = document.getElementById('view-inner-folder'); viewInner.style.display = 'block';
-      document.getElementById('inner-folder-title').innerText = groupName;
-      
-      let contactsInGroup = STATE.contacts.filter(c => c.group === groupName);
-      let listContainer = document.getElementById('inner-contact-list');
-      
-      if (contactsInGroup.length === 0) {
-          listContainer.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted); font-style:italic;">Chưa có người trong nhóm này</div>`;
-      } else {
-          listContainer.innerHTML = contactsInGroup.map(c => renderContactCardHTML(c, true)).join('');
-      }
-      document.getElementById('search-contact').value = ''; 
-
-      if (window.currentSortable) window.currentSortable.destroy();
-      window.currentSortable = new Sortable(listContainer, {
-          handle: '.drag-handle', delay: 200, delayOnTouchOnly: true, animation: 150, ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen',
-          onEnd: function (evt) { reorderContactsInGroup(groupName, evt.oldIndex, evt.newIndex); }
-      });
-  }
-
-  window.closeFolderView = function() { renderMainView(); }
-
-  window.reorderContactsInGroup = function(groupName, oldIndex, newIndex) {
-      if (oldIndex === newIndex) return;
-      let groupContacts = STATE.contacts.filter(c => c.group === groupName);
-      let movedItem = groupContacts.splice(oldIndex, 1)[0];
-      groupContacts.splice(newIndex, 0, movedItem);
-      
-      let newContacts = [];
-      STATE.groups.forEach(g => { if (g === groupName) newContacts.push(...groupContacts); else newContacts.push(...STATE.contacts.filter(c => c.group === g)); });
-      let accountedIds = new Set(newContacts.map(c => c.id));
-      STATE.contacts.forEach(c => { if(!accountedIds.has(c.id)) newContacts.push(c); });
-
-      STATE.contacts = newContacts; localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts));
-  }
-
-  window.sortContactsAZ = function() {
-      if(!STATE.currentFolder) return;
-      let groupName = STATE.currentFolder;
-      let groupContacts = STATE.contacts.filter(c => c.group === groupName);
-      groupContacts.sort((a, b) => a.name.localeCompare(b.name, 'vi'));
-      
-      let newContacts = [];
-      STATE.groups.forEach(g => { if (g === groupName) newContacts.push(...groupContacts); else newContacts.push(...STATE.contacts.filter(c => c.group === g)); });
-      let accountedIds = new Set(newContacts.map(c => c.id));
-      STATE.contacts.forEach(c => { if(!accountedIds.has(c.id)) newContacts.push(c); });
-
-      STATE.contacts = newContacts; localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts));
-      openFolderView(groupName); showDialog('Thành công', 'Đã sắp xếp danh sách theo thứ tự A-Z', 'alert');
-  }
-
-  window.searchContacts = function() {
-      let keyword = document.getElementById('search-contact').value.toLowerCase();
-      let viewFolders = document.getElementById('view-folder-list'), viewInner = document.getElementById('view-inner-folder'), viewSearch = document.getElementById('view-search-results');
-
-      if (!keyword) { if (STATE.currentFolder) openFolderView(STATE.currentFolder); else renderMainView(); return; }
-      viewFolders.style.display = 'none'; viewInner.style.display = 'none'; viewSearch.style.display = 'block';
-
-      let listToSearch = STATE.currentFolder ? STATE.contacts.filter(c => c.group === STATE.currentFolder) : STATE.contacts;
-      let filtered = listToSearch.filter(c => (c.name && c.name.toLowerCase().includes(keyword)) || (c.phone && c.phone.includes(keyword)) || (!STATE.currentFolder && c.group && c.group.toLowerCase().includes(keyword)));
-
-      if (filtered.length === 0) { viewSearch.innerHTML = '<div style="text-align:center; padding: 40px; color:var(--text-muted);">Không tìm thấy kết quả.</div>'; } 
-      else { viewSearch.innerHTML = filtered.map(c => renderContactCardHTML(c, false)).join(''); }
-  }
-
-  // ================== CÀI ĐẶT NHÓM & XUẤT DỮ LIỆU ==================
-  window.exportContactsCSV = function() {
-      if(STATE.contacts.length === 0) { showDialog("Lỗi", "Chưa có dữ liệu danh bạ để xuất!", "alert"); return; }
-      let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; 
-      csvContent += "Họ và Tên,Số Điện Thoại,Nhóm\n";
-      STATE.contacts.forEach(c => {
-          let name = `"${(c.name || '').replace(/"/g, '""')}"`;
-          let phone = `"${c.phone || ''}"`;
-          let group = `"${(c.group || 'Khác').replace(/"/g, '""')}"`;
-          csvContent += `${name},${phone},${group}\n`;
-      });
-      let encodedUri = encodeURI(csvContent); let link = document.createElement("a"); link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `DanhBa_${new Date().toLocaleDateString('vi-VN').replace(/\//g,'-')}.csv`);
-      document.body.appendChild(link); link.click(); link.remove();
-  }
-
-  window.exportContactsBackup = function() {
-      if(STATE.contacts.length === 0 && STATE.groups.length === 0) { showDialog("Lỗi", "Chưa có dữ liệu để sao lưu!", "alert"); return; }
-      let backupData = { type: "DanhBa_Backup_Standalone", appVersion: "2.1", timestamp: new Date().toISOString(), contacts: STATE.contacts, groups: STATE.groups };
-      let dataStr = "data:application/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData));
-      let link = document.createElement("a"); link.setAttribute("href", dataStr); link.setAttribute("download", `SaoLuu_DanhBa_${new Date().toLocaleDateString('vi-VN').replace(/\//g,'-')}.json`);
-      document.body.appendChild(link); link.click(); link.remove();
-  }
-
-  window.openGroupSettingsModal = function() {
-      updateStats(); renderGroupSettingsList();
-      let modal = document.getElementById('group-settings-modal'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('show'), 10);
-  }
-
-  window.closeGroupSettingsModal = function() {
-      let modal = document.getElementById('group-settings-modal'); modal.classList.remove('show'); setTimeout(() => modal.style.display = 'none', 300);
-      if(STATE.currentFolder) openFolderView(STATE.currentFolder); else renderMainView();
-  }
-
-  window.renderGroupSettingsList = function() {
-      let listDiv = document.getElementById('group-settings-list');
-      if(STATE.groups.length === 0) { listDiv.innerHTML = '<div style="text-align:center; color:var(--text-muted); font-size:13px; padding:20px;">Chưa có nhóm nào.</div>'; return; }
-      listDiv.innerHTML = STATE.groups.map((g, i) => `
-          <div class="group-item-card" data-group="${g.replace(/'/g, "\\'")}">
-              <span class="group-item-name">${g}</span>
-              <div class="group-actions">
-                  <div class="drag-handle drag-handle-setting" style="font-size: 24px; padding: 0 10px;">≡</div>
-                  <button class="btn-sq btn-edit" onclick="editGroupItem(${i})">✏️</button>
-                  <button class="btn-sq btn-del" onclick="deleteGroupItem(${i})">✖</button>
-              </div>
-          </div>
-      `).join('');
-
-      if (window.groupSortableSettings) window.groupSortableSettings.destroy();
-      window.groupSortableSettings = new Sortable(listDiv, {
-          handle: '.drag-handle-setting', animation: 150, ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen',
-          onEnd: function (evt) {
-              let movedItem = STATE.groups.splice(evt.oldIndex, 1)[0]; STATE.groups.splice(evt.newIndex, 0, movedItem);
-              localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups)); updateDataLists(); renderGroupSettingsList(); 
-              if (!STATE.currentFolder) renderMainView(); 
-          }
-      });
-  }
-
-  window.addNewGroup = function() {
-      let input = document.getElementById('new-group-input'), val = input.value.trim();
-      if(!val) { showDialog("Lỗi", "Vui lòng nhập tên nhóm!", "alert"); return; }
-      if(STATE.groups.includes(val)) { showDialog("Lỗi", "Nhóm này đã tồn tại!", "alert"); return; }
-      STATE.groups.unshift(val); localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups));
-      updateDataLists(); updateStats(); input.value = ''; renderGroupSettingsList();
-  }
-
-  window.editGroupItem = function(idx) {
-      idx = parseInt(idx); let oldName = STATE.groups[idx];
-      showDialog('Đổi tên nhóm', `Nhập tên mới cho nhóm "<b>${oldName}</b>":`, 'prompt', (newName) => {
-          if (!newName || newName.trim() === '' || newName.trim() === oldName) return; newName = newName.trim();
-          if (STATE.groups.includes(newName)) { showDialog("Lỗi", "Tên nhóm này đã tồn tại!", "alert"); return; }
-          STATE.groups[idx] = newName; STATE.contacts.forEach(c => { if (c.group === oldName) c.group = newName; });
-          if(STATE.currentFolder === oldName) STATE.currentFolder = newName;
-          localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups)); localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts));
-          updateDataLists(); renderGroupSettingsList();
-      }, oldName);
-  }
-
-  window.deleteGroupItem = function(idx) {
-      idx = parseInt(idx); let groupName = STATE.groups[idx]; if(!groupName) return;
-      let orphanedContacts = STATE.contacts.filter(c => c.group === groupName), count = orphanedContacts.length, msg = `Xóa nhóm "<b>${groupName}</b>"?`;
-      if(count > 0) msg += `<br><br><span style="color:#FF3B30;">⚠️ ${count} người sẽ bị đẩy về Kho Chờ (📥) để không mất dữ liệu.</span>`;
-      showDialog('Xóa Nhóm', msg, 'confirm', () => {
-          STATE.groups.splice(idx, 1);
-          if(count > 0) {
-              let remainingContacts = [];
-              STATE.contacts.forEach(c => { if(c.group === groupName) { c.group = ''; STATE.pending.push(c); } else { remainingContacts.push(c); } });
-              STATE.contacts = remainingContacts;
-              localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts)); localStorage.setItem('appPendingContacts', JSON.stringify(STATE.pending)); updatePendingBadge();
-          }
-          if(STATE.currentFolder === groupName) STATE.currentFolder = null;
-          localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups)); updateDataLists(); updateStats(); renderGroupSettingsList();
-      });
-  }
-
-  // ================== DỌN DẸP & THÙNG RÁC ==================
-  window.cleanupContacts = function() {
-      let unique = [], phones = new Set(), dups = 0;
-      STATE.contacts.forEach(c => {
-          let normPhone = window.normalizePhone(c.phone);
-          if (!phones.has(normPhone)) { unique.push(c); phones.add(normPhone); } 
-          else { c.deletedAt = Date.now(); STATE.trash.push(c); dups++; }
-      });
-      if (dups > 0) {
-          STATE.contacts = unique;
-          localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts)); localStorage.setItem('appTrashStandalone', JSON.stringify(STATE.trash));
-          renderMainView(); updateStats(); showDialog('Dọn dẹp', `Phát hiện và gộp <b>${dups}</b> liên hệ trùng lặp SĐT.<br><br>Đã chuyển những người bị trùng vào 🗑️ Thùng rác.`, 'alert');
-      } else {
-          showDialog('Dọn dẹp', 'Danh bạ của bạn đã rất sạch sẽ, không có liên hệ trùng SĐT.', 'alert');
-      }
-  }
-
-  window.openTrashModal = function() {
-      renderTrashList(); let modal = document.getElementById('trash-modal'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('show'), 10);
-  }
-  window.closeTrashModal = function() {
-      let modal = document.getElementById('trash-modal'); modal.classList.remove('show'); setTimeout(() => modal.style.display = 'none', 300); updateStats();
-  }
-  window.renderTrashList = function() {
-      let container = document.getElementById('trash-list-container');
-      if(STATE.trash.length === 0) { container.innerHTML = '<div style="text-align:center; padding: 30px; color:var(--text-muted); font-style:italic;">Thùng rác trống.</div>'; return; }
-      container.innerHTML = STATE.trash.map((c, i) => `
-          <div class="group-item-card" style="margin-bottom: 10px; border-radius: 12px; border: 1px solid var(--border);">
+          <div class="modal-list-item" onclick="chonDanTuModal(${realIndex})">
               <div>
-                 <div style="font-weight:800; font-size:15px; color:var(--text-main);">${c.name}</div>
-                 <div style="font-size:13px; color:var(--text-sub);">${c.phone}</div>
+                  <div style="font-weight:bold; color:var(--primary-color)">${escapeHTML(info.ten)}</div>
+                  <div style="font-size:12px; color:var(--text-sub)">ĐVT: ${escapeHTML(info.dvt)}</div>
               </div>
-              <button onclick="restoreTrash(${i})" style="background:rgba(52,199,89,0.15); color:#2E7D32; border:none; padding:8px 12px; border-radius:8px; font-weight:bold; cursor:pointer;">Khôi phục</button>
-          </div>
-      `).join('');
-  }
-  window.restoreTrash = function(idx) {
-      let restored = STATE.trash.splice(idx, 1)[0]; delete restored.deletedAt;
-      STATE.contacts.push(restored);
-      localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts)); localStorage.setItem('appTrashStandalone', JSON.stringify(STATE.trash));
-      renderTrashList(); renderMainView(); showDialog('Thành công', 'Đã khôi phục liên hệ về Danh bạ chính!', 'alert');
-  }
-  window.emptyTrash = function() {
-      if(STATE.trash.length === 0) return;
-      showDialog('Xóa vĩnh viễn', 'Bạn chắc chắn muốn dọn sạch thùng rác? Hành động này không thể khôi phục.', 'confirm', () => {
-          STATE.trash = []; localStorage.setItem('appTrashStandalone', JSON.stringify(STATE.trash)); renderTrashList();
-      });
-  }
-
-  // ================== MÃ QR CODE ==================
-  window.showQRCode = function(name, phone) {
-      let vcard = `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nTEL:${phone}\nEND:VCARD`;
-      let qr = qrcode(0, 'M');
-      qr.addData(vcard); qr.make();
-      document.getElementById('qr-code-img').innerHTML = qr.createImgTag(6);
-      document.getElementById('qr-name').innerText = name;
-      let modal = document.getElementById('qr-modal'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('show'), 10);
-  }
-  window.closeQRModal = function() {
-      let modal = document.getElementById('qr-modal'); modal.classList.remove('show'); setTimeout(() => modal.style.display = 'none', 300);
-  }
-
-  // ================== KHO CHỜ DUYỆT ==================
-  function updatePendingSelectedCountText() {
-      let textEl = document.getElementById('selected-count-text'), count = STATE.selectedPendingIds.length;
-      if (count > 0) { textEl.innerText = `Đã chọn: ${count}`; textEl.style.color = '#FF3B30'; } else { textEl.innerText = `Chọn tất cả`; textEl.style.color = '#0A84FF'; }
-  }
-
-  window.openPendingModal = function() {
-      STATE.selectedPendingIds = []; document.getElementById('search-pending').value = ''; document.getElementById('pending-group-input').value = '';
-      renderPendingList(STATE.pending); updatePendingSelectedCountText();
-      let modal = document.getElementById('pending-modal'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('show'), 10);
-  }
-
-  window.closePendingModal = function() {
-      let modal = document.getElementById('pending-modal'); modal.classList.remove('show'); setTimeout(() => modal.style.display = 'none', 300);
-      document.getElementById('chk-select-all-pending').checked = false; STATE.selectedPendingIds = []; hideAllDropdowns();
-      if(STATE.currentFolder) openFolderView(STATE.currentFolder); else renderMainView();
-  }
-
-  window.renderPendingList = function(dataArr) {
-      const container = document.getElementById('pending-list-container');
-      if (dataArr.length === 0) { container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-style:italic;">Kho chờ đang trống.</div>'; document.getElementById('chk-select-all-pending').checked = false; return; }
-      let html = dataArr.map(p => {
-          let isChecked = STATE.selectedPendingIds.includes(p.id.toString()) ? 'checked' : '';
-          return `<label class="pending-card"><input type="checkbox" class="custom-checkbox chk-pending-item" value="${p.id}" onchange="handlePendingCheck('${p.id}', this.checked)" ${isChecked}><div style="flex:1;"><span class="p-name">${p.name}</span><span class="p-phone">${p.phone}</span></div></label>`;
+              <div style="font-size:20px;">+</div>
+          </div>`;
       }).join('');
       container.innerHTML = html;
-      let allCheckedInView = dataArr.every(p => STATE.selectedPendingIds.includes(p.id.toString()));
-      document.getElementById('chk-select-all-pending').checked = allCheckedInView;
   }
 
-  window.handlePendingCheck = function(id, isChecked) {
-      id = id.toString();
-      if (isChecked) { if (!STATE.selectedPendingIds.includes(id)) STATE.selectedPendingIds.push(id); } else { STATE.selectedPendingIds = STATE.selectedPendingIds.filter(x => x !== id); }
-      let kw = document.getElementById('search-pending').value.toLowerCase();
-      let currentViewData = kw ? STATE.pending.filter(p => (p.name && p.name.toLowerCase().includes(kw)) || (p.phone && p.phone.includes(kw))) : STATE.pending;
-      let allCheckedInView = currentViewData.length > 0 && currentViewData.every(p => STATE.selectedPendingIds.includes(p.id.toString()));
-      document.getElementById('chk-select-all-pending').checked = allCheckedInView; updatePendingSelectedCountText();
-  }
-
-  window.toggleSelectAllPending = function() {
-      let isChecked = document.getElementById('chk-select-all-pending').checked, checkboxesInView = document.querySelectorAll('.chk-pending-item');
-      checkboxesInView.forEach(chk => {
-          chk.checked = isChecked; let id = chk.value.toString();
-          if (isChecked) { if(!STATE.selectedPendingIds.includes(id)) STATE.selectedPendingIds.push(id); } else { STATE.selectedPendingIds = STATE.selectedPendingIds.filter(x => x !== id); }
-      });
-      updatePendingSelectedCountText();
-  }
-
-  window.searchPending = function() {
-      let kw = document.getElementById('search-pending').value.toLowerCase();
-      if (!kw) { renderPendingList(STATE.pending); return; }
-      let filtered = STATE.pending.filter(p => (p.name && p.name.toLowerCase().includes(kw)) || (p.phone && p.phone.includes(kw)));
-      renderPendingList(filtered);
-  }
-
-  window.deleteSelectedPending = function() {
-      if (STATE.selectedPendingIds.length === 0) { showDialog('Lỗi', 'Vui lòng tick chọn ít nhất 1 liên hệ để xóa!', 'alert'); return; }
-      showDialog('Xác nhận', `Xóa vĩnh viễn ${STATE.selectedPendingIds.length} liên hệ khỏi kho chờ?`, 'confirm', () => {
-          STATE.pending = STATE.pending.filter(p => !STATE.selectedPendingIds.includes(p.id.toString()));
-          localStorage.setItem('appPendingContacts', JSON.stringify(STATE.pending));
-          STATE.selectedPendingIds = []; document.getElementById('search-pending').value = ''; 
-          renderPendingList(STATE.pending); updatePendingSelectedCountText(); updatePendingBadge();
-      });
-  }
-
-  window.saveSelectedPendingToMain = function() {
-      if (STATE.selectedPendingIds.length === 0) { showDialog('Lỗi', 'Vui lòng tick chọn các số liên hệ cần lưu!', 'alert'); return; }
-      let finalGroup = document.getElementById('pending-group-input').value.trim() || 'Khác';
-      if (finalGroup !== 'Khác' && !STATE.groups.includes(finalGroup)) { STATE.groups.unshift(finalGroup); localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups)); updateDataLists(); }
-      let selectedContacts = STATE.pending.filter(p => STATE.selectedPendingIds.includes(p.id.toString()));
-      selectedContacts.forEach(c => { c.group = finalGroup; STATE.contacts.push(c); });
-      STATE.pending = STATE.pending.filter(p => !STATE.selectedPendingIds.includes(p.id.toString()));
-      localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts)); localStorage.setItem('appPendingContacts', JSON.stringify(STATE.pending));
-      STATE.selectedPendingIds = []; document.getElementById('chk-select-all-pending').checked = false; document.getElementById('search-pending').value = ''; document.getElementById('pending-group-input').value = '';
-      updatePendingSelectedCountText(); hideAllDropdowns(); updatePendingBadge();
-      showDialog('Thành công', `Đã lưu ${selectedContacts.length} số vào nhóm "${finalGroup}"!`, 'alert', () => {
-          if (STATE.pending.length === 0) closePendingModal(); else renderPendingList(STATE.pending);
-      });
-  }
-
-  // ================== THÊM/SỬA LIÊN HỆ THỦ CÔNG ==================
-  window.openContactModal = function(id = null) {
-      let title = document.getElementById('contact-modal-title'), inputId = document.getElementById('contact-id');
-      let inputName = document.getElementById('contact-name'), inputPhone = document.getElementById('contact-phone');
-      let inputGroup = document.getElementById('manual-group-input'), btnDelete = document.getElementById('btn-delete-contact');
-
-      if (id) {
-          let c = STATE.contacts.find(x => x.id.toString() === id.toString());
-          if(c) {
-              title.innerText = 'Sửa Liên Hệ'; inputId.value = c.id; inputName.value = c.name || ''; inputPhone.value = c.phone || ''; inputGroup.value = c.group || ''; btnDelete.style.display = 'block';
-          }
-      } else {
-          title.innerText = 'Thêm Liên Hệ'; inputId.value = ''; inputName.value = ''; inputPhone.value = ''; inputGroup.value = STATE.currentFolder ? STATE.currentFolder : ''; btnDelete.style.display = 'none';
-      }
-      let modal = document.getElementById('contact-modal'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('show'), 10);
-  }
-
-  window.closeContactModal = function() {
-      let modal = document.getElementById('contact-modal'); modal.classList.remove('show'); setTimeout(() => modal.style.display = 'none', 300); hideAllDropdowns();
-  }
-
-  window.saveContact = function() {
-      let id = document.getElementById('contact-id').value, name = document.getElementById('contact-name').value.trim(), phone = document.getElementById('contact-phone').value.trim();
-      let finalGroup = document.getElementById('manual-group-input').value.trim() || 'Khác';
-      if(!name || !phone) { showDialog("Lỗi", "Vui lòng nhập Tên và Số điện thoại!", "alert"); return; }
-      phone = window.normalizePhone(phone); 
-
-      if (finalGroup !== 'Khác' && !STATE.groups.includes(finalGroup)) { STATE.groups.unshift(finalGroup); localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups)); updateDataLists(); }
-
-      if (id) { 
-          let idx = STATE.contacts.findIndex(x => x.id.toString() === id.toString());
-          if(idx !== -1) STATE.contacts[idx] = { id: id, name, phone, group: finalGroup };
-      } else { 
-          if (STATE.contacts.some(c => window.normalizePhone(c.phone) === phone)) { showDialog("Cảnh báo", "Số điện thoại này đã tồn tại trong Danh bạ chính!", "alert"); return; }
-          STATE.contacts.push({ id: genId(), name, phone, group: finalGroup });
-      }
-
-      localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts)); closeContactModal();
-      if(STATE.currentFolder) openFolderView(STATE.currentFolder); else renderMainView();
-      document.getElementById('search-contact').value = '';
-  }
-
-  window.deleteContact = function() {
-      let id = document.getElementById('contact-id').value;
-      showDialog('Xác nhận xóa', 'Bạn có chắc chắn muốn xóa liên hệ này?', 'confirm', () => {
-          let idx = STATE.contacts.findIndex(x => x.id.toString() === id.toString());
-          if(idx > -1) {
-              let deleted = STATE.contacts.splice(idx, 1)[0];
-              deleted.deletedAt = Date.now(); STATE.trash.push(deleted); // Ném vào thùng rác
-              localStorage.setItem('appTrashStandalone', JSON.stringify(STATE.trash));
-              localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts));
-          }
-          closeContactModal();
-          if(STATE.currentFolder) openFolderView(STATE.currentFolder); else renderMainView();
-      });
-  }
-
-  // ================== NHẬP TỪ THIẾT BỊ / FILE ==================
-  window.importFromContacts = async function() {
-      const supported = ('contacts' in navigator && 'ContactsManager' in window);
-      if (!supported) {
-          let modal = document.getElementById('ios-warning-modal'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('show'), 10); return;
-      }
-      try { const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: true }); if (contacts && contacts.length > 0) pushToPending(contacts, 'device'); } catch (err) { console.log(err); }
-  }
-
-  function pushToPending(rawContacts, source) {
-      let addedCount = 0, sessionPhones = new Set(), existingPhones = new Set();
-      STATE.contacts.forEach(c => existingPhones.add(window.normalizePhone(c.phone)));
-      STATE.pending.forEach(p => existingPhones.add(window.normalizePhone(p.phone)));
-
-      rawContacts.forEach(c => {
-          let name = 'Không tên', phones = [];
-          if (source === 'device' || source === 'file') { name = c.name && c.name.length > 0 ? c.name[0] : 'Không tên'; phones = c.tel || []; }
-          phones.forEach(rawPhone => {
-              let normPhone = window.normalizePhone(rawPhone);
-              if (normPhone && /\d/.test(normPhone) && !sessionPhones.has(normPhone)) {
-                  if (!existingPhones.has(normPhone)) {
-                      STATE.pending.push({ id: genId(), name, phone: normPhone, group: '' }); addedCount++; existingPhones.add(normPhone);
-                  }
-                  sessionPhones.add(normPhone);
-              }
+  let timeoutModal = null;
+  function timKiemModalDan() {
+      if(timeoutModal) clearTimeout(timeoutModal);
+      timeoutModal = setTimeout(() => {
+          let tk = document.getElementById('search-modal-dan').value.toLowerCase();
+          if(!tk) { renderListModalDan(STATE.excel.data); return; }
+          let kq = STATE.excel.data.filter(h => {
+              let info = trichXuatThongTinDan(h);
+              return info.ten.toLowerCase().includes(tk);
           });
+          renderListModalDan(kq);
+      }, 300);
+  }
+
+  function chonDanTuModal(index) {
+      haptic();
+      let hang = STATE.excel.data[index];
+      let info = trichXuatThongTinDan(hang);
+      document.getElementById('lenh-ten').value = info.ten;
+      document.getElementById('lenh-dvt').value = info.dvt;
+      dongModalChonDan();
+  }
+
+  function themVaoLenh() {
+      haptic();
+      let ten = document.getElementById('lenh-ten').value.trim();
+      let dvt = document.getElementById('lenh-dvt').value.trim();
+      let cap = document.getElementById('lenh-cap').value.trim();
+      let sl = document.getElementById('lenh-sl').value.trim();
+
+      if(!ten) { showDialog("Lỗi", "Vui lòng chọn đạn từ danh mục trước.", "alert"); return; }
+      if(!sl) { showDialog("Lỗi", "Vui lòng nhập số lượng.", "alert"); return; }
+
+      let item = { id: generateID(), ten, dvt, cap, sl: parseFloat(sl) };
+      STATE.lenh.push(item);
+      localStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh));
+      
+      // Reset form (Giữ lại ĐVT và Tên nếu họ muốn nhập cấp khác, nhưng thường sẽ reset)
+      document.getElementById('lenh-cap').value = '';
+      document.getElementById('lenh-sl').value = '';
+
+      renderBangLenh();
+      capNhatDropdownLenh(); // Cập nhật sang tab 3
+  }
+
+  function xoaLenh(id) {
+      showDialog("Xác nhận", "Bạn có chắc muốn xóa lệnh xuất này? Các xe đang thực hiện theo lệnh này sẽ không bị ảnh hưởng.", "confirm", () => {
+          STATE.lenh = STATE.lenh.filter(i => i.id !== id);
+          localStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh));
+          renderBangLenh();
+          capNhatDropdownLenh();
       });
-
-      if (addedCount > 0) {
-          localStorage.setItem('appPendingContacts', JSON.stringify(STATE.pending)); updatePendingBadge();
-          showDialog('Thành công', `Đã đồng bộ đầu số (+84) và lọc ra <b>${addedCount}</b> SĐT MỚI đưa vào Kho chờ 📥.`, 'alert');
-      } else { showDialog('Thông báo', 'Không có liên hệ MỚI nào được thêm!<br><br>Tất cả SĐT bạn vừa chọn đều <b>đã tồn tại</b> trong Danh bạ hoặc Kho chờ.', 'alert'); }
   }
 
-  window.handleContactFileUpload = function(event) {
-      let file = event.target.files[0]; if (!file) return; let reader = new FileReader();
-      reader.onload = function(e) {
-          let text = e.target.result, fileName = file.name.toLowerCase();
-          if (fileName.endsWith('.json')) {
-              try {
-                  let data = JSON.parse(text);
-                  if (data.type === "DanhBa_Backup_Standalone") restoreBackup(data); else showDialog("Lỗi", "File JSON không hợp lệ hoặc không phải bản sao lưu của ứng dụng này!", "alert");
-              } catch (err) { showDialog("Lỗi", "Không thể đọc file JSON!", "alert"); }
-          } else {
-              let parsedContacts = [];
-              if (fileName.endsWith('.vcf')) parsedContacts = parseVCF(text); else if (fileName.endsWith('.csv')) parsedContacts = parseCSV(text);
-              if (parsedContacts.length > 0) pushToPending(parsedContacts, 'file'); else showDialog("Lỗi", "Hệ thống không tìm thấy số điện thoại hợp lệ nào trong tệp này!", "alert");
-          }
-      }; reader.readAsText(file); event.target.value = ''; 
+  function renderBangLenh() {
+      let tbody = document.getElementById('tbody-lenh');
+      if(STATE.lenh.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="padding:20px; color:var(--text-sub);">Chưa có lệnh xuất nào.</td></tr>`;
+          return;
+      }
+      tbody.innerHTML = STATE.lenh.map((item, index) => `
+          <tr>
+              <td>${index + 1}</td>
+              <td style="text-align:left; font-weight:bold;">${escapeHTML(item.ten)}</td>
+              <td>${escapeHTML(item.dvt)}</td>
+              <td>${escapeHTML(item.cap)}</td>
+              <td style="color:var(--primary-color); font-weight:bold;">${item.sl}</td>
+              <td><button class="btn-sm btn-del" onclick="xoaLenh('${item.id}')">XÓA</button></td>
+          </tr>
+      `).join('');
   }
 
-  window.restoreBackup = function(data) {
-      showDialog("Khôi phục dữ liệu", `Bạn muốn gộp bản sao lưu này vào danh bạ hiện tại?\n\n- ${data.contacts.length} liên hệ\n- ${data.groups.length} nhóm`, "confirm", () => {
-          data.groups.forEach(g => { if (!STATE.groups.includes(g)) STATE.groups.push(g); });
-          localStorage.setItem('appGroupsStandalone', JSON.stringify(STATE.groups));
+  // =========================================================
+  // LOGIC TAB 3: THỰC HIỆN XUẤT CHO XE
+  // =========================================================
 
-          let existingPhones = new Set(STATE.contacts.map(c => window.normalizePhone(c.phone)));
-          let addedCount = 0;
-          data.contacts.forEach(c => {
-              let normPhone = window.normalizePhone(c.phone);
-              if (!existingPhones.has(normPhone)) { c.id = genId(); c.phone = normPhone; STATE.contacts.push(c); existingPhones.add(normPhone); addedCount++; }
-          });
-          localStorage.setItem('appContactsStandalone', JSON.stringify(STATE.contacts));
-          updateDataLists(); renderMainView(); showDialog("Thành công", `Đã khôi phục: Thêm mới ${addedCount} liên hệ. Các nhóm đã được cập nhật.`, "alert");
+  function capNhatDropdownLenh() {
+      let select = document.getElementById('th-chon-lenh');
+      if(STATE.lenh.length === 0) {
+          select.innerHTML = '<option value="">-- Chưa có Lệnh xuất nào --</option>';
+          return;
+      }
+      let html = '<option value="">-- Chọn lệnh đạn --</option>';
+      html += STATE.lenh.map(l => {
+          let text = `${l.ten} (Lệnh: ${l.sl} ${l.dvt})`;
+          return `<option value="${l.id}">${escapeHTML(text)}</option>`;
+      }).join('');
+      select.innerHTML = html;
+  }
+
+  function tuDongDienCapTuLenh() {
+      let idLenh = document.getElementById('th-chon-lenh').value;
+      if(!idLenh) return;
+      let lenhGoc = STATE.lenh.find(l => l.id === idLenh);
+      if(lenhGoc && lenhGoc.cap) {
+          document.getElementById('th-cap').value = lenhGoc.cap; // Gợi ý cấp từ lệnh
+      }
+  }
+
+  function themVaoThucHien() {
+      haptic();
+      let xe = document.getElementById('th-xe').value.trim();
+      let idLenh = document.getElementById('th-chon-lenh').value;
+      let cap = document.getElementById('th-cap').value.trim();
+      let sl = document.getElementById('th-sl').value.trim();
+
+      if(!xe) { showDialog("Lỗi", "Vui lòng nhập tên hoặc số xe.", "alert"); return; }
+      if(!idLenh) { showDialog("Lỗi", "Vui lòng chọn đạn từ Lệnh xuất.", "alert"); return; }
+      if(!sl) { showDialog("Lỗi", "Vui lòng nhập số lượng xuất cho xe.", "alert"); return; }
+
+      let lenhGoc = STATE.lenh.find(l => l.id === idLenh);
+      if(!lenhGoc) return; // Bảo vệ
+
+      let item = { 
+          id: generateID(), 
+          lenhId: idLenh, 
+          xe: xe, 
+          ten: lenhGoc.ten, 
+          dvt: lenhGoc.dvt, 
+          cap: cap, 
+          sl: parseFloat(sl) 
+      };
+
+      STATE.thucHien.push(item);
+      localStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
+
+      // Reset form một phần (thường xuất 1 xe nhiều đạn, nên giữ lại tên Xe)
+      document.getElementById('th-chon-lenh').value = '';
+      document.getElementById('th-cap').value = '';
+      document.getElementById('th-sl').value = '';
+
+      renderBangThucHien();
+      showDialog("Ghi sổ", `Đã ghi xuất ${sl} ${lenhGoc.dvt} cho xe ${xe}`, "alert");
+  }
+
+  function xoaThucHien(id) {
+      showDialog("Xác nhận", "Bạn có chắc muốn xóa lịch sử xuất của xe này?", "confirm", () => {
+          STATE.thucHien = STATE.thucHien.filter(i => i.id !== id);
+          localStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
+          renderBangThucHien();
       });
   }
 
-  function parseVCF(text) {
-      let contacts = [], vcards = text.split('BEGIN:VCARD');
-      for (let vcard of vcards) {
-          if (!vcard.trim()) continue;
-          let nameMatch = vcard.match(/^FN[^:]*:(.*)$/im) || vcard.match(/^N[^:]*:(.*)$/im);
-          let phoneRegex = /^TEL[^:]*:(.*)$/gm, phones = [], match;
-          while ((match = phoneRegex.exec(vcard)) !== null) { let phone = match[1].trim().replace(/[\s\-()]/g, ''); if (phone && /\d/.test(phone)) phones.push(phone); }
-          if (nameMatch && phones.length > 0) { let name = nameMatch[1].trim().replace(/;/g, ' '); contacts.push({ name: [name], tel: phones }); }
-      } return contacts;
-  }
-
-  function parseCSV(text) {
-      let contacts = [], lines = text.split(/\r?\n/); if (lines.length === 0) return contacts;
-      const splitCSV = (str) => { let result = [], insideQuote = false, currentStr = ""; for (let i = 0; i < str.length; i++) { let char = str[i]; if (char === '"') insideQuote = !insideQuote; else if (char === ',' && !insideQuote) { result.push(currentStr); currentStr = ""; } else currentStr += char; } result.push(currentStr); return result; };
-      let headers = splitCSV(lines[0]).map(h => h.trim().toLowerCase());
-      let nameIdx = headers.findIndex(h => h === 'name' || h === 'first name' || h === 'tên' || h === 'họ tên' || h === 'họ và tên');
-      if (nameIdx === -1) nameIdx = headers.findIndex(h => h.includes('name') && !h.includes('phonetic') && !h.includes('file as')); if (nameIdx === -1) nameIdx = 0;
-      let phoneIdx = headers.findIndex(h => h === 'phone 1 - value' || h === 'phone' || h === 'số điện thoại' || h === 'sđt' || h === 'điện thoại');
-      if (phoneIdx === -1) phoneIdx = headers.findIndex(h => (h.includes('phone') || h.includes('tel') || h.includes('mobile')) && !h.includes('label')); if (phoneIdx === -1) phoneIdx = 1;
-      for (let i = 1; i < lines.length; i++) {
-          if (!lines[i].trim()) continue; let cols = splitCSV(lines[i]);
-          if (cols.length > Math.max(nameIdx, phoneIdx)) {
-              let name = cols[nameIdx] ? cols[nameIdx].trim() : '';
-              if (headers[0] === 'first name' && headers[1] === 'middle name' && headers[2] === 'last name') { let fullName = []; if(cols[0]) fullName.push(cols[0].trim()); if(cols[1]) fullName.push(cols[1].trim()); if(cols[2]) fullName.push(cols[2].trim()); if(fullName.length > 0) name = fullName.join(' '); }
-              let phones = [], phone1 = cols[phoneIdx] ? cols[phoneIdx].replace(/[\s\-()]/g, '').trim() : ''; if (phone1 && /\d/.test(phone1)) phones.push(phone1);
-              if (headers.includes('phone 2 - value')) { let phone2Idx = headers.indexOf('phone 2 - value'); let phone2 = cols[phone2Idx] ? cols[phone2Idx].replace(/[\s\-()]/g, '').trim() : ''; if (phone2 && /\d/.test(phone2)) phones.push(phone2); }
-              if (headers.includes('phone 3 - value')) { let phone3Idx = headers.indexOf('phone 3 - value'); let phone3 = cols[phone3Idx] ? cols[phone3Idx].replace(/[\s\-()]/g, '').trim() : ''; if (phone3 && /\d/.test(phone3)) phones.push(phone3); }
-              if (name && phones.length > 0) { contacts.push({ name: [name], tel: phones }); }
-          }
-      } return contacts;
-  }
-
-  window.closeIosWarningModal = function() {
-      let modal = document.getElementById('ios-warning-modal'); modal.classList.remove('show'); setTimeout(() => modal.style.display = 'none', 300);
+  function renderBangThucHien() {
+      let tbody = document.getElementById('tbody-thuc-hien');
+      if(STATE.thucHien.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="padding:20px; color:var(--text-sub);">Chưa có xe nào nhận đạn.</td></tr>`;
+          return;
+      }
+      // Hiển thị mới nhất lên đầu
+      let reversed = [...STATE.thucHien].reverse();
+      tbody.innerHTML = reversed.map((item) => `
+          <tr>
+              <td style="font-weight:bold; color:var(--warning-color); text-align:left;">${escapeHTML(item.xe)}</td>
+              <td style="text-align:left; font-size:13px;">${escapeHTML(item.ten)}</td>
+              <td>${escapeHTML(item.dvt)}</td>
+              <td>${escapeHTML(item.cap)}</td>
+              <td style="color:var(--success-color); font-weight:bold;">${item.sl}</td>
+              <td><button class="btn-sm btn-del" onclick="xoaThucHien('${item.id}')">XÓA</button></td>
+          </tr>
+      `).join('');
   }
 </script>
 </body>
