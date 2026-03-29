@@ -14,7 +14,6 @@
 
   <title>Quản lý Xuất Đạn Dược</title>
 
-  <!-- Thư viện -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -148,7 +147,6 @@
     .tong-hop-box { background: var(--input-bg); border: 1px solid var(--border-light); padding: 15px; border-radius: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;}
     .tong-hop-so { font-size: 24px; font-weight: bold; color: var(--primary-color); }
     
-    /* STYLE Ô TÊN ĐẠN CLICKABLE */
     .input-clickable { cursor: pointer; background-color: #E3F2FD; color: var(--primary-color); font-weight: bold; }
   </style>
 </head>
@@ -186,12 +184,7 @@
     <!-- ==================== TAB 2: LỆNH XUẤT ==================== -->
     <div id="tab-lenh" class="tab-content">
       <div class="card" style="margin-top: 5px;">
-        
-        <div style="display:flex; gap:10px; margin-bottom: 15px;">
-             <button class="btn" style="background: var(--info-color); margin: 0; flex: 1;" onclick="moModalXemLenh()">📊 TỔNG TẤN LỆNH</button>
-             <button class="btn" style="background: #E91E63; margin: 0; flex: 1;" onclick="document.getElementById('ai-upload').click()">📷 QUÉT ẢNH (AI)</button>
-             <input type="file" id="ai-upload" accept="image/*" multiple style="display:none;" onchange="xuLyQuetAnh(event)">
-        </div>
+        <button class="btn" style="background: var(--info-color); margin-bottom: 15px;" onclick="moModalXemLenh()">📊 XEM TỔNG KHỐI LƯỢNG LỆNH (TẤN)</button>
         <hr style="border: 0; border-top: 1px dashed var(--border-light); margin: 0 0 15px 0;">
 
         <div class="form-group" style="margin-bottom:15px;">
@@ -212,11 +205,14 @@
           </div>
           <div class="form-group" style="flex: 1 1 30%;">
             <label>Cấp</label>
-            <input type="number" id="lenh-cap" class="form-control" style="padding:0 5px; text-align:center;">
+            <select id="lenh-cap" class="form-control" style="padding:0 5px; text-align:center;">
+              <option value=""></option>
+              <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+            </select>
           </div>
           <div class="form-group" style="flex: 1 1 40%;">
             <label>Số lượng</label>
-            <input type="number" id="lenh-sl" class="form-control" style="padding:0 5px; text-align:center;">
+            <input type="number" inputmode="decimal" id="lenh-sl" class="form-control" style="padding:0 5px; text-align:center;">
           </div>
         </div>
         
@@ -273,11 +269,14 @@
         <div class="form-row" style="margin-bottom:0; flex-wrap: nowrap;">
           <div class="form-group" style="flex: 1 1 40%;">
             <label>Cấp (Thực tế)</label>
-            <input type="number" id="th-cap" class="form-control" style="text-align:center;">
+            <select id="th-cap" class="form-control" style="text-align:center; padding:0 5px;">
+              <option value=""></option>
+              <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+            </select>
           </div>
           <div class="form-group" style="flex: 1 1 60%;">
             <label>SL (Thực xuất)</label>
-            <input type="number" id="th-sl" class="form-control" placeholder="Số lượng" style="text-align:center;">
+            <input type="number" inputmode="decimal" id="th-sl" class="form-control" placeholder="Số lượng" style="text-align:center;">
           </div>
         </div>
         
@@ -309,56 +308,53 @@
     <!-- ==================== TAB 4: BÁO CÁO ==================== -->
     <div id="tab-bao-cao" class="tab-content">
       
-      <div id="khu-vuc-chup-anh" style="background: var(--bg-body); padding: 5px; border-radius: 12px;">
+      <div class="card" style="margin-top: 5px; background:var(--primary-color); color:white; border:none;">
+          <h3 style="margin: 0 0 10px 0;">LỌC BÁO CÁO</h3>
+          <div class="form-row" style="margin-bottom:0;">
+              <div class="form-group">
+                  <label style="color:rgba(255,255,255,0.8)">Ngày xuất (Trong kỳ)</label>
+                  <input type="date" id="bc-ngay" class="form-control" onchange="renderBaoCao()" style="padding:0 5px;">
+              </div>
+              <div class="form-group">
+                  <label style="color:rgba(255,255,255,0.8)">Lọc Số Xe</label>
+                  <input type="text" id="bc-xe" class="form-control" placeholder="Tất cả xe..." onkeyup="renderBaoCao()">
+              </div>
+          </div>
+      </div>
+
+      <div style="display:flex; gap:10px;">
+          <button class="btn" style="background:#0A84FF; margin:10px 0; width:100%;" onclick="xuatAnhBaoCao()">📸 XUẤT ẢNH BÁO CÁO</button>
+      </div>
+
+      <div class="tong-hop-box">
+          <div>
+              <div style="font-weight:bold; color:var(--text-main); font-size:16px;">TỔNG LƯỢT XUẤT</div>
+              <div style="font-size:12px; color:var(--text-sub);">Dựa trên bộ lọc</div>
+          </div>
+          <div class="tong-hop-so" id="bc-tong-luot">0</div>
+      </div>
+
+      <!-- KHU VỰC NÀY SẼ ĐƯỢC CHỤP ẢNH -->
+      <div id="khu-vuc-chup-anh" style="background: var(--bg-card); border-radius: 12px; padding: 15px 10px; border: 1px solid var(--border-light);">
+          <div style="text-align:center; font-size:18px; font-weight:bold; color:var(--primary-color); margin-bottom:10px; text-transform:uppercase;" id="bc-tieu-de-anh">BÁO CÁO XUẤT KHO</div>
           
-          <div class="card" style="margin-top: 5px; background:var(--primary-color); color:white; border:none;" data-html2canvas-ignore="true">
-              <h3 style="margin: 0 0 10px 0;">LỌC BÁO CÁO</h3>
-              <div class="form-row" style="margin-bottom:0;">
-                  <div class="form-group">
-                      <label style="color:rgba(255,255,255,0.8)">Ngày xuất</label>
-                      <input type="date" id="bc-ngay" class="form-control" onchange="renderBaoCao()" style="padding:0 5px;">
-                  </div>
-                  <div class="form-group">
-                      <label style="color:rgba(255,255,255,0.8)">Lọc Số Xe</label>
-                      <input type="text" id="bc-xe" class="form-control" placeholder="Tất cả xe..." onkeyup="renderBaoCao()">
-                  </div>
-              </div>
-          </div>
-
-          <div style="display:flex; gap:10px;" data-html2canvas-ignore="true">
-              <button class="btn" style="background:#0A84FF; margin:10px 0; width:100%;" onclick="xuatAnhBaoCao()">📸 XUẤT ẢNH BÁO CÁO</button>
-          </div>
-
-          <div class="tong-hop-box" data-html2canvas-ignore="true">
-              <div>
-                  <div style="font-weight:bold; color:var(--text-main); font-size:16px;">TỔNG LƯỢT XUẤT</div>
-                  <div style="font-size:12px; color:var(--text-sub);">Dựa trên bộ lọc</div>
-              </div>
-              <div class="tong-hop-so" id="bc-tong-luot">0</div>
-          </div>
-
-          <!-- BẢNG BÁO CÁO ĐỂ CHỤP ẢNH -->
-          <div style="background: var(--bg-card); border-radius: 12px; padding: 10px; border: 1px solid var(--border-light);">
-              <div style="text-align:center; font-size:18px; font-weight:bold; color:var(--primary-color); margin-bottom:10px; text-transform:uppercase;" id="bc-tieu-de-anh">BÁO CÁO XUẤT KHO</div>
-              
-              <div class="card" style="padding:0; overflow:hidden; border:none; box-shadow:none; margin-top:0;">
-                <div class="table-container" id="table-bao-cao-scroll" style="max-height: 55vh;">
-                  <table style="min-width: 600px;">
-                    <thead>
-                      <tr>
-                        <th style="width: 40px;">Xe</th>
-                        <th style="width: 140px;">Tên đạn</th>
-                        <th style="width: 30px;">Cấp</th>
-                        <th style="width: 50px;">Lệnh</th>
-                        <th style="width: 50px;">Đã Cấp</th>
-                        <th style="width: 50px; background: var(--warning-color);">Xuất</th>
-                        <th style="width: 50px;">Còn</th>
-                      </tr>
-                    </thead>
-                    <tbody id="tbody-bao-cao"></tbody>
-                  </table>
-                </div>
-              </div>
+          <div class="card" style="padding:0; overflow:hidden; border:none; box-shadow:none; margin-top:0; border-radius: 0;">
+            <div class="table-container" id="table-bao-cao-scroll" style="max-height: 55vh; border-radius: 0;">
+              <table style="min-width: 600px;">
+                <thead>
+                  <tr>
+                    <th style="width: 40px;">Xe</th>
+                    <th style="width: 140px;">Tên đạn</th>
+                    <th style="width: 30px;">Cấp</th>
+                    <th style="width: 40px;">Lệnh</th>
+                    <th style="width: 50px;">Đã Cấp</th>
+                    <th style="width: 40px; background: var(--warning-color);">Xuất</th>
+                    <th style="width: 40px;">Còn</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-bao-cao"></tbody>
+              </table>
+            </div>
           </div>
       </div>
     </div>
@@ -430,9 +426,6 @@
   </div>
 
 <script>
-  // CẤU HÌNH API AI (Gemini)
-  const apiKey = ""; 
-
   function haptic() { if (navigator.vibrate) navigator.vibrate(15); }
   function escapeHTML(str) { if (str == null) return ''; return String(str).replace(/[&<>'"]/g, tag => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'}[tag] || tag)); }
   function generateID() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
@@ -464,9 +457,7 @@
               hienThiBangDanhMuc(STATE.excel.data); 
           }
           let savedLenh = localStorage.getItem('duLieuLenh'); 
-          if (savedLenh) {
-              STATE.lenh = JSON.parse(savedLenh);
-          }
+          if (savedLenh) { STATE.lenh = JSON.parse(savedLenh); }
           let savedThucHien = localStorage.getItem('duLieuThucHien'); if (savedThucHien) STATE.thucHien = JSON.parse(savedThucHien);
           STATE.thucHien.forEach(th => { if(!th.ngay) th.ngay = today; });
 
@@ -596,120 +587,15 @@
       } return 0;
   }
 
-  // --- GIAO TIẾP API OCR (AI VISION) ---
-  async function fetchWithRetry(url, options, retries = 3) {
-      const delays = [2000, 4000, 8000];
-      for (let i = 0; i < retries; i++) {
-          try {
-              const response = await fetch(url, options);
-              if (!response.ok) throw new Error(`HTTP ${response.status}`);
-              return await response.json();
-          } catch (error) {
-              if (i === retries - 1) throw error;
-              await new Promise(res => setTimeout(res, delays[i]));
-          }
-      }
-  }
-
-  async function xuLyQuetAnh(event) {
-      let files = event.target.files; if (!files || files.length === 0) return;
-      let file = files[0];
-      
-      showDialog("Đang quét ảnh (AI)", "Trí tuệ nhân tạo đang phân tích bảng Lệnh Phải Xuất. Vui lòng giữ mạng ổn định...", "alert");
-      
-      try {
-          let base64Image = await new Promise((resolve) => {
-              let reader = new FileReader();
-              reader.onload = (e) => resolve(e.target.result.split(',')[1]);
-              reader.readAsDataURL(file);
-          });
-
-          const promptText = `Analyze this military supply table image. Extract the "Phải xuất" (Command/Required) data ONLY. Return a JSON ARRAY of objects. Keys: "ten" (string, ammo name), "dvt" (string, unit), "cap" (number, "Phân cấp" column under "Phải xuất"), "sl" (number, "Số lượng" column under "Phải xuất"). Ignore empty rows. DO NOT wrap the output in markdown code blocks like \`\`\`json. Return strictly the raw JSON array.`;
-
-          const payload = {
-              contents: [{
-                  role: "user",
-                  parts: [
-                      { text: promptText },
-                      { inlineData: { mimeType: file.type, data: base64Image } }
-                  ]
-              }],
-              generationConfig: {
-                  responseMimeType: "application/json",
-                  responseSchema: {
-                      type: "ARRAY",
-                      items: {
-                          type: "OBJECT",
-                          properties: {
-                              ten: { type: "STRING" },
-                              dvt: { type: "STRING" },
-                              cap: { type: "NUMBER" },
-                              sl: { type: "NUMBER" }
-                          }
-                      }
-                  }
-              }
-          };
-
-          const result = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(payload)
-          });
-
-          if(result.error) throw new Error(result.error.message);
-
-          let textResponse = result.candidates?.[0]?.content?.parts?.[0]?.text;
-          if(!textResponse) throw new Error("AI không trả về kết quả.");
-          
-          let parsedData = JSON.parse(textResponse);
-          
-          if (parsedData && parsedData.length > 0) {
-               let currentSoLenh = document.getElementById('lenh-so').value.trim() || "Lệnh (Từ Ảnh)";
-               
-               parsedData.forEach(item => {
-                   STATE.lenh.push({
-                       id: generateID(),
-                       soLenh: currentSoLenh,
-                       ten: item.ten || "Không rõ",
-                       dvt: item.dvt || "Viên",
-                       cap: item.cap || "",
-                       sl: parseFloat(item.sl) || 0
-                   });
-               });
-               
-               localStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh));
-               renderBangLenh();
-               closeDialog();
-               showDialog("Thành công", `AI đã trích xuất tự động ${parsedData.length} loại đạn từ ảnh và lưu vào Lệnh.`, "alert");
-          } else {
-               throw new Error("Không phát hiện được dữ liệu dạng bảng.");
-          }
-
-      } catch (err) {
-          console.error(err);
-          closeDialog();
-          showDialog("Lỗi OCR", "Quá trình đọc ảnh bằng AI thất bại. Ảnh mờ hoặc máy chủ bận.", "alert");
-      }
-      event.target.value = '';
-  }
-
-
   // --- TAB 2: LỆNH XUẤT ---
   function moModalChonDan() {
       haptic(); if(STATE.excel.data.length === 0) { showDialog("Lỗi", "Tải File Excel trước.", "alert"); return; }
-      
-      // Giữ lại từ khoá tìm kiếm cũ nếu có
       let currentSearch = document.getElementById('search-modal-dan').value.toLowerCase();
       let dataToRender = STATE.excel.data;
-      if(currentSearch) {
-          dataToRender = STATE.excel.data.filter(h => trichXuatThongTinDan(h).ten.toLowerCase().includes(currentSearch));
-      }
-      
+      if(currentSearch) { dataToRender = STATE.excel.data.filter(h => trichXuatThongTinDan(h).ten.toLowerCase().includes(currentSearch)); }
       renderListModalDan(dataToRender);
       let wrapper = document.getElementById('modal-chon-dan'); wrapper.style.display = 'flex'; setTimeout(() => wrapper.classList.add('show'), 10);
   }
-  
   function dongModalChonDan() { let w = document.getElementById('modal-chon-dan'); w.classList.remove('show'); setTimeout(() => w.style.display = 'none', 300); }
   
   function renderListModalDan(data) {
@@ -720,7 +606,6 @@
           return `<div class="modal-list-item" onclick="chonDanTuModal(${STATE.excel.data.indexOf(hang)})"><div style="flex:1; padding-right: 10px;"><div class="text-dan-name">${escapeHTML(info.ten)}</div><div style="font-size:12px; color:var(--text-sub)">${extra.join(' | ')}</div></div><div style="font-size:24px; color:var(--success-color);">+</div></div>`;
       }).join('');
   }
-  
   let timeoutModal = null;
   function timKiemModalDan() {
       if(timeoutModal) clearTimeout(timeoutModal);
@@ -747,10 +632,10 @@
 
       if (idLenhDangSua) {
           let index = STATE.lenh.findIndex(l => l.id === idLenhDangSua);
-          if (index !== -1) STATE.lenh[index] = { id: idLenhDangSua, soLenh, ten, dvt, cap, sl: parseFloat(sl) };
+          if (index !== -1) STATE.lenh[index] = { id: idLenhDangSua, soLenh, ten, dvt, cap, sl: parseFloat(sl), time: STATE.lenh[index].time };
           huySuaLenh();
       } else {
-          STATE.lenh.push({ id: generateID(), soLenh, ten, dvt, cap, sl: parseFloat(sl) });
+          STATE.lenh.push({ id: generateID(), soLenh, ten, dvt, cap, sl: parseFloat(sl), time: Date.now() });
           document.getElementById('lenh-cap').value = ''; document.getElementById('lenh-sl').value = '';
       }
       localStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh)); renderBangLenh();
@@ -759,7 +644,13 @@
   function batDauSuaLenh(id) {
       haptic(); let item = STATE.lenh.find(l => l.id === id); if(!item) return;
       document.getElementById('lenh-so').value = item.soLenh; document.getElementById('lenh-ten').value = item.ten;
-      document.getElementById('lenh-dvt').value = item.dvt; document.getElementById('lenh-cap').value = item.cap; document.getElementById('lenh-sl').value = item.sl;
+      document.getElementById('lenh-dvt').value = item.dvt; 
+      
+      let capSelect = document.getElementById('lenh-cap');
+      let optionExists = Array.from(capSelect.options).some(opt => opt.value == item.cap);
+      capSelect.value = optionExists ? item.cap : '';
+      
+      document.getElementById('lenh-sl').value = item.sl;
       idLenhDangSua = id;
       document.getElementById('btn-luu-lenh').innerText = "💾 CẬP NHẬT LỆNH"; document.getElementById('btn-luu-lenh').style.background = "var(--primary-color)";
       document.getElementById('btn-huy-lenh').style.display = "block"; window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -778,7 +669,6 @@
       let tbody = document.getElementById('tbody-lenh');
       if(STATE.lenh.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="padding:20px;">Chưa có lệnh.</td></tr>`; return; }
       
-      // SỬA LỖI SẮP XẾP: Đảo ngược mảng để cái nào vừa nhập (nằm cuối mảng) sẽ lên đầu danh sách
       let reversedLenh = [...STATE.lenh].reverse();
       
       tbody.innerHTML = reversedLenh.map(item => `
@@ -850,15 +740,34 @@
       document.getElementById('th-chon-dan').innerHTML = '<option value="">-- Vui lòng chọn Lệnh trước --</option>';
   }
 
+  // LOGIC SẮP XẾP: ĐẨY ĐẠN ĐÃ CẤP HẾT XUỐNG CUỐI VÀ GẮN TAG [ĐÃ ĐỦ]
   function loadDanTheoLenh() {
       let soLenhChon = document.getElementById('th-so-lenh').value; let selectDan = document.getElementById('th-chon-dan');
       if(!soLenhChon) { selectDan.innerHTML = '<option value="">-- Vui lòng chọn Lệnh trước --</option>'; return; }
+      
       let danTrongLenh = STATE.lenh.filter(l => l.soLenh === soLenhChon);
       
-      selectDan.innerHTML = '<option value="">-- Chọn loại đạn --</option>' + danTrongLenh.map(l => { 
+      // Bước 1: Tính toán số lượng còn lại cho từng đạn
+      let danKemConLai = danTrongLenh.map(l => {
           let daXuat = STATE.thucHien.filter(t => t.lenhId === l.id).reduce((sum, current) => sum + current.sl, 0);
           let conLai = l.sl - daXuat;
-          return `<option value="${l.id}" data-conlai="${conLai}">${escapeHTML(l.ten)} - (Còn: ${conLai} ${escapeHTML(l.dvt)})</option>`; 
+          return { ...l, conLai: conLai };
+      });
+
+      // Bước 2: Sắp xếp (Đạn nào conLai <= 0 thì bị đẩy xuống dưới cùng)
+      danKemConLai.sort((a, b) => {
+          let aHet = a.conLai <= 0 ? 1 : 0;
+          let bHet = b.conLai <= 0 ? 1 : 0;
+          return aHet - bHet; 
+      });
+      
+      // Bước 3: Render HTML
+      selectDan.innerHTML = '<option value="">-- Chọn loại đạn --</option>' + danKemConLai.map(l => { 
+          let textDisplay = `${escapeHTML(l.ten)} - (Còn: ${l.conLai} ${escapeHTML(l.dvt)})`;
+          if (l.conLai <= 0) {
+              textDisplay = `[ĐÃ ĐỦ] ` + textDisplay;
+          }
+          return `<option value="${l.id}" data-conlai="${l.conLai}">${textDisplay}</option>`; 
       }).join('');
   }
 
@@ -868,7 +777,10 @@
       
       let lenhGoc = STATE.lenh.find(l => l.id === idLenh); 
       if(lenhGoc) {
-          document.getElementById('th-cap').value = lenhGoc.cap || ''; 
+          let capSelect = document.getElementById('th-cap');
+          let optionExists = Array.from(capSelect.options).some(opt => opt.value == lenhGoc.cap);
+          capSelect.value = optionExists ? lenhGoc.cap : '';
+          
           let selectedOption = selectEl.options[selectEl.selectedIndex];
           let conLai = selectedOption.getAttribute('data-conlai');
           if(conLai && parseFloat(conLai) > 0) { document.getElementById('th-sl').value = conLai; } else { document.getElementById('th-sl').value = ''; }
@@ -909,7 +821,13 @@
       haptic(); let item = STATE.thucHien.find(t => t.id === id); if(!item) return;
       document.getElementById('th-xe').value = item.xe; document.getElementById('th-ngay').value = item.ngay || getTodayString();
       document.getElementById('th-so-lenh').value = item.soLenh; loadDanTheoLenh();
-      setTimeout(() => { document.getElementById('th-chon-dan').value = item.lenhId; document.getElementById('th-cap').value = item.cap; document.getElementById('th-sl').value = item.sl; }, 50);
+      setTimeout(() => { 
+          document.getElementById('th-chon-dan').value = item.lenhId; 
+          let capSelect = document.getElementById('th-cap');
+          let optionExists = Array.from(capSelect.options).some(opt => opt.value == item.cap);
+          capSelect.value = optionExists ? item.cap : '';
+          document.getElementById('th-sl').value = item.sl; 
+      }, 50);
       idThucHienDangSua = id; document.getElementById('btn-ghi-xe').innerText = "💾 CẬP NHẬT SỔ"; document.getElementById('btn-ghi-xe').style.background = "var(--primary-color)";
       document.getElementById('btn-huy-xe').style.display = "block"; window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -953,7 +871,7 @@
 
       let tbody = document.getElementById('tbody-bao-cao');
       if(dataLoc.length === 0) { 
-          tbody.innerHTML = `<tr><td colspan="7" style="padding:20px;">Không có dữ liệu xuất trong ngày này.</td></tr>`; 
+          tbody.innerHTML = `<tr><td colspan="7" style="padding:20px;">Không có dữ liệu xuất trong kỳ.</td></tr>`; 
           document.getElementById('bc-tong-luot').innerText = "0"; return; 
       }
       document.getElementById('bc-tong-luot').innerText = dataLoc.length; 
@@ -979,7 +897,7 @@
               </td>
               <td style="font-size:12px;">${escapeHTML(item.cap)}</td>
               <td style="color:var(--primary-color); font-weight:bold; font-size:12px;">${slLenh}</td>
-              <td style="color:var(--text-sub); font-size:12px;">${daCapTruocDo}</td>
+              <td style="color:var(--text-sub); font-size:12px; font-weight:bold;">${tongDaCap}</td>
               <td style="color:var(--success-color); font-weight:bold; font-size:13px;">${item.sl}</td>
               <td style="color:${conLai < 0 ? 'var(--danger-color)' : 'var(--text-main)'}; font-weight:bold; font-size:12px;">${conLai}</td>
           </tr>
@@ -990,24 +908,31 @@
       haptic();
       let target = document.getElementById('khu-vuc-chup-anh');
       let scrollBox = document.getElementById('table-bao-cao-scroll');
+      
       let oldMaxHeight = scrollBox.style.maxHeight;
-      let oldOverflow = scrollBox.style.overflowY;
+      let oldOverflowY = scrollBox.style.overflowY;
+      let oldOverflowX = scrollBox.style.overflowX;
+      let oldWidth = target.style.width;
+
       scrollBox.style.maxHeight = 'none';
       scrollBox.style.overflowY = 'visible';
+      scrollBox.style.overflowX = 'visible';
+      target.style.width = '800px'; 
       
-      showDialog("Đang xử lý", "Hệ thống đang render ảnh báo cáo, vui lòng chờ...", "alert");
+      showDialog("Đang xử lý", "Hệ thống đang tạo ảnh báo cáo chất lượng cao...", "alert");
 
       setTimeout(() => {
-          html2canvas(target, { scale: 2, backgroundColor: "#F2F2F7" }).then(canvas => {
-              scrollBox.style.maxHeight = oldMaxHeight; scrollBox.style.overflowY = oldOverflow;
+          html2canvas(target, { scale: 2, backgroundColor: "#F2F2F7", useCORS: true, windowWidth: 800 }).then(canvas => {
+              scrollBox.style.maxHeight = oldMaxHeight; scrollBox.style.overflowY = oldOverflowY; scrollBox.style.overflowX = oldOverflowX; target.style.width = oldWidth;
               let link = document.createElement('a');
               link.download = 'BaoCao_DanDuoc_' + getTodayString() + '.jpg';
               link.href = canvas.toDataURL("image/jpeg", 0.9); link.click(); closeDialog();
           }).catch(err => {
-              console.error(err); scrollBox.style.maxHeight = oldMaxHeight; scrollBox.style.overflowY = oldOverflow;
-              showDialog("Lỗi", "Không thể tạo ảnh do bộ nhớ thiết bị đầy.", "alert");
+              console.error(err); 
+              scrollBox.style.maxHeight = oldMaxHeight; scrollBox.style.overflowY = oldOverflowY; scrollBox.style.overflowX = oldOverflowX; target.style.width = oldWidth;
+              showDialog("Lỗi", "Thiết bị không đủ bộ nhớ để tạo ảnh.", "alert");
           });
-      }, 500); 
+      }, 800); 
   }
 </script>
 </body>
