@@ -466,8 +466,6 @@
           let savedLenh = localStorage.getItem('duLieuLenh'); 
           if (savedLenh) {
               STATE.lenh = JSON.parse(savedLenh);
-              // Bổ sung thuộc tính time cho dữ liệu cũ để sắp xếp Mới Nhất lên đầu
-              STATE.lenh.forEach(l => { if(!l.time) l.time = 0; });
           }
           let savedThucHien = localStorage.getItem('duLieuThucHien'); if (savedThucHien) STATE.thucHien = JSON.parse(savedThucHien);
           STATE.thucHien.forEach(th => { if(!th.ngay) th.ngay = today; });
@@ -668,7 +666,6 @@
           
           if (parsedData && parsedData.length > 0) {
                let currentSoLenh = document.getElementById('lenh-so').value.trim() || "Lệnh (Từ Ảnh)";
-               let timeNow = Date.now();
                
                parsedData.forEach(item => {
                    STATE.lenh.push({
@@ -677,8 +674,7 @@
                        ten: item.ten || "Không rõ",
                        dvt: item.dvt || "Viên",
                        cap: item.cap || "",
-                       sl: parseFloat(item.sl) || 0,
-                       time: timeNow
+                       sl: parseFloat(item.sl) || 0
                    });
                });
                
@@ -703,7 +699,7 @@
   function moModalChonDan() {
       haptic(); if(STATE.excel.data.length === 0) { showDialog("Lỗi", "Tải File Excel trước.", "alert"); return; }
       
-      // KHÔNG RESET VALUE ĐỂ GIỮ LẠI TỪ KHOÁ CŨ
+      // Giữ lại từ khoá tìm kiếm cũ nếu có
       let currentSearch = document.getElementById('search-modal-dan').value.toLowerCase();
       let dataToRender = STATE.excel.data;
       if(currentSearch) {
@@ -751,11 +747,10 @@
 
       if (idLenhDangSua) {
           let index = STATE.lenh.findIndex(l => l.id === idLenhDangSua);
-          // Giữ lại time cũ khi update
-          if (index !== -1) STATE.lenh[index] = { id: idLenhDangSua, soLenh, ten, dvt, cap, sl: parseFloat(sl), time: STATE.lenh[index].time };
+          if (index !== -1) STATE.lenh[index] = { id: idLenhDangSua, soLenh, ten, dvt, cap, sl: parseFloat(sl) };
           huySuaLenh();
       } else {
-          STATE.lenh.push({ id: generateID(), soLenh, ten, dvt, cap, sl: parseFloat(sl), time: Date.now() });
+          STATE.lenh.push({ id: generateID(), soLenh, ten, dvt, cap, sl: parseFloat(sl) });
           document.getElementById('lenh-cap').value = ''; document.getElementById('lenh-sl').value = '';
       }
       localStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh)); renderBangLenh();
@@ -783,10 +778,10 @@
       let tbody = document.getElementById('tbody-lenh');
       if(STATE.lenh.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="padding:20px;">Chưa có lệnh.</td></tr>`; return; }
       
-      // SẮP XẾP: Thời gian mới nhất (lớn nhất) lên đầu
-      let sortedLenh = [...STATE.lenh].sort((a,b) => (b.time || 0) - (a.time || 0));
+      // SỬA LỖI SẮP XẾP: Đảo ngược mảng để cái nào vừa nhập (nằm cuối mảng) sẽ lên đầu danh sách
+      let reversedLenh = [...STATE.lenh].reverse();
       
-      tbody.innerHTML = sortedLenh.map(item => `
+      tbody.innerHTML = reversedLenh.map(item => `
           <tr style="${idLenhDangSua === item.id ? 'background-color: #E3F2FD;' : ''}">
               <td style="font-weight:bold; color:var(--primary-color)">${escapeHTML(item.soLenh)}</td>
               <td style="text-align:left; font-weight:bold; font-size:12px;">${escapeHTML(item.ten)}</td>
