@@ -470,6 +470,9 @@
   let idLenhDangSua = null;
   let idThucHienDangSua = null;
 
+  // Biến cache để lưu trữ key của các cột quan trọng (tránh lặp lại việc tìm kiếm)
+  let cacheCotExcel = { tenCol: null, dvtCol: null, klrCol: null };
+
   // ==================== KHỞI TẠO APP ====================
   document.addEventListener('DOMContentLoaded', () => { 
       let today = getTodayString();
@@ -571,7 +574,12 @@
   function debounceTimKiem() { if (timeoutTimKiem) clearTimeout(timeoutTimKiem); timeoutTimKiem = setTimeout(() => timKiemDanhMuc(), 300); }
   
   function xuLyFileExcel(e) { 
-      haptic(); let file = e.target.files[0]; if (!file) return; let reader = new FileReader(); 
+      haptic(); let file = e.target.files[0]; if (!file) return; 
+      
+      // Xoá bộ đệm Caching (Tối ưu hóa performance) khi tải file mới để các key được quét lại chính xác
+      cacheCotExcel = { tenCol: null, dvtCol: null, klrCol: null };
+      
+      let reader = new FileReader(); 
       reader.onload = function(evt) { 
           try {
               let data = new Uint8Array(evt.target.result); let workbook = XLSX.read(data, {type: 'array'}); 
@@ -639,22 +647,37 @@
       hienThiBangDanhMuc(STATE.excel.data.filter(h => Object.values(h).some(v => String(v).toLowerCase().includes(tk)))); 
   }
 
-  // Thuật toán tìm đúng cột Tên và ĐVT
+  // Thuật toán tìm đúng cột Tên và ĐVT đã được tối ưu hiệu năng với Cache
   function trichXuatThongTinDan(hang) {
-      let keys = Object.keys(hang); let tenCol = '', dvtCol = '', klrCol = '';
-      for(let k of keys) { let lk = k.toLowerCase().trim(); if(['tên đạn dược', 'tên đạn', 'tên'].includes(lk)) { tenCol = k; break; } }
-      if(!tenCol) { for(let k of keys) { let lk = k.toLowerCase(); if(lk.includes('tên') && lk.includes('đạn')) { tenCol = k; break; } } }
-      if(!tenCol) { for(let k of keys) { let lk = k.toLowerCase(); if(!lk.includes('stt') && !lk.includes('số tt') && !lk.includes('tt')) { tenCol = k; break; } } }
-      if(!tenCol) tenCol = keys[0]; // fallback
-      for(let k of keys) {
-          let lk = k.toLowerCase();
-          if(lk.includes('đvt') || lk.includes('đơn vị') || lk.includes('tính')) dvtCol = k;
-          if(lk.includes('klr') || lk.includes('khối lượng') || lk.includes('trọng')) klrCol = k;
+      let keys = Object.keys(hang);
+      
+      // Nếu chưa có cache, thực hiện tìm kiếm key 1 lần duy nhất
+      if (!cacheCotExcel.tenCol) {
+          let tenCol = '', dvtCol = '', klrCol = '';
+          
+          for(let k of keys) { 
+              let lk = k.toLowerCase().trim(); 
+              if(['tên đạn dược', 'tên đạn', 'tên'].includes(lk)) { tenCol = k; break; } 
+          }
+          if(!tenCol) { for(let k of keys) { let lk = k.toLowerCase(); if(lk.includes('tên') && lk.includes('đạn')) { tenCol = k; break; } } }
+          if(!tenCol) { for(let k of keys) { let lk = k.toLowerCase(); if(!lk.includes('stt') && !lk.includes('số tt') && !lk.includes('tt')) { tenCol = k; break; } } }
+          if(!tenCol) tenCol = keys[0]; // fallback an toàn
+
+          for(let k of keys) {
+              let lk = k.toLowerCase();
+              if(lk.includes('đvt') || lk.includes('đơn vị') || lk.includes('tính')) dvtCol = k;
+              if(lk.includes('klr') || lk.includes('khối lượng') || lk.includes('trọng')) klrCol = k;
+          }
+
+          // Lưu vào cache để dùng cho hàng ngàn object sau này (Độ phức tạp chuyển từ O(N) xuống O(1))
+          cacheCotExcel = { tenCol, dvtCol, klrCol };
       }
+
+      // Sử dụng trực tiếp key từ cache
       return { 
-          ten: hang[tenCol] ? String(hang[tenCol]) : 'N/A', 
-          dvt: dvtCol && hang[dvtCol] ? String(hang[dvtCol]) : '', 
-          klr: klrCol && hang[klrCol] ? String(hang[klrCol]) : '' 
+          ten: hang[cacheCotExcel.tenCol] ? String(hang[cacheCotExcel.tenCol]) : 'N/A', 
+          dvt: cacheCotExcel.dvtCol && hang[cacheCotExcel.dvtCol] ? String(hang[cacheCotExcel.dvtCol]) : '', 
+          klr: cacheCotExcel.klrCol && hang[cacheCotExcel.klrCol] ? String(hang[cacheCotExcel.klrCol]) : '' 
       };
   }
 
