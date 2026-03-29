@@ -344,4 +344,366 @@
                 <thead>
                   <tr>
                       <th style="width: 40px;">Xe</th>
-                      
+                      <th style="width: 80px;">Số Lệnh</th>
+                      <th style="width: 150px;">Tên Loại Đạn</th>
+                      <th style="width: 40px;">Cấp</th>
+                      <th style="width: 60px;">SL Xuất</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-bao-cao">
+                  <tr><td colspan="5" style="padding: 20px; color: var(--text-sub);">Chưa có dữ liệu xuất.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <div style="display: flex; justify-content: space-between; margin-top: 20px; font-weight: bold; font-size: 14px; padding: 0 10px;">
+              <div style="text-align: center;">
+                  <p>NGƯỜI NHẬN</p>
+                  <p style="font-weight: normal; font-style: italic; color: var(--text-sub);">(Ký, họ tên)</p>
+              </div>
+              <div style="text-align: center;">
+                  <p>THỦ KHO</p>
+                  <p style="font-weight: normal; font-style: italic; color: var(--text-sub);">(Ký, họ tên)</p>
+              </div>
+          </div>
+      </div>
+    </div> <!-- Kết thúc Tab 4 -->
+
+  </div> <!-- Kết thúc Container -->
+
+  <!-- ==================== BOTTOM NAVIGATION ==================== -->
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="chuyenTab('tab-danh-muc', this)">
+      <span class="nav-icon">📁</span>
+      <span>Danh mục</span>
+    </div>
+    <div class="nav-item" onclick="chuyenTab('tab-lenh', this)">
+      <span class="nav-icon">📝</span>
+      <span>Lệnh xuất</span>
+    </div>
+    <div class="nav-item" onclick="chuyenTab('tab-thuc-hien', this)">
+      <span class="nav-icon">🚚</span>
+      <span>Thực hiện</span>
+    </div>
+    <div class="nav-item" onclick="chuyenTab('tab-bao-cao', this)">
+      <span class="nav-icon">📊</span>
+      <span>Báo cáo</span>
+    </div>
+  </div>
+
+  <!-- MODAL CHỌN ĐẠN -->
+  <div id="modal-chon-dan" class="modal-overlay" onclick="dongModal(event, 'modal-chon-dan')">
+    <div class="custom-dialog-box" style="height: 60vh; max-width: 400px; padding: 10px;">
+        <h3 style="margin-top: 5px; color: var(--primary-color);">CHỌN ĐẠN DƯỢC</h3>
+        <input type="text" id="search-dan-modal" class="form-control" placeholder="Tìm kiếm đạn..." style="margin-bottom: 10px;" onkeyup="locDanTrongModal()">
+        <div id="danh-sach-dan-modal" style="overflow-y: auto; text-align: left; flex: 1; border: 1px solid var(--border-light); border-radius: 8px;">
+            <!-- Render danh sách đạn gợi ý vào đây -->
+        </div>
+        <button class="btn" style="background: var(--text-sub); margin-top: 10px;" onclick="document.getElementById('modal-chon-dan').classList.remove('show')">ĐÓNG</button>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT ==================== -->
+  <script>
+    /* 1. STATE (Quản lý trạng thái ứng dụng) */
+    let danhMucDan = ["Đạn pháo 100mm", "Đạn pháo 85mm", "Đạn súng bộ binh 7.62mm K43", "Đạn 12.7mm", "Lựu đạn F1"];
+    let danhSachLenh = [];
+    let danhSachThucHien = [];
+    let xeHienTai = 1;
+
+    // Sửa lỗi: Kiểm tra phần tử có tồn tại trong DOM trước khi set giá trị ngày
+    const elThNgay = document.getElementById('th-ngay');
+    if (elThNgay) elThNgay.valueAsDate = new Date();
+    
+    const elBcNgay = document.getElementById('bc-ngay');
+    if (elBcNgay) elBcNgay.valueAsDate = new Date();
+
+    /* 2. TAB NAVIGATION (Chuyển Tab) */
+    function chuyenTab(tabId, element) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      
+      document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+      element.classList.add('active');
+
+      // Hook xử lý khi vào từng tab
+      if(tabId === 'tab-thuc-hien') capNhatDropdownLenh();
+      if(tabId === 'tab-bao-cao') renderBaoCao();
+    }
+
+    /* 3. HIỆU ỨNG RUNG (Haptic Feedback) */
+    function haptic() {
+      if (navigator.vibrate) navigator.vibrate(50);
+    }
+
+    /* 4. CHỨC NĂNG: LỆNH XUẤT */
+    function moModalChonDan() {
+        const modal = document.getElementById('modal-chon-dan');
+        const listContainer = document.getElementById('danh-sach-dan-modal');
+        listContainer.innerHTML = '';
+        
+        danhMucDan.forEach(dan => {
+            const div = document.createElement('div');
+            div.className = 'modal-list-item';
+            div.innerHTML = `<span class="text-dan-name">${dan}</span>`;
+            div.onclick = () => {
+                document.getElementById('lenh-ten').value = dan;
+                document.getElementById('lenh-dvt').value = "Hộp/Quả"; // Gợi ý ĐVT
+                modal.classList.remove('show');
+            };
+            listContainer.appendChild(div);
+        });
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
+    }
+
+    function locDanTrongModal() {
+        const val = document.getElementById('search-dan-modal').value.toLowerCase();
+        const items = document.querySelectorAll('.modal-list-item');
+        items.forEach(item => {
+            if (item.innerText.toLowerCase().includes(val)) item.style.display = 'flex';
+            else item.style.display = 'none';
+        });
+    }
+
+    function dongModal(e, id) {
+        if (e.target.id === id) document.getElementById(id).classList.remove('show');
+    }
+
+    function xuLyLuuLenh() {
+        haptic();
+        const soLenh = document.getElementById('lenh-so').value.trim();
+        const tenDan = document.getElementById('lenh-ten').value.trim();
+        const dvt = document.getElementById('lenh-dvt').value.trim();
+        const cap = document.getElementById('lenh-cap').value;
+        const sl = parseFloat(document.getElementById('lenh-sl').value);
+
+        if (!soLenh || !tenDan || !cap || isNaN(sl)) {
+            alert("Vui lòng nhập đủ: Số lệnh, Tên đạn, Cấp và Số lượng!");
+            return;
+        }
+
+        const id = new Date().getTime();
+        danhSachLenh.push({ id, soLenh, tenDan, dvt, cap, sl });
+        
+        // Reset form nhanh
+        document.getElementById('lenh-ten').value = '';
+        document.getElementById('lenh-cap').value = '';
+        document.getElementById('lenh-sl').value = '';
+        
+        renderBangLenh();
+        alert("Thêm lệnh thành công!");
+    }
+
+    function renderBangLenh() {
+        const tbody = document.getElementById('tbody-lenh');
+        tbody.innerHTML = '';
+        danhSachLenh.forEach(item => {
+            tbody.innerHTML += `
+                <tr>
+                    <td style="font-weight:bold;">${item.soLenh}</td>
+                    <td style="text-align:left; color:var(--primary-color); font-weight:bold;">${item.tenDan}</td>
+                    <td>${item.dvt}</td>
+                    <td>${item.cap}</td>
+                    <td>${item.sl}</td>
+                    <td><button class="btn-sm btn-del" onclick="xoaLenh(${item.id})">Xóa</button></td>
+                </tr>
+            `;
+        });
+    }
+
+    function xoaLenh(id) {
+        if(confirm("Xóa dòng lệnh này?")) {
+            danhSachLenh = danhSachLenh.filter(x => x.id !== id);
+            renderBangLenh();
+        }
+    }
+
+    /* 5. CHỨC NĂNG: THỰC HIỆN (GHI XE) */
+    function capNhatDropdownLenh() {
+        const selLenh = document.getElementById('th-so-lenh');
+        selLenh.innerHTML = '<option value="">-- Chọn lệnh --</option>';
+        
+        // Lấy danh sách Số lệnh duy nhất (tránh trùng lặp trong dropdown)
+        const cacLenh = [...new Set(danhSachLenh.map(x => x.soLenh))];
+        cacLenh.forEach(l => selLenh.innerHTML += `<option value="${l}">${l}</option>`);
+    }
+
+    function loadDanTheoLenh() {
+        const soLenhChon = document.getElementById('th-so-lenh').value;
+        const selDan = document.getElementById('th-chon-dan');
+        selDan.innerHTML = '<option value="">-- Chọn đạn --</option>';
+        
+        const danTrongLenh = danhSachLenh.filter(x => x.soLenh === soLenhChon);
+        danTrongLenh.forEach(d => {
+            // Lưu id của lệnh vào value để truy xuất dễ dàng
+            selDan.innerHTML += `<option value="${d.id}">${d.tenDan} (SL: ${d.sl})</option>`;
+        });
+    }
+
+    function tuDongDienCapTuLenh() {
+        const idLenh = parseInt(document.getElementById('th-chon-dan').value);
+        const lenh = danhSachLenh.find(x => x.id === idLenh);
+        if(lenh) {
+            document.getElementById('th-cap').value = lenh.cap;
+            // Gợi ý số lượng còn lại
+            document.getElementById('th-sl').placeholder = `Max: ${lenh.sl}`;
+        }
+    }
+
+    function xuLyGhiXe() {
+        haptic();
+        const xeNhan = document.getElementById('th-xe').value.trim() || `Xe số ${xeHienTai}`;
+        const ngayXuat = document.getElementById('th-ngay').value;
+        const soLenh = document.getElementById('th-so-lenh').value;
+        const idLenh = parseInt(document.getElementById('th-chon-dan').value);
+        const cap = document.getElementById('th-cap').value;
+        const slThuc = parseFloat(document.getElementById('th-sl').value);
+
+        if(!soLenh || !idLenh || isNaN(slThuc)) {
+            alert("Vui lòng chọn Lệnh, Loại đạn và nhập Số lượng thực xuất!");
+            return;
+        }
+
+        const lenhGoc = danhSachLenh.find(x => x.id === idLenh);
+        danhSachThucHien.push({
+            id: new Date().getTime(),
+            ngayXuat,
+            xe: xeNhan,
+            soLenh,
+            tenDan: lenhGoc.tenDan,
+            cap,
+            sl: slThuc
+        });
+
+        // Tự động tăng số xe nếu không nhập biển số cụ thể
+        if(!document.getElementById('th-xe').value.trim()) xeHienTai++;
+        
+        document.getElementById('th-sl').value = ''; // Xóa trắng ô SL
+        renderBangThucHien();
+    }
+
+    function renderBangThucHien() {
+        const tbody = document.getElementById('tbody-thuc-hien');
+        tbody.innerHTML = '';
+        danhSachThucHien.forEach(item => {
+            // Format ngày để hiển thị ngắn gọn (DD/MM)
+            const ngaySplit = item.ngayXuat.split('-');
+            const ngayShort = `${ngaySplit[2]}/${ngaySplit[1]}`;
+
+            tbody.innerHTML += `
+                <tr>
+                    <td>${ngayShort}</td>
+                    <td style="font-weight:bold; color:var(--danger-color);">${item.xe}</td>
+                    <td style="text-align:left; font-weight:bold;">${item.tenDan}</td>
+                    <td>${item.cap}</td>
+                    <td style="font-weight:bold; color:var(--success-color);">${item.sl}</td>
+                    <td><button class="btn-sm btn-del" onclick="xoaThucHien(${item.id})">Xóa</button></td>
+                </tr>
+            `;
+        });
+    }
+
+    function xoaThucHien(id) {
+        if(confirm("Xóa chuyến xe này?")) {
+            danhSachThucHien = danhSachThucHien.filter(x => x.id !== id);
+            renderBangThucHien();
+        }
+    }
+
+    /* 6. CHỨC NĂNG: BÁO CÁO & XUẤT ẢNH */
+    function renderBaoCao() {
+        const ngayLoc = document.getElementById('bc-ngay').value;
+        const xeLoc = document.getElementById('bc-xe').value.trim().toLowerCase();
+        
+        // Lọc dữ liệu
+        let dataLoc = danhSachThucHien;
+        if (ngayLoc) dataLoc = dataLoc.filter(x => x.ngayXuat === ngayLoc);
+        if (xeLoc) dataLoc = dataLoc.filter(x => x.xe.toLowerCase().includes(xeLoc));
+
+        document.getElementById('bc-tong-luot').innerText = dataLoc.length;
+
+        // Nhóm theo xe để dùng thuộc tính rowspan cho đẹp (giống Excel)
+        const groupedByXe = {};
+        dataLoc.forEach(item => {
+            if(!groupedByXe[item.xe]) groupedByXe[item.xe] = [];
+            groupedByXe[item.xe].push(item);
+        });
+
+        const tbody = document.getElementById('tbody-bao-cao');
+        tbody.innerHTML = '';
+
+        if(Object.keys(groupedByXe).length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="padding: 20px; color: var(--text-sub);">Không có dữ liệu phù hợp.</td></tr>';
+            return;
+        }
+
+        Object.keys(groupedByXe).forEach(xe => {
+            const cacDanCuaXe = groupedByXe[xe];
+            cacDanCuaXe.forEach((dan, index) => {
+                const tr = document.createElement('tr');
+                
+                // Chỉ render cột Xe ở dòng đầu tiên của nhóm
+                if (index === 0) {
+                    tr.innerHTML += `<td rowspan="${cacDanCuaXe.length}" style="font-weight:bold; color:var(--danger-color); vertical-align: middle;">${xe}</td>`;
+                }
+                
+                tr.innerHTML += `
+                    <td style="font-weight:bold;">${dan.soLenh}</td>
+                    <td style="text-align:left;">${dan.tenDan}</td>
+                    <td>${dan.cap}</td>
+                    <td style="font-weight:bold;">${dan.sl}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        });
+    }
+
+    async function xuatAnhBaoCao() {
+        const el = document.getElementById('khu-vuc-chup-anh');
+        const btn = event.currentTarget;
+        
+        if (danhSachThucHien.length === 0) return alert("Chưa có dữ liệu để xuất!");
+        
+        btn.innerText = "⏳ ĐANG XUẤT ẢNH...";
+        try {
+            // Tạm thời ẩn thanh scrollbar của bảng khi chụp để ảnh đẹp hơn
+            const tableScroll = document.getElementById('table-bao-cao-scroll');
+            tableScroll.style.maxHeight = 'none';
+            tableScroll.style.overflow = 'visible';
+
+            const canvas = await html2canvas(el, { 
+                scale: 2, 
+                useCORS: true, 
+                backgroundColor: "#ffffff",
+                windowWidth: el.scrollWidth,
+                windowHeight: el.scrollHeight
+            });
+            
+            // Khôi phục scroll
+            tableScroll.style.maxHeight = '55vh';
+            tableScroll.style.overflowY = 'auto';
+
+            const link = document.createElement('a');
+            link.download = `Bao_Cao_Xuat_Dan_${new Date().getTime()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            haptic();
+        } catch (e) {
+            console.error(e);
+            alert("Có lỗi khi xuất ảnh. Đảm bảo bạn đang mở trên trình duyệt chuẩn.");
+        } finally {
+            btn.innerText = "📸 XUẤT ẢNH BÁO CÁO";
+        }
+    }
+
+    /* Các hàm placeholder tránh báo lỗi khi bấm UI */
+    function moMenuHeThong() { alert("Chức năng Hệ thống đang phát triển!"); }
+    function xuLyFileExcel(e) { alert("File đã nhận. Cần code hàm thư viện xlsx để đọc dữ liệu vào danhSachDan."); }
+    function moModalXemLenh() { alert("Tổng khối lượng (Demo): 12.5 Tấn"); }
+    function toggleCaiDatDanhMuc() { alert("Mở panel cài đặt danh mục"); }
+    function debounceTimKiem() { console.log("Searching..."); }
+  </script>
+</body>
+</html>
