@@ -193,7 +193,6 @@
     .bc-tab-btn { flex: 1; padding: 10px; font-size: 13px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; transition: 0.2s; background: transparent; color: var(--text-sub); display:flex; justify-content:center; align-items:center; gap: 6px;}
     .bc-tab-btn.active { background: var(--bg-card); color: var(--text-main); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
 
-    /* Giao diện chip gợi ý Lô */
     .chip-lo { display: inline-block; background: var(--primary-light); color: var(--primary-color); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; margin: 0 8px 8px 0; cursor: pointer; border: 1px solid transparent; transition: 0.2s;}
     .chip-lo:active { filter: brightness(0.9); border-color: var(--primary-color); }
 
@@ -390,16 +389,18 @@
           </div>
       </div>
 
-      <div id="vung-nut-bao-cao-ngay" style="display:flex; gap:10px;">
-          <button class="btn" style="background:var(--primary-light); color: var(--primary-color); margin:12px 0;" onclick="xuatAnhBaoCao()"><i class="ph ph-camera"></i> XUẤT ẢNH</button>
-          <button class="btn" style="background:var(--warning-color); margin:12px 0;" onclick="moModalXemChiTietXe()"><i class="ph ph-truck"></i> TẢI TRỌNG XE</button>
+      <div id="vung-nut-bao-cao-ngay" style="display:flex; flex-wrap:wrap; gap:10px; margin-top: 12px;">
+          <button class="btn" style="background:var(--primary-light); color: var(--primary-color); flex:1; margin:0;" onclick="xuatAnhBaoCao()"><i class="ph ph-camera"></i> XUẤT ẢNH</button>
+          <button class="btn" style="background:var(--warning-color); flex:1; margin:0;" onclick="moModalXemChiTietXe()"><i class="ph ph-truck"></i> TẢI TRỌNG XE</button>
+          <button class="btn" style="background:var(--info-color); flex:100%; margin:0;" onclick="moModalTongHopToanBoLo()"><i class="ph ph-stack"></i> XEM TOÀN BỘ LÔ KỲ NÀY</button>
       </div>
 
-      <div id="vung-nut-bao-cao-lenh" style="display:none; gap:10px;">
-          <button class="btn" style="background:var(--info-color); margin:12px 0; width:100%;" onclick="xuatAnhBaoCao()"><i class="ph ph-camera"></i> XUẤT ẢNH TIẾN ĐỘ</button>
+      <div id="vung-nut-bao-cao-lenh" style="display:none; flex-wrap:wrap; gap:10px; margin-top: 12px;">
+          <button class="btn" style="background:var(--primary-light); color: var(--primary-color); flex:1; margin:0;" onclick="xuatAnhBaoCao()"><i class="ph ph-camera"></i> XUẤT ẢNH TIẾN ĐỘ</button>
+          <button class="btn" style="background:var(--info-color); flex:1; margin:0;" onclick="moModalTongHopToanBoLo()"><i class="ph ph-stack"></i> XEM TOÀN BỘ LÔ ĐÃ XUẤT</button>
       </div>
 
-      <div id="vung-tong-hop-ngay" class="tong-hop-box">
+      <div id="vung-tong-hop-ngay" class="tong-hop-box" style="margin-top: 16px;">
           <div>
               <div style="font-weight:700; color:var(--text-main); font-size:15px;">TỔNG MỤC XUẤT</div>
               <div style="font-size:12px; color:var(--text-sub);">Bấm vào đạn trong bảng để xem Lô</div>
@@ -492,7 +493,19 @@
     </div>
   </div>
 
-  <!-- MODAL QUẢN LÝ LÔ CHUNG (ĐA NĂNG) -->
+  <!-- MODAL TỔNG HỢP TOÀN BỘ LÔ -->
+  <div id="modal-tong-hop-lo" class="modal-overlay">
+    <div class="custom-dialog-box modal-full" style="max-height: 85vh; background: var(--bg-body);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+         <h3 style="font-weight: 800; margin:0;">Tổng Hợp Toàn Bộ Lô</h3>
+         <button class="btn-sm" style="background:var(--success-color); width:auto; padding: 0 12px; font-size: 13px;" onclick="xuatExcelToanBoLo()"><i class="ph ph-file-xls" style="margin-right:4px;"></i> XUẤT BẢNG</button>
+      </div>
+      <div class="modal-list-container" id="noidung-tong-hop-lo" style="border:none; border-radius: 0; background: var(--bg-card);"></div>
+      <button class="btn-modal-cancel" style="background: var(--bg-card); border: 0.5px solid var(--border-light);" onclick="dongModalTongHopToanBoLo()">ĐÓNG BẢNG</button>
+    </div>
+  </div>
+
+  <!-- MODAL QUẢN LÝ LÔ CHUNG (ĐA NĂNG CÓ SỬA LÔ) -->
   <div id="modal-quan-ly-lo" class="modal-overlay">
     <div class="custom-dialog-box modal-full" style="height: auto; max-height: 85vh; background: var(--bg-body);">
       <h3 id="ql-lo-title" style="font-weight: 800; text-align: left; margin-bottom: 8px;">Chi tiết Lô xuất</h3>
@@ -503,7 +516,6 @@
          <span>Đã có Lô: <span id="ql-lo-sl-da-nhap" style="color:var(--warning-color); font-weight:800; font-size:15px;">0</span></span>
       </div>
 
-      <!-- Khu vực nhập liệu & Gợi ý (Sẽ ẩn nếu chỉ Xem) -->
       <div id="vung-nhap-lo">
           <div id="vung-goi-y-lo" style="text-align: left; display: none; margin-bottom: 12px;">
               <div style="font-size: 12px; font-weight: 600; color: var(--text-sub); margin-bottom: 8px;"><i class="ph ph-magic-wand"></i> Gợi ý Lô từ Lệnh xuất:</div>
@@ -514,10 +526,11 @@
              <div class="form-group" style="flex:1; margin-bottom: 0;">
                <input type="text" id="input-ql-ten-lo" class="form-control" style="background: var(--bg-body); border:none;" placeholder="Tên Lô (VD: Lô 1-20)">
              </div>
-             <div class="form-group" style="width:90px; margin-bottom: 0;">
-               <input type="number" id="input-ql-sl-lo" class="form-control" style="background: var(--bg-body); border:none; text-align:center; font-weight:700;" placeholder="SL">
+             <div class="form-group" style="width:80px; margin-bottom: 0;">
+               <input type="number" id="input-ql-sl-lo" class="form-control" style="background: var(--bg-body); border:none; text-align:center; font-weight:700; padding:0 5px;" placeholder="SL">
              </div>
-             <button class="btn btn-sm" style="background:var(--success-color); height:46px; width:46px; margin:0; border-radius: 10px;" onclick="xuLyThemQuanLyLo()"><i class="ph ph-plus-bold"></i></button>
+             <button class="btn btn-sm" id="btn-cancel-edit-lo" style="background:var(--input-bg); color:var(--text-main); height:46px; width:40px; margin:0; border-radius: 10px; display:none;" onclick="huySuaLo()"><i class="ph ph-x"></i></button>
+             <button class="btn btn-sm" id="btn-submit-lo" style="background:var(--success-color); height:46px; width:46px; margin:0; border-radius: 10px;" onclick="xuLyThemQuanLyLo()"><i class="ph ph-plus-bold"></i></button>
           </div>
       </div>
 
@@ -547,14 +560,12 @@
   </div>
 
 <script>
-  // ==================== BỘ NHỚ AN TOÀN ====================
   const safeStorage = {
       getItem: function(key) { try { return window.localStorage.getItem(key); } catch(e) { return null; } },
       setItem: function(key, value) { try { window.localStorage.setItem(key, value); } catch(e) { console.warn("Lỗi lưu trữ."); } },
       clear: function() { try { window.localStorage.clear(); } catch(e) { } }
   };
 
-  // ==================== UTILS ====================
   function haptic() { if (navigator.vibrate) navigator.vibrate(15); }
   function escapeHTML(str) { if (str == null) return ''; return String(str).replace(/[&<>'"]/g, tag => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'}[tag] || tag)); }
   function generateID() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
@@ -568,17 +579,15 @@
       if(!dateStr) return ''; let parts = dateStr.split('-'); if(parts.length !== 3) return dateStr; return `${parts[2]}/${parts[1]}`;
   }
 
-  // ==================== STATE ====================
   const STATE = { excel: { data: [], config: { fontSize: 14, cot: {} } }, lenh: [], thucHien: [] };
   let idLenhDangSua = null;
   let idThucHienDangSua = null;
   let cacheCotExcel = { tenCol: null, dvtCol: null, klrCol: null };
   let currentBaoCaoMode = 'ngay'; 
   
-  // Quản lý trạng thái cho Modal Lô Đa Năng
   let currentLoContext = { type: null, id: null, viewData: null }; 
+  let idLoDangSua = null; // Trạng thái dùng cho việc Sửa Lô
 
-  // ==================== KHỞI TẠO ====================
   document.addEventListener('DOMContentLoaded', () => { 
       let today = getTodayString();
       try {
@@ -611,7 +620,6 @@
       capNhatGoiYXe(); 
   });
 
-  // ==================== UI DIALOG ====================
   window.showDialog = function(title, message, type = 'alert', confirmFn = null) {
       document.getElementById('dialog-title').innerText = title; document.getElementById('dialog-message').innerHTML = message; 
       let btnContainer = document.getElementById('dialog-buttons'); let wrapper = document.getElementById('custom-dialog-wrapper'); 
@@ -764,7 +772,6 @@
       return 0;
   }
 
-  // ==================== MODAL CHỌN ĐẠN (DÙNG CHUNG) ====================
   function moModalChonDan() {
       haptic(); if(STATE.excel.data.length === 0) { showDialog("Lỗi", "Vui lòng tải File Excel ở Tab Danh Mục trước.", "alert"); return; }
       let currentSearch = document.getElementById('search-modal-dan').value.toLowerCase(); let dataToRender = STATE.excel.data;
@@ -1014,6 +1021,7 @@
   function moModalQuanLyLo(type, id, viewData = null) {
       haptic();
       currentLoContext = { type, id, viewData };
+      huySuaLo(); // Reset form sửa
       
       let titleEl = document.getElementById('ql-lo-title');
       let nameEl = document.getElementById('ql-lo-ten-dan');
@@ -1022,10 +1030,6 @@
       let vungNhap = document.getElementById('vung-nhap-lo');
       let vungGoiY = document.getElementById('vung-goi-y-lo');
       
-      // Xóa form
-      document.getElementById('input-ql-ten-lo').value = '';
-      document.getElementById('input-ql-sl-lo').value = '';
-
       if (type === 'LENH') {
           let record = STATE.lenh.find(l => l.id === id);
           if(!record) return;
@@ -1064,7 +1068,6 @@
           nameEl.innerText = viewData.name || "Tên đạn";
           vungNhap.style.display = 'none';
           
-          // Tính tổng từ listLo (vì đây là gộp)
           let tongDaXuat = viewData.listLo.reduce((sum, lo) => sum + lo.sl, 0);
           tongEl.innerText = viewData.total || tongDaXuat;
           daNhapEl.innerText = tongDaXuat;
@@ -1093,11 +1096,43 @@
       w.classList.remove('show');
       setTimeout(() => w.style.display = 'none', 300);
       
-      // Update tables upon closing
       if(currentLoContext.type === 'LENH') renderBangLenh();
       if(currentLoContext.type === 'THUCHIEN') renderBangThucHien();
       
       currentLoContext = { type: null, id: null, viewData: null };
+  }
+
+  function batDauSuaLo(idLo) {
+      haptic();
+      idLoDangSua = idLo;
+      let record = null;
+      if (currentLoContext.type === 'LENH') record = STATE.lenh.find(l => l.id === currentLoContext.id);
+      else if (currentLoContext.type === 'THUCHIEN') record = STATE.thucHien.find(t => t.id === currentLoContext.id);
+      
+      if(!record || !record.danhSachLo) return;
+      let loInfo = record.danhSachLo.find(l => l.id === idLo);
+      if(!loInfo) return;
+
+      document.getElementById('input-ql-ten-lo').value = loInfo.tenLo;
+      document.getElementById('input-ql-sl-lo').value = loInfo.sl;
+
+      let btnSubmit = document.getElementById('btn-submit-lo');
+      btnSubmit.innerHTML = '<i class="ph ph-check-bold"></i>';
+      btnSubmit.style.background = 'var(--primary-color)';
+      
+      document.getElementById('btn-cancel-edit-lo').style.display = 'block';
+  }
+
+  function huySuaLo() {
+      idLoDangSua = null;
+      document.getElementById('input-ql-ten-lo').value = '';
+      document.getElementById('input-ql-sl-lo').value = '';
+
+      let btnSubmit = document.getElementById('btn-submit-lo');
+      btnSubmit.innerHTML = '<i class="ph ph-plus-bold"></i>';
+      btnSubmit.style.background = 'var(--success-color)';
+      
+      document.getElementById('btn-cancel-edit-lo').style.display = 'none';
   }
 
   function renderChiTietQuanLyLo(record) {
@@ -1118,12 +1153,19 @@
       if(dsLo.length === 0) {
           container.innerHTML = `<div style="padding:20px; text-align:center; color:var(--text-sub);">Chưa có Lô nào được nhập.</div>`;
       } else {
-          container.innerHTML = dsLo.map((lo) => `
+          // Xử lý Yêu cầu 1: Lệnh xuất (LENH) thì Lô nhập sau lên trên
+          let dsHienThi = [...dsLo];
+          if (currentLoContext.type === 'LENH') {
+              dsHienThi.reverse();
+          }
+
+          container.innerHTML = dsHienThi.map((lo) => `
               <div class="modal-list-item" style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-card);">
                   <div style="font-weight:700; color:var(--text-main);">${escapeHTML(lo.tenLo)}</div>
-                  <div style="display:flex; align-items:center; gap: 15px;">
-                      <span style="font-weight:800; color:var(--primary-color);">${lo.sl}</span>
-                      <button class="btn-sm btn-del" style="margin:0; height:32px; width:32px;" onclick="xoaQuanLyLo('${lo.id}')"><i class="ph ph-trash"></i></button>
+                  <div style="display:flex; align-items:center; gap: 8px;">
+                      <span style="font-weight:800; color:var(--primary-color); margin-right: 8px;">${lo.sl}</span>
+                      <button class="btn-sm btn-edit" style="margin:0; height:32px; width:32px; font-size:14px;" onclick="batDauSuaLo('${lo.id}')"><i class="ph ph-pencil-simple"></i></button>
+                      <button class="btn-sm btn-del" style="margin:0; height:32px; width:32px; font-size:14px;" onclick="xoaQuanLyLo('${lo.id}')"><i class="ph ph-trash"></i></button>
                   </div>
               </div>
           `).join('');
@@ -1139,7 +1181,6 @@
       if(record) {
           let currentDaNhap = (record.danhSachLo || []).reduce((sum, lo) => sum + lo.sl, 0);
           let slConLaiThemDuoc = record.sl - currentDaNhap;
-          // Điền số lượng gợi ý, nhưng không vượt quá số lượng còn lại cần nhập
           document.getElementById('input-ql-sl-lo').value = Math.min(slGoiY, slConLaiThemDuoc);
       }
   }
@@ -1163,23 +1204,34 @@
 
       if(!record.danhSachLo) record.danhSachLo = [];
       let currentDaNhap = record.danhSachLo.reduce((sum, lo) => sum + lo.sl, 0);
+      
+      // Xử lý sửa lô
+      if (idLoDangSua) {
+          let loCu = record.danhSachLo.find(l => l.id === idLoDangSua);
+          if(loCu) currentDaNhap -= loCu.sl; // Tạm trừ số cũ đi để check limit
+      }
+
       let slConLaiThemDuoc = record.sl - currentDaNhap;
 
       if (slLo > slConLaiThemDuoc) {
-          showDialog("Vượt Quá Giới Hạn", `Tổng Lô không được vượt quá số lượng gốc (${record.sl}). Bạn chỉ có thể nhập thêm tối đa <b>${slConLaiThemDuoc}</b>.`, "alert");
+          showDialog("Vượt Quá Giới Hạn", `Tổng Lô không được vượt quá số lượng gốc (${record.sl}). Bạn chỉ có thể lưu tối đa <b>${slConLaiThemDuoc}</b> cho thao tác này.`, "alert");
           return;
       }
 
-      record.danhSachLo.push({ id: generateID(), tenLo: tenLo, sl: slLo });
+      if (idLoDangSua) {
+          let indexLo = record.danhSachLo.findIndex(l => l.id === idLoDangSua);
+          if (indexLo !== -1) {
+              record.danhSachLo[indexLo].tenLo = tenLo;
+              record.danhSachLo[indexLo].sl = slLo;
+          }
+      } else {
+          record.danhSachLo.push({ id: generateID(), tenLo: tenLo, sl: slLo });
+      }
       
-      // Save based on context
       if (currentLoContext.type === 'LENH') safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh));
       else safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
       
-      // Xóa form
-      document.getElementById('input-ql-ten-lo').value = '';
-      document.getElementById('input-ql-sl-lo').value = '';
-      
+      huySuaLo(); // Dọn dẹp form
       renderChiTietQuanLyLo(record);
   }
 
@@ -1195,10 +1247,11 @@
       if (currentLoContext.type === 'LENH') safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh));
       else safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
 
+      if (idLoDangSua === idLo) huySuaLo();
+
       renderChiTietQuanLyLo(record);
   }
 
-  // Hàm tiện ích gộp danh sách Lô bị trùng tên (phục vụ Báo Cáo)
   function gopDanhSachLo(dsLo) {
       let grouped = {};
       dsLo.forEach(lo => {
@@ -1501,6 +1554,152 @@
               target.style.width = oldWidth; showDialog("Lỗi", "Trình duyệt đang chặn tạo ảnh.", "alert");
           });
       }, 800); 
+  }
+
+  // ==================== TỔNG HỢP VÀ XUẤT EXCEL TOÀN BỘ LÔ ====================
+  function moModalTongHopToanBoLo() {
+      haptic();
+      let html = '';
+      
+      if (currentBaoCaoMode === 'ngay') {
+          let locNgay = document.getElementById('bc-ngay').value; 
+          let locXe = document.getElementById('bc-xe').value.toLowerCase().trim();
+          let dataLoc = STATE.thucHien.filter(item => { return (!locNgay || item.ngay === locNgay) && (!locXe || item.xe.toLowerCase().includes(locXe)); });
+          
+          if(dataLoc.length === 0) {
+              showDialog("Trống", "Không có dữ liệu trong kỳ này để tổng hợp.", "alert"); return;
+          }
+
+          let danGop = {};
+          dataLoc.forEach(item => {
+              if(!danGop[item.ten]) danGop[item.ten] = { ten: item.ten, tatCaLo: [] };
+              if(item.danhSachLo) danGop[item.ten].tatCaLo.push(...item.danhSachLo);
+          });
+
+          html = Object.values(danGop).map(d => {
+              let loGop = gopDanhSachLo(d.tatCaLo);
+              if(loGop.length === 0) return '';
+              let rowHtml = loGop.map(lo => `
+                  <tr style="border-bottom:0.5px solid var(--border-light);">
+                      <td style="padding:10px 16px; font-weight:600; text-align:left;">${escapeHTML(lo.tenLo)}</td>
+                      <td style="padding:10px 16px; font-weight:800; color:var(--primary-color); text-align:right;">${lo.sl}</td>
+                  </tr>`).join('');
+              
+              return `
+              <div style="margin-bottom: 12px; background:var(--bg-body); border-radius:12px; padding:8px;">
+                 <div style="font-weight: 800; font-size: 14px; color: var(--text-main); margin-bottom: 8px; padding: 0 8px;">Tên đạn: <span style="color:var(--info-color)">${escapeHTML(d.ten)}</span></div>
+                 <table style="width:100%; font-size:13px; background:var(--bg-card); border-radius:8px; overflow:hidden;">
+                     ${rowHtml}
+                 </table>
+              </div>`;
+          }).join('');
+
+      } else {
+          // Mode Lệnh
+          let danGop = {};
+          STATE.lenh.forEach(item => {
+              if(!danGop[item.ten]) danGop[item.ten] = { ten: item.ten, tatCaLo: [] };
+              STATE.thucHien.filter(t => t.lenhId === item.id).forEach(t => {
+                  if(t.danhSachLo) danGop[item.ten].tatCaLo.push(...t.danhSachLo);
+              });
+          });
+
+          html = Object.values(danGop).map(d => {
+              let loGop = gopDanhSachLo(d.tatCaLo);
+              if(loGop.length === 0) return '';
+              let rowHtml = loGop.map(lo => `
+                  <tr style="border-bottom:0.5px solid var(--border-light);">
+                      <td style="padding:10px 16px; font-weight:600; text-align:left;">${escapeHTML(lo.tenLo)}</td>
+                      <td style="padding:10px 16px; font-weight:800; color:var(--primary-color); text-align:right;">${lo.sl}</td>
+                  </tr>`).join('');
+              
+              return `
+              <div style="margin-bottom: 12px; background:var(--bg-body); border-radius:12px; padding:8px;">
+                 <div style="font-weight: 800; font-size: 14px; color: var(--text-main); margin-bottom: 8px; padding: 0 8px;">Tên đạn: <span style="color:var(--info-color)">${escapeHTML(d.ten)}</span></div>
+                 <table style="width:100%; font-size:13px; background:var(--bg-card); border-radius:8px; overflow:hidden;">
+                     ${rowHtml}
+                 </table>
+              </div>`;
+          }).join('');
+      }
+
+      if(!html.trim()) {
+           document.getElementById('noidung-tong-hop-lo').innerHTML = `<div style="padding:30px; text-align:center; color:var(--text-sub);">Chưa có Lô nào được lưu trong hệ thống ở kỳ này.</div>`;
+      } else {
+           document.getElementById('noidung-tong-hop-lo').innerHTML = `<div style="padding: 12px;">${html}</div>`;
+      }
+      
+      let w = document.getElementById('modal-tong-hop-lo');
+      w.style.display = 'flex';
+      setTimeout(() => w.classList.add('show'), 10);
+  }
+
+  function dongModalTongHopToanBoLo() {
+      let w = document.getElementById('modal-tong-hop-lo');
+      w.classList.remove('show');
+      setTimeout(() => w.style.display = 'none', 300);
+  }
+
+  function xuatExcelToanBoLo() {
+      haptic();
+      let exportData = [];
+
+      if (currentBaoCaoMode === 'ngay') {
+          let locNgay = document.getElementById('bc-ngay').value; 
+          let locXe = document.getElementById('bc-xe').value.toLowerCase().trim();
+          let dataLoc = STATE.thucHien.filter(item => { return (!locNgay || item.ngay === locNgay) && (!locXe || item.xe.toLowerCase().includes(locXe)); });
+          
+          dataLoc.forEach(item => {
+              if(item.danhSachLo && item.danhSachLo.length > 0) {
+                  let loGop = gopDanhSachLo(item.danhSachLo);
+                  loGop.forEach(lo => {
+                      exportData.push({
+                          "Tên Đạn": item.ten,
+                          "Số Lô": lo.tenLo,
+                          "Số Lượng": lo.sl,
+                          "Ngày Xuất": item.ngay,
+                          "Số Xe": item.xe,
+                          "Cấp": item.cap
+                      });
+                  });
+              }
+          });
+      } else {
+          STATE.lenh.forEach(item => {
+              let dsLoCuaLenh = [];
+              STATE.thucHien.filter(t => t.lenhId === item.id).forEach(t => {
+                  if(t.danhSachLo) dsLoCuaLenh.push(...t.danhSachLo);
+              });
+              
+              if(dsLoCuaLenh.length > 0) {
+                  let loGop = gopDanhSachLo(dsLoCuaLenh);
+                  loGop.forEach(lo => {
+                      exportData.push({
+                          "Số Lệnh": item.soLenh,
+                          "Tên Đạn": item.ten,
+                          "Số Lô": lo.tenLo,
+                          "Số Lượng": lo.sl,
+                          "Cấp": item.cap
+                      });
+                  });
+              }
+          });
+      }
+
+      if(exportData.length === 0) {
+          showDialog("Lỗi", "Không có dữ liệu Lô nào để xuất Excel.", "alert");
+          return;
+      }
+
+      showDialog("Đang xử lý", "Đang tạo file Excel...", "alert");
+      setTimeout(() => {
+          let ws = XLSX.utils.json_to_sheet(exportData);
+          let wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, "ChiTietLo");
+          let fileName = `BangKe_ChiTietLo_${getTodayString()}.xlsx`;
+          XLSX.writeFile(wb, fileName);
+          closeDialog();
+      }, 500);
   }
 </script>
 </body>
