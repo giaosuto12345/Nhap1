@@ -795,6 +795,46 @@
       capNhatDropdownSoLenh();
       capNhatGoiYXe(); 
       capNhatGoiYSoLenh();
+
+      // --- TỐI ƯU HÓA BÀN PHÍM PC (BẤM ENTER ĐỂ ĐỒNG BỘ/LƯU NHANH) ---
+      document.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+              let activeEl = document.activeElement;
+              if (!activeEl || activeEl.tagName !== 'INPUT') return; // Chỉ kích hoạt khi đang gõ trong ô Input
+
+              let id = activeEl.id;
+
+              // 1. Khu vực Nhập Lô liên hoàn
+              if (id === 'input-ql-ten-lo') {
+                  e.preventDefault();
+                  document.getElementById('input-ql-sl-lo').focus(); // Chuyển con trỏ sang ô Số Lượng
+              } 
+              else if (id === 'input-ql-sl-lo') {
+                  e.preventDefault();
+                  document.getElementById('btn-submit-lo').click(); // Submit Lô
+              }
+              // 2. Khu vực Lệnh Xuất
+              else if (['lenh-so', 'lenh-sl'].includes(id)) {
+                  e.preventDefault();
+                  document.getElementById('btn-luu-lenh').click();
+              }
+              // 3. Khu vực Thực Hiện (Ghi sổ xe)
+              else if (['th-ngay', 'th-phieu', 'th-xe-input', 'th-sl'].includes(id)) {
+                  e.preventDefault();
+                  document.getElementById('btn-ghi-xe').click();
+              }
+              // 4. Tùy chọn Cài đặt
+              else if (id === 'set-fontsize') {
+                  e.preventDefault();
+                  luuCaiDatDanhMuc();
+              }
+              // 5. Tìm kiếm
+              else if (id === 'search-modal-dan' || id === 'search-danh-muc') {
+                  e.preventDefault();
+                  activeEl.blur(); // Ẩn bàn phím sau khi gõ xong
+              }
+          }
+      });
   });
 
   window.showDialog = function(title, message, type = 'alert', confirmFn = null) {
