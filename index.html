@@ -293,14 +293,18 @@
       <div class="card" style="margin-top: 8px;">
         
         <div class="form-row" style="flex-wrap: nowrap;">
-            <div class="form-group" style="flex:1.2;">
-                <label>Xe nhận (Gợi ý)</label>
-                <input type="text" id="th-xe" list="ds-xe-thuc-hien" class="form-control" placeholder="Trống = Tự tăng">
-                <datalist id="ds-xe-thuc-hien"></datalist>
-            </div>
-            <div class="form-group">
+            <div class="form-group" style="flex: 1 1 30%;">
                 <label>Ngày xuất</label>
                 <input type="date" id="th-ngay" class="form-control" style="font-weight:700; padding: 0 5px;" onchange="capNhatGoiYXe()">
+            </div>
+            <div class="form-group" style="flex: 1 1 35%;">
+                <label>Xe nhận</label>
+                <input type="text" id="th-xe" list="ds-xe-thuc-hien" class="form-control" placeholder="Trống=Tự tăng">
+                <datalist id="ds-xe-thuc-hien"></datalist>
+            </div>
+            <div class="form-group" style="flex: 1 1 35%;">
+                <label>Số phiếu</label>
+                <input type="text" id="th-phieu" class="form-control" placeholder="Tùy chọn">
             </div>
         </div>
         
@@ -981,6 +985,7 @@
   function xuLyGhiXe() {
       haptic();
       let xe = document.getElementById('th-xe').value.trim(); let ngay = document.getElementById('th-ngay').value;
+      let phieu = document.getElementById('th-phieu').value.trim();
       let idLenh = document.getElementById('th-chon-dan').value; let cap = document.getElementById('th-cap').value.trim(); let sl = document.getElementById('th-sl').value.trim();
 
       if(!idLenh || !sl || !ngay) { showDialog("Lỗi", "Vui lòng điền đủ Ngày, Chọn Đạn và Số lượng.", "alert"); return; }
@@ -996,12 +1001,12 @@
       if(idThucHienDangSua) {
           let index = STATE.thucHien.findIndex(t => t.id === idThucHienDangSua);
           let dsLoCu = STATE.thucHien[index].danhSachLo || [];
-          STATE.thucHien[index] = { id: idThucHienDangSua, lenhId: idLenh, soLenh: lenhGoc.soLenh, xe, ngay, ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap, sl: parseFloat(sl), danhSachLo: dsLoCu };
+          STATE.thucHien[index] = { id: idThucHienDangSua, lenhId: idLenh, soLenh: lenhGoc.soLenh, phieu: phieu, xe, ngay, ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap, sl: parseFloat(sl), danhSachLo: dsLoCu };
           huySuaThucHien();
       } else {
-          STATE.thucHien.push({ id: generateID(), lenhId: idLenh, soLenh: lenhGoc.soLenh, xe, ngay, ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap, sl: parseFloat(sl), danhSachLo: [] });
+          STATE.thucHien.push({ id: generateID(), lenhId: idLenh, soLenh: lenhGoc.soLenh, phieu: phieu, xe, ngay, ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap, sl: parseFloat(sl), danhSachLo: [] });
           document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; document.getElementById('th-chon-dan').value = ''; 
-          showDialog("Đã lưu sổ", `Xuất ${sl} ${lenhGoc.dvt} đạn ${lenhGoc.ten}\nCho Xe: ${xe}`, "alert");
+          showDialog("Đã lưu sổ", `Xuất ${sl} ${lenhGoc.dvt} đạn ${lenhGoc.ten}\nCho Xe: ${xe} ${phieu ? '(Phiếu: '+phieu+')' : ''}`, "alert");
           loadDanTheoLenh(); 
       }
       safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien)); 
@@ -1011,6 +1016,7 @@
   function batDauSuaThucHien(id) {
       haptic(); let item = STATE.thucHien.find(t => t.id === id); if(!item) return;
       document.getElementById('th-xe').value = item.xe; document.getElementById('th-ngay').value = item.ngay || getTodayString();
+      document.getElementById('th-phieu').value = item.phieu || '';
       document.getElementById('th-so-lenh').value = item.soLenh; loadDanTheoLenh();
       setTimeout(() => { 
           document.getElementById('th-chon-dan').value = item.lenhId; 
@@ -1022,7 +1028,7 @@
       document.getElementById('btn-huy-xe').style.display = "block"; window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   function huySuaThucHien() {
-      idThucHienDangSua = null; document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; document.getElementById('th-xe').value = '';
+      idThucHienDangSua = null; document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; document.getElementById('th-xe').value = ''; document.getElementById('th-phieu').value = '';
       document.getElementById('btn-ghi-xe').innerHTML = "<i class='ph ph-check-circle'></i> GHI SỔ XE"; document.getElementById('btn-ghi-xe').style.background = "var(--warning-color)"; document.getElementById('btn-huy-xe').style.display = "none";
   }
   function xoaThucHien(id) { 
@@ -1044,7 +1050,10 @@
           return `
           <tr style="${idThucHienDangSua === item.id ? 'background-color: var(--primary-light);' : ''}">
               <td style="font-size:11px; color:var(--text-sub);">${formatShortDate(item.ngay)}</td>
-              <td style="font-weight:800; color:var(--warning-color);">${escapeHTML(item.xe)}</td>
+              <td style="font-weight:800; color:var(--warning-color); line-height:1.2;">
+                 ${escapeHTML(item.xe)}
+                 ${item.phieu ? `<div style="font-size:10px; color:var(--text-main); font-weight:600; margin-top:2px;">(P: ${escapeHTML(item.phieu)})</div>` : ''}
+              </td>
               <td style="text-align:left; font-size:12px; font-weight:600; cursor:pointer;" onclick="moModalQuanLyLo('THUCHIEN', '${item.id}')">
                   <div style="color:var(--text-main);">${escapeHTML(item.ten)}</div>
                   <div style="font-size:11px; color:${trangThaiLoColor}; margin-top:4px; font-weight: 700;">
@@ -1585,23 +1594,33 @@
       let dataTrongNgay = STATE.thucHien.filter(t => t.ngay === locNgay);
       if (dataTrongNgay.length === 0) { showDialog("Trống", "Không có xe nào xuất trong ngày này.", "alert"); return; }
 
-      document.getElementById('tieu-de-chi-tiet-xe').innerText = "Tải Trọng Xe Ngày " + formatShortDate(locNgay);
-
       let xeGroups = {};
+      let tongNgayKL = 0;
+
       dataTrongNgay.forEach(item => {
-          if (!xeGroups[item.xe]) xeGroups[item.xe] = { items: [] };
+          if (!xeGroups[item.xe]) xeGroups[item.xe] = { items: [], tongKL: 0 };
           xeGroups[item.xe].items.push(item);
+          let klr = layKLRTuTenDan(item.ten); 
+          let khoiLuong = item.sl * klr;
+          xeGroups[item.xe].tongKL += khoiLuong;
+          tongNgayKL += khoiLuong;
       });
+      
+      let formatTongNgay = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(tongNgayKL / 1000);
+      document.getElementById('tieu-de-chi-tiet-xe').innerHTML = `Tải Trọng Ngày ${formatShortDate(locNgay)}<br><span style="color:var(--danger-color); font-size: 14px; font-weight: 700;">Tổng ngày: ${formatTongNgay} Tấn</span>`;
 
       let html = '';
       let dsXe = Object.keys(xeGroups).sort((a,b) => a.localeCompare(b));
 
       dsXe.forEach(xe => {
           let g = xeGroups[xe]; 
+          let formatTanXe = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(g.tongKL / 1000);
+          
           html += `
           <div class="card" style="margin-top: 0; margin-bottom: 16px; padding: 0; overflow: hidden;">
-              <div style="background: var(--input-bg); padding: 12px 16px; border-bottom: 1px solid var(--border-light);">
+              <div style="background: var(--input-bg); padding: 12px 16px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center;">
                   <span style="color: var(--warning-color); font-weight: 800; font-size: 16px;">XE SỐ: ${escapeHTML(xe)}</span>
+                  <span style="color: var(--danger-color); font-weight: 800; font-size: 14px;">${formatTanXe} Tấn</span>
               </div>
               <div style="background: var(--bg-card);">
                   ${g.items.map((i, idx) => `
@@ -1609,7 +1628,7 @@
                           <div class="modern-list-stt">${idx + 1}</div>
                           <div class="modern-list-content">
                               <div class="modern-list-title">${escapeHTML(i.ten)}</div>
-                              <div class="modern-list-subtitle">ĐVT: ${escapeHTML(i.dvt) || '?'} &bull; Cấp: ${escapeHTML(i.cap) || '?'}</div>
+                              <div class="modern-list-subtitle">ĐVT: ${escapeHTML(i.dvt) || '?'} &bull; Cấp: ${escapeHTML(i.cap) || '?'} ${i.phieu ? `&bull; <b style="color:var(--primary-color)">Phiếu: ${escapeHTML(i.phieu)}</b>` : ''}</div>
                           </div>
                           <div class="modern-list-qty">${i.sl}</div>
                       </div>
@@ -1770,6 +1789,7 @@
                           "Số Lượng": lo.sl,
                           "Ngày Xuất": item.ngay,
                           "Số Xe": item.xe,
+                          "Số Phiếu": item.phieu || "",
                           "Cấp": item.cap
                       });
                   });
@@ -1779,7 +1799,11 @@
           STATE.lenh.forEach(item => {
               let dsLoCuaLenh = [];
               STATE.thucHien.filter(t => t.lenhId === item.id).forEach(t => {
-                  if(t.danhSachLo) dsLoCuaLenh.push(...t.danhSachLo);
+                  if(t.danhSachLo) {
+                     // Đẩy kèm thông tin phiếu của lần xuất đó vào lô nếu cần (tùy chọn)
+                     // Ở chế độ lệnh thì gom chung nên thông tin phiếu có thể bị gộp, tạm thời giữ nguyên cấu trúc
+                     dsLoCuaLenh.push(...t.danhSachLo);
+                  }
               });
               
               if(dsLoCuaLenh.length > 0) {
