@@ -71,9 +71,9 @@
 
     .container { max-width: 900px; margin: 0 auto; padding: 0 12px; }
     
-    /* GIAO DIỆN TỐI ƯU COMPACT (CHUYÊN NGHIỆP) */
+    /* GIAO DIỆN TỐI ƯU COMPACT & ALIGNMENT */
     .dash-header { 
-        padding: calc(12px + env(safe-area-inset-top)) 12px 10px 12px; 
+        padding: calc(12px + env(safe-area-inset-top)) 12px 12px 12px; 
         display: flex; justify-content: space-between; align-items: center; 
         background: var(--header-bg); 
         backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -88,47 +88,67 @@
         display: flex; align-items: center; gap: 4px; transition: 0.2s;
     }
 
-    .card { background: var(--bg-card); border-radius: 16px; padding: 12px; box-shadow: var(--card-shadow); margin-top: 10px; border: 0.5px solid var(--border-light); }
-    .btn { margin: 4px 0; width: 100%; padding: 12px; font-size: 14px; font-weight: 700; border: none; border-radius: 12px; background: var(--success-color); color: #fff; cursor: pointer; transition: 0.2s; display:flex; justify-content:center; align-items:center; gap:6px;}
+    .card { background: var(--bg-card); border-radius: 16px; padding: 14px; box-shadow: var(--card-shadow); margin-top: 10px; border: 0.5px solid var(--border-light); }
+    
+    /* CHUẨN HÓA BUTTONS & INPUTS */
+    .btn { margin: 4px 0; width: 100%; height: 46px; font-size: 14px; font-weight: 700; border: none; border-radius: 12px; background: var(--success-color); color: #fff; cursor: pointer; transition: 0.2s; display:flex; justify-content:center; align-items:center; gap:6px;}
     .btn:active { transform: scale(0.97); opacity: 0.9;}
 
-    .form-group { margin-bottom: 10px; display: flex; flex-direction: column; }
-    .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text-sub); margin-bottom: 4px; margin-left: 2px;}
-    .form-control { width: 100%; height: 42px; padding: 0 12px; font-size: 14px; font-weight: 600; border-radius: 10px; border: 1.5px solid var(--border-light); background: var(--input-bg); color: var(--text-main); -webkit-appearance: none; appearance: none; font-family: inherit; transition: 0.2s;}
+    .form-group { margin-bottom: 12px; display: flex; flex-direction: column; }
+    .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text-sub); margin-bottom: 6px; margin-left: 2px;}
+    
+    .form-control { 
+        width: 100%; 
+        height: 46px; /* Chuẩn 46px đồng bộ toàn bộ App */
+        padding: 0 14px; 
+        font-size: 15px; 
+        font-weight: 600; 
+        border-radius: 12px; 
+        border: 1px solid var(--border-light); 
+        background: var(--input-bg); 
+        color: var(--text-main); 
+        -webkit-appearance: none; 
+        appearance: none; 
+        font-family: inherit; 
+        transition: 0.2s;
+        box-sizing: border-box;
+    }
     .form-control:focus { outline: none; border-color: var(--primary-color); background: var(--bg-card); box-shadow: 0 0 0 2px var(--primary-light);}
     
-    select.form-control { background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 14px; padding-right: 32px; }
-    
-    /* FIX LỖI XUỐNG DÒNG NGÀY THÁNG TRÊN IPHONE SAFARI */
-    input[type="date"].form-control { 
-        text-align: left; 
-        padding: 0 8px; 
-        font-size: 13.5px; 
+    select.form-control { 
+        background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); 
+        background-repeat: no-repeat; 
+        background-position: right 12px center; 
+        background-size: 14px; 
+        padding-right: 32px; 
     }
+    
+    input[type="date"].form-control { text-align: left; }
     input[type="date"]::-webkit-date-and-time-value { text-align: left; white-space: nowrap; }
 
-    .form-row { display: flex; gap: 8px; width: 100%; align-items: flex-end; }
-    .form-row .form-group { flex: 1 1 0%; min-width: 0; margin-bottom: 10px; }
+    /* FLEXBOX CHUẨN XÁC, KHÔNG LỆCH */
+    .form-row { display: flex; gap: 10px; width: 100%; align-items: flex-end; }
+    .form-row .form-group { flex: 1 1 0%; min-width: 0; margin-bottom: 12px; }
     
-    .btn-sm { padding: 6px; font-size: 15px; border-radius: 8px; font-weight: bold; border: none; cursor: pointer; color: white; margin: 2px; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;}
+    .btn-sm { padding: 0; font-size: 16px; border-radius: 8px; font-weight: bold; border: none; cursor: pointer; color: white; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;}
     .btn-del { background: rgba(255, 59, 48, 0.1); color: var(--danger-color); }
     .btn-edit { background: var(--primary-light); color: var(--primary-color); }
     .btn-sm:active { filter: brightness(0.9); }
     
     .search-bar-container { display: flex; gap: 8px; margin-bottom: 8px; }
-    .search-input { flex: 1; padding: 0 12px !important; height: 44px; font-size: 14px !important; border-radius: 12px !important; border: 1.5px solid var(--border-light) !important; background: var(--input-bg) !important; color: var(--text-main) !important;}
-    .action-btn { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; color: white; border-radius: 12px; font-size: 20px; border: none; cursor: pointer; flex-shrink:0; transition: 0.2s;}
+    .search-input { flex: 1; padding: 0 12px !important; height: 46px; font-size: 15px !important; border-radius: 12px !important; border: 1px solid var(--border-light) !important; background: var(--input-bg) !important; color: var(--text-main) !important;}
+    .action-btn { display: flex; align-items: center; justify-content: center; width: 46px; height: 46px; color: white; border-radius: 12px; font-size: 20px; border: none; cursor: pointer; flex-shrink:0; transition: 0.2s;}
     .action-btn:active { transform: scale(0.95); }
     
     .setting-panel { background: var(--input-bg); border: 1px solid var(--border-light); border-radius: 12px; padding: 12px; margin-bottom: 12px; display: none; }
     .set-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; font-size: 13px; font-weight: 600; padding-bottom: 8px; border-bottom: 0.5px solid var(--border-light);}
     .set-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
     
-    /* BẢNG DỮ LIỆU TỐI ƯU KHOẢNG CÁCH */
-    .table-container { overflow-x: auto; max-height: 55vh; overflow-y: auto; border-radius: 10px; border: 0.5px solid var(--border-light); -webkit-overflow-scrolling: touch; }
+    /* BẢNG DỮ LIỆU TỐI ƯU */
+    .table-container { overflow-x: auto; max-height: 55vh; overflow-y: auto; border-radius: 12px; border: 1px solid var(--border-light); -webkit-overflow-scrolling: touch; }
     table { table-layout: auto; width: 100%; border-collapse: separate; border-spacing: 0; min-width: 450px; }
-    th { background: var(--primary-light); color: var(--primary-color); position: sticky; top: 0; z-index: 10; font-weight: 700; font-size: 11px; text-transform: uppercase; padding: 8px 4px; border-bottom: 1px solid var(--border-light); white-space: nowrap; text-align: center; }
-    td { padding: 10px 4px; border-bottom: 0.5px solid var(--border-light); word-wrap: break-word; white-space: normal; text-align: center; font-size: 12px; font-weight: 500; line-height: 1.3;}
+    th { background: var(--primary-light); color: var(--primary-color); position: sticky; top: 0; z-index: 10; font-weight: 700; font-size: 11px; text-transform: uppercase; padding: 10px 8px; border-bottom: 1px solid var(--border-light); white-space: nowrap; text-align: center; vertical-align: middle;}
+    td { padding: 12px 8px; border-bottom: 0.5px solid var(--border-light); word-wrap: break-word; white-space: normal; text-align: center; font-size: 13px; font-weight: 500; line-height: 1.4; vertical-align: middle;}
     tr:last-child td { border-bottom: none; }
     
     #bang-danh-muc th:first-child { position: sticky; left: 0; z-index: 12; }
@@ -150,60 +170,61 @@
     .custom-dialog-box { background: var(--bg-card); width: 90%; max-width: 360px; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); transform: scale(0.95); opacity: 0; transition: 0.3s; display: flex; flex-direction: column; }
     .modal-overlay.show .custom-dialog-box { transform: scale(1); opacity: 1; }
     .dialog-buttons { display: flex; gap: 8px; margin-top: 20px;}
-    .btn-dialog { flex: 1; padding: 12px; border-radius: 10px; font-weight: 700; border: none; cursor: pointer; background: var(--primary-color); color: white; font-size: 14px;}
+    .btn-dialog { flex: 1; height: 46px; border-radius: 10px; font-weight: 700; border: none; cursor: pointer; background: var(--primary-color); color: white; font-size: 14px;}
     
-    .modal-full { width: 95%; max-width: 600px; max-height: 90vh; padding: 14px; display: flex; flex-direction: column; justify-content: flex-start; border-radius: 16px; }
+    .modal-full { width: 95%; max-width: 600px; max-height: 90vh; padding: 16px; display: flex; flex-direction: column; justify-content: flex-start; border-radius: 16px; }
     .modal-full h3 { margin: 0 0 12px 0; flex-shrink: 0; font-size: 16px;}
-    #search-modal-dan { flex-shrink: 0; margin-bottom: 10px; } 
+    #search-modal-dan { flex-shrink: 0; margin-bottom: 12px; } 
     .modal-list-container { flex: 1; overflow-y: auto; text-align: left; border: 0.5px solid var(--border-light); border-radius: 10px; min-height: 0; }
     .modal-list-item { padding: 12px 10px; border-bottom: 0.5px solid var(--border-light); font-size: 13px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;}
     .modal-list-item:active { background: var(--input-bg); }
     .text-dan-name { font-weight: 700; color:var(--text-main); white-space: normal; word-break: break-word; line-height: 1.3; margin-bottom: 4px;}
     
-    .btn-modal-cancel { flex: 0 0 auto; height: 44px; width: 100%; margin-top: 12px; background: var(--input-bg); color: var(--text-main); border-radius: 10px; font-weight: 700; font-size: 14px; border: 0.5px solid var(--border-light); cursor: pointer; }
+    .btn-modal-cancel { flex: 0 0 auto; height: 46px; width: 100%; margin-top: 12px; background: var(--input-bg); color: var(--text-main); border-radius: 12px; font-weight: 700; font-size: 14px; border: 1px solid var(--border-light); cursor: pointer; transition: 0.2s;}
+    .btn-modal-cancel:active { filter: brightness(0.9); }
 
     /* DANH SÁCH HIỆN ĐẠI (FLEXBOX) TRONG MODAL & BÁO CÁO */
     .modern-list-item {
         display: flex; 
         align-items: center; 
-        padding: 10px 8px; 
+        padding: 10px 12px; 
         border-bottom: 0.5px solid var(--border-light);
         background: var(--bg-card);
     }
     .modern-list-item:last-child { border-bottom: none; }
-    .modern-list-stt { width: 24px; font-weight: 700; color: var(--text-sub); font-size: 12px; flex-shrink: 0; text-align:center;}
-    .modern-list-content { flex: 1; padding: 0 8px; min-width: 0; }
+    .modern-list-stt { width: 26px; font-weight: 700; color: var(--text-sub); font-size: 12px; flex-shrink: 0; text-align:left;}
+    .modern-list-content { flex: 1; padding: 0 4px; min-width: 0; }
     .modern-list-title { font-weight: 700; color: var(--text-main); word-break: break-word; font-size: 13px; line-height: 1.3;}
-    .modern-list-subtitle { font-size: 11px; color: var(--text-sub); margin-top: 3px; font-weight: 500;}
-    .modern-list-qty { font-weight: 800; color: var(--primary-color); font-size: 15px; flex-shrink: 0; text-align: right;}
+    .modern-list-subtitle { font-size: 11px; color: var(--text-sub); margin-top: 4px; font-weight: 500;}
+    .modern-list-qty { font-weight: 800; color: var(--primary-color); font-size: 15px; flex-shrink: 0; text-align: right; min-width: 40px;}
 
     /* BẢNG TỔNG QUAN DASHBOARD */
-    .dashboard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
-    .dash-box { background: var(--input-bg); border-radius: 10px; padding: 8px 4px; text-align: center; border: 0.5px solid var(--border-light); }
-    .dash-box-title { font-size: 10px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 4px; }
+    .dashboard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+    .dash-box { background: var(--input-bg); border-radius: 12px; padding: 10px 4px; text-align: center; border: 1px solid var(--border-light); }
+    .dash-box-title { font-size: 10px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 6px; }
     .dash-box-val { font-size: 14px; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px;}
     .val-danger { color: var(--danger-color); }
     .val-success { color: var(--success-color); }
     .val-warning { color: var(--warning-color); }
 
-    /* ================= CƠ CHẾ MODAL LÔ ================= */
+    /* ================= CƠ CHẾ MODAL LÔ (CHUẨN HÓA LẠI CSS) ================= */
     .modal-bottom-sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10000; display: none; flex-direction: column; justify-content: flex-end; opacity: 0; transition: opacity 0.3s; }
     .modal-bottom-sheet.show { opacity: 1; }
-    .sheet-content { background: var(--bg-body); width: 100%; height: 95dvh; border-radius: 16px 16px 0 0; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.1, 0.8, 0.1, 1); }
+    .sheet-content { background: var(--bg-body); width: 100%; height: 95dvh; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.1, 0.8, 0.1, 1); }
     .modal-bottom-sheet.show .sheet-content { transform: translateY(0); }
 
-    .tong-hop-box { background: var(--bg-card); border: 0.5px solid var(--border-light); padding: 12px; border-radius: 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--card-shadow);}
+    .tong-hop-box { background: var(--bg-card); border: 0.5px solid var(--border-light); padding: 12px 16px; border-radius: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--card-shadow);}
     .tong-hop-so { font-size: 24px; font-weight: 800; color: var(--primary-color); letter-spacing: -1px;}
     
     .input-clickable { cursor: pointer; background-color: var(--primary-light); color: var(--primary-color); font-weight: 700; border-color: transparent;}
     
-    /* MODIFIED: Tối ưu thanh Tab Báo Cáo cho 3 nút trên iPhone */
-    .bc-tab-container { display:flex; background: var(--input-bg); padding: 4px; border-radius: 12px; margin-bottom: 12px; gap: 4px; }
-    .bc-tab-btn { flex: 1; padding: 8px 2px; font-size: 10px; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; background: transparent; color: var(--text-sub); display:flex; flex-direction: column; justify-content:center; align-items:center; gap: 4px; white-space: nowrap;}
-    .bc-tab-btn i { font-size: 18px; }
+    /* MODIFIED: Tối ưu thanh Tab Báo Cáo */
+    .bc-tab-container { display:flex; background: var(--input-bg); padding: 4px; border-radius: 14px; margin-bottom: 12px; gap: 4px; }
+    .bc-tab-btn { flex: 1; padding: 10px 2px; font-size: 11px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; transition: 0.2s; background: transparent; color: var(--text-sub); display:flex; flex-direction: column; justify-content:center; align-items:center; gap: 4px; white-space: nowrap;}
+    .bc-tab-btn i { font-size: 20px; }
     .bc-tab-btn.active { background: var(--bg-card); color: var(--text-main); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
 
-    .chip-lo { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 700; margin: 0; cursor: pointer; border: 1px solid transparent; background: var(--primary-light); color: var(--primary-color); transition: 0.2s; white-space: nowrap;}
+    .chip-lo { display: inline-block; padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 700; margin: 0; cursor: pointer; border: 1px solid transparent; background: var(--primary-light); color: var(--primary-color); transition: 0.2s; white-space: nowrap;}
     .chip-lo:active { filter: brightness(0.9); }
 
     ::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -235,10 +256,10 @@
             <div style="margin-bottom: 10px; color: var(--text-main); font-weight: 700; font-size: 14px;">Cài đặt cột hiển thị</div>
             <div class="form-group">
                 <label>Cỡ chữ bảng (px)</label>
-                <input type="number" id="set-fontsize" class="form-control" value="13" style="width: 100px; height: 36px;">
+                <input type="number" id="set-fontsize" class="form-control" value="13" style="width: 100px;">
             </div>
             <div id="danh-sach-cot-cai-dat" style="max-height: 180px; overflow-y: auto; margin-bottom: 10px; border: 0.5px solid var(--border-light); padding: 8px; border-radius: 10px; background: var(--bg-card);"></div>
-            <button class="btn" style="background: var(--text-main); padding: 10px;" onclick="luuCaiDatDanhMuc()"><i class="ph ph-floppy-disk"></i> LƯU CÀI ĐẶT</button>
+            <button class="btn" style="background: var(--text-main); height: 40px;" onclick="luuCaiDatDanhMuc()"><i class="ph ph-floppy-disk"></i> LƯU CÀI ĐẶT</button>
         </div>
 
         <div style="font-size: 11px; color: var(--text-sub); text-align: center;"><i class="ph ph-arrows-left-right"></i> Vuốt ngang bảng để xem thêm</div>
@@ -257,40 +278,40 @@
     <!-- ==================== TAB 2: LỆNH XUẤT ==================== -->
     <div id="tab-lenh" class="tab-content">
       <div class="card" style="margin-top: 8px;">
-        <button class="btn" style="background: var(--primary-light); color: var(--primary-color); margin-bottom: 12px; padding: 10px; font-size: 13px;" onclick="moModalXemLenh()"><i class="ph ph-chart-donut"></i> KIỂM TRA LỆNH (DANH SÁCH)</button>
+        <button class="btn" style="background: var(--primary-light); color: var(--primary-color); margin-bottom: 16px;" onclick="moModalXemLenh()"><i class="ph ph-chart-donut"></i> KIỂM TRA LỆNH (DANH SÁCH)</button>
 
         <div class="form-row">
-            <div class="form-group" style="flex: 1 1 40%;">
+            <div class="form-group" style="flex: 1 1 35%;">
               <label>Số Lệnh/Phiếu</label>
               <input type="text" id="lenh-so" class="form-control" placeholder="VD: 01/PX" style="font-weight:700;">
             </div>
-            <div class="form-group" style="flex: 1 1 60%;">
+            <div class="form-group" style="flex: 1 1 65%;">
               <label>Tên đạn</label>
               <input type="text" id="lenh-ten" class="form-control input-clickable" placeholder="🔍 Bấm chọn..." readonly onclick="moModalChonDan()">
             </div>
         </div>
         
-        <div class="form-row" style="margin-bottom:0; flex-wrap: nowrap;">
+        <div class="form-row" style="margin-bottom:0;">
           <div class="form-group" style="flex: 1 1 30%;">
             <label>ĐVT</label>
-            <input type="text" id="lenh-dvt" class="form-control" readonly style="padding:0 4px; text-align:center; background: var(--border-light); border-color:transparent;">
+            <input type="text" id="lenh-dvt" class="form-control" readonly style="text-align:center; background: var(--border-light); border-color:transparent;">
           </div>
           <div class="form-group" style="flex: 1 1 30%;">
             <label>Cấp</label>
-            <select id="lenh-cap" class="form-control" style="padding:0 4px; text-align:center; background-position: right 4px center;">
+            <select id="lenh-cap" class="form-control" style="text-align:center;">
               <option value=""></option>
               <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
             </select>
           </div>
           <div class="form-group" style="flex: 1 1 40%;">
-            <label>Số lượng</label>
-            <input type="number" inputmode="decimal" pattern="[0-9]*" id="lenh-sl" class="form-control" style="padding:0 4px; text-align:center; font-weight: 800; color: var(--primary-color);">
+            <label style="text-align: center;">Số lượng</label>
+            <input type="number" inputmode="decimal" pattern="[0-9]*" id="lenh-sl" class="form-control" style="text-align:center; font-weight: 800; color: var(--primary-color); font-size: 16px;">
           </div>
         </div>
         
-        <div style="display:flex; gap:8px; margin-top: 4px;">
+        <div style="display:flex; gap:10px; margin-top: 6px;">
             <button class="btn" id="btn-luu-lenh" onclick="xuLyLuuLenh()" style="margin-bottom:0; flex:1;"><i class="ph ph-plus-circle"></i> THÊM LỆNH</button>
-            <button class="btn" id="btn-huy-lenh" onclick="huySuaLenh()" style="margin-bottom:0; background:var(--input-bg); color: var(--text-main); display:none; flex:1;">HỦY</button>
+            <button class="btn" id="btn-huy-lenh" onclick="huySuaLenh()" style="margin-bottom:0; background:var(--input-bg); color: var(--text-main); border: 1px solid var(--border-light); display:none; flex:1;">HỦY SỬA</button>
         </div>
       </div>
 
@@ -317,7 +338,6 @@
     <div id="tab-thuc-hien" class="tab-content">
       <div class="card" style="margin-top: 8px;">
         
-        <!-- TÁCH ĐÔI NGÀY VÀ PHIẾU LÊN 1 DÒNG ĐỂ ĐẢM BẢO KHÔNG TRÀN TRÊN IPHONE -->
         <div class="form-row">
             <div class="form-group" style="flex: 1.3;">
                 <label>Ngày xuất</label>
@@ -330,19 +350,17 @@
         </div>
 
         <div class="form-group">
-            <label>Xe nhận (Ghim theo phiếu)</label>
+            <label>Xe nhận</label>
             <select id="th-xe-select" class="form-control" style="font-weight: 700; color: var(--warning-color);" onchange="xuLyChonXeThucHien()">
                 <option value="AUTO">-- Tự động tăng xe mới --</option>
                 <option value="MANUAL">✍️ Nhập số/tên xe khác...</option>
             </select>
-            <input type="text" id="th-xe-input" class="form-control" placeholder="Nhập tên/số xe..." style="display:none; margin-top: 6px; font-weight:700; color: var(--warning-color);">
+            <input type="text" id="th-xe-input" class="form-control" placeholder="Nhập tên/số xe..." style="display:none; margin-top: 8px; font-weight:700; color: var(--warning-color);">
         </div>
         
-        <div class="form-row">
-            <div class="form-group" style="flex: 1;">
-              <label>Bước 1: Chọn Lệnh</label>
-              <select id="th-so-lenh" class="form-control" style="font-weight: 700; color: var(--info-color);" onchange="loadDanTheoLenh()"><option value="">-- Chọn lệnh --</option></select>
-            </div>
+        <div class="form-group">
+          <label>Bước 1: Chọn Lệnh</label>
+          <select id="th-so-lenh" class="form-control" style="font-weight: 700; color: var(--info-color);" onchange="loadDanTheoLenh()"><option value="">-- Chọn lệnh --</option></select>
         </div>
 
         <div class="form-group">
@@ -350,23 +368,23 @@
           <select id="th-chon-dan" class="form-control" onchange="tuDongDienCapTuLenh()"><option value="">-- Chọn đạn --</option></select>
         </div>
         
-        <div class="form-row" style="margin-bottom:0; flex-wrap: nowrap;">
+        <div class="form-row" style="margin-bottom:0;">
           <div class="form-group" style="flex: 1 1 35%;">
             <label>Cấp</label>
-            <select id="th-cap" class="form-control" style="text-align:center; padding:0 4px; background-position: right 4px center;">
+            <select id="th-cap" class="form-control" style="text-align:center;">
               <option value=""></option>
               <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
             </select>
           </div>
           <div class="form-group" style="flex: 1 1 65%;">
-            <label>SL Xuất</label>
-            <input type="number" inputmode="decimal" pattern="[0-9]*" id="th-sl" class="form-control" placeholder="Số lượng" style="text-align:center; font-weight: 800; font-size: 16px; color: var(--danger-color);">
+            <label style="text-align: center;">Số Lượng (Thực xuất)</label>
+            <input type="number" inputmode="decimal" pattern="[0-9]*" id="th-sl" class="form-control" placeholder="0" style="text-align:center; font-weight: 800; font-size: 18px; color: var(--danger-color);">
           </div>
         </div>
         
-        <div style="display:flex; gap:8px; margin-top: 6px;">
+        <div style="display:flex; gap:10px; margin-top: 8px;">
             <button class="btn" id="btn-ghi-xe" onclick="xuLyGhiXe()" style="margin-bottom:0; background:var(--warning-color); flex:1;"><i class="ph ph-check-circle"></i> GHI SỔ XE</button>
-            <button class="btn" id="btn-huy-xe" onclick="huySuaThucHien()" style="margin-bottom:0; background:var(--input-bg); color:var(--text-main); display:none; flex:1;">HỦY SỬA</button>
+            <button class="btn" id="btn-huy-xe" onclick="huySuaThucHien()" style="margin-bottom:0; background:var(--input-bg); color:var(--text-main); border: 1px solid var(--border-light); display:none; flex:1;">HỦY SỬA</button>
         </div>
       </div>
 
@@ -415,21 +433,21 @@
               </div>
           </div>
 
-          <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top: 10px;">
-              <button class="btn" style="background:var(--warning-color); flex:1; margin:0; font-size: 13px;" onclick="moModalXemChiTietXe()"><i class="ph ph-truck"></i> TẢI TRỌNG XE</button>
-              <button class="btn" style="background:var(--info-color); flex:1; margin:0; font-size: 13px;" onclick="moModalTongHopToanBoLo()"><i class="ph ph-stack"></i> XEM TOÀN BỘ LÔ</button>
+          <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top: 12px;">
+              <button class="btn" style="background:var(--warning-color); flex:1; margin:0;" onclick="moModalXemChiTietXe()"><i class="ph ph-truck"></i> TẢI TRỌNG XE</button>
+              <button class="btn" style="background:var(--info-color); flex:1; margin:0;" onclick="moModalTongHopToanBoLo()"><i class="ph ph-stack"></i> XEM TOÀN BỘ LÔ</button>
           </div>
 
-          <div class="tong-hop-box" style="margin-top: 12px; padding: 12px;">
+          <div class="tong-hop-box" style="margin-top: 16px; padding: 14px 16px;">
               <div>
-                  <div style="font-weight:700; color:var(--text-main); font-size:14px;">TỔNG MỤC XUẤT</div>
-                  <div style="font-size:11px; color:var(--text-sub);">Bấm vào đạn trong bảng để xem Lô</div>
+                  <div style="font-weight:700; color:var(--text-main); font-size:15px;">TỔNG MỤC XUẤT</div>
+                  <div style="font-size:12px; color:var(--text-sub);">Bấm vào đạn trong bảng để xem Lô</div>
               </div>
-              <div class="tong-hop-so" id="bc-tong-luot" style="font-size: 24px;">0</div>
+              <div class="tong-hop-so" id="bc-tong-luot" style="font-size: 26px;">0</div>
           </div>
 
-          <div style="background: var(--bg-card); border-radius: 16px; padding: 12px 8px; border: 0.5px solid var(--border-light); box-shadow: var(--card-shadow); margin-top: 10px;">
-              <div style="text-align:center; font-size:15px; font-weight:800; color:var(--text-main); margin-bottom:8px; text-transform:uppercase; letter-spacing: -0.5px;" id="bc-tieu-de-anh">BÁO CÁO XUẤT KHO</div>
+          <div style="background: var(--bg-card); border-radius: 16px; padding: 16px 10px; border: 1px solid var(--border-light); box-shadow: var(--card-shadow); margin-top: 12px;">
+              <div style="text-align:center; font-size:16px; font-weight:800; color:var(--text-main); margin-bottom:12px; text-transform:uppercase; letter-spacing: -0.5px;" id="bc-tieu-de-anh">BÁO CÁO XUẤT KHO</div>
               
               <div style="padding:0; overflow:hidden; border:none; border-radius: 0;">
                 <div class="table-container" style="max-height: 55vh; border-radius: 10px 10px 0 0; border-bottom: none;">
@@ -449,9 +467,9 @@
                     <tbody id="tbody-bao-cao-ngay"></tbody>
                   </table>
                 </div>
-                <div id="vung-tong-khoi-luong-ngay" style="display: none; padding: 10px 12px; background: var(--bg-card); border: 0.5px solid var(--border-light); border-top: none; justify-content: space-between; align-items: center; border-radius: 0 0 10px 10px;">
-                    <span style="font-size: 12px; font-weight: 800; color: var(--text-main); text-transform: uppercase;">Tổng xuất trong ngày:</span>
-                    <span style="font-size: 16px; font-weight: 900; color: var(--warning-color); background: rgba(255, 149, 0, 0.1); padding: 4px 8px; border-radius: 6px;" id="txt-tong-tan-ngay">0 <span style="font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase;">Tấn</span></span>
+                <div id="vung-tong-khoi-luong-ngay" style="display: none; padding: 12px 14px; background: var(--bg-card); border: 1px solid var(--border-light); border-top: none; justify-content: space-between; align-items: center; border-radius: 0 0 10px 10px;">
+                    <span style="font-size: 13px; font-weight: 800; color: var(--text-main); text-transform: uppercase;">Tổng xuất trong ngày:</span>
+                    <span style="font-size: 17px; font-weight: 900; color: var(--warning-color); background: rgba(255, 149, 0, 0.1); padding: 4px 10px; border-radius: 8px;" id="txt-tong-tan-ngay">0 <span style="font-size: 12px; font-weight: 700; color: var(--text-sub); text-transform: uppercase;">Tấn</span></span>
                 </div>
               </div>
           </div>
@@ -459,9 +477,9 @@
 
       <!-- VÙNG BÁO CÁO LỆNH -->
       <div id="vung-bao-cao-lenh" style="display:none;">
-          <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top: 10px; margin-bottom: 12px;">
-              <button class="btn" style="background:var(--success-color); flex:1; margin:0; font-size: 13px;" onclick="xuatExcelTienDoLenh()"><i class="ph ph-file-xls"></i> EXCEL TIẾN ĐỘ</button>
-              <button class="btn" style="background:var(--info-color); flex:1; margin:0; font-size: 13px;" onclick="moModalTongHopToanBoLo()"><i class="ph ph-stack"></i> TỔNG LÔ ĐÃ XUẤT</button>
+          <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top: 12px; margin-bottom: 16px;">
+              <button class="btn" style="background:var(--success-color); flex:1; margin:0;" onclick="xuatExcelTienDoLenh()"><i class="ph ph-file-xls"></i> EXCEL TIẾN ĐỘ</button>
+              <button class="btn" style="background:var(--info-color); flex:1; margin:0;" onclick="moModalTongHopToanBoLo()"><i class="ph ph-stack"></i> TỔNG LÔ ĐÃ XUẤT</button>
           </div>
           
           <!-- DASHBOARD TỔNG QUAN TẤN -->
@@ -485,8 +503,8 @@
 
       <!-- VÙNG BÁO CÁO ĐẠN -->
       <div id="vung-bao-cao-dan" style="display:none;">
-          <div class="card" style="margin-top: 10px; padding: 0; overflow: hidden; border: none; background: transparent; box-shadow: none;">
-              <div style="text-align:center; font-size:16px; font-weight:800; color:var(--text-main); margin-bottom:10px; text-transform:uppercase;">TỔNG HỢP THEO ĐẠN</div>
+          <div class="card" style="margin-top: 12px; padding: 0; overflow: hidden; border: none; background: transparent; box-shadow: none;">
+              <div style="text-align:center; font-size:16px; font-weight:800; color:var(--text-main); margin-bottom:12px; text-transform:uppercase;">TỔNG HỢP THEO ĐẠN</div>
               <div class="table-container" style="background: var(--bg-card);">
                 <table style="min-width: 400px;">
                   <thead>
@@ -528,7 +546,7 @@
   <div id="custom-dialog-wrapper" class="modal-overlay">
     <div class="custom-dialog-box" style="justify-content:center;">
       <h3 id="dialog-title" style="margin-top:0; font-size: 16px; font-weight: 800;">Thông báo</h3>
-      <p id="dialog-message" style="color:var(--text-sub); font-size:13px; margin-bottom:10px; line-height: 1.4;">Nội dung</p>
+      <p id="dialog-message" style="color:var(--text-sub); font-size:14px; margin-bottom:10px; line-height: 1.4;">Nội dung</p>
       <div id="dialog-buttons" class="dialog-buttons"></div>
     </div>
   </div>
@@ -547,7 +565,7 @@
     <div class="custom-dialog-box modal-full" style="background: var(--bg-body);">
       <h3 style="font-weight: 800; text-align: left; margin-bottom: 10px; flex-shrink: 0; font-size: 15px;">Kiểm Tra Danh Sách Lệnh</h3>
       <div class="modal-list-container" id="noidung-xem-lenh" style="border:none; border-radius: 0; background: var(--bg-body);"></div>
-      <button class="btn-modal-cancel" style="background: var(--bg-card); border: 0.5px solid var(--border-light);" onclick="dongModalXemLenh()">ĐÓNG BẢNG</button>
+      <button class="btn-modal-cancel" style="background: var(--bg-card);" onclick="dongModalXemLenh()">ĐÓNG BẢNG</button>
     </div>
   </div>
 
@@ -560,7 +578,7 @@
       <div class="modal-list-container" id="khung-chup-chi-tiet-xe" style="border:none; border-radius: 0; background: var(--bg-body);">
          <div id="noidung-chi-tiet-xe" style="padding-bottom: 8px;"></div>
       </div>
-      <button class="btn-modal-cancel" style="background: var(--bg-card); border: 0.5px solid var(--border-light);" onclick="dongModalXemChiTietXe()">ĐÓNG BẢNG</button>
+      <button class="btn-modal-cancel" style="background: var(--bg-card);" onclick="dongModalXemChiTietXe()">ĐÓNG BẢNG</button>
     </div>
   </div>
 
@@ -569,51 +587,59 @@
     <div class="custom-dialog-box modal-full" style="background: var(--bg-body);">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px; flex-shrink: 0;">
          <h3 style="font-weight: 800; margin:0; font-size: 15px; text-align:left;">Tổng Hợp Lô</h3>
-         <button class="btn-sm" style="background:var(--success-color); width:auto; padding: 0 10px; font-size: 12px; height: 28px;" onclick="xuatExcelToanBoLo()"><i class="ph ph-file-xls" style="margin-right:4px;"></i> EXCEL</button>
+         <button class="btn-sm" style="background:var(--success-color); width:auto; padding: 0 12px; font-size: 13px; height: 32px;" onclick="xuatExcelToanBoLo()"><i class="ph ph-file-xls" style="margin-right:4px;"></i> EXCEL</button>
       </div>
       <div class="modal-list-container" id="khung-chup-tong-hop-lo" style="border:none; border-radius: 0; background: var(--bg-body);">
          <div id="noidung-tong-hop-lo"></div>
       </div>
-      <button class="btn-modal-cancel" style="background: var(--bg-card); border: 0.5px solid var(--border-light);" onclick="dongModalTongHopToanBoLo()">ĐÓNG BẢNG</button>
+      <button class="btn-modal-cancel" style="background: var(--bg-card);" onclick="dongModalTongHopToanBoLo()">ĐÓNG BẢNG</button>
     </div>
   </div>
 
-  <!-- ==================== MODAL QUẢN LÝ LÔ ==================== -->
+  <!-- ==================== MODAL QUẢN LÝ LÔ (ĐÃ SỬA CĂN CHỈNH) ==================== -->
   <div id="modal-quan-ly-lo" class="modal-bottom-sheet">
     <div class="sheet-content">
       
-      <div style="padding: 14px 14px 8px 14px; flex-shrink: 0; background: var(--bg-body); border-bottom: 1px solid var(--border-light); z-index: 10;">
-          <h3 id="ql-lo-title" style="font-weight: 800; text-align: left; margin: 0 0 6px 0; font-size: 18px;">Chi tiết Lô xuất</h3>
-          <div style="text-align: left; font-size: 13px; font-weight: 700; color: var(--primary-color); margin-bottom: 10px; line-height: 1.3;" id="ql-lo-ten-dan">Tên đạn</div>
+      <div style="padding: 16px 16px 10px 16px; flex-shrink: 0; background: var(--bg-body); border-bottom: 1px solid var(--border-light); z-index: 10;">
+          <h3 id="ql-lo-title" style="font-weight: 800; text-align: left; margin: 0 0 8px 0; font-size: 18px;">Chi tiết Lô xuất</h3>
+          <div style="text-align: left; font-size: 14px; font-weight: 700; color: var(--primary-color); margin-bottom: 12px; line-height: 1.3;" id="ql-lo-ten-dan">Tên đạn</div>
           
-          <div style="display:flex; justify-content:space-between; font-weight:600; font-size: 12px; background: var(--bg-card); border: 0.5px solid var(--border-light); padding: 10px; border-radius: 10px; margin-bottom: 10px;">
-             <span>Tổng SL: <span id="ql-lo-sl-tong" style="color:var(--text-main); font-weight:800; font-size:14px;">0</span></span>
-             <span>Đã có Lô: <span id="ql-lo-sl-da-nhap" style="color:var(--warning-color); font-weight:800; font-size:14px;">0</span></span>
+          <div style="display:flex; justify-content:space-between; font-weight:600; font-size: 13px; background: var(--bg-card); border: 1px solid var(--border-light); padding: 12px; border-radius: 12px; margin-bottom: 12px;">
+             <span>Tổng SL: <span id="ql-lo-sl-tong" style="color:var(--text-main); font-weight:800; font-size:15px;">0</span></span>
+             <span>Đã có Lô: <span id="ql-lo-sl-da-nhap" style="color:var(--warning-color); font-weight:800; font-size:15px;">0</span></span>
           </div>
 
-          <div id="vung-goi-y-lo" style="display: none; margin-bottom: 10px; background: var(--bg-card); border: 0.5px solid var(--border-light); padding: 10px; border-radius: 10px;">
-              <div style="font-size: 12px; font-weight: 700; color: var(--primary-color); margin-bottom: 6px;"><i class="ph ph-magic-wand"></i> Chọn nhanh Lô:</div>
-              <div id="danh-sach-chip-goi-y" style="display: flex; flex-wrap: wrap; gap: 6px; max-height: 100px; overflow-y: auto;"></div>
+          <!-- MỚI: Mở rộng chiều cao Vùng gợi ý Lô lên 250px -->
+          <div id="vung-goi-y-lo" style="display: none; margin-bottom: 12px; background: var(--bg-card); border: 1px solid var(--border-light); padding: 12px; border-radius: 12px;">
+              <div style="font-size: 13px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;"><i class="ph ph-magic-wand"></i> Chọn nhanh Lô:</div>
+              <div id="danh-sach-chip-goi-y" style="display: flex; flex-wrap: wrap; gap: 8px; max-height: 250px; overflow-y: auto; padding-bottom: 6px;"></div>
           </div>
 
+          <!-- MỚI: Tách Form Nhập Lô để cân đối vuông vức -->
           <div id="vung-nhap-lo-chinh">
-              <div id="vung-goi-y-thong-minh" style="display: flex; gap: 6px; overflow-x: auto; margin-bottom: 6px; white-space: nowrap; -webkit-overflow-scrolling: touch; min-height: 0;"></div>
-              <div style="display: flex; background: var(--bg-card); border-radius: 12px; padding: 4px; align-items: center; border: 0.5px solid var(--border-light); box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
-                 <input type="text" id="input-ql-ten-lo" style="flex: 1.5; background: transparent; border: none; font-size: 15px; font-weight: 700; padding: 0 10px; height: 42px; outline: none; color: var(--text-main); min-width:0;" placeholder="Tên (VD: 203)" autocomplete="off" oninput="xuLyGoiYLoAuto()">
-                 <div style="width: 1px; height: 20px; background: var(--border-light); margin: 0 2px;"></div>
-                 <input type="number" id="input-ql-sl-lo" inputmode="decimal" pattern="[0-9]*" style="flex: 1; background: transparent; border: none; text-align: center; font-weight: 800; font-size: 16px; height: 42px; outline: none; color: var(--danger-color); min-width:0;" placeholder="SL">
+              <div id="vung-goi-y-thong-minh" style="display: flex; gap: 8px; overflow-x: auto; margin-bottom: 8px; white-space: nowrap; -webkit-overflow-scrolling: touch; min-height: 0;"></div>
+              
+              <div style="display: flex; gap: 10px; margin-bottom: 4px;">
+                  <div style="flex: 2;">
+                      <label style="font-size:12px; font-weight:600; color:var(--text-sub); display:block; margin-bottom:6px; margin-left: 2px;">Tên Lô (VD: 203)</label>
+                      <input type="text" id="input-ql-ten-lo" class="form-control" style="font-weight:700;" placeholder="Nhập tên lô..." autocomplete="off" oninput="xuLyGoiYLoAuto()">
+                  </div>
+                  <div style="flex: 1;">
+                      <label style="font-size:12px; font-weight:600; color:var(--text-sub); display:block; margin-bottom:6px; text-align:center;">Số Lượng</label>
+                      <input type="number" id="input-ql-sl-lo" class="form-control" style="font-weight:800; color:var(--danger-color); text-align:center;" placeholder="0" inputmode="decimal" pattern="[0-9]*">
+                  </div>
               </div>
           </div>
       </div>
 
-      <div style="flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; background: var(--bg-body);">
-          <div id="danh-sach-ql-lo-container" style="display: flex; flex-direction: column; gap: 6px;"></div>
+      <div style="flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; background: var(--bg-body);">
+          <div id="danh-sach-ql-lo-container" style="display: flex; flex-direction: column; gap: 8px;"></div>
       </div>
 
-      <div id="vung-nut-lo-bottom" style="padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); background: var(--bg-card); border-top: 1px solid var(--border-light); flex-shrink: 0; display: flex; gap: 10px;">
-          <button id="btn-thoat-lo" onclick="dongModalQuanLyLo()" style="flex: 1; height: 44px; border-radius: 12px; border: none; background: var(--input-bg); color: var(--text-main); font-weight: 800; font-size: 14px; transition: 0.2s;">THOÁT</button>
-          <button id="btn-huy-sua-lo" onclick="huySuaLo()" style="flex: 1; height: 44px; border-radius: 12px; border: none; background: var(--input-bg); color: var(--danger-color); font-weight: 800; font-size: 14px; display: none; transition: 0.2s;">HỦY SỬA</button>
-          <button id="btn-submit-lo" onclick="xuLyThemQuanLyLo()" style="flex: 1.5; height: 44px; border-radius: 12px; border: none; background: var(--success-color); color: white; font-weight: 800; font-size: 14px; transition: 0.2s;">NHẬP LÔ</button>
+      <div id="vung-nut-lo-bottom" style="padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: var(--bg-card); border-top: 1px solid var(--border-light); flex-shrink: 0; display: flex; gap: 12px;">
+          <button id="btn-thoat-lo" onclick="dongModalQuanLyLo()" style="flex: 1; height: 48px; border-radius: 12px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--text-main); font-weight: 800; font-size: 15px; transition: 0.2s;">THOÁT</button>
+          <button id="btn-huy-sua-lo" onclick="huySuaLo()" style="flex: 1; height: 48px; border-radius: 12px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--danger-color); font-weight: 800; font-size: 15px; display: none; transition: 0.2s;">HỦY SỬA</button>
+          <button id="btn-submit-lo" onclick="xuLyThemQuanLyLo()" style="flex: 1.5; height: 48px; border-radius: 12px; border: none; background: var(--success-color); color: white; font-weight: 800; font-size: 15px; transition: 0.2s; box-shadow: 0 4px 10px rgba(52,199,89,0.2);">NHẬP LÔ</button>
       </div>
 
     </div>
@@ -623,17 +649,17 @@
   <div id="modal-he-thong" class="modal-overlay">
     <div class="custom-dialog-box" style="justify-content:center;">
       <h3 style="margin-top:0; color:var(--text-main); font-weight: 800;">Hệ Thống</h3>
-      <p style="font-size:12px; color:var(--text-sub); margin-bottom: 16px;">Đồng bộ và quản lý bộ nhớ cục bộ.</p>
+      <p style="font-size:13px; color:var(--text-sub); margin-bottom: 16px;">Đồng bộ và quản lý bộ nhớ cục bộ.</p>
       
-      <button class="btn" style="background:var(--input-bg); color: var(--primary-color); padding: 10px;" onclick="capNhatPhienBanApp()"><i class="ph ph-arrows-clockwise"></i> TẢI LẠI TRANG</button>
+      <button class="btn" style="background:var(--input-bg); color: var(--primary-color);" onclick="capNhatPhienBanApp()"><i class="ph ph-arrows-clockwise"></i> TẢI LẠI TRANG</button>
       
       <div style="display: flex; gap: 8px; margin-top: 8px;">
-          <button class="btn" style="background:var(--success-color); flex:1; font-size:12px; padding: 10px;" onclick="xuatDuLieu()"><i class="ph ph-download-simple"></i> SAO LƯU</button>
-          <button class="btn" style="background:var(--warning-color); flex:1; font-size:12px; padding: 10px;" onclick="document.getElementById('import-file').click()"><i class="ph ph-upload-simple"></i> PHỤC HỒI</button>
+          <button class="btn" style="background:var(--success-color); flex:1; font-size:13px;" onclick="xuatDuLieu()"><i class="ph ph-download-simple"></i> SAO LƯU</button>
+          <button class="btn" style="background:var(--warning-color); flex:1; font-size:13px;" onclick="document.getElementById('import-file').click()"><i class="ph ph-upload-simple"></i> PHỤC HỒI</button>
           <input type="file" id="import-file" style="display:none;" accept=".json" onchange="nhapDuLieu(event)">
       </div>
       
-      <button class="btn" style="background:rgba(255, 59, 48, 0.1); color: var(--danger-color); margin-top: 8px; padding: 10px;" onclick="xoaToanBoDuLieu()"><i class="ph ph-trash"></i> XÓA DỮ LIỆU</button>
+      <button class="btn" style="background:rgba(255, 59, 48, 0.1); color: var(--danger-color); margin-top: 8px;" onclick="xoaToanBoDuLieu()"><i class="ph ph-trash"></i> XÓA DỮ LIỆU</button>
       
       <button class="btn-modal-cancel" onclick="dongMenuHeThong()">ĐÓNG</button>
     </div>
@@ -734,16 +760,25 @@
   });
 
   window.showDialog = function(title, message, type = 'alert', confirmFn = null) {
-      document.getElementById('dialog-title').innerText = title; document.getElementById('dialog-message').innerHTML = message; 
-      let btnContainer = document.getElementById('dialog-buttons'); let wrapper = document.getElementById('custom-dialog-wrapper'); 
-      wrapper.style.display = 'flex'; setTimeout(() => wrapper.classList.add('show'), 10);
-      window.closeDialog = function() { wrapper.classList.remove('show'); setTimeout(() => wrapper.style.display = 'none', 300); };
-      if (type === 'alert') { btnContainer.innerHTML = `<button onclick="closeDialog()" class="btn-dialog">ĐÓNG</button>`; } 
-      else if (type === 'confirm') {
+      document.getElementById('dialog-title').innerText = title;
+      document.getElementById('dialog-message').innerHTML = message;
+      let btnContainer = document.getElementById('dialog-buttons');
+      let wrapper = document.getElementById('custom-dialog-wrapper');
+      wrapper.style.display = 'flex';
+      setTimeout(() => wrapper.classList.add('show'), 10);
+      
+      window.closeDialog = function() {
+          wrapper.classList.remove('show');
+          setTimeout(() => wrapper.style.display = 'none', 300);
+      };
+      
+      if (type === 'alert') {
+          btnContainer.innerHTML = `<button onclick="closeDialog()" class="btn-dialog">ĐÓNG</button>`;
+      } else if (type === 'confirm') {
           window.execConfirm = function() { closeDialog(); if(confirmFn) confirmFn(); }
           btnContainer.innerHTML = `<button onclick="closeDialog()" class="btn-dialog" style="background:var(--input-bg); color:var(--text-main)">HỦY</button><button onclick="execConfirm()" class="btn-dialog" style="background:var(--danger-color)">ĐỒNG Ý</button>`;
       }
-  }
+  };
 
   function chuyenTab(tabId, title, navId) {
       haptic();
@@ -969,7 +1004,7 @@
       let capSelect = document.getElementById('lenh-cap'); let optionExists = Array.from(capSelect.options).some(opt => opt.value == item.cap); capSelect.value = optionExists ? item.cap : '';
       document.getElementById('lenh-sl').value = item.sl; idLenhDangSua = id;
       document.getElementById('btn-luu-lenh').innerHTML = "<i class='ph ph-floppy-disk'></i> CẬP NHẬT LỆNH"; 
-      document.getElementById('btn-huy-lenh').style.display = "block"; window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.getElementById('btn-huy-lenh').style.display = "flex"; window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   function huySuaLenh() {
       idLenhDangSua = null; document.getElementById('lenh-ten').value = ''; document.getElementById('lenh-dvt').value = ''; document.getElementById('lenh-cap').value = ''; document.getElementById('lenh-sl').value = '';
@@ -981,7 +1016,7 @@
   }
   function renderBangLenh() {
       let tbody = document.getElementById('tbody-lenh');
-      if(STATE.lenh.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="padding:20px; color:var(--text-sub);">Chưa có lệnh xuất nào.</td></tr>`; return; }
+      if(STATE.lenh.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="padding:20px; text-align:center; color:var(--text-sub);">Chưa có lệnh xuất nào.</td></tr>`; return; }
       let reversedLenh = [...STATE.lenh].reverse();
       tbody.innerHTML = reversedLenh.map(item => {
           let dsLo = item.danhSachLo || [];
@@ -991,17 +1026,19 @@
           return `
           <tr style="${idLenhDangSua === item.id ? 'background-color: var(--primary-light);' : ''}">
               <td style="font-weight:700; color:var(--primary-color)">${escapeHTML(item.soLenh)}</td>
-              <td style="text-align:left; font-size:12px; font-weight:600; cursor:pointer;" onclick="moModalQuanLyLo('LENH', '${item.id}')">
+              <td style="text-align:left; cursor:pointer;" onclick="moModalQuanLyLo('LENH', '${item.id}')">
                   <div style="color:var(--text-main); font-weight:700;">${escapeHTML(item.ten)}</div>
-                  <div style="font-size:10px; color:${trangThaiLoColor}; margin-top:2px; font-weight: 700;">
-                     <i class="ph ph-stack"></i> Nhập Lô: ${slDaNhapLo} / ${item.sl}
+                  <div style="font-size:10px; color:${trangThaiLoColor}; margin-top:3px; font-weight: 700;">
+                     <i class="ph ph-stack"></i> Dự kiến Lô: ${slDaNhapLo} / ${item.sl}
                   </div>
               </td>
               <td style="color:var(--text-sub);">${escapeHTML(item.dvt)}</td><td style="color:var(--text-sub);">${escapeHTML(item.cap)}</td>
               <td style="color:var(--danger-color); font-weight:700;">${item.sl}</td>
               <td>
-                  <button class="btn-sm btn-edit" onclick="batDauSuaLenh('${item.id}')"><i class="ph ph-pencil-simple"></i></button>
-                  <button class="btn-sm btn-del" onclick="xoaLenh('${item.id}')"><i class="ph ph-trash"></i></button>
+                  <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
+                      <button class="btn-sm btn-edit" onclick="batDauSuaLenh('${item.id}')"><i class="ph ph-pencil-simple"></i></button>
+                      <button class="btn-sm btn-del" onclick="xoaLenh('${item.id}')"><i class="ph ph-trash"></i></button>
+                  </div>
               </td>
           </tr>
       `}).join('');
@@ -1019,8 +1056,8 @@
           let items = groups[soLenh]; 
           html += `
           <div class="card" style="margin-top: 0; margin-bottom: 12px; padding: 0; overflow: hidden;">
-              <div style="background: var(--input-bg); padding: 10px 12px; border-bottom: 0.5px solid var(--border-light);">
-                  <span style="color: var(--primary-color); font-weight: 800; font-size: 15px;">${escapeHTML(soLenh)}</span>
+              <div style="background: var(--input-bg); padding: 10px 12px; border-bottom: 1px solid var(--border-light);">
+                  <span style="color: var(--primary-color); font-weight: 800; font-size: 15px;">LỆNH: ${escapeHTML(soLenh)}</span>
               </div>
               <div style="background: var(--bg-card);">
                   ${items.map((i, idx) => `
@@ -1084,7 +1121,7 @@
       let xe = "";
       if (xeSelectVal === 'MANUAL') {
           xe = document.getElementById('th-xe-input').value.trim();
-          if(!xe) { showDialog("Lỗi", "Vui lòng nhập số xe cụ thể.", "alert"); return; }
+          if(!xe) { showDialog("Lỗi", "Vui lòng nhập số/tên xe cụ thể.", "alert"); return; }
       } else if (xeSelectVal === 'AUTO') {
           if (idThucHienDangSua) { showDialog("Lỗi", "Vui lòng chọn hoặc nhập số xe khi đang sửa.", "alert"); return; }
           let maxNum = 0; let uniqueXeToday = [...new Set(STATE.thucHien.filter(t => t.ngay === ngay).map(t => t.xe))];
@@ -1135,7 +1172,7 @@
       }, 50);
       idThucHienDangSua = id; 
       document.getElementById('btn-ghi-xe').innerHTML = "<i class='ph ph-floppy-disk'></i> CẬP NHẬT SỔ"; document.getElementById('btn-ghi-xe').style.background = "var(--primary-color)";
-      document.getElementById('btn-huy-xe').style.display = "block"; window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.getElementById('btn-huy-xe').style.display = "flex"; window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   function huySuaThucHien() {
       idThucHienDangSua = null; 
@@ -1152,7 +1189,7 @@
   }
   function renderBangThucHien() {
       let tbody = document.getElementById('tbody-thuc-hien');
-      if(STATE.thucHien.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="padding:20px; color:var(--text-sub);">Chưa có dữ liệu xuất.</td></tr>`; return; }
+      if(STATE.thucHien.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="padding:20px; text-align:center; color:var(--text-sub);">Chưa có dữ liệu xuất.</td></tr>`; return; }
       let reversed = [...STATE.thucHien].reverse();
       tbody.innerHTML = reversed.map((item) => {
           let dsLo = item.danhSachLo || [];
@@ -1166,17 +1203,19 @@
                  ${escapeHTML(item.xe)}
                  ${item.phieu ? `<div style="font-size:9px; color:var(--text-main); font-weight:600; margin-top:2px;">(P: ${escapeHTML(item.phieu)})</div>` : ''}
               </td>
-              <td style="text-align:left; font-size:12px; font-weight:600; cursor:pointer;" onclick="moModalQuanLyLo('THUCHIEN', '${item.id}')">
-                  <div style="color:var(--text-main);">${escapeHTML(item.ten)}</div>
-                  <div style="font-size:10px; color:${trangThaiLoColor}; margin-top:2px; font-weight: 700;">
+              <td style="text-align:left; cursor:pointer;" onclick="moModalQuanLyLo('THUCHIEN', '${item.id}')">
+                  <div style="color:var(--text-main); font-weight:700;">${escapeHTML(item.ten)}</div>
+                  <div style="font-size:10px; color:${trangThaiLoColor}; margin-top:3px; font-weight: 700;">
                      <i class="ph ph-stack"></i> Nhập Lô: ${slDaNhapLo} / ${item.sl}
                   </div>
               </td>
               <td style="color:var(--text-sub);">${escapeHTML(item.cap)}</td>
               <td style="color:var(--success-color); font-weight:800;">${item.sl}</td>
               <td>
-                  <button class="btn-sm btn-edit" onclick="batDauSuaThucHien('${item.id}')"><i class="ph ph-pencil-simple"></i></button>
-                  <button class="btn-sm btn-del" onclick="xoaThucHien('${item.id}')"><i class="ph ph-trash"></i></button>
+                  <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
+                      <button class="btn-sm btn-edit" onclick="batDauSuaThucHien('${item.id}')"><i class="ph ph-pencil-simple"></i></button>
+                      <button class="btn-sm btn-del" onclick="xoaThucHien('${item.id}')"><i class="ph ph-trash"></i></button>
+                  </div>
               </td>
           </tr>
       `}).join('');
@@ -1205,11 +1244,11 @@
           if(!record) return;
           titleEl.innerText = "Dự kiến Lô xuất (Lệnh)";
           nameEl.innerText = record.ten;
-          vungNhap.style.display = 'flex'; 
+          vungNhap.style.display = 'block'; 
           vungGoiY.style.display = 'none';
           vungGoiYThongMinh.innerHTML = '';
           
-          document.getElementById('btn-submit-lo').style.display = 'flex';
+          document.getElementById('btn-submit-lo').style.display = 'block';
           document.getElementById('btn-huy-sua-lo').style.display = 'none';
           document.getElementById('btn-thoat-lo').style.display = 'block';
           
@@ -1220,10 +1259,10 @@
           if(!record) return;
           titleEl.innerText = "Thực tế xuất Lô";
           nameEl.innerText = record.ten;
-          vungNhap.style.display = 'flex';
+          vungNhap.style.display = 'block';
           vungGoiYThongMinh.innerHTML = '';
           
-          document.getElementById('btn-submit-lo').style.display = 'flex';
+          document.getElementById('btn-submit-lo').style.display = 'block';
           document.getElementById('btn-huy-sua-lo').style.display = 'none';
           document.getElementById('btn-thoat-lo').style.display = 'block';
           
@@ -1264,9 +1303,9 @@
               container.innerHTML = `<div style="padding:20px; text-align:center; color:var(--text-sub);">Chưa có thông tin Lô.</div>`;
           } else {
               container.innerHTML = viewData.listLo.map(lo => `
-                  <div class="modern-list-item" style="border-radius:10px; margin-bottom:6px; border:0.5px solid var(--border-light);">
+                  <div class="modern-list-item" style="border-radius:10px; margin-bottom:8px; border:1px solid var(--border-light);">
                       <div class="modern-list-content" style="padding-left: 0;">
-                          <div class="modern-list-title" style="font-size: 14px;">${escapeHTML(lo.tenLo)}</div>
+                          <div class="modern-list-title" style="font-size: 15px;">${escapeHTML(lo.tenLo)}</div>
                       </div>
                       <div class="modern-list-qty">${lo.sl}</div>
                   </div>
@@ -1328,7 +1367,7 @@
 
       if (suggestions.size > 0) {
           let html = Array.from(suggestions).map(sug => {
-              return `<div class="chip-lo" style="background: var(--info-color); border:none; color: white; padding: 4px 12px; margin:0; flex-shrink:0; font-size:13px; box-shadow: 0 2px 6px rgba(88,86,214,0.3);" onclick="appendGoiY('${sug}')"><b>${sug}</b></div>`;
+              return `<div class="chip-lo" style="background: var(--info-color); border:none; color: white; padding: 6px 14px; margin:0; flex-shrink:0; font-size:14px; box-shadow: 0 2px 6px rgba(88,86,214,0.3);" onclick="appendGoiY('${sug}')"><b>${sug}</b></div>`;
           }).join('');
           vungGoiY.innerHTML = html;
       } else {
@@ -1403,12 +1442,14 @@
           }
 
           container.innerHTML = dsHienThi.map((lo) => `
-              <div class="modal-list-item" style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-card); border-radius:10px; margin-bottom:4px; padding:6px 10px; border:0.5px solid var(--border-light);">
-                  <div style="font-weight:700; color:var(--text-main); font-size:13px; word-break:break-word; padding-right:8px;">${escapeHTML(lo.tenLo)}</div>
-                  <div style="display:flex; align-items:center; gap: 6px; flex-shrink:0;">
-                      <span style="font-weight:800; font-size:14px; color:var(--primary-color); margin-right: 4px;">${lo.sl}</span>
-                      <button class="btn-sm btn-edit" style="margin:0; height:26px; width:26px; font-size:13px; border-radius:6px; background:var(--primary-light); color:var(--primary-color);" onclick="batDauSuaLo('${lo.id}')"><i class="ph ph-pencil-simple"></i></button>
-                      <button class="btn-sm btn-del" style="margin:0; height:26px; width:26px; font-size:13px; border-radius:6px; background:rgba(255, 59, 48, 0.1); color:var(--danger-color);" onclick="xoaQuanLyLo('${lo.id}')"><i class="ph ph-trash"></i></button>
+              <div class="modern-list-item" style="border-radius:12px; margin-bottom:8px; border:1px solid var(--border-light);">
+                  <div class="modern-list-content" style="padding-left:0;">
+                      <div class="modern-list-title" style="font-size:15px;">${escapeHTML(lo.tenLo)}</div>
+                  </div>
+                  <div style="display:flex; align-items:center; gap: 8px; flex-shrink:0;">
+                      <div class="modern-list-qty" style="margin-right: 8px;">${lo.sl}</div>
+                      <button class="btn-sm btn-edit" onclick="batDauSuaLo('${lo.id}')"><i class="ph ph-pencil-simple"></i></button>
+                      <button class="btn-sm btn-del" onclick="xoaQuanLyLo('${lo.id}')"><i class="ph ph-trash"></i></button>
                   </div>
               </div>
           `).join('');
@@ -1496,7 +1537,6 @@
       renderChiTietQuanLyLo(record);
   }
 
-  // ==================== TAB 4: BÁO CÁO ====================
   function chuyenLoaiBaoCao(mode) {
       haptic();
       currentBaoCaoMode = mode;
@@ -1532,7 +1572,7 @@
       let vungTong = document.getElementById('vung-tong-khoi-luong-ngay');
 
       if(dataLoc.length === 0) { 
-          tbody.innerHTML = `<tr><td colspan="8" style="padding:20px; color:var(--text-sub);">Không có dữ liệu xuất trong kỳ.</td></tr>`; 
+          tbody.innerHTML = `<tr><td colspan="8" style="padding:20px; text-align:center; color:var(--text-sub);">Không có dữ liệu xuất trong kỳ.</td></tr>`; 
           document.getElementById('bc-tong-luot').innerText = "0"; 
           if(vungTong) vungTong.style.display = 'none';
           return; 
@@ -1577,17 +1617,17 @@
           }));
 
           return `
-          <tr>
+          <tr style="border-bottom:0.5px solid var(--border-light); background: var(--bg-card);">
               <td style="font-weight:800; color:var(--text-sub);">${index + 1}</td>
               <td style="text-align:left; cursor:pointer;" onclick="moModalQuanLyLo('VIEW', null, JSON.parse('${viewDataStr}'))">
                  <div style="font-weight:700; color:var(--text-main);">${escapeHTML(item.ten)}</div>
-                 <div style="font-size:10px; color:var(--primary-color); margin-top:2px;"><i class="ph ph-stack"></i> Xem Lô xuất</div>
+                 <div style="font-size:11px; color:var(--primary-color); margin-top:3px;"><i class="ph ph-stack"></i> Xem Lô xuất</div>
               </td>
               <td style="color:var(--text-sub);">${escapeHTML(item.dvt)}</td>
               <td style="color:var(--text-sub);">${escapeHTML(item.cap)}</td>
               <td style="color:var(--primary-color); font-weight:700;">${slLenh}</td>
               <td style="color:var(--text-sub); font-weight:700;">${tongDaCap}</td>
-              <td style="color:var(--warning-color); font-weight:800; font-size:13px; background: rgba(255, 149, 0, 0.05);">${item.slGroup}</td>
+              <td style="color:var(--warning-color); font-weight:800; font-size:14px; background: rgba(255, 149, 0, 0.05);">${item.slGroup}</td>
               <td style="color:${conLai < 0 ? 'var(--danger-color)' : 'var(--text-main)'}; font-weight:700;">${conLai}</td>
           </tr>
       `}).join('');
@@ -1595,7 +1635,7 @@
       if(vungTong) {
           vungTong.style.display = 'flex';
           let formatTongTan = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(tongTanXuat);
-          document.getElementById('txt-tong-tan-ngay').innerHTML = `${formatTongTan} <span style="font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase;">Tấn</span>`;
+          document.getElementById('txt-tong-tan-ngay').innerHTML = `${formatTongTan} <span style="font-size: 12px; font-weight: 700; color: var(--text-sub); text-transform: uppercase;">Tấn</span>`;
       }
   }
 
@@ -1655,27 +1695,27 @@
           if(percent > 100) percent = 100;
 
           html += `
-          <div class="card" style="margin-top: 0; margin-bottom: 12px; padding:0; overflow:hidden;">
-              <div style="background: var(--input-bg); padding: 12px; border-bottom: 1px solid var(--border-light);">
-                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
-                      <span style="color: var(--primary-color); font-weight: 800; font-size: 15px;">${escapeHTML(soLenh)}</span>
-                      <span style="color: var(--text-main); font-weight: 700; font-size: 12px;">${formatTanDaXuat} / ${formatTanLenh} Tấn</span>
+          <div class="card" style="margin-top: 0; margin-bottom: 16px; padding:0; overflow:hidden;">
+              <div style="background: var(--input-bg); padding: 16px; border-bottom: 1px solid var(--border-light);">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+                      <span style="color: var(--primary-color); font-weight: 800; font-size: 16px;">${escapeHTML(soLenh)}</span>
+                      <span style="color: var(--text-main); font-weight: 700; font-size: 13px;">${formatTanDaXuat} / ${formatTanLenh} Tấn</span>
                   </div>
-                  <div style="width:100%; height:4px; background:rgba(0,0,0,0.05); border-radius:2px; overflow:hidden; margin-bottom:4px;">
+                  <div style="width:100%; height:6px; background:rgba(0,0,0,0.05); border-radius:3px; overflow:hidden; margin-bottom:6px;">
                       <div style="height:100%; width:${percent}%; background:${percent >= 100 ? 'var(--success-color)' : 'var(--primary-color)'}; transition:0.3s;"></div>
                   </div>
-                  <div style="font-size:11px; color:var(--text-sub); text-align:right; font-weight: 500;">Còn nợ: <b style="color: var(--text-main);">${formatTanConLai} Tấn</b></div>
+                  <div style="font-size:12px; color:var(--text-sub); text-align:right; font-weight: 500;">Còn nợ: <b style="color: var(--text-main);">${formatTanConLai} Tấn</b></div>
               </div>
               
               <div class="table-container" style="border: none; border-radius: 0; max-height: none;">
                   <table style="width:100%; min-width: 500px; font-size:11px; text-align:center; border-collapse: collapse;">
                       <tr style="color:var(--text-sub); background: var(--bg-card);">
-                        <th style="padding:8px 4px; text-align:left; width: 150px; background: transparent;">Tên đạn</th>
-                        <th style="padding:8px 4px; width: 30px; background: transparent;">ĐVT</th>
-                        <th style="padding:8px 4px; width: 30px; background: transparent;">Cấp</th>
-                        <th style="padding:8px 4px; width: 50px; background: transparent;">Kế Hoạch</th>
-                        <th style="padding:8px 4px; width: 50px; background: transparent;">Đã Cấp</th>
-                        <th style="padding:8px 4px; width: 50px; background: transparent;">Còn Lại</th>
+                        <th style="padding:10px 4px; text-align:left; width: 150px; background: transparent;">Tên đạn</th>
+                        <th style="padding:10px 4px; width: 40px; background: transparent;">ĐVT</th>
+                        <th style="padding:10px 4px; width: 40px; background: transparent;">Cấp</th>
+                        <th style="padding:10px 4px; width: 60px; background: transparent;">Kế Hoạch</th>
+                        <th style="padding:10px 4px; width: 60px; background: transparent;">Đã Cấp</th>
+                        <th style="padding:10px 4px; width: 60px; background: transparent;">Còn Lại</th>
                       </tr>
                       ${g.items.map(i => {
                           let colorConLai = i.conLai < 0 ? 'var(--danger-color)' : (i.conLai === 0 ? 'var(--success-color)' : 'var(--text-main)');
@@ -1690,15 +1730,15 @@
 
                           return `
                           <tr style="border-top:0.5px solid var(--border-light); background: var(--bg-card);">
-                              <td style="padding:10px 4px; text-align:left; cursor:pointer;" onclick="moModalQuanLyLo('VIEW', null, JSON.parse('${viewDataStr}'))">
+                              <td style="padding:12px 6px; text-align:left; cursor:pointer;" onclick="moModalQuanLyLo('VIEW', null, JSON.parse('${viewDataStr}'))">
                                   <div style="font-weight:700; color:var(--text-main);">${escapeHTML(i.ten)}</div>
-                                  <div style="font-size:10px; color:var(--primary-color); margin-top:2px;"><i class="ph ph-stack"></i> Xem Lô đã xuất</div>
+                                  <div style="font-size:11px; color:var(--primary-color); margin-top:3px;"><i class="ph ph-stack"></i> Xem Lô đã xuất</div>
                               </td>
-                              <td style="padding:10px 4px; color:var(--text-sub);">${escapeHTML(i.dvt)}</td>
-                              <td style="padding:10px 4px; color:var(--text-sub);">${escapeHTML(i.cap)}</td>
-                              <td style="padding:10px 4px; font-weight:700; color:var(--primary-color);">${i.slLenh}</td>
-                              <td style="padding:10px 4px; font-weight:700; color:var(--warning-color);">${i.slDaXuat}</td>
-                              <td style="padding:10px 4px; font-weight:800; color:${colorConLai};">${i.conLai}</td>
+                              <td style="padding:12px 4px; color:var(--text-sub);">${escapeHTML(i.dvt)}</td>
+                              <td style="padding:12px 4px; color:var(--text-sub);">${escapeHTML(i.cap)}</td>
+                              <td style="padding:12px 4px; font-weight:700; color:var(--primary-color);">${i.slLenh}</td>
+                              <td style="padding:12px 4px; font-weight:700; color:var(--warning-color);">${i.slDaXuat}</td>
+                              <td style="padding:12px 4px; font-weight:800; color:${colorConLai};">${i.conLai}</td>
                           </tr>
                           `;
                       }).join('')}
@@ -1747,14 +1787,14 @@
 
           return `
           <tr style="border-top:0.5px solid var(--border-light); background: var(--bg-card);">
-              <td style="padding:10px 4px; text-align:left; cursor:pointer;" onclick="moModalQuanLyLo('VIEW', null, JSON.parse('${viewDataStr}'))">
+              <td style="padding:12px 6px; text-align:left; cursor:pointer;" onclick="moModalQuanLyLo('VIEW', null, JSON.parse('${viewDataStr}'))">
                   <div style="font-weight:700; color:var(--text-main); line-height: 1.3;">${escapeHTML(item.ten)}</div>
-                  <div style="font-size:10px; color:var(--primary-color); margin-top:2px;"><i class="ph ph-stack"></i> Xem tổng Lô đã xuất</div>
+                  <div style="font-size:11px; color:var(--primary-color); margin-top:3px;"><i class="ph ph-stack"></i> Xem tổng Lô đã xuất</div>
               </td>
-              <td style="padding:10px 4px; color:var(--text-sub);">${escapeHTML(item.dvt)}</td>
-              <td style="padding:10px 4px; font-weight:700; color:var(--primary-color);">${item.slLenh}</td>
-              <td style="padding:10px 4px; font-weight:700; color:var(--warning-color);">${item.slDaXuat}</td>
-              <td style="padding:10px 4px; font-weight:800; color:${colorConLai};">${conLai}</td>
+              <td style="padding:12px 4px; color:var(--text-sub);">${escapeHTML(item.dvt)}</td>
+              <td style="padding:12px 4px; font-weight:700; color:var(--primary-color);">${item.slLenh}</td>
+              <td style="padding:12px 4px; font-weight:700; color:var(--warning-color);">${item.slDaXuat}</td>
+              <td style="padding:12px 4px; font-weight:800; color:${colorConLai};">${conLai}</td>
           </tr>
           `;
       }).join('');
