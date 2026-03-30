@@ -1874,6 +1874,8 @@
           let viewDataStr = escapeHTML(JSON.stringify({
               title: "Chi tiết Lô xuất (Báo cáo)",
               name: item.ten,
+              dvt: item.dvt,
+              cap: item.cap,
               total: item.slGroup,
               listLo: loGop
           }));
@@ -1985,6 +1987,8 @@
                           let viewDataStr = escapeHTML(JSON.stringify({
                               title: "Chi tiết Lô thực xuất",
                               name: i.ten,
+                              dvt: i.dvt,
+                              cap: i.cap,
                               total: i.slDaXuat,
                               listLo: loGop
                           }));
@@ -2042,6 +2046,8 @@
           let viewDataStr = escapeHTML(JSON.stringify({
               title: "Tổng Lô Đã Xuất Của Đạn Này",
               name: item.ten,
+              dvt: item.dvt,
+              cap: "Tổng Hợp",
               total: item.slDaXuat,
               listLo: loGop
           }));
@@ -2120,21 +2126,42 @@
           let gXe = xeGroups[xe]; 
           let formatTanXe = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(gXe.tongKL / 1000);
           
+          // Gộp đạn cho view Tổng Xe (Merged View)
           let mergedItems = [];
           gXe.items.forEach(i => {
               let existing = mergedItems.find(m => m.ten === i.ten && m.cap === i.cap);
-              if(existing) { existing.sl += i.sl; } else { mergedItems.push({...i}); }
+              if(existing) { 
+                  existing.sl += i.sl; 
+                  if(i.danhSachLo) existing.danhSachLo.push(...i.danhSachLo);
+              } else { 
+                  let newItem = {...i};
+                  newItem.danhSachLo = i.danhSachLo ? [...i.danhSachLo] : [];
+                  mergedItems.push(newItem); 
+              }
           });
           
           let mergedHtml = mergedItems.map((i, idx) => {
+              let loGop = gopDanhSachLo(i.danhSachLo || []);
+              let viewDataStr = escapeHTML(JSON.stringify({
+                  title: `Chi tiết Lô Xe ${xe}`,
+                  name: i.ten,
+                  dvt: i.dvt,
+                  cap: i.cap,
+                  total: i.sl,
+                  listLo: loGop
+              }));
+
               return `
-              <div class="modern-list-item">
+              <div class="modern-list-item" onclick="moModalQuanLyLo('VIEW', null, JSON.parse('${viewDataStr}'))" style="cursor: pointer; padding: 12px 16px;">
                   <div class="modern-list-stt">${idx + 1}</div>
                   <div class="modern-list-content">
                       <div class="modern-list-title">${escapeHTML(i.ten)}</div>
-                      <div class="modern-list-subtitle">ĐVT: ${escapeHTML(i.dvt) || '?'} &bull; Cấp: ${escapeHTML(i.cap)}</div>
+                      <div class="modern-list-subtitle">ĐVT: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.dvt) || '?'}</span> &bull; Cấp: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.cap)}</span></div>
                   </div>
-                  <div class="modern-list-qty">${i.sl}</div>
+                  <div style="display:flex; align-items:center; gap: 8px;">
+                      <div class="modern-list-qty">${i.sl}</div>
+                      <i class="ph-bold ph-caret-right" style="color: #C7C7CC; font-size: 16px;"></i>
+                  </div>
               </div>`;
           }).join('');
 
@@ -2147,21 +2174,42 @@
                   let gPhieu = gXe.phieuGroups[phieu];
                   let formatTanPhieu = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(gPhieu.tongKL / 1000);
 
+                  // Gộp đạn bên trong 1 Phiếu
                   let ticketItems = [];
                   gPhieu.items.forEach(i => {
                       let existing = ticketItems.find(m => m.ten === i.ten && m.cap === i.cap);
-                      if(existing) { existing.sl += i.sl; } else { ticketItems.push({...i}); }
+                      if(existing) { 
+                          existing.sl += i.sl; 
+                          if(i.danhSachLo) existing.danhSachLo.push(...i.danhSachLo);
+                      } else { 
+                          let newItem = {...i};
+                          newItem.danhSachLo = i.danhSachLo ? [...i.danhSachLo] : [];
+                          ticketItems.push(newItem); 
+                      }
                   });
 
                   let itemsHtml = ticketItems.map((i, idx) => {
+                      let loGop = gopDanhSachLo(i.danhSachLo || []);
+                      let viewDataStr = escapeHTML(JSON.stringify({
+                          title: `Chi tiết Lô Phiếu ${phieu}`,
+                          name: i.ten,
+                          dvt: i.dvt,
+                          cap: i.cap,
+                          total: i.sl,
+                          listLo: loGop
+                      }));
+
                       return `
-                      <div class="modern-list-item">
+                      <div class="modern-list-item" onclick="moModalQuanLyLo('VIEW', null, JSON.parse('${viewDataStr}'))" style="cursor: pointer; padding: 12px 16px;">
                           <div class="modern-list-stt">${idx + 1}</div>
                           <div class="modern-list-content">
                               <div class="modern-list-title">${escapeHTML(i.ten)}</div>
-                              <div class="modern-list-subtitle">ĐVT: ${escapeHTML(i.dvt) || '?'} &bull; Cấp: ${escapeHTML(i.cap)}</div>
+                              <div class="modern-list-subtitle">ĐVT: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.dvt) || '?'}</span> &bull; Cấp: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.cap)}</span></div>
                           </div>
-                          <div class="modern-list-qty">${i.sl}</div>
+                          <div style="display:flex; align-items:center; gap: 8px;">
+                              <div class="modern-list-qty">${i.sl}</div>
+                              <i class="ph-bold ph-caret-right" style="color: #C7C7CC; font-size: 16px;"></i>
+                          </div>
                       </div>`;
                   }).join('');
 
@@ -2215,13 +2263,107 @@
   function dongModalXemChiTietXe() { let w = document.getElementById('modal-chi-tiet-xe'); w.classList.remove('show'); setTimeout(() => w.style.display = 'none', 300); }
 
   function xuatExcelTienDoLenh() {
+  function moModalQuanLyLo(type, id, viewData = null) {
       haptic();
-      let exportData = [];
+      currentLoContext = { type, id, viewData };
+      huySuaLo(); 
+      
+      let titleEl = document.getElementById('ql-lo-title');
+      let nameEl = document.getElementById('ql-lo-ten-dan');
+      let tongEl = document.getElementById('ql-lo-sl-tong');
+      let daNhapEl = document.getElementById('ql-lo-sl-da-nhap');
+      
+      let vungNhap = document.getElementById('vung-nhap-lo-chinh');
+      let vungGoiY = document.getElementById('vung-goi-y-lo');
+      let vungGoiYThongMinh = document.getElementById('vung-goi-y-thong-minh');
+      
+      document.getElementById('input-ql-ten-lo').value = '';
+      document.getElementById('input-ql-sl-lo').value = '';
 
-      if(STATE.lenh.length === 0) {
-          showDialog("Lỗi", "Chưa có dữ liệu Lệnh nào để xuất.", "alert");
-          return;
+      if (type === 'LENH') {
+          let record = STATE.lenh.find(l => l.id === id);
+          if(!record) return;
+          titleEl.innerText = "Dự kiến Lô xuất (Lệnh)";
+          nameEl.innerHTML = `${escapeHTML(record.ten)} <br><span style="font-size:12px; color:var(--text-sub); font-weight:500; display:inline-block; margin-top:4px;">Cấp: ${escapeHTML(record.cap)} &bull; ĐVT: ${escapeHTML(record.dvt)}</span>`;
+          vungNhap.style.display = 'block'; 
+          vungGoiY.style.display = 'none';
+          vungGoiYThongMinh.innerHTML = '';
+          
+          document.getElementById('btn-submit-lo').style.display = 'block';
+          document.getElementById('btn-huy-sua-lo').style.display = 'none';
+          document.getElementById('btn-thoat-lo').style.display = 'block';
+          
+          renderChiTietQuanLyLo(record);
+      } 
+      else if (type === 'THUCHIEN') {
+          let record = STATE.thucHien.find(t => t.id === id);
+          if(!record) return;
+          titleEl.innerText = "Thực tế xuất Lô";
+          nameEl.innerHTML = `${escapeHTML(record.ten)} <br><span style="font-size:12px; color:var(--text-sub); font-weight:500; display:inline-block; margin-top:4px;">Cấp: ${escapeHTML(record.cap)} &bull; ĐVT: ${escapeHTML(record.dvt)}</span>`;
+          vungNhap.style.display = 'block';
+          vungGoiYThongMinh.innerHTML = '';
+          
+          document.getElementById('btn-submit-lo').style.display = 'block';
+          document.getElementById('btn-huy-sua-lo').style.display = 'none';
+          document.getElementById('btn-thoat-lo').style.display = 'block';
+          
+          let lenhGoc = STATE.lenh.find(l => l.id === record.lenhId);
+          if (lenhGoc && lenhGoc.danhSachLo && lenhGoc.danhSachLo.length > 0) {
+              vungGoiY.style.display = 'block';
+              let chipsHtml = lenhGoc.danhSachLo.map(lo => {
+                  return `<button class="chip-lo" onclick="dienNhanhGoiYLo('${escapeHTML(lo.tenLo)}', ${lo.sl})">
+                             ${escapeHTML(lo.tenLo)} <span style="opacity:0.6; font-weight: 500;">(${lo.sl})</span>
+                          </button>`;
+              }).join('');
+              document.getElementById('danh-sach-chip-goi-y').innerHTML = chipsHtml;
+          } else {
+              vungGoiY.style.display = 'none';
+          }
+          
+          renderChiTietQuanLyLo(record);
       }
+      else if (type === 'VIEW') {
+          titleEl.innerText = viewData.title || "Chi tiết Lô";
+          nameEl.innerHTML = `${escapeHTML(viewData.name)} <br><span style="font-size:12px; color:var(--text-sub); font-weight:500; display:inline-block; margin-top:4px;">Cấp: ${escapeHTML(viewData.cap)} &bull; ĐVT: ${escapeHTML(viewData.dvt)}</span>`;
+          
+          vungNhap.style.display = 'none';
+          vungGoiY.style.display = 'none';
+          vungGoiYThongMinh.innerHTML = '';
+          
+          document.getElementById('btn-submit-lo').style.display = 'none';
+          document.getElementById('btn-huy-sua-lo').style.display = 'none';
+          document.getElementById('btn-thoat-lo').style.display = 'block';
+          
+          let tongDaXuat = viewData.listLo.reduce((sum, lo) => sum + lo.sl, 0);
+          tongEl.innerText = viewData.total || tongDaXuat;
+          daNhapEl.innerText = tongDaXuat;
+          daNhapEl.style.color = (tongDaXuat === viewData.total) ? 'var(--success-color)' : 'var(--warning-color)';
+
+          let container = document.getElementById('danh-sach-ql-lo-container');
+          if (viewData.listLo.length === 0) {
+              container.innerHTML = `<div style="padding:40px; text-align:center; color:var(--text-sub);"><i class="ph-bold ph-stack" style="font-size:32px; opacity:0.5; margin-bottom:8px;"></i><br>Chưa có Lô nào được lưu.</div>`;
+          } else {
+              container.innerHTML = viewData.listLo.map((lo, idx) => `
+                  <div class="modern-list-item" style="border-radius:14px; margin-bottom:10px; border:0.5px solid var(--border-light); box-shadow: var(--card-shadow); padding: 12px 14px;">
+                      <div class="modern-list-stt" style="font-size: 14px; width: 28px;">${idx + 1}</div>
+                      <div class="modern-list-content" style="padding-left: 0;">
+                          <div class="modern-list-title" style="font-size: 16px;">${escapeHTML(lo.tenLo)}</div>
+                      </div>
+                      <div class="modern-list-qty" style="font-size: 18px;">${lo.sl}</div>
+                  </div>
+              `).join('');
+          }
+      }
+      
+      let w = document.getElementById('modal-quan-ly-lo');
+      w.style.display = 'flex';
+      setTimeout(() => {
+          w.classList.add('show');
+          if (type === 'LENH' || type === 'THUCHIEN') {
+              xuLyGoiYLoAuto();
+          }
+      }, 10);
+  }
 
       STATE.lenh.forEach(item => {
           let slDaXuat = 0;
