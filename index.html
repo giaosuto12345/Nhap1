@@ -623,18 +623,11 @@
              <button class="btn-sm" style="background:var(--primary-light); color:var(--primary-color); width:auto; padding: 0 10px; font-size: 12px; height: 30px;" onclick="xuatAnhBaoCaoModal('noidung-tong-hop-lo', 'TongHopLo')"><i class="ph-bold ph-camera"></i></button>
              <button class="btn-sm" style="background:var(--success-color); width:auto; padding: 0 10px; font-size: 12px; height: 30px;" onclick="xuatExcelToanBoLo()"><i class="ph-bold ph-file-xls"></i></button>
          </div>
-      </div>
-      <div class="modal-list-container" id="noidung-tong-hop-lo"></div>
-      <div class="modal-footer">
-          <button class="btn-modal-cancel-sm" onclick="dongModalTongHopToanBoLo()">ĐÓNG</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== MODAL BOTTOM SHEET (QUẢN LÝ LÔ) ==================== -->
+  <!-- ==================== MODAL BOTTOM SHEET (QUẢN LÝ LÔ) TỐI ƯU ==================== -->
   <div id="modal-quan-ly-lo" class="modal-bottom-sheet">
     <div class="sheet-content">
       
+      <!-- PILL DRAG INDICATOR -->
       <div class="sheet-pill-wrapper"><div class="sheet-pill"></div></div>
 
       <div style="padding: 4px 20px 12px 20px; flex-shrink: 0; background: var(--bg-body); border-bottom: 0.5px solid var(--border-light); z-index: 10;">
@@ -654,14 +647,21 @@
           <div id="vung-nhap-lo-chinh">
               <div id="vung-goi-y-thong-minh" style="display: flex; gap: 8px; overflow-x: auto; margin-bottom: 10px; white-space: nowrap; -webkit-overflow-scrolling: touch; min-height: 0;"></div>
               
+              <!-- MỚI: Thanh công cụ Nhập Lô có nút Excel -->
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding: 0 2px;">
+                  <label style="font-size:12px; font-weight:700; color:var(--text-sub); text-transform: uppercase; margin:0;">Nhập Lô Thủ Công</label>
+                  <button onclick="document.getElementById('excel-upload-lo').click()" style="background:var(--success-color); color:white; border:none; padding: 4px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; display:flex; align-items:center; gap:4px; cursor:pointer;">
+                      <i class="ph-bold ph-file-xls" style="font-size: 14px;"></i> TỪ EXCEL
+                  </button>
+                  <input type="file" id="excel-upload-lo" style="display:none;" accept=".xlsx, .xls, .csv" onchange="xuLyNhapsLoTuExcel(event)">
+              </div>
+
               <div style="display: flex; gap: 12px; margin-bottom: 4px;">
                   <div style="flex: 2;">
-                      <label style="font-size:12px; font-weight:700; color:var(--text-sub); display:block; margin-bottom:6px; margin-left: 2px; text-transform: uppercase;">Tên Lô (VD: 203)</label>
-                      <input type="text" id="input-ql-ten-lo" class="form-control" style="font-weight:700; font-size: 16px;" placeholder="Nhập tên lô..." autocomplete="off" oninput="xuLyGoiYLoAuto()">
+                      <input type="text" id="input-ql-ten-lo" class="form-control" style="font-weight:700; font-size: 16px;" placeholder="Tên Lô (VD: 203)" autocomplete="off" oninput="xuLyGoiYLoAuto()">
                   </div>
                   <div style="flex: 1;">
-                      <label style="font-size:12px; font-weight:700; color:var(--text-sub); display:block; margin-bottom:6px; text-align:center; text-transform: uppercase;">Số Lượng</label>
-                      <input type="number" id="input-ql-sl-lo" class="form-control" style="font-weight:800; color:var(--danger-color); text-align:center; font-size: 18px;" placeholder="0" inputmode="decimal" pattern="[0-9]*">
+                      <input type="number" id="input-ql-sl-lo" class="form-control" style="font-weight:800; color:var(--danger-color); text-align:center; font-size: 18px;" placeholder="SL" inputmode="decimal" pattern="[0-9]*">
                   </div>
               </div>
           </div>
@@ -1692,6 +1692,92 @@
       renderChiTietQuanLyLo(record);
       xuLyGoiYLoAuto(); 
   }
+
+  // --- MỚI: HÀM NHẬP LÔ TỪ EXCEL ---
+  window.xuLyNhapsLoTuExcel = function(e) {
+      haptic();
+      let file = e.target.files[0];
+      if (!file) return;
+
+      let record = null;
+      if (currentLoContext.type === 'LENH') record = STATE.lenh.find(l => l.id === currentLoContext.id);
+      else if (currentLoContext.type === 'THUCHIEN') record = STATE.thucHien.find(t => t.id === currentLoContext.id);
+
+      if (!record) return;
+
+      let reader = new FileReader();
+      reader.onload = function(evt) {
+          try {
+              let data = new Uint8Array(evt.target.result);
+              let workbook = XLSX.read(data, {type: 'array'});
+              let json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {defval: ""});
+
+              if(json.length === 0) {
+                  showDialog("Lỗi", "File Excel rỗng!", "alert");
+                  e.target.value = '';
+                  return;
+              }
+
+              // Thuật toán nhận diện cột thông minh
+              let headers = Object.keys(json[0]);
+              let colTen = headers.find(k => k.toLowerCase().includes('lô') || k.toLowerCase().includes('tên'));
+              let colSL = headers.find(k => k.toLowerCase().includes('sl') || k.toLowerCase().includes('lượng') || k.toLowerCase() === 'số lượng');
+
+              if (!colTen || !colSL) {
+                  showDialog("Lỗi Định Dạng", "File Excel phải có Cột chứa chữ 'Lô' và Cột chứa chữ 'SL' (hoặc Số Lượng).", "alert");
+                  e.target.value = '';
+                  return;
+              }
+
+              if (!record.danhSachLo) record.danhSachLo = [];
+              let currentDaNhap = record.danhSachLo.reduce((sum, lo) => sum + lo.sl, 0);
+              let slConLaiThemDuoc = record.sl - currentDaNhap;
+
+              let newBatches = [];
+              let totalNewSl = 0;
+
+              for (let i = 0; i < json.length; i++) {
+                  let row = json[i];
+                  let tenLo = String(row[colTen]).trim();
+                  let sl = parseFloat(row[colSL]);
+
+                  if (tenLo && !isNaN(sl) && sl > 0) {
+                      newBatches.push({ id: generateID(), tenLo: tenLo, sl: sl });
+                      totalNewSl += sl;
+                  }
+              }
+
+              if (newBatches.length === 0) {
+                  showDialog("Lỗi", "Không tìm thấy dữ liệu Tên Lô hoặc Số lượng hợp lệ trong file.", "alert");
+                  e.target.value = '';
+                  return;
+              }
+
+              // Kiểm tra chống nhập lố
+              if (totalNewSl > slConLaiThemDuoc) {
+                  showDialog("Vượt Quá Giới Hạn", `File Excel có tổng số lượng (${totalNewSl}) vượt quá số lượng còn lại cho phép nhập (${slConLaiThemDuoc}). Vui lòng kiểm tra lại file.`, "alert");
+                  e.target.value = '';
+                  return;
+              }
+
+              // Lưu dữ liệu
+              record.danhSachLo.push(...newBatches);
+
+              if (currentLoContext.type === 'LENH') safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh));
+              else safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
+
+              renderChiTietQuanLyLo(record);
+              xuLyGoiYLoAuto();
+              showToast(`Đã nạp tự động ${newBatches.length} Lô từ Excel!`);
+
+          } catch (err) {
+              console.error(err);
+              showDialog("Lỗi", "Đã xảy ra lỗi khi đọc file Excel.", "alert");
+          }
+          e.target.value = ''; // Reset input để có thể chọn lại file cũ
+      };
+      reader.readAsArrayBuffer(file);
+  };
 
   function xoaQuanLyLo(idLo) {
       let record = null;
