@@ -448,10 +448,13 @@
           </div>
 
           <div style="background: var(--bg-card); border-radius: 16px; padding: 16px 10px; border: 1px solid var(--border-light); box-shadow: var(--card-shadow); margin-top: 12px;">
-              <div style="text-align:center; font-size:16px; font-weight:800; color:var(--text-main); margin-bottom:12px; text-transform:uppercase; letter-spacing: -0.5px;" id="bc-tieu-de-anh">BÁO CÁO XUẤT KHO</div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom: 1px solid var(--border-light); padding-bottom: 8px;">
+                  <div style="font-size:15px; font-weight:800; color:var(--text-main); text-transform:uppercase; letter-spacing: -0.5px;" id="bc-tieu-de-anh">BÁO CÁO XUẤT KHO</div>
+                  <div id="bc-tong-tan-title" style="font-size:14px; font-weight:800; color:var(--danger-color); display:none; background: rgba(255, 59, 48, 0.1); padding: 4px 8px; border-radius: 6px;">0 Tấn</div>
+              </div>
               
               <div style="padding:0; overflow:hidden; border:none; border-radius: 0;">
-                <div class="table-container" style="max-height: 55vh; border-radius: 10px 10px 0 0; border-bottom: none;">
+                <div class="table-container" style="max-height: 55vh; border-radius: 10px; border-bottom: none;">
                   <table style="min-width: 550px;">
                     <thead>
                       <tr>
@@ -467,10 +470,6 @@
                     </thead>
                     <tbody id="tbody-bao-cao-ngay"></tbody>
                   </table>
-                </div>
-                <div id="vung-tong-khoi-luong-ngay" style="display: none; padding: 12px 14px; background: var(--bg-card); border: 1px solid var(--border-light); border-top: none; justify-content: space-between; align-items: center; border-radius: 0 0 10px 10px;">
-                    <span style="font-size: 13px; font-weight: 800; color: var(--text-main); text-transform: uppercase;">Tổng xuất trong ngày:</span>
-                    <span style="font-size: 17px; font-weight: 900; color: var(--warning-color); background: rgba(255, 149, 0, 0.1); padding: 4px 10px; border-radius: 8px;" id="txt-tong-tan-ngay">0 <span style="font-size: 12px; font-weight: 700; color: var(--text-sub); text-transform: uppercase;">Tấn</span></span>
                 </div>
               </div>
           </div>
@@ -1583,13 +1582,15 @@
       let locXe = document.getElementById('bc-xe').value.toLowerCase().trim();
       let dataLoc = STATE.thucHien.filter(item => { return (!locNgay || item.ngay === locNgay) && (!locXe || item.xe.toLowerCase().includes(locXe)); });
 
+      document.getElementById('bc-tieu-de-anh').innerText = `BÁO CÁO ${locNgay ? '(' + formatShortDate(locNgay) + ')' : ''}`;
+
       let tbody = document.getElementById('tbody-bao-cao-ngay');
-      let vungTong = document.getElementById('vung-tong-khoi-luong-ngay');
+      let vungTongTitle = document.getElementById('bc-tong-tan-title');
 
       if(dataLoc.length === 0) { 
           tbody.innerHTML = `<tr><td colspan="8" style="padding:20px; text-align:center; color:var(--text-sub);">Không có dữ liệu xuất trong kỳ.</td></tr>`; 
           document.getElementById('bc-tong-luot').innerText = "0"; 
-          if(vungTong) vungTong.style.display = 'none';
+          if(vungTongTitle) vungTongTitle.style.display = 'none';
           return; 
       }
 
@@ -1647,10 +1648,10 @@
           </tr>
       `}).join('');
 
-      if(vungTong) {
-          vungTong.style.display = 'flex';
+      if(vungTongTitle) {
+          vungTongTitle.style.display = 'block';
           let formatTongTan = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(tongTanXuat);
-          document.getElementById('txt-tong-tan-ngay').innerHTML = `${formatTongTan} <span style="font-size: 12px; font-weight: 700; color: var(--text-sub); text-transform: uppercase;">Tấn</span>`;
+          vungTongTitle.innerHTML = `${formatTongTan} Tấn`;
       }
   }
 
@@ -1827,12 +1828,16 @@
       let tongNgayKL = 0;
 
       dataTrongNgay.forEach(item => {
-          if (!xeGroups[item.xe]) xeGroups[item.xe] = { items: [], tongKL: 0 };
+          if (!xeGroups[item.xe]) xeGroups[item.xe] = { items: [], tongKL: 0, phieuKL: {} };
           xeGroups[item.xe].items.push(item);
           let klr = layKLRTuTenDan(item.ten); 
           let khoiLuong = item.sl * klr;
           xeGroups[item.xe].tongKL += khoiLuong;
           tongNgayKL += khoiLuong;
+          
+          let p = item.phieu || "Không ghi phiếu";
+          if(!xeGroups[item.xe].phieuKL[p]) xeGroups[item.xe].phieuKL[p] = 0;
+          xeGroups[item.xe].phieuKL[p] += khoiLuong;
       });
       
       let formatTongNgay = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(tongNgayKL / 1000);
@@ -1841,9 +1846,30 @@
       let html = '';
       let dsXe = Object.keys(xeGroups).sort((a,b) => a.localeCompare(b));
 
-      dsXe.forEach(xe => {
+      dsXe.forEach((xe, idxXe) => {
           let g = xeGroups[xe]; 
           let formatTanXe = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(g.tongKL / 1000);
+          
+          let phieuHtml = '';
+          let numPhieu = Object.keys(g.phieuKL).length;
+          if (numPhieu > 1) {
+              let listPhieu = Object.keys(g.phieuKL).map(p => {
+                  return `<div style="display:flex; justify-content:space-between; font-size:12px; padding: 6px 0; border-bottom:0.5px dotted var(--border-light);">
+                      <span style="color:var(--text-main); font-weight: 600;">Phiếu: <b style="color:var(--info-color)">${escapeHTML(p)}</b></span>
+                      <span style="font-weight:800; color:var(--danger-color)">${new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(g.phieuKL[p] / 1000)} Tấn</span>
+                  </div>`;
+              }).join('');
+              
+              phieuHtml = `
+              <div style="padding: 0 12px 10px 12px;">
+                  <button onclick="let el = document.getElementById('phieu-xe-${idxXe}'); el.style.display = el.style.display === 'none' ? 'block' : 'none';" style="background:var(--primary-light); color:var(--primary-color); border:none; padding:8px 12px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; width:100%; display:flex; justify-content:space-between; align-items:center;">
+                      <span><i class="ph ph-receipt"></i> TẢI TRỌNG THEO PHIẾU (${numPhieu})</span> <i class="ph ph-caret-down"></i>
+                  </button>
+                  <div id="phieu-xe-${idxXe}" style="display:none; margin-top:8px; background:var(--input-bg); padding:0 10px; border-radius:8px; border: 0.5px solid var(--border-light);">
+                      ${listPhieu}
+                  </div>
+              </div>`;
+          }
           
           html += `
           <div class="card" style="margin-top: 0; margin-bottom: 12px; padding: 0; overflow: hidden;">
@@ -1851,13 +1877,14 @@
                   <span style="color: var(--warning-color); font-weight: 800; font-size: 15px;">XE SỐ: ${escapeHTML(xe)}</span>
                   <span style="color: var(--danger-color); font-weight: 800; font-size: 13px;">${formatTanXe} Tấn</span>
               </div>
+              ${phieuHtml}
               <div style="background: var(--bg-card);">
                   ${g.items.map((i, idx) => `
                       <div class="modern-list-item">
                           <div class="modern-list-stt">${idx + 1}</div>
                           <div class="modern-list-content">
                               <div class="modern-list-title">${escapeHTML(i.ten)}</div>
-                              <div class="modern-list-subtitle">ĐVT: ${escapeHTML(i.dvt) || '?'} &bull; Cấp: ${escapeHTML(i.cap) || '?'} ${i.phieu ? `&bull; <b style="color:var(--primary-color)">Phiếu: ${escapeHTML(i.phieu)}</b>` : ''}</div>
+                              <div class="modern-list-subtitle">ĐVT: ${escapeHTML(i.dvt) || '?'} &bull; Cấp: ${escapeHTML(i.cap) || '?'}</div>
                           </div>
                           <div class="modern-list-qty">${i.sl}</div>
                       </div>
@@ -1923,8 +1950,9 @@
 
           let danGop = {};
           dataLoc.forEach(item => {
-              if(!danGop[item.ten]) danGop[item.ten] = { ten: item.ten, tatCaLo: [] };
-              if(item.danhSachLo) danGop[item.ten].tatCaLo.push(...item.danhSachLo);
+              let key = item.ten + '_' + item.cap;
+              if(!danGop[key]) danGop[key] = { ten: item.ten, cap: item.cap, dvt: item.dvt, tatCaLo: [] };
+              if(item.danhSachLo) danGop[key].tatCaLo.push(...item.danhSachLo);
           });
 
           html = Object.values(danGop).map(d => {
@@ -1940,7 +1968,7 @@
               
               return `
               <div style="margin-bottom: 12px; background:var(--bg-card); border-radius:12px; padding:8px; border: 0.5px solid var(--border-light); box-shadow: var(--card-shadow);">
-                 <div style="font-weight: 800; font-size: 13px; color: var(--text-main); margin-bottom: 6px; padding: 4px 8px;">Đạn: <span style="color:var(--info-color)">${escapeHTML(d.ten)}</span></div>
+                 <div style="font-weight: 800; font-size: 13px; color: var(--text-main); margin-bottom: 6px; padding: 4px 8px; line-height: 1.4;">Đạn: <span style="color:var(--info-color)">${escapeHTML(d.ten)}</span> <span style="color:var(--text-sub); font-size:11px; margin-left:4px;">(Cấp ${d.cap} - ${d.dvt})</span></div>
                  <div style="background:var(--input-bg); border-radius:10px; overflow:hidden;">
                      ${rowHtml}
                  </div>
@@ -1950,9 +1978,10 @@
       } else {
           let danGop = {};
           STATE.lenh.forEach(item => {
-              if(!danGop[item.ten]) danGop[item.ten] = { ten: item.ten, tatCaLo: [] };
+              let key = item.ten + '_' + item.cap;
+              if(!danGop[key]) danGop[key] = { ten: item.ten, cap: item.cap, dvt: item.dvt, tatCaLo: [] };
               STATE.thucHien.filter(t => t.lenhId === item.id).forEach(t => {
-                  if(t.danhSachLo) danGop[item.ten].tatCaLo.push(...t.danhSachLo);
+                  if(t.danhSachLo) danGop[key].tatCaLo.push(...t.danhSachLo);
               });
           });
 
@@ -1969,7 +1998,7 @@
               
               return `
               <div style="margin-bottom: 12px; background:var(--bg-card); border-radius:12px; padding:8px; border: 0.5px solid var(--border-light); box-shadow: var(--card-shadow);">
-                 <div style="font-weight: 800; font-size: 13px; color: var(--text-main); margin-bottom: 6px; padding: 4px 8px;">Đạn: <span style="color:var(--info-color)">${escapeHTML(d.ten)}</span></div>
+                 <div style="font-weight: 800; font-size: 13px; color: var(--text-main); margin-bottom: 6px; padding: 4px 8px; line-height: 1.4;">Đạn: <span style="color:var(--info-color)">${escapeHTML(d.ten)}</span> <span style="color:var(--text-sub); font-size:11px; margin-left:4px;">(Cấp ${d.cap} - ${d.dvt})</span></div>
                  <div style="background:var(--input-bg); border-radius:10px; overflow:hidden;">
                      ${rowHtml}
                  </div>
