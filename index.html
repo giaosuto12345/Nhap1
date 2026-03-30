@@ -431,9 +431,9 @@
       <div id="khu-vuc-chup-anh" style="background: var(--bg-card); border-radius: 20px; padding: 16px 12px; border: 0.5px solid var(--border-light); box-shadow: var(--card-shadow);">
           <div style="text-align:center; font-size:18px; font-weight:800; color:var(--text-main); margin-bottom:12px; text-transform:uppercase; letter-spacing: -0.5px;" id="bc-tieu-de-anh">BÁO CÁO XUẤT KHO</div>
           
-          <!-- KHUNG BÁO CÁO NGÀY -->
+          <!-- KHUNG BÁO CÁO NGÀY CÓ TÍNH TỔNG KHỐI LƯỢNG (SỬA Ở ĐÂY) -->
           <div id="khung-bao-cao-ngay" style="padding:0; overflow:hidden; border:none; border-radius: 0;">
-            <div class="table-container" id="table-bao-cao-scroll" style="max-height: 55vh; border-radius: 12px;">
+            <div class="table-container" id="table-bao-cao-scroll" style="max-height: 55vh; border-radius: 12px 12px 0 0; border-bottom: none;">
               <table style="min-width: 650px;">
                 <thead>
                   <tr>
@@ -449,6 +449,11 @@
                 </thead>
                 <tbody id="tbody-bao-cao-ngay"></tbody>
               </table>
+            </div>
+            <!-- DÒNG TỔNG KHỐI LƯỢNG -->
+            <div id="vung-tong-khoi-luong-ngay" style="display: none; padding: 14px 16px; background: var(--bg-card); border: 0.5px solid var(--border-light); border-top: none; justify-content: space-between; align-items: center; border-radius: 0 0 12px 12px;">
+                <span style="font-size: 13px; font-weight: 800; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px;">Tổng khối lượng xuất:</span>
+                <span style="font-size: 18px; font-weight: 900; color: var(--warning-color); background: rgba(255, 149, 0, 0.1); padding: 4px 10px; border-radius: 8px;" id="txt-tong-tan-ngay">0 <span style="font-size: 12px; font-weight: 700; color: var(--text-sub); text-transform: uppercase;">Tấn</span></span>
             </div>
           </div>
 
@@ -991,9 +996,13 @@
       document.getElementById('bc-tieu-de-anh').innerText = `BÁO CÁO XUẤT KHO ${locNgay ? '(' + formatShortDate(locNgay) + ')' : ''}`;
 
       let tbody = document.getElementById('tbody-bao-cao-ngay');
+      let vungTong = document.getElementById('vung-tong-khoi-luong-ngay');
+
       if(dataLoc.length === 0) { 
           tbody.innerHTML = `<tr><td colspan="8" style="padding:20px; color:var(--text-sub);">Không có dữ liệu xuất trong kỳ.</td></tr>`; 
-          document.getElementById('bc-tong-luot').innerText = "0"; return; 
+          document.getElementById('bc-tong-luot').innerText = "0"; 
+          if(vungTong) vungTong.style.display = 'none';
+          return; 
       }
 
       let groupedData = {};
@@ -1005,6 +1014,8 @@
 
       let finalData = Object.values(groupedData);
       document.getElementById('bc-tong-luot').innerText = finalData.length; 
+      
+      let tongTanXuat = 0; // Biến tính tổng khối lượng
       
       tbody.innerHTML = finalData.map((item, index) => {
           let daCapTruocDo = 0;
@@ -1020,6 +1031,10 @@
           let tongDaCap = daCapTruocDo + item.slGroup; 
           let conLai = slLenh - tongDaCap;
 
+          // Tính toán Khối Lượng cho dòng hiện tại
+          let klr = layKLRTuTenDan(item.ten);
+          tongTanXuat += (item.slGroup * klr) / 1000;
+
           return `
           <tr>
               <td style="font-weight:800; color:var(--text-sub);">${index + 1}</td>
@@ -1032,6 +1047,13 @@
               <td style="color:${conLai < 0 ? 'var(--danger-color)' : 'var(--text-main)'}; font-weight:700;">${conLai}</td>
           </tr>
       `}).join('');
+
+      // Cập nhật và hiển thị dòng Tổng khối lượng
+      if(vungTong) {
+          vungTong.style.display = 'flex';
+          let formatTongTan = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(tongTanXuat);
+          document.getElementById('txt-tong-tan-ngay').innerHTML = `${formatTongTan} <span style="font-size: 12px; font-weight: 700; color: var(--text-sub); text-transform: uppercase;">Tấn</span>`;
+      }
   }
 
   function renderTinhTrangLenh() {
