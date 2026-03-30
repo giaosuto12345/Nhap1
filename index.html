@@ -173,6 +173,10 @@
     .action-btn { display: flex; align-items: center; justify-content: center; width: 46px; height: 46px; color: white; border-radius: 14px; font-size: 22px; border: none; cursor: pointer; flex-shrink:0; transition: 0.2s;}
     .action-btn:active { transform: scale(0.9); }
     
+    .setting-panel { background: var(--input-bg); border: 1px solid var(--border-light); border-radius: 12px; padding: 12px; margin-bottom: 12px; display: none; }
+    .set-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; font-size: 13px; font-weight: 600; padding-bottom: 8px; border-bottom: 0.5px solid var(--border-light);}
+    .set-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
+    
     /* BẢNG DỮ LIỆU (HTML TABLE CHO TAB 1 & 2) */
     .table-container { overflow-x: auto; max-height: 55vh; overflow-y: auto; border-radius: 12px; border: 1px solid var(--border-light); -webkit-overflow-scrolling: touch; }
     table { table-layout: auto; width: 100%; border-collapse: separate; border-spacing: 0; min-width: 450px; background: var(--bg-card);}
@@ -209,11 +213,25 @@
     .dialog-buttons { display: flex; gap: 10px; margin-top: 24px;}
     .btn-dialog { flex: 1; height: 46px; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; background: var(--primary-color); color: white; font-size: 15px;}
     
+    /* ================= TOAST NOTIFICATION (THÔNG BÁO HIỆN ĐẠI) ================= */
+    .toast-msg {
+        position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+        background: rgba(30, 30, 30, 0.9); color: #FFF;
+        padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: 600;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px);
+        z-index: 99999; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        display: flex; align-items: center; gap: 8px; white-space: nowrap; pointer-events: none;
+    }
+    @media (prefers-color-scheme: dark) { .toast-msg { background: rgba(200, 200, 200, 0.9); color: #000; } }
+    .toast-msg.show { top: calc(20px + env(safe-area-inset-top)); }
+
     /* ================= MODAL FULL SCREEN (BẢNG BÁO CÁO) ================= */
-    .modal-full { width: 96%; max-width: 600px; max-height: 85vh; padding: 0; display: flex; flex-direction: column; justify-content: flex-start; border-radius: 20px; overflow: hidden; background: var(--bg-body);}
-    .modal-list-container { flex: 1; overflow-y: auto; text-align: left; -webkit-overflow-scrolling: touch; }
+    .modal-full { width: 96%; max-width: 600px; max-height: 85vh; padding: 0; display: flex; flex-direction: column; justify-content: flex-start; border-radius: 20px; overflow: hidden; background: var(--bg-body); position: relative;}
+    .modal-full-header { position: sticky; top: 0; background: var(--bg-card); padding: 16px; border-bottom: 1px solid var(--border-light); z-index: 20; display: flex; justify-content: space-between; align-items: center; }
+    .modal-list-container { flex: 1; overflow-y: auto; text-align: left; -webkit-overflow-scrolling: touch; padding: 16px; background: var(--bg-body);}
     
-    .btn-modal-cancel { height: 54px; width: 100%; background: var(--bg-card); color: var(--primary-color); border: none; font-weight: 700; font-size: 16px; cursor: pointer; border-top: 0.5px solid var(--border-light); }
+    .btn-modal-cancel { height: 54px; width: 100%; background: var(--bg-card); color: var(--primary-color); border: none; font-weight: 700; font-size: 16px; cursor: pointer; border-top: 0.5px solid var(--border-light); position: sticky; bottom: 0; z-index: 20;}
     .btn-modal-cancel:active { background: var(--input-bg); }
 
     /* DANH SÁCH HIỆN ĐẠI (APPLE SETTINGS STYLE) */
@@ -585,55 +603,52 @@
     </div>
   </div>
 
+  <!-- ================= TOAST NOTIFICATION (THÔNG BÁO HIỆN ĐẠI) ================= -->
+  <div id="app-toast-msg" class="toast-msg"></div>
+
   <!-- MODAL: TÌM ĐẠN -->
   <div id="modal-chon-dan" class="modal-overlay">
     <div class="custom-dialog-box modal-full">
-      <div style="padding: 16px; padding-bottom: 0;">
-          <h3 style="font-weight: 800; margin-bottom: 12px;">Tìm Chọn Đạn</h3>
+      <div class="modal-full-header">
+          <h3 style="font-weight: 800; margin:0;">Tìm Chọn Đạn</h3>
+      </div>
+      <div style="padding: 16px; padding-bottom: 0; background: var(--bg-body);">
           <input type="text" id="search-modal-dan" class="form-control" placeholder="Gõ tên đạn để lọc..." onkeyup="timKiemModalDan()">
       </div>
-      <div class="modal-list-container" id="modal-danh-sach-dan" style="padding: 0 16px; border: none;"></div>
-      <div style="padding: 16px;">
-          <button class="btn-modal-cancel" onclick="dongModalChonDan()">HỦY BỎ</button>
-      </div>
+      <div class="modal-list-container" id="modal-danh-sach-dan"></div>
+      <button class="btn-modal-cancel" onclick="dongModalChonDan()">ĐÓNG</button>
     </div>
   </div>
 
   <!-- MODAL: BÁO CÁO FULL CƠ BẢN -->
   <div id="modal-xem-lenh" class="modal-overlay">
     <div class="custom-dialog-box modal-full">
-      <div style="padding: 16px; border-bottom: 0.5px solid var(--border-light); background: var(--bg-card); z-index: 10;">
-          <h3 style="font-weight: 800; margin:0; text-align: center; font-size: 16px;">Chi Tiết Danh Sách Lệnh</h3>
+      <div class="modal-full-header">
+          <h3 style="font-weight: 800; margin:0; font-size: 16px;">Chi Tiết Danh Sách Lệnh</h3>
       </div>
-      <div class="modal-list-container" id="noidung-xem-lenh" style="background: var(--bg-body);"></div>
-      <div style="padding: 12px 16px; background: var(--bg-card); border-top: 0.5px solid var(--border-light);">
-          <button class="btn-modal-cancel" style="margin: 0; border: none; background: var(--input-bg);" onclick="dongModalXemLenh()">ĐÓNG BẢNG</button>
-      </div>
+      <div class="modal-list-container" id="noidung-xem-lenh"></div>
+      <button class="btn-modal-cancel" onclick="dongModalXemLenh()">ĐÓNG BẢNG</button>
     </div>
   </div>
 
   <div id="modal-chi-tiet-xe" class="modal-overlay">
     <div class="custom-dialog-box modal-full">
-      <div style="padding: 16px; border-bottom: 0.5px solid var(--border-light); background: var(--bg-card); z-index: 10;">
-         <h3 id="tieu-de-chi-tiet-xe" style="font-weight: 800; margin:0; text-align: center; font-size: 16px; line-height: 1.4;">Chi Tiết Tải Trọng Xe</h3>
+      <div class="modal-full-header">
+         <h3 id="tieu-de-chi-tiet-xe" style="font-weight: 800; margin:0; text-align: left; font-size: 16px; line-height: 1.4;">Chi Tiết Tải Trọng Xe</h3>
       </div>
-      <div class="modal-list-container" id="noidung-chi-tiet-xe" style="background: var(--bg-body); padding: 12px;"></div>
-      <div style="padding: 12px 16px; background: var(--bg-card); border-top: 0.5px solid var(--border-light);">
-          <button class="btn-modal-cancel" style="margin: 0; border: none; background: var(--input-bg);" onclick="dongModalXemChiTietXe()">ĐÓNG BẢNG</button>
-      </div>
+      <div class="modal-list-container" id="noidung-chi-tiet-xe"></div>
+      <button class="btn-modal-cancel" onclick="dongModalXemChiTietXe()">ĐÓNG BẢNG</button>
     </div>
   </div>
 
   <div id="modal-tong-hop-lo" class="modal-overlay">
     <div class="custom-dialog-box modal-full">
-      <div style="display:flex; justify-content:space-between; align-items:center; padding: 16px; background: var(--bg-card); border-bottom: 0.5px solid var(--border-light); z-index: 10;">
+      <div class="modal-full-header">
          <h3 style="font-weight: 800; margin:0; font-size: 16px;">Tổng Hợp Lô Đã Xuất</h3>
          <button class="btn-sm" style="background:var(--success-color); width:auto; padding: 0 12px; font-size: 13px; height: 34px;" onclick="xuatExcelToanBoLo()"><i class="ph-bold ph-download-simple" style="margin-right:4px;"></i> EXCEL</button>
       </div>
-      <div class="modal-list-container" id="noidung-tong-hop-lo" style="background: var(--bg-body); padding: 12px;"></div>
-      <div style="padding: 12px 16px; background: var(--bg-card); border-top: 0.5px solid var(--border-light);">
-          <button class="btn-modal-cancel" style="margin: 0; border: none; background: var(--input-bg);" onclick="dongModalTongHopToanBoLo()">ĐÓNG BẢNG</button>
-      </div>
+      <div class="modal-list-container" id="noidung-tong-hop-lo"></div>
+      <button class="btn-modal-cancel" onclick="dongModalTongHopToanBoLo()">ĐÓNG BẢNG</button>
     </div>
   </div>
 
@@ -704,7 +719,7 @@
       <button class="btn" style="background:rgba(255, 59, 48, 0.1); color: var(--danger-color); margin-top: 10px;" onclick="xoaToanBoDuLieu()"><i class="ph-bold ph-trash"></i> XÓA TRẮNG</button>
       
       <div style="margin-top: 24px;">
-          <button class="btn-modal-cancel" style="background: transparent; border: none;" onclick="dongMenuHeThong()">ĐÓNG</button>
+          <button class="btn-modal-cancel" style="background: transparent; border: none; position: relative;" onclick="dongMenuHeThong()">ĐÓNG</button>
       </div>
     </div>
   </div>
@@ -763,7 +778,7 @@
       return sortBatchesCustom(result);
   }
 
-  const STATE = { excel: { data: [], config: { fontSize: 14, cot: {} } }, lenh: [], thucHien: [] };
+  const STATE = { excel: { data: [], config: { fontSize: 13, cot: {} } }, lenh: [], thucHien: [] };
   let idLenhDangSua = null;
   let idThucHienDangSua = null;
   let cacheCotExcel = { tenCol: null, dvtCol: null, klrCol: null };
@@ -825,6 +840,29 @@
       }
   };
 
+  // --- HỆ THỐNG TOAST THÔNG BÁO HIỆN ĐẠI ---
+  window.showToast = function(message, icon = 'ph-fill ph-check-circle', color = 'var(--success-color)') {
+      haptic();
+      let toast = document.getElementById('app-toast-msg');
+      if(!toast) {
+          toast = document.createElement('div');
+          toast.id = 'app-toast-msg';
+          toast.className = 'toast-msg';
+          document.body.appendChild(toast);
+      }
+      toast.innerHTML = `<i class="${icon}" style="color:${color}; font-size:20px;"></i> <span>${escapeHTML(message)}</span>`;
+      
+      // Xóa class show nếu đang hiện để reset animation
+      toast.classList.remove('show');
+      
+      // Đợi 1 chút rồi hiện lên lại
+      setTimeout(() => {
+          toast.classList.add('show');
+          if(window.toastTimer) clearTimeout(window.toastTimer);
+          window.toastTimer = setTimeout(() => { toast.classList.remove('show'); }, 2500);
+      }, 50);
+  };
+
   function chuyenTab(tabId, title, navId) {
       haptic();
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -851,7 +889,7 @@
       let dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr); 
       let linkElement = document.createElement('a'); let date = new Date(); let dStr = `${date.getDate()}_${date.getMonth()+1}_${date.getFullYear()}`;
       linkElement.setAttribute('href', dataUri); linkElement.setAttribute('download', `SaoLuu_QuanLyDan_${dStr}.json`);
-      linkElement.click(); showDialog("Thành công", "Đã tải file dữ liệu xuống máy.", "alert");
+      linkElement.click(); showToast("Đã tải file dữ liệu xuống máy!");
   }
   function nhapDuLieu(event) {
       let file = event.target.files[0]; if(!file) return; let reader = new FileReader();
@@ -926,7 +964,7 @@
               STATE.excel.data = json.map(row => { let newRow = {}; for (let k in row) { if (!k.startsWith('__EMPTY')) newRow[k] = row[k]; } return newRow; }); 
               safeStorage.setItem('duLieuExcelOffline', JSON.stringify(STATE.excel.data));
               taoCauHinhMacDinh(); hienThiBangDanhMuc(STATE.excel.data); 
-              showDialog("Thành công", "Đã nạp file Excel vào bộ nhớ.", "alert"); 
+              showToast("Đã tải dữ liệu Excel thành công!"); 
           } catch (err) { showDialog("Lỗi", "Không thể đọc định dạng file này.", "alert"); }
           e.target.value = ''; 
       }; reader.readAsArrayBuffer(file); 
@@ -940,14 +978,14 @@
       haptic(); let panel = document.getElementById('panel-cai-dat-danh-muc'); 
       if(panel.style.display === 'block') { panel.style.display = 'none'; return; } 
       if(STATE.excel.data.length === 0) { showDialog("Lỗi", "Hãy tải file Excel lên trước!", "alert"); return; } 
-      document.getElementById('set-fontsize').value = STATE.excel.config.fontSize || 14; 
+      document.getElementById('set-fontsize').value = STATE.excel.config.fontSize || 13; 
       document.getElementById('danh-sach-cot-cai-dat').innerHTML = Object.keys(STATE.excel.config.cot).map(tenCot => { 
-          return `<div class="set-row"><label style="margin:0; display:flex; align-items:center; flex:1; cursor:pointer;"><input type="checkbox" id="chk-col-${tenCot}" style="transform:scale(1.2); margin-right:10px;" ${STATE.excel.config.cot[tenCot].show ? "checked" : ""}> ${escapeHTML(tenCot)}</label></div>`; 
+          return `<div class="set-row"><label style="margin:0; display:flex; align-items:center; flex:1; cursor:pointer;"><input type="checkbox" id="chk-col-${tenCot}" style="transform:scale(1.2); margin-right:8px;" ${STATE.excel.config.cot[tenCot].show ? "checked" : ""}> ${escapeHTML(tenCot)}</label></div>`; 
       }).join(''); 
       panel.style.display = 'block'; 
   }
   function luuCaiDatDanhMuc() { 
-      haptic(); STATE.excel.config.fontSize = parseInt(document.getElementById('set-fontsize').value) || 14; 
+      haptic(); STATE.excel.config.fontSize = parseInt(document.getElementById('set-fontsize').value) || 13; 
       Object.keys(STATE.excel.config.cot).forEach(t => { 
           let el = document.getElementById(`chk-col-${t}`); if(el) STATE.excel.config.cot[t].show = el.checked; 
       }); 
@@ -962,7 +1000,7 @@
           return; 
       } 
       let cotHienThi = Object.keys(STATE.excel.config.cot || {}).filter(c => STATE.excel.config.cot[c].show);
-      if(cotHienThi.length === 0) cotHienThi = Object.keys(data[0]); let fz = (STATE.excel.config.fontSize || 14) + "px";
+      if(cotHienThi.length === 0) cotHienThi = Object.keys(data[0]); let fz = (STATE.excel.config.fontSize || 13) + "px";
       thead.innerHTML = cotHienThi.map(c => `<th>${escapeHTML(c)}</th>`).join(''); 
       tbody.innerHTML = data.map(h => `<tr>${cotHienThi.map((c, i) => `<td style="text-align: ${i===0?"left":"center"}; font-size: ${fz};">${escapeHTML(h[c] !== undefined ? h[c] : '')}</td>`).join('')}</tr>`).join(''); 
   }
@@ -1049,9 +1087,11 @@
           let dsLoCu = STATE.lenh[index].danhSachLo || [];
           if (index !== -1) STATE.lenh[index] = { id: idLenhDangSua, soLenh, ten, dvt, cap, sl: parseFloat(sl), time: STATE.lenh[index].time, danhSachLo: dsLoCu };
           huySuaLenh();
+          showToast("Đã cập nhật lệnh!");
       } else {
           STATE.lenh.push({ id: generateID(), soLenh, ten, dvt, cap, sl: parseFloat(sl), time: Date.now(), danhSachLo: [] });
           document.getElementById('lenh-cap').value = ''; document.getElementById('lenh-sl').value = '';
+          showToast("Đã thêm Lệnh mới!");
       }
       safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh)); renderBangLenh();
       capNhatGoiYSoLenh();
@@ -1093,7 +1133,7 @@
               <td style="font-weight:800; color:var(--text-main)">${escapeHTML(item.soLenh)}</td>
               <td style="text-align:left; cursor:pointer;" onclick="moModalQuanLyLo('LENH', '${item.id}')">
                   <div style="color:var(--text-main); font-weight:700;">${escapeHTML(item.ten)}</div>
-                  <div style="font-size:11px; color:${trangThaiLoColor}; margin-top:4px; font-weight: 700;">
+                  <div style="font-size:10px; color:${trangThaiLoColor}; margin-top:3px; font-weight: 700;">
                      <i class="ph-bold ph-stack"></i> Dự kiến Lô: ${slDaNhapLo} / ${item.sl}
                   </div>
               </td>
@@ -1113,16 +1153,24 @@
       haptic(); if(STATE.lenh.length === 0) { showDialog("Trống", "Chưa có lệnh nào.", "alert"); return; }
       let groups = {};
       STATE.lenh.forEach(item => {
-          if(!groups[item.soLenh]) groups[item.soLenh] = [];
-          groups[item.soLenh].push(item);
+          if(!groups[item.soLenh]) groups[item.soLenh] = { items: [], tongKL: 0 };
+          
+          let klr = layKLRTuTenDan(item.ten);
+          groups[item.soLenh].tongKL += (item.sl * klr);
+          groups[item.soLenh].items.push(item);
       });
       let html = '';
       for(let soLenh in groups) {
-          let items = groups[soLenh]; 
+          let g = groups[soLenh]; 
+          let formatTan = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(g.tongKL / 1000);
+          
           html += `
           <div class="modern-list">
-              <div class="modern-list-header">LỆNH: ${escapeHTML(soLenh)}</div>
-              ${items.map((i, idx) => `
+              <div class="modern-list-header" style="display:flex; justify-content:space-between;">
+                  <span style="color:var(--primary-color);">LỆNH: ${escapeHTML(soLenh)}</span>
+                  <span style="color:var(--danger-color); font-weight:800;">${formatTan} Tấn</span>
+              </div>
+              ${g.items.map((i, idx) => `
                   <div class="modern-list-item">
                       <div class="modern-list-stt">${idx + 1}</div>
                       <div class="modern-list-content">
@@ -1134,7 +1182,8 @@
               `).join('')}
           </div>`;
       }
-      document.getElementById('noidung-xem-lenh').innerHTML = html; let w = document.getElementById('modal-xem-lenh'); w.style.display = 'flex'; setTimeout(() => w.classList.add('show'), 10);
+      document.getElementById('noidung-xem-lenh').innerHTML = html; 
+      let w = document.getElementById('modal-xem-lenh'); w.style.display = 'flex'; setTimeout(() => w.classList.add('show'), 10);
   }
   function dongModalXemLenh() { let w = document.getElementById('modal-xem-lenh'); w.classList.remove('show'); setTimeout(() => w.style.display = 'none', 300); }
 
@@ -1199,10 +1248,11 @@
           let dsLoCu = STATE.thucHien[index].danhSachLo || [];
           STATE.thucHien[index] = { id: idThucHienDangSua, lenhId: idLenh, soLenh: lenhGoc.soLenh, phieu: phieu, xe, ngay, ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap, sl: parseFloat(sl), danhSachLo: dsLoCu };
           huySuaThucHien();
+          showToast("Đã cập nhật xe!");
       } else {
           STATE.thucHien.push({ id: generateID(), lenhId: idLenh, soLenh: lenhGoc.soLenh, phieu: phieu, xe, ngay, ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap, sl: parseFloat(sl), danhSachLo: [] });
           document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; document.getElementById('th-chon-dan').value = ''; 
-          showDialog("Đã lưu sổ", `Xuất ${sl} ${lenhGoc.dvt} đạn ${lenhGoc.ten}\nCho Xe: ${xe} ${phieu ? '(Phiếu: '+phieu+')' : ''}`, "alert");
+          showToast(`Đã xuất vào xe ${xe} ${phieu ? '(P:'+phieu+')' : ''}`);
           loadDanTheoLenh(); 
       }
       safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien)); 
@@ -1259,14 +1309,14 @@
 
           return `
           <tr style="${idThucHienDangSua === item.id ? 'background-color: var(--primary-light);' : ''}">
-              <td style="font-size:11px; color:var(--text-sub);">${formatShortDate(item.ngay)}</td>
+              <td style="font-size:10px; color:var(--text-sub);">${formatShortDate(item.ngay)}</td>
               <td style="font-weight:800; color:var(--text-main); line-height:1.3;">
                  ${escapeHTML(item.xe)}
                  ${item.phieu ? `<div style="font-size:10px; color:var(--info-color); font-weight:700; margin-top:3px;">P: ${escapeHTML(item.phieu)}</div>` : ''}
               </td>
               <td style="text-align:left; cursor:pointer;" onclick="moModalQuanLyLo('THUCHIEN', '${item.id}')">
                   <div style="color:var(--text-main); font-weight:700;">${escapeHTML(item.ten)}</div>
-                  <div style="font-size:10px; color:${trangThaiLoColor}; margin-top:4px; font-weight: 700;">
+                  <div style="font-size:10px; color:${trangThaiLoColor}; margin-top:3px; font-weight: 700;">
                      <i class="ph-bold ph-stack"></i> Nhập Lô: ${slDaNhapLo} / ${item.sl}
                   </div>
               </td>
@@ -1332,7 +1382,7 @@
               vungGoiY.style.display = 'block';
               let chipsHtml = lenhGoc.danhSachLo.map(lo => {
                   return `<button class="chip-lo" onclick="dienNhanhGoiYLo('${escapeHTML(lo.tenLo)}', ${lo.sl})">
-                             ${escapeHTML(lo.tenLo)} <span style="opacity:0.6; font-weight: 600; margin-left:2px;">(${lo.sl})</span>
+                             ${escapeHTML(lo.tenLo)} <span style="opacity:0.6; font-weight: 500;">(${lo.sl})</span>
                           </button>`;
               }).join('');
               document.getElementById('danh-sach-chip-goi-y').innerHTML = chipsHtml;
@@ -1757,26 +1807,27 @@
           if(percent > 100) percent = 100;
 
           html += `
-          <div class="modern-list" style="margin: 0 0 16px 0;">
-              <div class="modern-list-header" style="display:flex; justify-content:space-between; align-items:center;">
-                  <span style="color: var(--primary-color); font-size: 14px;">LỆNH: ${escapeHTML(soLenh)}</span>
-                  <span style="color: var(--text-main); font-size: 13px;">${formatTanDaXuat} / ${formatTanLenh} Tấn</span>
-              </div>
-              <div style="padding: 12px 16px; background: var(--bg-body); border-bottom: 0.5px solid var(--border-light);">
+          <div class="card" style="margin-top: 0; margin-bottom: 16px; padding:0; overflow:hidden;">
+              <div style="background: var(--input-bg); padding: 16px; border-bottom: 1px solid var(--border-light);">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+                      <span style="color: var(--primary-color); font-weight: 800; font-size: 16px;">${escapeHTML(soLenh)}</span>
+                      <span style="color: var(--text-main); font-weight: 700; font-size: 13px;">${formatTanDaXuat} / ${formatTanLenh} Tấn</span>
+                  </div>
                   <div style="width:100%; height:6px; background:rgba(0,0,0,0.05); border-radius:3px; overflow:hidden; margin-bottom:6px;">
                       <div style="height:100%; width:${percent}%; background:${percent >= 100 ? 'var(--success-color)' : 'var(--primary-color)'}; transition:0.3s;"></div>
                   </div>
                   <div style="font-size:12px; color:var(--text-sub); text-align:right; font-weight: 500;">Còn nợ: <b style="color: var(--text-main);">${formatTanConLai} Tấn</b></div>
               </div>
+              
               <div class="table-container" style="border: none; border-radius: 0; max-height: none;">
-                  <table style="width:100%; min-width: 500px; font-size:12px; text-align:center; border-collapse: collapse;">
+                  <table style="width:100%; min-width: 500px; font-size:11px; text-align:center; border-collapse: collapse;">
                       <tr style="color:var(--text-sub); background: var(--bg-card);">
-                        <th style="padding:10px 8px; text-align:left; width: 150px; background: transparent;">Tên đạn</th>
-                        <th style="padding:10px 4px; width: 30px; background: transparent;">ĐVT</th>
-                        <th style="padding:10px 4px; width: 30px; background: transparent;">Cấp</th>
-                        <th style="padding:10px 4px; width: 50px; background: transparent;">Kế Hoạch</th>
-                        <th style="padding:10px 4px; width: 50px; background: transparent;">Đã Cấp</th>
-                        <th style="padding:10px 4px; width: 50px; background: transparent;">Còn Lại</th>
+                        <th style="padding:10px 4px; text-align:left; width: 150px; background: transparent;">Tên đạn</th>
+                        <th style="padding:10px 4px; width: 40px; background: transparent;">ĐVT</th>
+                        <th style="padding:10px 4px; width: 40px; background: transparent;">Cấp</th>
+                        <th style="padding:10px 4px; width: 60px; background: transparent;">Kế Hoạch</th>
+                        <th style="padding:10px 4px; width: 60px; background: transparent;">Đã Cấp</th>
+                        <th style="padding:10px 4px; width: 60px; background: transparent;">Còn Lại</th>
                       </tr>
                       ${g.items.map(i => {
                           let colorConLai = i.conLai < 0 ? 'var(--danger-color)' : (i.conLai === 0 ? 'var(--success-color)' : 'var(--text-main)');
@@ -1791,7 +1842,7 @@
 
                           return `
                           <tr style="border-top:0.5px solid var(--border-light); background: var(--bg-card);">
-                              <td style="padding:12px 8px; text-align:left; cursor:pointer;" onclick="moModalQuanLyLo('VIEW', null, JSON.parse('${viewDataStr}'))">
+                              <td style="padding:12px 6px; text-align:left; cursor:pointer;" onclick="moModalQuanLyLo('VIEW', null, JSON.parse('${viewDataStr}'))">
                                   <div style="font-weight:700; color:var(--text-main);">${escapeHTML(i.ten)}</div>
                                   <div style="font-size:11px; color:var(--primary-color); margin-top:3px;"><i class="ph-bold ph-stack"></i> Xem Lô đã xuất</div>
                               </td>
@@ -1848,7 +1899,7 @@
 
           return `
           <tr style="border-top:0.5px solid var(--border-light); background: var(--bg-card);">
-              <td style="padding:12px 8px; text-align:left; cursor:pointer;" onclick="moModalQuanLyLo('VIEW', null, JSON.parse('${viewDataStr}'))">
+              <td style="padding:12px 6px; text-align:left; cursor:pointer;" onclick="moModalQuanLyLo('VIEW', null, JSON.parse('${viewDataStr}'))">
                   <div style="font-weight:700; color:var(--text-main); line-height: 1.3;">${escapeHTML(item.ten)}</div>
                   <div style="font-size:11px; color:var(--primary-color); margin-top:3px;"><i class="ph-bold ph-stack"></i> Xem tổng Lô đã xuất</div>
               </td>
@@ -2042,7 +2093,7 @@
           });
       });
 
-      showDialog("Đang xử lý", "Đang tạo file Excel...", "alert");
+      showToast("Đang tạo file Excel...", "ph-fill ph-spinner-gap", "var(--warning-color)");
       setTimeout(() => {
           let ws = XLSX.utils.json_to_sheet(exportData);
           let wb = XLSX.utils.book_new();
@@ -2208,14 +2259,14 @@
           }
       });
 
-      showDialog("Đang xử lý", "Đang tạo file Excel...", "alert");
+      showToast("Đang tạo file Excel...", "ph-fill ph-spinner-gap", "var(--warning-color)");
       setTimeout(() => {
           let ws = XLSX.utils.json_to_sheet(exportData);
           let wb = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(wb, ws, "ChiTietXuatKho");
           let fileName = `BangKe_ChiTietXuatKho_${getTodayString()}.xlsx`;
           XLSX.writeFile(wb, fileName);
-          closeDialog();
+          closeDialog(); // In case dialog was accidentally called
       }, 500);
   }
 </script>
