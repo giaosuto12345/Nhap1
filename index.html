@@ -292,20 +292,24 @@
     <div id="tab-thuc-hien" class="tab-content">
       <div class="card" style="margin-top: 8px;">
         
-        <div class="form-row" style="flex-wrap: nowrap;">
-            <div class="form-group" style="flex: 1 1 30%;">
+        <!-- MODIFIED: Tách đôi Date và Số phiếu ra 1 dòng, đưa Xe nhận xuống dưới để chống chèn ép trên màn hình iPhone -->
+        <div class="form-row">
+            <div class="form-group" style="flex: 1;">
                 <label>Ngày xuất</label>
-                <input type="date" id="th-ngay" class="form-control" style="font-weight:700; padding: 0 5px;" onchange="capNhatGoiYXe()">
+                <input type="date" id="th-ngay" class="form-control" style="font-weight:700;" onchange="capNhatGoiYXe()">
             </div>
-            <div class="form-group" style="flex: 1 1 35%;">
-                <label>Xe nhận</label>
-                <input type="text" id="th-xe" list="ds-xe-thuc-hien" class="form-control" placeholder="Trống=Tự tăng">
-                <datalist id="ds-xe-thuc-hien"></datalist>
-            </div>
-            <div class="form-group" style="flex: 1 1 35%;">
+            <div class="form-group" style="flex: 1;">
                 <label>Số phiếu</label>
                 <input type="text" id="th-phieu" class="form-control" placeholder="Tùy chọn">
             </div>
+        </div>
+        <div class="form-group">
+            <label>Xe nhận</label>
+            <select id="th-xe-select" class="form-control" style="font-weight: 700; color: var(--warning-color);" onchange="xuLyChonXeThucHien()">
+                <option value="AUTO">-- Tự động xếp xe mới --</option>
+                <option value="MANUAL">✍️ Nhập số xe khác...</option>
+            </select>
+            <input type="text" id="th-xe-input" class="form-control" placeholder="Nhập tên/số xe..." style="display:none; margin-top: 8px; font-weight:700; color: var(--primary-color);">
         </div>
         
         <div class="form-group">
@@ -367,14 +371,15 @@
 
       <div id="vung-loc-bao-cao-ngay" class="card" style="margin-top: 0px; background: var(--bg-card); border-color: var(--border-light);">
           <div class="form-row" style="margin-bottom:0;">
-              <div class="form-group">
+              <div class="form-group" style="flex:1;">
                   <label>Ngày xuất</label>
-                  <input type="date" id="bc-ngay" class="form-control" onchange="capNhatGoiYXe(); renderBaoCaoNgay();" style="padding:0 5px; font-weight: 600;">
+                  <input type="date" id="bc-ngay" class="form-control" onchange="capNhatGoiYXe(); renderBaoCaoNgay();" style="font-weight: 600;">
               </div>
-              <div class="form-group">
+              <div class="form-group" style="flex:1;">
                   <label>Lọc Số Xe</label>
-                  <input type="text" id="bc-xe" list="ds-xe-bao-cao" class="form-control" placeholder="Tất cả xe..." onkeyup="renderBaoCaoNgay()" onchange="renderBaoCaoNgay()">
-                  <datalist id="ds-xe-bao-cao"></datalist>
+                  <select id="bc-xe" class="form-control" style="font-weight: 600;" onchange="renderBaoCaoNgay()">
+                      <option value="">Tất cả xe...</option>
+                  </select>
               </div>
           </div>
       </div>
@@ -732,8 +737,39 @@
       let ngayBaoCao = document.getElementById('bc-ngay').value;
       let dsXeThucHien = [...new Set(STATE.thucHien.filter(t => t.ngay === ngayThucHien && t.xe).map(t => t.xe))].sort();
       let dsXeBaoCao = [...new Set(STATE.thucHien.filter(t => t.ngay === ngayBaoCao && t.xe).map(t => t.xe))].sort();
-      document.getElementById('ds-xe-thuc-hien').innerHTML = dsXeThucHien.map(x => `<option value="${escapeHTML(x)}">`).join('');
-      document.getElementById('ds-xe-bao-cao').innerHTML = dsXeBaoCao.map(x => `<option value="${escapeHTML(x)}">`).join('');
+      
+      let selectThucHien = document.getElementById('th-xe-select');
+      let currentVal = selectThucHien.value;
+      let htmlThucHien = `<option value="AUTO">-- Tự động xếp xe mới --</option>`;
+      dsXeThucHien.forEach(x => { htmlThucHien += `<option value="${escapeHTML(x)}">Xe số: ${escapeHTML(x)}</option>`; });
+      htmlThucHien += `<option value="MANUAL">✍️ Nhập số xe khác...</option>`;
+      selectThucHien.innerHTML = htmlThucHien;
+      
+      if (currentVal === 'MANUAL' || dsXeThucHien.includes(currentVal)) {
+          selectThucHien.value = currentVal;
+      } else {
+          selectThucHien.value = 'AUTO';
+          document.getElementById('th-xe-input').style.display = 'none';
+      }
+
+      let selectBaoCao = document.getElementById('bc-xe');
+      let currentBcVal = selectBaoCao.value;
+      let htmlBaoCao = `<option value="">Tất cả xe...</option>`;
+      dsXeBaoCao.forEach(x => { htmlBaoCao += `<option value="${escapeHTML(x)}">Xe: ${escapeHTML(x)}</option>`; });
+      selectBaoCao.innerHTML = htmlBaoCao;
+      if (dsXeBaoCao.includes(currentBcVal)) selectBaoCao.value = currentBcVal;
+  }
+
+  function xuLyChonXeThucHien() {
+      let val = document.getElementById('th-xe-select').value;
+      let inputEl = document.getElementById('th-xe-input');
+      if (val === 'MANUAL') {
+          inputEl.style.display = 'block';
+          inputEl.focus();
+      } else {
+          inputEl.style.display = 'none';
+          inputEl.value = '';
+      }
   }
 
   let timeoutTimKiem = null; 
@@ -984,16 +1020,24 @@
   }
   function xuLyGhiXe() {
       haptic();
-      let xe = document.getElementById('th-xe').value.trim(); let ngay = document.getElementById('th-ngay').value;
+      let ngay = document.getElementById('th-ngay').value;
       let phieu = document.getElementById('th-phieu').value.trim();
       let idLenh = document.getElementById('th-chon-dan').value; let cap = document.getElementById('th-cap').value.trim(); let sl = document.getElementById('th-sl').value.trim();
 
       if(!idLenh || !sl || !ngay) { showDialog("Lỗi", "Vui lòng điền đủ Ngày, Chọn Đạn và Số lượng.", "alert"); return; }
-      if (!xe) {
-          if (idThucHienDangSua) { showDialog("Lỗi", "Vui lòng nhập số xe khi đang sửa.", "alert"); return; }
+      
+      let xeSelectVal = document.getElementById('th-xe-select').value;
+      let xe = "";
+      if (xeSelectVal === 'MANUAL') {
+          xe = document.getElementById('th-xe-input').value.trim();
+          if(!xe) { showDialog("Lỗi", "Vui lòng nhập số xe cụ thể.", "alert"); return; }
+      } else if (xeSelectVal === 'AUTO') {
+          if (idThucHienDangSua) { showDialog("Lỗi", "Vui lòng chọn hoặc nhập số xe khi đang sửa.", "alert"); return; }
           let maxNum = 0; let uniqueXeToday = [...new Set(STATE.thucHien.filter(t => t.ngay === ngay).map(t => t.xe))];
           uniqueXeToday.forEach(x => { let num = parseInt(x, 10); if (!isNaN(num) && String(num) === x.trim()) { if (num > maxNum) maxNum = num; } });
           xe = String(maxNum + 1); 
+      } else {
+          xe = xeSelectVal;
       }
 
       let lenhGoc = STATE.lenh.find(l => l.id === idLenh); if(!lenhGoc) return; 
@@ -1015,8 +1059,20 @@
 
   function batDauSuaThucHien(id) {
       haptic(); let item = STATE.thucHien.find(t => t.id === id); if(!item) return;
-      document.getElementById('th-xe').value = item.xe; document.getElementById('th-ngay').value = item.ngay || getTodayString();
+      document.getElementById('th-ngay').value = item.ngay || getTodayString();
       document.getElementById('th-phieu').value = item.phieu || '';
+      
+      let selectXe = document.getElementById('th-xe-select');
+      let options = Array.from(selectXe.options).map(o => o.value);
+      if(options.includes(item.xe)) {
+          selectXe.value = item.xe;
+          document.getElementById('th-xe-input').style.display = 'none';
+      } else {
+          selectXe.value = 'MANUAL';
+          document.getElementById('th-xe-input').style.display = 'block';
+          document.getElementById('th-xe-input').value = item.xe;
+      }
+
       document.getElementById('th-so-lenh').value = item.soLenh; loadDanTheoLenh();
       setTimeout(() => { 
           document.getElementById('th-chon-dan').value = item.lenhId; 
@@ -1028,7 +1084,9 @@
       document.getElementById('btn-huy-xe').style.display = "block"; window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   function huySuaThucHien() {
-      idThucHienDangSua = null; document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; document.getElementById('th-xe').value = ''; document.getElementById('th-phieu').value = '';
+      idThucHienDangSua = null; 
+      document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; document.getElementById('th-phieu').value = '';
+      document.getElementById('th-xe-select').value = 'AUTO'; document.getElementById('th-xe-input').style.display = 'none'; document.getElementById('th-xe-input').value = '';
       document.getElementById('btn-ghi-xe').innerHTML = "<i class='ph ph-check-circle'></i> GHI SỔ XE"; document.getElementById('btn-ghi-xe').style.background = "var(--warning-color)"; document.getElementById('btn-huy-xe').style.display = "none";
   }
   function xoaThucHien(id) { 
