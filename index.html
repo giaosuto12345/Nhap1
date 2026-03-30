@@ -283,7 +283,8 @@
         <div class="form-row">
             <div class="form-group" style="flex: 1 1 35%;">
               <label>Số Lệnh/Phiếu</label>
-              <input type="text" id="lenh-so" class="form-control" placeholder="VD: 01/PX" style="font-weight:700;">
+              <input type="text" id="lenh-so" list="ds-so-lenh" class="form-control" placeholder="VD: 01/PX" style="font-weight:700;">
+              <datalist id="ds-so-lenh"></datalist>
             </div>
             <div class="form-group" style="flex: 1 1 65%;">
               <label>Tên đạn</label>
@@ -420,11 +421,11 @@
       <div id="vung-bao-cao-ngay">
           <div class="card" style="margin-top: 0px; background: var(--bg-card); border-color: var(--border-light);">
               <div class="form-row" style="margin-bottom:0;">
-                  <div class="form-group" style="flex:1.2;">
+                  <div class="form-group" style="flex:1.5;">
                       <label>Ngày xuất</label>
                       <input type="date" id="bc-ngay" class="form-control" onchange="capNhatGoiYXe(); renderBaoCaoNgay();" style="font-weight: 600;">
                   </div>
-                  <div class="form-group" style="flex:1.8;">
+                  <div class="form-group" style="flex:1;">
                       <label>Lọc Số Xe</label>
                       <select id="bc-xe" class="form-control" style="font-weight: 600;" onchange="renderBaoCaoNgay()">
                           <option value="">Tất cả xe...</option>
@@ -757,6 +758,7 @@
       renderBangThucHien(); 
       capNhatDropdownSoLenh();
       capNhatGoiYXe(); 
+      capNhatGoiYSoLenh();
   });
 
   window.showDialog = function(title, message, type = 'alert', confirmFn = null) {
@@ -821,6 +823,11 @@
       }; reader.readAsText(file); event.target.value = '';
   }
   function xoaToanBoDuLieu() { showDialog("Cảnh báo", "Xóa sạch dữ liệu bộ nhớ tạm?", "confirm", () => { safeStorage.clear(); try { location.reload(); } catch(e){} }); }
+
+  function capNhatGoiYSoLenh() {
+      let uniqueLenh = [...new Set(STATE.lenh.map(l => l.soLenh))];
+      document.getElementById('ds-so-lenh').innerHTML = uniqueLenh.map(sl => `<option value="${escapeHTML(sl)}">`).join('');
+  }
 
   function capNhatGoiYXe() {
       let ngayThucHien = document.getElementById('th-ngay').value;
@@ -997,6 +1004,8 @@
           document.getElementById('lenh-cap').value = ''; document.getElementById('lenh-sl').value = '';
       }
       safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh)); renderBangLenh();
+      capNhatGoiYSoLenh();
+      capNhatDropdownSoLenh();
   }
   function batDauSuaLenh(id) {
       haptic(); let item = STATE.lenh.find(l => l.id === id); if(!item) return;
@@ -1012,7 +1021,13 @@
       document.getElementById('btn-huy-lenh').style.display = "none";
   }
   function xoaLenh(id) { 
-      showDialog("Xác nhận", "Xóa loại đạn này khỏi lệnh?", "confirm", () => { STATE.lenh = STATE.lenh.filter(i => i.id !== id); safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh)); renderBangLenh(); }); 
+      showDialog("Xác nhận", "Xóa loại đạn này khỏi lệnh?", "confirm", () => { 
+          STATE.lenh = STATE.lenh.filter(i => i.id !== id); 
+          safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh)); 
+          renderBangLenh(); 
+          capNhatGoiYSoLenh();
+          capNhatDropdownSoLenh();
+      }); 
   }
   function renderBangLenh() {
       let tbody = document.getElementById('tbody-lenh');
