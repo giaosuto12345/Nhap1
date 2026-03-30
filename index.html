@@ -2,7 +2,6 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <!-- Tối ưu viewport cho iPhone, ngăn chặn zoom khi bấm vào input -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -176,7 +175,7 @@
     .dialog-buttons { display: flex; gap: 10px; margin-top: 24px;}
     .btn-dialog { flex: 1; height: 46px; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; background: var(--primary-color); color: white; font-size: 15px;}
     
-    /* ================= TOAST NOTIFICATION (THÔNG BÁO HIỆN ĐẠI) ================= */
+    /* ================= TOAST NOTIFICATION ================= */
     .toast-msg {
         position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
         background: rgba(30, 30, 30, 0.9); color: #FFF;
@@ -189,17 +188,16 @@
     @media (prefers-color-scheme: dark) { .toast-msg { background: rgba(200, 200, 200, 0.9); color: #000; } }
     .toast-msg.show { top: calc(20px + env(safe-area-inset-top)); }
 
-    /* ================= MODAL FULL SCREEN (BẢNG BÁO CÁO) ================= */
+    /* ================= MODAL FULL SCREEN ================= */
     .modal-full { width: 96%; max-width: 600px; max-height: 85vh; padding: 0; display: flex; flex-direction: column; justify-content: flex-start; border-radius: 20px; overflow: hidden; background: var(--bg-body); position: relative;}
     .modal-full-header { position: sticky; top: 0; background: var(--bg-card); padding: 16px; border-bottom: 1px solid var(--border-light); z-index: 20; display: flex; justify-content: space-between; align-items: center; }
     .modal-list-container { flex: 1; overflow-y: auto; text-align: left; -webkit-overflow-scrolling: touch; padding: 16px; background: var(--bg-body);}
     
-    /* NÚT ĐÓNG BẢNG NHỎ GỌN HƠN MỚI */
     .modal-footer { position: sticky; bottom: 0; background: var(--bg-card); border-top: 0.5px solid var(--border-light); padding: 12px; display: flex; justify-content: center; z-index: 20; }
     .btn-modal-cancel-sm { background: var(--input-bg); color: var(--text-main); font-weight: 700; font-size: 14px; padding: 0 32px; height: 40px; border-radius: 20px; border: none; cursor: pointer; transition: 0.2s;}
     .btn-modal-cancel-sm:active { filter: brightness(0.9); transform: scale(0.95); }
 
-    /* DANH SÁCH HIỆN ĐẠI (APPLE SETTINGS STYLE) */
+    /* DANH SÁCH HIỆN ĐẠI */
     .modern-list { background: var(--bg-card); border-radius: 16px; margin: 16px 0; overflow: hidden; box-shadow: var(--card-shadow); border: 1px solid var(--border-light); }
     .modern-list-header { padding: 14px 16px; background: var(--bg-body); color: var(--text-sub); font-size: 12px; font-weight: 700; text-transform: uppercase; border-bottom: 0.5px solid var(--border-light); }
     .modern-list-item { display: flex; align-items: center; padding: 14px 16px; border-bottom: 0.5px solid var(--border-light); background: var(--bg-card); }
@@ -215,10 +213,12 @@
     .dash-box-title { font-size: 10px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 6px; }
     .dash-box-val { font-size: 15px; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px;}
 
-    /* ================= BOTTOM SHEET FULL (QUẢN LÝ LÔ) ================= */
-    .modal-bottom-sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); z-index: 10000; display: none; flex-direction: column; justify-content: flex-end; opacity: 0; transition: opacity 0.3s; }
+    /* ================= BOTTOM SHEET QUẢN LÝ LÔ (TỐI ƯU CẢ PC & MOBILE) ================= */
+    .modal-bottom-sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); z-index: 10000; display: none; flex-direction: column; justify-content: flex-end; align-items: center; opacity: 0; transition: opacity 0.3s; }
     .modal-bottom-sheet.show { opacity: 1; }
-    .sheet-content { background: var(--bg-body); width: 100%; height: 92dvh; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.1, 0.8, 0.1, 1); box-shadow: 0 -10px 40px rgba(0,0,0,0.1);}
+    
+    /* Giao diện Sheet được căn giữa và giới hạn kích thước trên PC */
+    .sheet-content { background: var(--bg-body); width: 100%; max-width: 650px; height: 92dvh; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.1, 0.8, 0.1, 1); box-shadow: 0 -10px 40px rgba(0,0,0,0.1);}
     .modal-bottom-sheet.show .sheet-content { transform: translateY(0); }
     
     .sheet-pill-wrapper { padding: 10px 0; display: flex; justify-content: center; background: var(--bg-card); border-radius: 20px 20px 0 0; }
@@ -252,7 +252,7 @@
     <div id="tab-danh-muc" class="tab-content active">
       <div class="card">
         <div class="search-bar-container">
-          <input type="text" id="search-danh-muc" class="search-input" placeholder="🔍 Tìm kiếm đạn..." onkeyup="debounceTimKiem()">
+          <input type="text" id="search-danh-muc" class="search-input" placeholder="🔍 Tìm kiếm đạn...">
           <button class="action-btn" style="background:var(--input-bg); color: var(--text-main);" onclick="toggleCaiDatDanhMuc(); haptic();"><i class="ph ph-faders"></i></button>
           <button class="action-btn" style="background:var(--primary-color)" onclick="document.getElementById('excel-upload').click(); haptic();"><i class="ph ph-file-xls"></i></button>
           <input type="file" id="excel-upload" style="display:none;" accept=".xlsx, .xls, .csv" onchange="xuLyFileExcel(event)">
@@ -294,7 +294,7 @@
             </div>
             <div class="form-group" style="flex: 1.8;">
               <label>Tên đạn</label>
-              <input type="text" id="lenh-ten" class="form-control" placeholder="🔍 Bấm chọn..." readonly onclick="moModalChonDan()" style="cursor: pointer; color: var(--primary-color);">
+              <input type="text" id="lenh-ten" class="form-control input-clickable" placeholder="🔍 Bấm chọn..." readonly onclick="moModalChonDan()" style="cursor: pointer; color: var(--primary-color);">
             </div>
         </div>
         
@@ -345,7 +345,6 @@
     <div id="tab-thuc-hien" class="tab-content">
       <div class="card">
         
-        <!-- ROW 1: NGÀY & PHIẾU (Tối ưu iOS) -->
         <div class="form-row">
             <div class="form-group" style="flex: 1.5;">
                 <label>Ngày xuất</label>
@@ -357,9 +356,8 @@
             </div>
         </div>
 
-        <!-- ROW 2: XE NHẬN (Full Width) -->
         <div class="form-group">
-            <label>Xe nhận (Ghim theo phiếu)</label>
+            <label>Xe nhận</label>
             <select id="th-xe-select" class="form-control" style="color: var(--warning-color);" onchange="xuLyChonXeThucHien()">
                 <option value="AUTO">-- Tự động tăng xe mới --</option>
                 <option value="MANUAL">✍️ Nhập số/tên xe khác...</option>
@@ -367,7 +365,6 @@
             <input type="text" id="th-xe-input" class="form-control" placeholder="Nhập tên/số xe..." style="display:none; margin-top: 10px; color: var(--warning-color);">
         </div>
         
-        <!-- ROW 3 & 4: LỆNH & ĐẠN -->
         <div class="form-group">
           <label>Bước 1: Chọn Lệnh</label>
           <select id="th-so-lenh" class="form-control" style="color: var(--info-color);" onchange="loadDanTheoLenh()"><option value="">-- Chọn lệnh --</option></select>
@@ -378,7 +375,6 @@
           <select id="th-chon-dan" class="form-control" onchange="tuDongDienCapTuLenh()"><option value="">-- Chọn đạn --</option></select>
         </div>
         
-        <!-- ROW 5: CẤP & SL -->
         <div class="form-row" style="margin-bottom:0;">
           <div class="form-group" style="flex: 1;">
             <label>Cấp</label>
@@ -444,10 +440,9 @@
               </div>
           </div>
 
-          <!-- MỚI: Bố trí nút xuất Excel và Ảnh thành Grid chuyên nghiệp -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px;">
               <button class="btn" style="background:var(--warning-color); margin:0; height:44px; font-size:12px;" onclick="moModalXemChiTietXe()"><i class="ph-fill ph-truck"></i> TẢI TRỌNG XE</button>
-              <button class="btn" style="background:var(--info-color); margin:0; height:44px; font-size:12px;" onclick="moModalTongHopToanBoLo()"><i class="ph-fill ph-stack"></i> XEM TẤT CẢ LÔ</button>
+              <button class="btn" style="background:var(--info-color); margin:0; height:44px; font-size:12px;" onclick="moModalTongHopToanBoLo()"><i class="ph-fill ph-stack"></i> TẤT CẢ LÔ</button>
               <button class="btn" style="background:var(--primary-light); color:var(--primary-color); margin:0; height:44px; font-size:12px;" onclick="xuatAnhBaoCaoModal('khu-vuc-chup-anh-ngay', 'BaoCaoXuatKho_Ngay')"><i class="ph-bold ph-camera"></i> XUẤT ẢNH</button>
               <button class="btn" style="background:var(--success-color); margin:0; height:44px; font-size:12px;" onclick="xuatExcelToanBoLo()"><i class="ph-bold ph-file-xls"></i> XUẤT EXCEL</button>
           </div>
@@ -623,7 +618,15 @@
              <button class="btn-sm" style="background:var(--primary-light); color:var(--primary-color); width:auto; padding: 0 10px; font-size: 12px; height: 30px;" onclick="xuatAnhBaoCaoModal('noidung-tong-hop-lo', 'TongHopLo')"><i class="ph-bold ph-camera"></i></button>
              <button class="btn-sm" style="background:var(--success-color); width:auto; padding: 0 10px; font-size: 12px; height: 30px;" onclick="xuatExcelToanBoLo()"><i class="ph-bold ph-file-xls"></i></button>
          </div>
-  <!-- ==================== MODAL BOTTOM SHEET (QUẢN LÝ LÔ) TỐI ƯU ==================== -->
+      </div>
+      <div class="modal-list-container" id="noidung-tong-hop-lo"></div>
+      <div class="modal-footer">
+          <button class="btn-modal-cancel-sm" onclick="dongModalTongHopToanBoLo()">ĐÓNG</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL BOTTOM SHEET QUẢN LÝ LÔ (TỐI ƯU CẢ PC LẪN MOBILE) ==================== -->
   <div id="modal-quan-ly-lo" class="modal-bottom-sheet">
     <div class="sheet-content">
       
@@ -647,11 +650,11 @@
           <div id="vung-nhap-lo-chinh">
               <div id="vung-goi-y-thong-minh" style="display: flex; gap: 8px; overflow-x: auto; margin-bottom: 10px; white-space: nowrap; -webkit-overflow-scrolling: touch; min-height: 0;"></div>
               
-              <!-- MỚI: Thanh công cụ Nhập Lô có nút Excel -->
+              <!-- NÚT TỪ EXCEL -->
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding: 0 2px;">
                   <label style="font-size:12px; font-weight:700; color:var(--text-sub); text-transform: uppercase; margin:0;">Nhập Lô Thủ Công</label>
-                  <button onclick="document.getElementById('excel-upload-lo').click()" style="background:var(--success-color); color:white; border:none; padding: 4px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; display:flex; align-items:center; gap:4px; cursor:pointer;">
-                      <i class="ph-bold ph-file-xls" style="font-size: 14px;"></i> TỪ EXCEL
+                  <button onclick="document.getElementById('excel-upload-lo').click()" style="background:var(--success-color); color:white; border:none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; display:flex; align-items:center; gap:4px; cursor:pointer;">
+                      <i class="ph-bold ph-file-xls"></i> TỪ EXCEL
                   </button>
                   <input type="file" id="excel-upload-lo" style="display:none;" accept=".xlsx, .xls, .csv" onchange="xuLyNhapsLoTuExcel(event)">
               </div>
@@ -672,8 +675,8 @@
       </div>
 
       <div id="vung-nut-lo-bottom" style="padding: 16px 20px calc(16px + env(safe-area-inset-bottom)); background: var(--bg-card); border-top: 0.5px solid var(--border-light); flex-shrink: 0; display: flex; gap: 12px;">
-          <button id="btn-thoat-lo" onclick="dongModalQuanLyLo()" style="flex: 1; height: 50px; border-radius: 14px; border: none; background: var(--input-bg); color: var(--text-main); font-weight: 700; font-size: 16px; transition: 0.2s;">THOÁT</button>
-          <button id="btn-huy-sua-lo" onclick="huySuaLo()" style="flex: 1; height: 50px; border-radius: 14px; border: none; background: rgba(255, 59, 48, 0.1); color: var(--danger-color); font-weight: 700; font-size: 16px; display: none; transition: 0.2s;">HỦY SỬA</button>
+          <button id="btn-thoat-lo" onclick="dongModalQuanLyLo()" style="flex: 1; height: 50px; border-radius: 14px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--text-main); font-weight: 700; font-size: 16px; transition: 0.2s;">THOÁT</button>
+          <button id="btn-huy-sua-lo" onclick="huySuaLo()" style="flex: 1; height: 50px; border-radius: 14px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--danger-color); font-weight: 700; font-size: 16px; display: none; transition: 0.2s;">HỦY SỬA</button>
           <button id="btn-submit-lo" onclick="xuLyThemQuanLyLo()" style="flex: 1.5; height: 50px; border-radius: 14px; border: none; background: var(--primary-color); color: white; font-weight: 700; font-size: 16px; transition: 0.2s; box-shadow: 0 4px 12px rgba(0,122,255,0.3);">NHẬP LÔ</button>
       </div>
 
@@ -800,38 +803,33 @@
       document.addEventListener('keydown', function(e) {
           if (e.key === 'Enter') {
               let activeEl = document.activeElement;
-              if (!activeEl || activeEl.tagName !== 'INPUT') return; // Chỉ kích hoạt khi đang gõ trong ô Input
+              if (!activeEl || activeEl.tagName !== 'INPUT') return; 
 
               let id = activeEl.id;
 
-              // 1. Khu vực Nhập Lô liên hoàn
               if (id === 'input-ql-ten-lo') {
                   e.preventDefault();
-                  document.getElementById('input-ql-sl-lo').focus(); // Chuyển con trỏ sang ô Số Lượng
+                  document.getElementById('input-ql-sl-lo').focus(); 
               } 
               else if (id === 'input-ql-sl-lo') {
                   e.preventDefault();
-                  document.getElementById('btn-submit-lo').click(); // Submit Lô
+                  document.getElementById('btn-submit-lo').click(); 
               }
-              // 2. Khu vực Lệnh Xuất
               else if (['lenh-so', 'lenh-sl'].includes(id)) {
                   e.preventDefault();
                   document.getElementById('btn-luu-lenh').click();
               }
-              // 3. Khu vực Thực Hiện (Ghi sổ xe)
               else if (['th-ngay', 'th-phieu', 'th-xe-input', 'th-sl'].includes(id)) {
                   e.preventDefault();
                   document.getElementById('btn-ghi-xe').click();
               }
-              // 4. Tùy chọn Cài đặt
               else if (id === 'set-fontsize') {
                   e.preventDefault();
                   luuCaiDatDanhMuc();
               }
-              // 5. Tìm kiếm
               else if (id === 'search-modal-dan' || id === 'search-danh-muc') {
                   e.preventDefault();
-                  activeEl.blur(); // Ẩn bàn phím sau khi gõ xong
+                  activeEl.blur(); 
               }
           }
       });
@@ -885,14 +883,12 @@
       let target = document.getElementById(elementId);
       if (!target) return;
 
-      // Tìm thẻ con chứa thanh cuộn (nếu có)
       let scrollContainer = target.querySelector('.table-container') || target.querySelector('.modal-list-container') || target;
       
       let oldMaxHeight = scrollContainer.style.maxHeight;
       let oldOverflowY = scrollContainer.style.overflowY;
       let oldHeight = scrollContainer.style.height;
 
-      // Ép giãn bảng ra full để chụp
       scrollContainer.style.maxHeight = 'none';
       scrollContainer.style.overflowY = 'visible';
       scrollContainer.style.height = 'auto';
@@ -905,7 +901,6 @@
               backgroundColor: "#F2F2F7", 
               useCORS: true 
           }).then(canvas => {
-              // Khôi phục UI
               scrollContainer.style.maxHeight = oldMaxHeight;
               scrollContainer.style.overflowY = oldOverflowY;
               scrollContainer.style.height = oldHeight;
@@ -1472,10 +1467,10 @@
 
           let container = document.getElementById('danh-sach-ql-lo-container');
           if (viewData.listLo.length === 0) {
-              container.innerHTML = `<div style="padding:40px; text-align:center; color:var(--text-sub);"><i class="ph-bold ph-stack" style="font-size:32px; opacity:0.5; margin-bottom:8px;"></i><br>Chưa có Lô nào được lưu.</div>`;
+              container.innerHTML = `<div style="padding:40px; text-align:center; color:var(--text-sub);"><i class="ph-bold ph-stack" style="font-size:32px; opacity:0.5; margin-bottom:8px;"></i><br>Chưa có Lô nào được nhập.</div>`;
           } else {
               container.innerHTML = viewData.listLo.map((lo, idx) => `
-                  <div class="modern-list-item" style="border-radius:14px; margin-bottom:10px; border:0.5px solid var(--border-light); box-shadow: var(--card-shadow); padding: 14px;">
+                  <div class="modern-list-item" style="border-radius:14px; margin-bottom:10px; border:0.5px solid var(--border-light); box-shadow: var(--card-shadow); padding: 12px 14px;">
                       <div class="modern-list-stt" style="font-size: 14px; width: 28px;">${idx + 1}</div>
                       <div class="modern-list-content" style="padding-left: 0;">
                           <div class="modern-list-title" style="font-size: 16px;">${escapeHTML(lo.tenLo)}</div>
@@ -1693,7 +1688,6 @@
       xuLyGoiYLoAuto(); 
   }
 
-  // --- MỚI: HÀM NHẬP LÔ TỪ EXCEL ---
   window.xuLyNhapsLoTuExcel = function(e) {
       haptic();
       let file = e.target.files[0];
@@ -1718,13 +1712,12 @@
                   return;
               }
 
-              // Thuật toán nhận diện cột thông minh
               let headers = Object.keys(json[0]);
               let colTen = headers.find(k => k.toLowerCase().includes('lô') || k.toLowerCase().includes('tên'));
               let colSL = headers.find(k => k.toLowerCase().includes('sl') || k.toLowerCase().includes('lượng') || k.toLowerCase() === 'số lượng');
 
               if (!colTen || !colSL) {
-                  showDialog("Lỗi Định Dạng", "File Excel phải có Cột chứa chữ 'Lô' và Cột chứa chữ 'SL' (hoặc Số Lượng).", "alert");
+                  showDialog("Lỗi Định Dạng", "File Excel phải có Cột chứa chữ 'Lô' và Cột 'SL' (hoặc Số Lượng).", "alert");
                   e.target.value = '';
                   return;
               }
@@ -1748,19 +1741,17 @@
               }
 
               if (newBatches.length === 0) {
-                  showDialog("Lỗi", "Không tìm thấy dữ liệu Tên Lô hoặc Số lượng hợp lệ trong file.", "alert");
+                  showDialog("Lỗi", "Không tìm thấy dữ liệu Tên Lô hoặc Số lượng hợp lệ.", "alert");
                   e.target.value = '';
                   return;
               }
 
-              // Kiểm tra chống nhập lố
               if (totalNewSl > slConLaiThemDuoc) {
-                  showDialog("Vượt Quá Giới Hạn", `File Excel có tổng số lượng (${totalNewSl}) vượt quá số lượng còn lại cho phép nhập (${slConLaiThemDuoc}). Vui lòng kiểm tra lại file.`, "alert");
+                  showDialog("Vượt Quá Giới Hạn", `File Excel có tổng SL (${totalNewSl}) vượt quá SL còn lại cho phép nhập (${slConLaiThemDuoc}).`, "alert");
                   e.target.value = '';
                   return;
               }
 
-              // Lưu dữ liệu
               record.danhSachLo.push(...newBatches);
 
               if (currentLoContext.type === 'LENH') safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh));
@@ -1774,7 +1765,7 @@
               console.error(err);
               showDialog("Lỗi", "Đã xảy ra lỗi khi đọc file Excel.", "alert");
           }
-          e.target.value = ''; // Reset input để có thể chọn lại file cũ
+          e.target.value = ''; 
       };
       reader.readAsArrayBuffer(file);
   };
@@ -1938,7 +1929,6 @@
           });
       });
 
-      // Update Dashboard
       document.getElementById('dash-tong-lenh').innerText = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 2 }).format(globalTongLenh) + " Tấn";
       document.getElementById('dash-tong-xuat').innerText = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 2 }).format(globalTongXuat) + " Tấn";
       document.getElementById('dash-tong-no').innerText = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 2 }).format(globalTongLenh - globalTongXuat) + " Tấn";
@@ -2046,7 +2036,7 @@
 
           return `
           <tr style="border-top:0.5px solid var(--border-light); background: var(--bg-card);">
-              <td style="padding:12px 6px; text-align:left; cursor:pointer;" onclick="moModalQuanLyLo('VIEW', null, JSON.parse('${viewDataStr}'))">
+              <td style="padding:12px 8px; text-align:left; cursor:pointer;" onclick="moModalQuanLyLo('VIEW', null, JSON.parse('${viewDataStr}'))">
                   <div style="font-weight:700; color:var(--text-main); line-height: 1.3;">${escapeHTML(item.ten)}</div>
                   <div style="font-size:11px; color:var(--primary-color); margin-top:3px;"><i class="ph-bold ph-stack"></i> Xem tổng Lô đã xuất</div>
               </td>
