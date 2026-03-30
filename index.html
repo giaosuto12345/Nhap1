@@ -193,8 +193,9 @@
     .bc-tab-btn { flex: 1; padding: 10px; font-size: 13px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; transition: 0.2s; background: transparent; color: var(--text-sub); display:flex; justify-content:center; align-items:center; gap: 6px;}
     .bc-tab-btn.active { background: var(--bg-card); color: var(--text-main); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
 
-    .chip-lo { display: inline-block; background: var(--primary-light); color: var(--primary-color); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; margin: 0 8px 8px 0; cursor: pointer; border: 1px solid transparent; transition: 0.2s;}
-    .chip-lo:active { filter: brightness(0.9); border-color: var(--primary-color); }
+    /* Chip Gợi ý Lô Thông minh */
+    .chip-lo { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 14px; font-weight: 700; margin: 0; cursor: pointer; border: 1px solid transparent; transition: 0.2s; white-space: nowrap;}
+    .chip-lo:active { filter: brightness(0.9); transform: scale(0.95); }
 
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -273,7 +274,8 @@
           </div>
           <div class="form-group" style="flex: 1 1 40%;">
             <label>Số lượng</label>
-            <input type="number" inputmode="decimal" id="lenh-sl" class="form-control" style="padding:0 5px; text-align:center; font-weight: bold; color: var(--primary-color);">
+            <!-- Đã thêm inputmode="decimal" pattern="[0-9]*" để mở phím số -->
+            <input type="number" inputmode="decimal" pattern="[0-9]*" id="lenh-sl" class="form-control" style="padding:0 5px; text-align:center; font-weight: bold; color: var(--primary-color);">
           </div>
         </div>
         
@@ -338,7 +340,8 @@
           </div>
           <div class="form-group" style="flex: 1 1 60%;">
             <label>SL (Thực xuất)</label>
-            <input type="number" inputmode="decimal" id="th-sl" class="form-control" placeholder="Số lượng" style="text-align:center; font-weight: 700; color: var(--danger-color);">
+            <!-- Đã thêm inputmode="decimal" pattern="[0-9]*" -->
+            <input type="number" inputmode="decimal" pattern="[0-9]*" id="th-sl" class="form-control" placeholder="Số lượng" style="text-align:center; font-weight: 700; color: var(--danger-color);">
           </div>
         </div>
         
@@ -505,7 +508,7 @@
     </div>
   </div>
 
-  <!-- MODAL QUẢN LÝ LÔ CHUNG (ĐA NĂNG CÓ SỬA LÔ) -->
+  <!-- MODAL QUẢN LÝ LÔ CHUNG (ĐA NĂNG: TO HƠN, KHUYẾT CHỮ, GỢI Ý THÔNG MINH) -->
   <div id="modal-quan-ly-lo" class="modal-overlay">
     <div class="custom-dialog-box modal-full" style="height: auto; max-height: 85vh; background: var(--bg-body);">
       <h3 id="ql-lo-title" style="font-weight: 800; text-align: left; margin-bottom: 8px;">Chi tiết Lô xuất</h3>
@@ -517,24 +520,34 @@
       </div>
 
       <div id="vung-nhap-lo">
-          <div id="vung-goi-y-lo" style="text-align: left; display: none; margin-bottom: 12px;">
-              <div style="font-size: 12px; font-weight: 600; color: var(--text-sub); margin-bottom: 8px;"><i class="ph ph-magic-wand"></i> Gợi ý Lô từ Lệnh xuất:</div>
+          <!-- Vùng gợi ý Lô từ Lệnh (Dành cho Thực Xuất) -->
+          <div id="vung-goi-y-lo" style="text-align: left; display: none; margin-bottom: 8px;">
+              <div style="font-size: 12px; font-weight: 600; color: var(--text-sub); margin-bottom: 8px;"><i class="ph ph-magic-wand"></i> Chọn nhanh Lô từ Lệnh:</div>
               <div id="danh-sach-chip-goi-y"></div>
           </div>
     
-          <div class="form-row" style="flex-wrap:nowrap; align-items: center; background: var(--bg-card); padding: 10px; border-radius: 14px; border: 0.5px solid var(--border-light);">
+          <!-- Form Nhập Liệu Mới: To hơn, không viền (khuyết chữ) -->
+          <div class="form-row" style="flex-wrap:nowrap; align-items: stretch; background: var(--bg-card); padding: 10px 12px; border-radius: 16px; border: 0.5px solid var(--border-light); box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+             <div class="form-group" style="flex:1.5; margin-bottom: 0;">
+               <input type="text" id="input-ql-ten-lo" class="form-control" style="background: transparent; border:none; font-size: 16px; font-weight: 700; padding: 0 4px; height: 100%; box-shadow: none;" placeholder="Tên Lô (VD: 203)" autocomplete="off" oninput="xuLyGoiYLoAuto()">
+             </div>
+             
+             <!-- Gạch chia ngăn cách -->
+             <div style="width: 1px; background: var(--border-light); margin: 6px 8px;"></div>
+             
              <div class="form-group" style="flex:1; margin-bottom: 0;">
-               <input type="text" id="input-ql-ten-lo" class="form-control" style="background: var(--bg-body); border:none;" placeholder="Tên Lô (VD: Lô 1-20)">
+               <input type="number" id="input-ql-sl-lo" class="form-control" inputmode="decimal" pattern="[0-9]*" style="background: var(--input-bg); border:none; text-align:center; font-weight:800; font-size: 16px; border-radius: 10px; height: 48px; box-shadow: none;" placeholder="SL">
              </div>
-             <div class="form-group" style="width:80px; margin-bottom: 0;">
-               <input type="number" id="input-ql-sl-lo" class="form-control" style="background: var(--bg-body); border:none; text-align:center; font-weight:700; padding:0 5px;" placeholder="SL">
-             </div>
-             <button class="btn btn-sm" id="btn-cancel-edit-lo" style="background:var(--input-bg); color:var(--text-main); height:46px; width:40px; margin:0; border-radius: 10px; display:none;" onclick="huySuaLo()"><i class="ph ph-x"></i></button>
-             <button class="btn btn-sm" id="btn-submit-lo" style="background:var(--success-color); height:46px; width:46px; margin:0; border-radius: 10px;" onclick="xuLyThemQuanLyLo()"><i class="ph ph-plus-bold"></i></button>
+             
+             <button class="btn btn-sm" id="btn-cancel-edit-lo" style="background:var(--input-bg); color:var(--text-main); height:48px; width:40px; margin:0 0 0 8px; border-radius: 10px; display:none;" onclick="huySuaLo()"><i class="ph ph-x"></i></button>
+             <button class="btn btn-sm" id="btn-submit-lo" style="background:var(--success-color); height:48px; width:48px; margin:0 0 0 8px; border-radius: 10px;" onclick="xuLyThemQuanLyLo()"><i class="ph ph-plus-bold" style="font-size: 18px;"></i></button>
           </div>
+
+          <!-- Vùng gợi ý hậu tố thông minh (Sinh ra khi gõ) -->
+          <div id="vung-goi-y-thong-minh" style="min-height: 0; margin-top: 8px; display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; white-space: nowrap;"></div>
       </div>
 
-      <div class="modal-list-container" id="danh-sach-ql-lo-container" style="margin-top: 16px; border:none;"></div>
+      <div class="modal-list-container" id="danh-sach-ql-lo-container" style="margin-top: 8px; border:none;"></div>
       
       <button class="btn-modal-cancel" style="background: var(--bg-card); border: 0.5px solid var(--border-light);" onclick="dongModalQuanLyLo()">ĐÓNG</button>
     </div>
@@ -586,7 +599,7 @@
   let currentBaoCaoMode = 'ngay'; 
   
   let currentLoContext = { type: null, id: null, viewData: null }; 
-  let idLoDangSua = null; // Trạng thái dùng cho việc Sửa Lô
+  let idLoDangSua = null; 
 
   document.addEventListener('DOMContentLoaded', () => { 
       let today = getTodayString();
@@ -649,7 +662,6 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // ==================== HỆ THỐNG ====================
   function moMenuHeThong() { haptic(); let m = document.getElementById('modal-he-thong'); m.style.display = 'flex'; setTimeout(() => m.classList.add('show'), 10); }
   function dongMenuHeThong() { let m = document.getElementById('modal-he-thong'); m.classList.remove('show'); setTimeout(() => m.style.display = 'none', 300); }
   function capNhatPhienBanApp() { haptic(); showDialog("Đang cập nhật", "Đang tải lại trang...", "alert"); setTimeout(() => { try { window.location.reload(); } catch(e) {} }, 1500); }
@@ -683,7 +695,6 @@
       document.getElementById('ds-xe-bao-cao').innerHTML = dsXeBaoCao.map(x => `<option value="${escapeHTML(x)}">`).join('');
   }
 
-  // ==================== TAB 1: EXCEL ====================
   let timeoutTimKiem = null; 
   function debounceTimKiem() { if (timeoutTimKiem) clearTimeout(timeoutTimKiem); timeoutTimKiem = setTimeout(() => timKiemDanhMuc(), 300); }
   function xuLyFileExcel(e) { 
@@ -802,7 +813,6 @@
       document.getElementById('lenh-ten').value = info.ten; document.getElementById('lenh-dvt').value = info.dvt; dongModalChonDan();
   }
 
-  // ==================== TAB 2: LỆNH XUẤT ====================
   function xuLyLuuLenh() {
       haptic();
       let soLenh = document.getElementById('lenh-so').value.trim(); let ten = document.getElementById('lenh-ten').value.trim();
@@ -1029,6 +1039,7 @@
       let daNhapEl = document.getElementById('ql-lo-sl-da-nhap');
       let vungNhap = document.getElementById('vung-nhap-lo');
       let vungGoiY = document.getElementById('vung-goi-y-lo');
+      let vungGoiYThongMinh = document.getElementById('vung-goi-y-thong-minh');
       
       if (type === 'LENH') {
           let record = STATE.lenh.find(l => l.id === id);
@@ -1037,6 +1048,7 @@
           nameEl.innerText = record.ten;
           vungNhap.style.display = 'block';
           vungGoiY.style.display = 'none';
+          vungGoiYThongMinh.innerHTML = '';
           renderChiTietQuanLyLo(record);
       } 
       else if (type === 'THUCHIEN') {
@@ -1045,8 +1057,8 @@
           titleEl.innerText = "Thực tế xuất Lô";
           nameEl.innerText = record.ten;
           vungNhap.style.display = 'block';
+          vungGoiYThongMinh.innerHTML = '';
           
-          // Xử lý gợi ý lô từ Lệnh
           let lenhGoc = STATE.lenh.find(l => l.id === record.lenhId);
           if (lenhGoc && lenhGoc.danhSachLo && lenhGoc.danhSachLo.length > 0) {
               vungGoiY.style.display = 'block';
@@ -1063,7 +1075,6 @@
           renderChiTietQuanLyLo(record);
       }
       else if (type === 'VIEW') {
-          // viewData format: { title: "", name: "", total: number, listLo: [{tenLo, sl}] }
           titleEl.innerText = viewData.title || "Chi tiết Lô";
           nameEl.innerText = viewData.name || "Tên đạn";
           vungNhap.style.display = 'none';
@@ -1088,7 +1099,13 @@
       
       let w = document.getElementById('modal-quan-ly-lo');
       w.style.display = 'flex';
-      setTimeout(() => w.classList.add('show'), 10);
+      setTimeout(() => {
+          w.classList.add('show');
+          // Gọi gợi ý thông minh ngay khi vừa mở lên (nếu ở chế độ nhập)
+          if (type === 'LENH' || type === 'THUCHIEN') {
+              xuLyGoiYLoAuto();
+          }
+      }, 10);
   }
 
   function dongModalQuanLyLo() {
@@ -1101,6 +1118,62 @@
       
       currentLoContext = { type: null, id: null, viewData: null };
   }
+
+  // --- LOGIC GỢI Ý HẬU TỐ THÔNG MINH ---
+  function xuLyGoiYLoAuto() {
+      let inputEl = document.getElementById('input-ql-ten-lo');
+      let val = inputEl.value;
+      let vungGoiY = document.getElementById('vung-goi-y-thong-minh');
+
+      let tenDanHienTai = document.getElementById('ql-lo-ten-dan').innerText;
+      let allHistoricalBatches = new Set();
+
+      // Quét qua Lệnh và Thực Hiện để lấy lịch sử Lô của Đạn này
+      STATE.lenh.forEach(l => {
+          if (l.ten === tenDanHienTai && l.danhSachLo) {
+              l.danhSachLo.forEach(lo => allHistoricalBatches.add(lo.tenLo.trim()));
+          }
+      });
+      STATE.thucHien.forEach(t => {
+          if (t.ten === tenDanHienTai && t.danhSachLo) {
+              t.danhSachLo.forEach(lo => allHistoricalBatches.add(lo.tenLo.trim()));
+          }
+      });
+
+      let suggestions = new Set();
+
+      allHistoricalBatches.forEach(histLo => {
+          let parts = histLo.split('-');
+          if (parts.length > 1) {
+              // Extract các hậu tố bắt đầu bằng dấu "-"
+              for (let i = 1; i < parts.length; i++) {
+                  let suffix = "-" + parts.slice(i).join('-');
+                  suggestions.add(suffix);
+              }
+          }
+      });
+
+      if (suggestions.size > 0) {
+          let html = Array.from(suggestions).map(sug => {
+              return `<div class="chip-lo" style="background: var(--info-color); color: white; padding: 6px 14px; margin:0; flex-shrink:0; font-size:14px;" onclick="appendGoiY('${sug}')"><b>${sug}</b></div>`;
+          }).join('');
+          vungGoiY.innerHTML = html;
+      } else {
+          vungGoiY.innerHTML = '';
+      }
+  }
+
+  function appendGoiY(suffix) {
+      haptic();
+      let inputEl = document.getElementById('input-ql-ten-lo');
+      // Tránh việc append 2 dấu trừ liên tiếp nếu user đã gõ dấu trừ ở cuối
+      if (inputEl.value.endsWith('-') && suffix.startsWith('-')) {
+          inputEl.value = inputEl.value.slice(0, -1);
+      }
+      inputEl.value += suffix;
+      document.getElementById('input-ql-sl-lo').focus(); // Tự nhảy sang ô SL
+  }
+  // ----------------------------------------
 
   function batDauSuaLo(idLo) {
       haptic();
@@ -1117,7 +1190,7 @@
       document.getElementById('input-ql-sl-lo').value = loInfo.sl;
 
       let btnSubmit = document.getElementById('btn-submit-lo');
-      btnSubmit.innerHTML = '<i class="ph ph-check-bold"></i>';
+      btnSubmit.innerHTML = '<i class="ph ph-check-bold" style="font-size: 20px;"></i>';
       btnSubmit.style.background = 'var(--primary-color)';
       
       document.getElementById('btn-cancel-edit-lo').style.display = 'block';
@@ -1129,7 +1202,7 @@
       document.getElementById('input-ql-sl-lo').value = '';
 
       let btnSubmit = document.getElementById('btn-submit-lo');
-      btnSubmit.innerHTML = '<i class="ph ph-plus-bold"></i>';
+      btnSubmit.innerHTML = '<i class="ph ph-plus-bold" style="font-size: 18px;"></i>';
       btnSubmit.style.background = 'var(--success-color)';
       
       document.getElementById('btn-cancel-edit-lo').style.display = 'none';
@@ -1153,7 +1226,7 @@
       if(dsLo.length === 0) {
           container.innerHTML = `<div style="padding:20px; text-align:center; color:var(--text-sub);">Chưa có Lô nào được nhập.</div>`;
       } else {
-          // Xử lý Yêu cầu 1: Lệnh xuất (LENH) thì Lô nhập sau lên trên
+          // Xử lý Yêu cầu: Lệnh xuất (LENH) thì Lô nhập sau lên trên
           let dsHienThi = [...dsLo];
           if (currentLoContext.type === 'LENH') {
               dsHienThi.reverse();
@@ -1174,7 +1247,6 @@
 
   function dienNhanhGoiYLo(tenLo, slGoiY) {
       document.getElementById('input-ql-ten-lo').value = tenLo;
-      
       let record = null;
       if (currentLoContext.type === 'THUCHIEN') record = STATE.thucHien.find(t => t.id === currentLoContext.id);
       
@@ -1205,10 +1277,9 @@
       if(!record.danhSachLo) record.danhSachLo = [];
       let currentDaNhap = record.danhSachLo.reduce((sum, lo) => sum + lo.sl, 0);
       
-      // Xử lý sửa lô
       if (idLoDangSua) {
           let loCu = record.danhSachLo.find(l => l.id === idLoDangSua);
-          if(loCu) currentDaNhap -= loCu.sl; // Tạm trừ số cũ đi để check limit
+          if(loCu) currentDaNhap -= loCu.sl;
       }
 
       let slConLaiThemDuoc = record.sl - currentDaNhap;
@@ -1231,8 +1302,9 @@
       if (currentLoContext.type === 'LENH') safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh));
       else safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
       
-      huySuaLo(); // Dọn dẹp form
+      huySuaLo();
       renderChiTietQuanLyLo(record);
+      xuLyGoiYLoAuto(); // Refresh suggestion after adding
   }
 
   function xoaQuanLyLo(idLo) {
