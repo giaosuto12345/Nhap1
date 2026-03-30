@@ -213,11 +213,10 @@
     .dash-box-title { font-size: 10px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 6px; }
     .dash-box-val { font-size: 15px; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px;}
 
-    /* ================= BOTTOM SHEET QUẢN LÝ LÔ (TỐI ƯU CẢ PC & MOBILE) ================= */
+    /* ================= BOTTOM SHEET QUẢN LÝ LÔ (TỐI ƯU PC LẪN MOBILE) ================= */
     .modal-bottom-sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); z-index: 10000; display: none; flex-direction: column; justify-content: flex-end; align-items: center; opacity: 0; transition: opacity 0.3s; }
     .modal-bottom-sheet.show { opacity: 1; }
     
-    /* Giao diện Sheet được căn giữa và giới hạn kích thước trên PC */
     .sheet-content { background: var(--bg-body); width: 100%; max-width: 650px; height: 92dvh; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.1, 0.8, 0.1, 1); box-shadow: 0 -10px 40px rgba(0,0,0,0.1);}
     .modal-bottom-sheet.show .sheet-content { transform: translateY(0); }
     
@@ -626,11 +625,10 @@
     </div>
   </div>
 
-  <!-- ==================== MODAL BOTTOM SHEET QUẢN LÝ LÔ (TỐI ƯU CẢ PC LẪN MOBILE) ==================== -->
+  <!-- ==================== MODAL BOTTOM SHEET QUẢN LÝ LÔ ==================== -->
   <div id="modal-quan-ly-lo" class="modal-bottom-sheet">
     <div class="sheet-content">
       
-      <!-- PILL DRAG INDICATOR -->
       <div class="sheet-pill-wrapper"><div class="sheet-pill"></div></div>
 
       <div style="padding: 4px 20px 12px 20px; flex-shrink: 0; background: var(--bg-body); border-bottom: 0.5px solid var(--border-light); z-index: 10;">
@@ -650,7 +648,6 @@
           <div id="vung-nhap-lo-chinh">
               <div id="vung-goi-y-thong-minh" style="display: flex; gap: 8px; overflow-x: auto; margin-bottom: 10px; white-space: nowrap; -webkit-overflow-scrolling: touch; min-height: 0;"></div>
               
-              <!-- NÚT TỪ EXCEL -->
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding: 0 2px;">
                   <label style="font-size:12px; font-weight:700; color:var(--text-sub); text-transform: uppercase; margin:0;">Nhập Lô Thủ Công</label>
                   <button onclick="document.getElementById('excel-upload-lo').click()" style="background:var(--success-color); color:white; border:none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; display:flex; align-items:center; gap:4px; cursor:pointer;">
@@ -799,7 +796,6 @@
       capNhatGoiYXe(); 
       capNhatGoiYSoLenh();
 
-      // --- TỐI ƯU HÓA BÀN PHÍM PC (BẤM ENTER ĐỂ ĐỒNG BỘ/LƯU NHANH) ---
       document.addEventListener('keydown', function(e) {
           if (e.key === 'Enter') {
               let activeEl = document.activeElement;
@@ -849,14 +845,14 @@
       };
       
       if (type === 'alert') {
-          btnContainer.innerHTML = `<button onclick="closeDialog()" class="btn-dialog">ĐÓNG</button>`;
+          window.execAlert = function() { closeDialog(); if(confirmFn) confirmFn(); };
+          btnContainer.innerHTML = `<button onclick="execAlert()" class="btn-dialog">ĐÓNG</button>`;
       } else if (type === 'confirm') {
           window.execConfirm = function() { closeDialog(); if(confirmFn) confirmFn(); }
           btnContainer.innerHTML = `<button onclick="closeDialog()" class="btn-dialog" style="background:var(--input-bg); color:var(--text-main)">HỦY</button><button onclick="execConfirm()" class="btn-dialog" style="background:var(--danger-color)">ĐỒNG Ý</button>`;
       }
   };
 
-  // --- HỆ THỐNG TOAST THÔNG BÁO HIỆN ĐẠI ---
   window.showToast = function(message, icon = 'ph-fill ph-check-circle', color = 'var(--success-color)') {
       haptic();
       let toast = document.getElementById('app-toast-msg');
@@ -877,7 +873,6 @@
       }, 50);
   };
 
-  // --- HÀM XUẤT ẢNH XUYÊN THANH CUỘN HOÀN HẢO ---
   window.xuatAnhBaoCaoModal = function(elementId, fileNameSuffix) {
       haptic();
       let target = document.getElementById(elementId);
@@ -940,13 +935,24 @@
   function moMenuHeThong() { haptic(); let m = document.getElementById('modal-he-thong'); m.style.display = 'flex'; setTimeout(() => m.classList.add('show'), 10); }
   function dongMenuHeThong() { let m = document.getElementById('modal-he-thong'); m.classList.remove('show'); setTimeout(() => m.style.display = 'none', 300); }
   function capNhatPhienBanApp() { haptic(); showDialog("Đang cập nhật", "Đang tải lại trang...", "alert"); setTimeout(() => { try { window.location.reload(); } catch(e) {} }, 1500); }
+  
   function xuatDuLieu() {
+      haptic();
       let dataStr = JSON.stringify({ excel: STATE.excel, lenh: STATE.lenh, thucHien: STATE.thucHien });
-      let dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr); 
-      let linkElement = document.createElement('a'); let date = new Date(); let dStr = `${date.getDate()}_${date.getMonth()+1}_${date.getFullYear()}`;
-      linkElement.setAttribute('href', dataUri); linkElement.setAttribute('download', `SaoLuu_QuanLyDan_${dStr}.json`);
-      linkElement.click(); showToast("Đã tải file dữ liệu xuống máy!");
+      let blob = new Blob([dataStr], { type: "application/json;charset=utf-8" });
+      let url = URL.createObjectURL(blob);
+      let linkElement = document.createElement('a');
+      let date = new Date();
+      let dStr = `${date.getDate()}_${date.getMonth()+1}_${date.getFullYear()}`;
+      linkElement.setAttribute('href', url);
+      linkElement.setAttribute('download', `SaoLuu_QuanLyDan_${dStr}.json`);
+      document.body.appendChild(linkElement);
+      linkElement.click();
+      document.body.removeChild(linkElement);
+      URL.revokeObjectURL(url);
+      showToast("Đã tải file dữ liệu xuống máy!");
   }
+  
   function nhapDuLieu(event) {
       let file = event.target.files[0]; if(!file) return; let reader = new FileReader();
       reader.onload = function(e) {
@@ -955,10 +961,16 @@
               if(imp.excel) { STATE.excel = imp.excel; safeStorage.setItem('duLieuExcelOffline', JSON.stringify(STATE.excel.data)); safeStorage.setItem('cauHinhBangExcel', JSON.stringify(STATE.excel.config));}
               if(imp.lenh) { STATE.lenh = imp.lenh; safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh)); }
               if(imp.thucHien) { STATE.thucHien = imp.thucHien; safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien)); }
-              showDialog("Hoàn tất", "Khôi phục thành công! Trang sẽ tải lại.", "alert", () => { try { location.reload() } catch(e) {} }); 
-          } catch(err) { showDialog("Lỗi", "File không hợp lệ!", "alert"); }
+              showDialog("Hoàn tất", "Khôi phục thành công! Trang sẽ tự động tải lại.", "alert", () => {
+                  window.location.reload();
+              });
+          } catch(err) {
+              console.error(err);
+              showDialog("Lỗi", "File không hợp lệ hoặc bị lỗi dữ liệu!", "alert");
+          }
       }; reader.readAsText(file); event.target.value = '';
   }
+  
   function xoaToanBoDuLieu() { showDialog("Cảnh báo", "Xóa sạch dữ liệu bộ nhớ tạm?", "confirm", () => { safeStorage.clear(); try { location.reload(); } catch(e){} }); }
 
   function capNhatGoiYSoLenh() {
