@@ -140,7 +140,6 @@
     .dialog-buttons { display: flex; gap: 10px; margin-top: 24px;}
     .btn-dialog { flex: 1; padding: 14px; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; background: var(--primary-color); color: white; font-size: 15px;}
     
-    /* MODIFIED: Đổi height tĩnh thành max-height để linh hoạt khung hình */
     .modal-full { width: 95%; max-width: 600px; max-height: 90vh; padding: 16px; display: flex; flex-direction: column; justify-content: flex-start; border-radius: 20px; }
     .modal-full h3 { margin: 0 0 16px 0; flex-shrink: 0; font-size: 18px;}
     #search-modal-dan { flex-shrink: 0; margin-bottom: 12px; } 
@@ -150,6 +149,21 @@
     .text-dan-name { font-weight: 700; color:var(--text-main); white-space: normal; word-break: break-word; line-height: 1.4; margin-bottom: 4px;}
     
     .btn-modal-cancel { flex: 0 0 auto; height: 50px; width: 100%; margin-top: 16px; background: var(--input-bg); color: var(--text-main); border-radius: 14px; font-weight: 700; font-size: 15px; border: none; cursor: pointer; }
+
+    /* DANH SÁCH HIỆN ĐẠI (FLEXBOX) TRONG MODAL */
+    .modern-list-item {
+        display: flex; 
+        align-items: center; 
+        padding: 12px 10px; 
+        border-bottom: 0.5px solid var(--border-light);
+        background: var(--bg-card);
+    }
+    .modern-list-item:last-child { border-bottom: none; }
+    .modern-list-stt { width: 28px; font-weight: 700; color: var(--text-sub); font-size: 13px; flex-shrink: 0; }
+    .modern-list-content { flex: 1; padding: 0 8px; min-width: 0; }
+    .modern-list-title { font-weight: 700; color: var(--text-main); word-break: break-word; font-size: 14px; line-height: 1.3;}
+    .modern-list-subtitle { font-size: 12px; color: var(--text-sub); margin-top: 4px; font-weight: 500;}
+    .modern-list-qty { font-weight: 800; color: var(--primary-color); font-size: 16px; flex-shrink: 0; text-align: right;}
 
     /* ================= CƠ CHẾ MODAL LÔ ================= */
     .modal-bottom-sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10000; display: none; flex-direction: column; justify-content: flex-end; opacity: 0; transition: opacity 0.3s; }
@@ -219,7 +233,7 @@
     <!-- ==================== TAB 2: LỆNH XUẤT ==================== -->
     <div id="tab-lenh" class="tab-content">
       <div class="card" style="margin-top: 8px;">
-        <button class="btn" style="background: var(--primary-light); color: var(--primary-color); margin-bottom: 16px;" onclick="moModalXemLenh()"><i class="ph ph-chart-donut"></i> TỔNG KHỐI LƯỢNG (TẤN)</button>
+        <button class="btn" style="background: var(--primary-light); color: var(--primary-color); margin-bottom: 16px;" onclick="moModalXemLenh()"><i class="ph ph-chart-donut"></i> KIỂM TRA LỆNH (DANH SÁCH)</button>
 
         <div class="form-group" style="margin-bottom:16px;">
           <label>Số Lệnh / Phiếu xuất</label>
@@ -363,7 +377,7 @@
 
       <div id="vung-nut-bao-cao-ngay" style="display:flex; flex-wrap:wrap; gap:10px; margin-top: 12px;">
           <button class="btn" style="background:var(--primary-light); color: var(--primary-color); flex:1; margin:0;" onclick="xuatAnhBaoCao()"><i class="ph ph-camera"></i> XUẤT ẢNH</button>
-          <button class="btn" style="background:var(--warning-color); flex:1; margin:0;" onclick="moModalXemChiTietXe()"><i class="ph ph-truck"></i> TẢI TRỌNG XE</button>
+          <button class="btn" style="background:var(--warning-color); flex:1; margin:0;" onclick="moModalXemChiTietXe()"><i class="ph ph-truck"></i> CHI TIẾT TẢI TRỌNG XE</button>
           <button class="btn" style="background:var(--info-color); flex:100%; margin:0;" onclick="moModalTongHopToanBoLo()"><i class="ph ph-stack"></i> XEM TOÀN BỘ LÔ KỲ NÀY</button>
       </div>
 
@@ -449,21 +463,20 @@
     </div>
   </div>
 
+  <!-- MODAL: TỔNG HỢP LỆNH (SỬA LẠI UI) -->
   <div id="modal-xem-lenh" class="modal-overlay">
     <div class="custom-dialog-box modal-full" style="background: var(--bg-body);">
-      <h3 style="font-weight: 800; text-align: left;">Tổng Hợp Lệnh (Tấn)</h3>
-      <div class="modal-list-container" id="noidung-xem-lenh" style="border:none; border-radius: 0;"></div>
+      <h3 style="font-weight: 800; text-align: left; margin-bottom: 12px; flex-shrink: 0; font-size: 16px;">Kiểm Tra Danh Sách Lệnh</h3>
+      <div class="modal-list-container" id="noidung-xem-lenh" style="border:none; border-radius: 0; background: var(--bg-body);"></div>
       <button class="btn-modal-cancel" style="background: var(--bg-card); border: 0.5px solid var(--border-light);" onclick="dongModalXemLenh()">ĐÓNG BẢNG</button>
     </div>
   </div>
 
-  <!-- MODIFIED: Chỉnh sửa Modal Chi Tiết Xe (Ảnh hưởng khung hình & Thêm nút xuất) -->
+  <!-- MODAL: CHI TIẾT TẢI TRỌNG XE (SỬA LẠI UI) -->
   <div id="modal-chi-tiet-xe" class="modal-overlay">
     <div class="custom-dialog-box modal-full" style="background: var(--bg-body);">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; flex-shrink: 0;">
          <h3 id="tieu-de-chi-tiet-xe" style="font-weight: 800; margin:0; text-align: left; font-size: 16px;">Chi Tiết Tải Trọng Xe</h3>
-         <!-- MỚI: Nút chụp ảnh toàn bộ danh sách -->
-         <button class="btn-sm" style="background:var(--primary-color); width:auto; padding: 0 10px; font-size: 12px;" onclick="xuatAnhModal('khung-chup-chi-tiet-xe', 'TaiTrongXe')"><i class="ph ph-camera" style="margin-right:4px;"></i> XUẤT ẢNH</button>
       </div>
       <div class="modal-list-container" id="khung-chup-chi-tiet-xe" style="border:none; border-radius: 0; background: var(--bg-body);">
          <div id="noidung-chi-tiet-xe" style="padding-bottom: 8px;"></div>
@@ -472,16 +485,12 @@
     </div>
   </div>
 
-  <!-- MODIFIED: Chỉnh sửa Modal Tổng Hợp Lô (Ảnh hưởng khung hình & Thêm nút xuất ảnh) -->
+  <!-- MODAL: TỔNG HỢP TOÀN BỘ LÔ (SỬA LẠI UI) -->
   <div id="modal-tong-hop-lo" class="modal-overlay">
     <div class="custom-dialog-box modal-full" style="background: var(--bg-body);">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; flex-shrink: 0;">
          <h3 style="font-weight: 800; margin:0; font-size: 16px; text-align:left;">Tổng Hợp Lô</h3>
-         <div style="display: flex; gap: 6px;">
-             <!-- MỚI: Nút chụp ảnh toàn bộ danh sách -->
-             <button class="btn-sm" style="background:var(--primary-color); width:auto; padding: 0 10px; font-size: 12px;" onclick="xuatAnhModal('khung-chup-tong-hop-lo', 'TongHopLo')"><i class="ph ph-camera" style="margin-right:4px;"></i> ẢNH</button>
-             <button class="btn-sm" style="background:var(--success-color); width:auto; padding: 0 10px; font-size: 12px;" onclick="xuatExcelToanBoLo()"><i class="ph ph-file-xls" style="margin-right:4px;"></i> EXCEL</button>
-         </div>
+         <button class="btn-sm" style="background:var(--success-color); width:auto; padding: 0 10px; font-size: 12px;" onclick="xuatExcelToanBoLo()"><i class="ph ph-file-xls" style="margin-right:4px;"></i> XUẤT EXCEL</button>
       </div>
       <div class="modal-list-container" id="khung-chup-tong-hop-lo" style="border:none; border-radius: 0; background: var(--bg-body);">
          <div id="noidung-tong-hop-lo"></div>
@@ -490,7 +499,7 @@
     </div>
   </div>
 
-  <!-- ==================== MODAL QUẢN LÝ LÔ (BOTTOM SHEET FULL, FIX KEYBOARD IOS) ==================== -->
+  <!-- ==================== MODAL QUẢN LÝ LÔ (BOTTOM SHEET FULL) ==================== -->
   <div id="modal-quan-ly-lo" class="modal-bottom-sheet">
     <div class="sheet-content">
       
@@ -902,39 +911,35 @@
           </tr>
       `}).join('');
   }
+  
+  // MODIFIED: Thiết kế lại dạng danh sách (Flexbox) cho Kiểm Tra Lệnh
   function moModalXemLenh() {
       haptic(); if(STATE.lenh.length === 0) { showDialog("Trống", "Chưa có lệnh nào.", "alert"); return; }
       let groups = {};
       STATE.lenh.forEach(item => {
-          if(!groups[item.soLenh]) groups[item.soLenh] = { items: [], tongKL: 0 };
-          groups[item.soLenh].items.push(item);
-          let klr = layKLRTuTenDan(item.ten); groups[item.soLenh].tongKL += (item.sl * klr);
+          if(!groups[item.soLenh]) groups[item.soLenh] = [];
+          groups[item.soLenh].push(item);
       });
       let html = '';
       for(let soLenh in groups) {
-          let g = groups[soLenh]; let tan = g.tongKL / 1000; let formatTan = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(tan);
+          let items = groups[soLenh]; 
           html += `
-          <div class="card" style="margin-top: 0; margin-bottom: 16px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border-light); padding-bottom: 10px; margin-bottom: 10px;">
+          <div class="card" style="margin-top: 0; margin-bottom: 16px; padding: 0; overflow: hidden;">
+              <div style="background: var(--input-bg); padding: 12px 16px; border-bottom: 1px solid var(--border-light);">
                   <span style="color: var(--primary-color); font-weight: 800; font-size: 16px;">${escapeHTML(soLenh)}</span>
-                  <span style="color: var(--danger-color); font-weight: 800; font-size: 15px;">Tổng: ${formatTan} Tấn</span>
               </div>
-              <table style="width:100%; font-size:12px; text-align:center; border-collapse: collapse;">
-                  <tr style="color:var(--text-sub);">
-                    <th style="width:30px; padding:6px 2px; background:transparent;">STT</th>
-                    <th style="text-align:left; padding:6px 2px; background:transparent;">Tên đạn</th>
-                    <th style="width:45px; padding:6px 2px; background:transparent;">SL</th>
-                    <th style="width:45px; padding:6px 2px; background:transparent;">KLR</th>
-                  </tr>
-                  ${g.items.map((i, idx) => `
-                      <tr style="border-bottom:0.5px dotted var(--border-light);">
-                          <td style="padding:10px 2px; font-weight:700;">${idx + 1}</td>
-                          <td style="padding:10px 2px; text-align:left; font-weight:600;">${escapeHTML(i.ten)}</td>
-                          <td style="padding:10px 2px; font-weight:700; color:var(--primary-color);">${i.sl}</td>
-                          <td style="padding:10px 2px; color:var(--text-sub);">${layKLRTuTenDan(i.ten)}</td>
-                      </tr>
+              <div style="background: var(--bg-card);">
+                  ${items.map((i, idx) => `
+                      <div class="modern-list-item">
+                          <div class="modern-list-stt">${idx + 1}</div>
+                          <div class="modern-list-content">
+                              <div class="modern-list-title">${escapeHTML(i.ten)}</div>
+                              <div class="modern-list-subtitle">ĐVT: ${escapeHTML(i.dvt) || '?'} &bull; Cấp: ${escapeHTML(i.cap) || '?'}</div>
+                          </div>
+                          <div class="modern-list-qty">${i.sl}</div>
+                      </div>
                   `).join('')}
-              </table>
+              </div>
           </div>`;
       }
       document.getElementById('noidung-xem-lenh').innerHTML = html; let w = document.getElementById('modal-xem-lenh'); w.style.display = 'flex'; setTimeout(() => w.classList.add('show'), 10);
@@ -1137,10 +1142,13 @@
           if (viewData.listLo.length === 0) {
               container.innerHTML = `<div style="padding:20px; text-align:center; color:var(--text-sub);">Chưa có thông tin Lô.</div>`;
           } else {
+              // MODIFIED: Cập nhật danh sách Lô bằng Flexbox để không bị đẩy ra ngoài
               container.innerHTML = viewData.listLo.map(lo => `
-                  <div class="modal-list-item" style="background:var(--bg-card); display:flex; justify-content:space-between; align-items:center; border-radius:12px; margin-bottom:8px; border:0.5px solid var(--border-light);">
-                      <div style="font-weight:700; color:var(--text-main); font-size:15px;">${escapeHTML(lo.tenLo)}</div>
-                      <div style="font-weight:800; color:var(--primary-color); font-size:16px;">${lo.sl}</div>
+                  <div class="modern-list-item" style="border-radius:12px; margin-bottom:8px; border:0.5px solid var(--border-light);">
+                      <div class="modern-list-content" style="padding-left: 0;">
+                          <div class="modern-list-title" style="font-size: 15px;">${escapeHTML(lo.tenLo)}</div>
+                      </div>
+                      <div class="modern-list-qty">${lo.sl}</div>
                   </div>
               `).join('');
           }
@@ -1276,8 +1284,8 @@
 
           container.innerHTML = dsHienThi.map((lo) => `
               <div class="modal-list-item" style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-card); border-radius:8px; margin-bottom:4px; padding:8px 12px; border:0.5px solid var(--border-light);">
-                  <div style="font-weight:700; color:var(--text-main); font-size:14px;">${escapeHTML(lo.tenLo)}</div>
-                  <div style="display:flex; align-items:center; gap: 8px;">
+                  <div style="font-weight:700; color:var(--text-main); font-size:14px; word-break:break-word; padding-right:8px;">${escapeHTML(lo.tenLo)}</div>
+                  <div style="display:flex; align-items:center; gap: 8px; flex-shrink:0;">
                       <span style="font-weight:800; font-size:15px; color:var(--primary-color); margin-right: 4px;">${lo.sl}</span>
                       <button class="btn-sm btn-edit" style="margin:0; height:28px; width:28px; font-size:14px; border-radius:6px; background:var(--primary-light); color:var(--primary-color);" onclick="batDauSuaLo('${lo.id}')"><i class="ph ph-pencil-simple"></i></button>
                       <button class="btn-sm btn-del" style="margin:0; height:28px; width:28px; font-size:14px; border-radius:6px; background:rgba(255, 59, 48, 0.1); color:var(--danger-color);" onclick="xoaQuanLyLo('${lo.id}')"><i class="ph ph-trash"></i></button>
@@ -1568,6 +1576,7 @@
       container.innerHTML = html;
   }
 
+  // MODIFIED: Thiết kế lại Modal Chi tiết xe theo dạng Modern List Flexbox
   function moModalXemChiTietXe() {
       haptic();
       let locNgay = document.getElementById('bc-ngay').value;
@@ -1580,38 +1589,32 @@
 
       let xeGroups = {};
       dataTrongNgay.forEach(item => {
-          if (!xeGroups[item.xe]) xeGroups[item.xe] = { items: [], tongKL: 0 };
+          if (!xeGroups[item.xe]) xeGroups[item.xe] = { items: [] };
           xeGroups[item.xe].items.push(item);
-          let klr = layKLRTuTenDan(item.ten); xeGroups[item.xe].tongKL += (item.sl * klr);
       });
 
       let html = '';
       let dsXe = Object.keys(xeGroups).sort((a,b) => a.localeCompare(b));
 
       dsXe.forEach(xe => {
-          let g = xeGroups[xe]; let tan = g.tongKL / 1000; let formatTan = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(tan);
+          let g = xeGroups[xe]; 
           html += `
-          <div class="card" style="margin-top: 0; margin-bottom: 16px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border-light); padding-bottom: 10px; margin-bottom: 10px;">
+          <div class="card" style="margin-top: 0; margin-bottom: 16px; padding: 0; overflow: hidden;">
+              <div style="background: var(--input-bg); padding: 12px 16px; border-bottom: 1px solid var(--border-light);">
                   <span style="color: var(--warning-color); font-weight: 800; font-size: 16px;">XE SỐ: ${escapeHTML(xe)}</span>
-                  <span style="color: var(--danger-color); font-weight: 800; font-size: 15px;">Tổng tải: ${formatTan} Tấn</span>
               </div>
-              <table style="width:100%; font-size:13px; text-align:center; border-collapse: collapse;">
-                  <tr style="color:var(--text-sub);">
-                    <th style="width:30px; padding:6px 2px; background: transparent;">STT</th>
-                    <th style="text-align:left; padding:6px 2px; background: transparent;">Tên đạn</th>
-                    <th style="width:45px; padding:6px 2px; background: transparent;">SL</th>
-                    <th style="width:45px; padding:6px 2px; background: transparent;">KLR</th>
-                  </tr>
+              <div style="background: var(--bg-card);">
                   ${g.items.map((i, idx) => `
-                      <tr style="border-bottom:0.5px dotted var(--border-light);">
-                          <td style="padding:10px 2px; font-weight:700;">${idx + 1}</td>
-                          <td style="padding:10px 2px; text-align:left; font-weight:600;">${escapeHTML(i.ten)}</td>
-                          <td style="padding:10px 2px; font-weight:700; color:var(--primary-color);">${i.sl}</td>
-                          <td style="padding:10px 2px; color:var(--text-sub);">${layKLRTuTenDan(i.ten)}</td>
-                      </tr>
+                      <div class="modern-list-item">
+                          <div class="modern-list-stt">${idx + 1}</div>
+                          <div class="modern-list-content">
+                              <div class="modern-list-title">${escapeHTML(i.ten)}</div>
+                              <div class="modern-list-subtitle">ĐVT: ${escapeHTML(i.dvt) || '?'} &bull; Cấp: ${escapeHTML(i.cap) || '?'}</div>
+                          </div>
+                          <div class="modern-list-qty">${i.sl}</div>
+                      </div>
                   `).join('')}
-              </table>
+              </div>
           </div>`;
       });
 
@@ -1661,54 +1664,7 @@
       }, 800); 
   }
 
-  // --- MỚI: TÍNH NĂNG XUẤT ẢNH XUYÊN THANH CUỘN CHO MODAL ---
-  function xuatAnhModal(elementId, tenFileSuffix) {
-      haptic();
-      let target = document.getElementById(elementId);
-      if (!target || !target.innerHTML.trim()) {
-          showDialog("Lỗi", "Không có nội dung để xuất ảnh.", "alert");
-          return;
-      }
-
-      // Lưu lại style cũ
-      let oldMaxHeight = target.style.maxHeight;
-      let oldOverflowY = target.style.overflowY;
-      let oldHeight = target.style.height;
-
-      // Xóa giới hạn kích thước để html2canvas chụp toàn bộ thẻ div
-      target.style.maxHeight = 'none';
-      target.style.overflowY = 'visible';
-      target.style.height = 'auto';
-
-      showDialog("Đang xử lý", "Hệ thống đang cuộn trang để tạo ảnh đầy đủ...", "alert");
-
-      setTimeout(() => {
-          html2canvas(target, { 
-              scale: 2, 
-              backgroundColor: "#F2F2F7", 
-              useCORS: true 
-          }).then(canvas => {
-              // Khôi phục UI
-              target.style.maxHeight = oldMaxHeight;
-              target.style.overflowY = oldOverflowY;
-              target.style.height = oldHeight;
-
-              let link = document.createElement('a');
-              link.download = `${tenFileSuffix}_${getTodayString()}.jpg`;
-              link.href = canvas.toDataURL("image/jpeg", 0.9);
-              link.click();
-              closeDialog();
-          }).catch(err => {
-              console.error(err);
-              // Khôi phục UI
-              target.style.maxHeight = oldMaxHeight;
-              target.style.overflowY = oldOverflowY;
-              target.style.height = oldHeight;
-              showDialog("Lỗi", "Không thể tạo ảnh trên thiết bị này.", "alert");
-          });
-      }, 600);
-  }
-
+  // MODIFIED: Thiết kế lại Modal Tổng Hợp Lô theo dạng Modern List Flexbox
   function moModalTongHopToanBoLo() {
       haptic();
       let html = '';
@@ -1732,17 +1688,19 @@
               let loGop = gopDanhSachLo(d.tatCaLo);
               if(loGop.length === 0) return '';
               let rowHtml = loGop.map(lo => `
-                  <tr style="border-bottom:0.5px dotted var(--border-light);">
-                      <td style="padding:10px 16px; font-weight:600; text-align:left;">${escapeHTML(lo.tenLo)}</td>
-                      <td style="padding:10px 16px; font-weight:800; color:var(--primary-color); text-align:right;">${lo.sl}</td>
-                  </tr>`).join('');
+                  <div class="modern-list-item">
+                      <div class="modern-list-content" style="padding-left:0;">
+                          <div class="modern-list-title" style="font-size:15px;">${escapeHTML(lo.tenLo)}</div>
+                      </div>
+                      <div class="modern-list-qty">${lo.sl}</div>
+                  </div>`).join('');
               
               return `
               <div style="margin-bottom: 12px; background:var(--bg-card); border-radius:12px; padding:8px; border: 0.5px solid var(--border-light); box-shadow: var(--card-shadow);">
                  <div style="font-weight: 800; font-size: 14px; color: var(--text-main); margin-bottom: 8px; padding: 4px 8px;">Đạn: <span style="color:var(--info-color)">${escapeHTML(d.ten)}</span></div>
-                 <table style="width:100%; font-size:13px; background:var(--input-bg); border-radius:8px; overflow:hidden; border-collapse: collapse;">
+                 <div style="background:var(--input-bg); border-radius:8px; overflow:hidden;">
                      ${rowHtml}
-                 </table>
+                 </div>
               </div>`;
           }).join('');
 
@@ -1759,17 +1717,19 @@
               let loGop = gopDanhSachLo(d.tatCaLo);
               if(loGop.length === 0) return '';
               let rowHtml = loGop.map(lo => `
-                  <tr style="border-bottom:0.5px dotted var(--border-light);">
-                      <td style="padding:10px 16px; font-weight:600; text-align:left;">${escapeHTML(lo.tenLo)}</td>
-                      <td style="padding:10px 16px; font-weight:800; color:var(--primary-color); text-align:right;">${lo.sl}</td>
-                  </tr>`).join('');
+                  <div class="modern-list-item">
+                      <div class="modern-list-content" style="padding-left:0;">
+                          <div class="modern-list-title" style="font-size:15px;">${escapeHTML(lo.tenLo)}</div>
+                      </div>
+                      <div class="modern-list-qty">${lo.sl}</div>
+                  </div>`).join('');
               
               return `
               <div style="margin-bottom: 12px; background:var(--bg-card); border-radius:12px; padding:8px; border: 0.5px solid var(--border-light); box-shadow: var(--card-shadow);">
                  <div style="font-weight: 800; font-size: 14px; color: var(--text-main); margin-bottom: 8px; padding: 4px 8px;">Đạn: <span style="color:var(--info-color)">${escapeHTML(d.ten)}</span></div>
-                 <table style="width:100%; font-size:13px; background:var(--input-bg); border-radius:8px; overflow:hidden; border-collapse: collapse;">
+                 <div style="background:var(--input-bg); border-radius:8px; overflow:hidden;">
                      ${rowHtml}
-                 </table>
+                 </div>
               </div>`;
           }).join('');
       }
