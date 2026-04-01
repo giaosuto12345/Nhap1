@@ -2178,20 +2178,17 @@
 
   window.togglePhieuView = function(xeId) {
       haptic();
-      let mergedView = document.getElementById('view-merged-' + xeId);
       let groupedView = document.getElementById('view-grouped-' + xeId);
       let btn = document.getElementById('btn-toggle-' + xeId);
       
-      if(mergedView.style.display === 'none') {
-          mergedView.style.display = 'block';
-          groupedView.style.display = 'none';
-          btn.innerHTML = '<i class="ph-bold ph-receipt"></i> CHI TIẾT THEO PHIẾU ĐỂ SỬA';
+      if(groupedView.style.display === 'none') {
+          groupedView.style.display = 'block';
+          btn.innerHTML = '<i class="ph-bold ph-caret-up"></i> ẨN CHI TIẾT';
           btn.style.background = 'var(--primary-light)';
           btn.style.color = 'var(--primary-color)';
       } else {
-          mergedView.style.display = 'none';
-          groupedView.style.display = 'block';
-          btn.innerHTML = '<i class="ph-bold ph-list"></i> THU GỌN VỀ 1 DANH SÁCH (ẨN NÚT SỬA)';
+          groupedView.style.display = 'none';
+          btn.innerHTML = '<i class="ph-bold ph-caret-down"></i> XEM CHI TIẾT';
           btn.style.background = 'var(--input-bg)';
           btn.style.color = 'var(--text-main)';
       }
@@ -2235,95 +2232,58 @@
           let gXe = xeGroups[xe]; 
           let formatTanXe = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(gXe.tongKL / 1000);
           
-          // Gộp đạn cho view Tổng Xe (Merged View)
-          let mergedItems = [];
-          gXe.items.forEach(i => {
-              let existing = mergedItems.find(m => m.ten === i.ten && m.cap === i.cap);
-              if(existing) { 
-                  existing.sl += i.sl; 
-                  if(i.danhSachLo) existing.danhSachLo.push(...i.danhSachLo);
-              } else { 
-                  let newItem = {...i};
-                  newItem.danhSachLo = i.danhSachLo ? [...i.danhSachLo] : [];
-                  mergedItems.push(newItem); 
-              }
-          });
-          
-          let mergedHtml = mergedItems.map((i, idx) => {
-              let loGop = gopDanhSachLo(i.danhSachLo || []);
-              // MÃ HOÁ DỮ LIỆU
-              let viewDataStr = encodeURIComponent(JSON.stringify({
-                  title: `Chi tiết Lô Xe ${xe}`,
-                  name: i.ten,
-                  dvt: i.dvt,
-                  cap: i.cap,
-                  total: i.sl,
-                  listLo: loGop
-              }));
-
-              return `
-              <div class="modern-list-item" style="padding: 12px 16px;">
-                  <div class="modern-list-stt">${idx + 1}</div>
-                  <div class="modern-list-content" onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))" style="cursor: pointer;">
-                      <div class="modern-list-title">${escapeHTML(i.ten)}</div>
-                      <div class="modern-list-subtitle">ĐVT: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.dvt) || '?'}</span> &bull; Cấp: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.cap)}</span></div>
-                  </div>
-                  <div style="display:flex; align-items:center; gap: 8px;">
-                      <div class="modern-list-qty" onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))" style="cursor:pointer;">${i.sl}</div>
-                      <i class="ph-bold ph-caret-right" style="color: #C7C7CC; font-size: 16px;"></i>
-                  </div>
-              </div>`;
-          }).join('');
-
           let phieuHtml = '';
           let dsPhieu = Object.keys(gXe.phieuGroups).sort();
           let numPhieu = dsPhieu.length;
 
-          if (numPhieu >= 1) {
-              dsPhieu.forEach(phieu => {
-                  let gPhieu = gXe.phieuGroups[phieu];
-                  let formatTanPhieu = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(gPhieu.tongKL / 1000);
+          dsPhieu.forEach(phieu => {
+              let gPhieu = gXe.phieuGroups[phieu];
+              let formatTanPhieu = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(gPhieu.tongKL / 1000);
 
-                  // CHI TIẾT ĐỂ SỬA (Giữ nguyên bản ghi thô, không gộp)
-                  let itemsHtml = gPhieu.items.map((i, idx) => {
-                      let loGop = gopDanhSachLo(i.danhSachLo || []);
-                      
-                      return `
-                      <div class="modern-list-item" style="padding: 12px 16px;">
-                          <div class="modern-list-stt">${idx + 1}</div>
-                          <div class="modern-list-content" onclick="moModalQuanLyLo('THUCHIEN', '${i.id}')" style="cursor: pointer;">
-                              <div class="modern-list-title">${escapeHTML(i.ten)}</div>
-                              <div class="modern-list-subtitle">ĐVT: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.dvt) || '?'}</span> &bull; Cấp: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.cap)}</span></div>
-                          </div>
-                          <div style="display:flex; align-items:center; gap: 12px;">
-                              <div class="modern-list-qty" onclick="moModalQuanLyLo('THUCHIEN', '${i.id}')" style="cursor:pointer;">${i.sl}</div>
-                              <button onclick="event.stopPropagation(); suaTrucTiepTuBaoCao('${i.id}')" class="btn-sm btn-edit" style="width:36px; height:36px; border-radius:10px; background: rgba(0, 122, 255, 0.15);"><i class="ph-bold ph-pencil-simple"></i></button>
-                          </div>
-                      </div>`;
-                  }).join('');
+              // CHI TIẾT TỪNG BẢN GHI (Cho phép bấm vào chữ để Quản lý Lô, bấm bút để Sửa xe/số lượng)
+              let itemsHtml = gPhieu.items.map((i, idx) => {
+                  let loGop = gopDanhSachLo(i.danhSachLo || []);
+                  
+                  // Hiển thị trực quan Lô dưới tên đạn
+                  let soLoText = "";
+                  if (loGop.length > 0) {
+                      soLoText = loGop.map(l => `${escapeHTML(l.tenLo)} <span style="opacity:0.7">(${l.sl})</span>`).join(', ');
+                  } else {
+                      soLoText = `<span style="color: var(--warning-color); font-style: italic;">Chưa nhập lô</span>`;
+                  }
 
-                  phieuHtml += `
-                  <div style="border-bottom: 8px solid var(--bg-body);">
-                      <div style="background: var(--bg-body); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 0.5px solid var(--border-light);">
-                          <span style="font-size: 13px; font-weight: 800; color: var(--text-main);">Phiếu: <span style="color: var(--primary-color);">${escapeHTML(phieu)}</span></span>
-                          <span style="font-size: 14px; font-weight: 800; color: var(--danger-color);">${formatTanPhieu} Tấn</span>
+                  return `
+                  <div class="modern-list-item" style="padding: 12px 16px; border-bottom: 0.5px solid var(--border-light);">
+                      <div class="modern-list-stt">${idx + 1}</div>
+                      <div class="modern-list-content" onclick="moModalQuanLyLo('THUCHIEN', '${i.id}')" style="cursor: pointer;">
+                          <div class="modern-list-title">${escapeHTML(i.ten)}</div>
+                          <div class="modern-list-subtitle">ĐVT: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.dvt) || '?'}</span> &bull; Cấp: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.cap)}</span></div>
+                          <div style="font-size: 11px; color: var(--info-color); margin-top: 4px; font-weight: 600;">Lô: ${soLoText}</div>
                       </div>
-                      <div style="background: var(--bg-card);">
-                          ${itemsHtml}
+                      <div style="display:flex; align-items:center; gap: 12px;">
+                          <div class="modern-list-qty" onclick="moModalQuanLyLo('THUCHIEN', '${i.id}')" style="cursor:pointer;">${i.sl}</div>
+                          <button onclick="event.stopPropagation(); suaTrucTiepTuBaoCao('${i.id}')" class="btn-sm btn-edit" style="width:36px; height:36px; border-radius:10px; background: rgba(0, 122, 255, 0.15);"><i class="ph-bold ph-pencil-simple"></i></button>
                       </div>
                   </div>`;
-              });
-          }
+              }).join('');
 
-          let toggleButtonHtml = '';
-          if (numPhieu >= 1) {
-              toggleButtonHtml = `
-              <div style="padding: 12px 16px; background: var(--bg-body); border-bottom: 0.5px solid var(--border-light);">
-                  <button onclick="togglePhieuView('xe-${idxXe}')" id="btn-toggle-xe-${idxXe}" style="background:var(--input-bg); color:var(--text-main); border:none; padding:10px 16px; border-radius:12px; font-size:13px; font-weight:700; cursor:pointer; width:100%; display:flex; justify-content:center; align-items:center; gap: 6px; transition: 0.2s;">
-                      <i class="ph-bold ph-list"></i> THU GỌN VỀ 1 DANH SÁCH (ẨN NÚT SỬA)
-                  </button>
+              phieuHtml += `
+              <div style="background: var(--bg-body); padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 0.5px solid var(--border-light); border-top: 1px solid var(--border-light);">
+                  <span style="font-size: 12px; font-weight: 800; color: var(--text-main); text-transform: uppercase;">Phiếu: <span style="color: var(--primary-color);">${escapeHTML(phieu)}</span></span>
+                  <span style="font-size: 13px; font-weight: 800; color: var(--danger-color);">${formatTanPhieu} Tấn</span>
+              </div>
+              <div style="background: var(--bg-card);">
+                  ${itemsHtml}
               </div>`;
-          }
+          });
+
+          // Nút toggle luôn hiển thị nhưng nội dung bên trong mặc định ẨN
+          let toggleButtonHtml = `
+          <div style="padding: 12px 16px; background: var(--bg-body); border-bottom: 0.5px solid var(--border-light); text-align: center;">
+              <button onclick="togglePhieuView('xe-${idxXe}')" id="btn-toggle-xe-${idxXe}" style="background:var(--input-bg); color:var(--text-main); border:none; padding:8px 16px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap: 6px; transition: 0.2s;">
+                  <i class="ph-bold ph-caret-down"></i> XEM CHI TIẾT
+              </button>
+          </div>`;
           
           html += `
           <div class="modern-list" style="margin: 0 0 16px 0;">
@@ -2333,17 +2293,11 @@
               </div>
               
               ${toggleButtonHtml}
-
-              <!-- Ẩn View Merged đi, Mở View Detail làm mặc định để thấy ngay nút SỬA -->
-              <div id="view-merged-xe-${idxXe}" style="background: var(--bg-card); display: none;">
-                  ${mergedHtml}
-              </div>
               
-              ${numPhieu >= 1 ? `
-              <div id="view-grouped-xe-${idxXe}" style="background: var(--bg-card); display: block;">
+              <!-- Khối Grouped được đặt display: none mặc định -->
+              <div id="view-grouped-xe-${idxXe}" style="display: none;">
                   ${phieuHtml}
               </div>
-              ` : ''}
           </div>`;
       });
 
