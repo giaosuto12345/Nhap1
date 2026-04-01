@@ -213,7 +213,7 @@
     .dash-box-title { font-size: 10px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 6px; }
     .dash-box-val { font-size: 15px; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px;}
 
-    /* ================= BOTTOM SHEET QUẢN LÝ LÔ (TỐI ƯU PC LẪN MOBILE) ================= */
+    /* ================= BOTTOM SHEET QUẢN LÝ LÔ ================= */
     .modal-bottom-sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); z-index: 10000; display: none; flex-direction: column; justify-content: flex-end; align-items: center; opacity: 0; transition: opacity 0.3s; }
     .modal-bottom-sheet.show { opacity: 1; }
     
@@ -251,7 +251,7 @@
     <div id="tab-danh-muc" class="tab-content active">
       <div class="card">
         <div class="search-bar-container">
-          <input type="text" id="search-danh-muc" class="search-input" placeholder="🔍 Tìm kiếm đạn...">
+          <input type="text" id="search-danh-muc" class="search-input" placeholder="🔍 Tìm kiếm đạn..." onkeyup="debounceTimKiem()">
           <button class="action-btn" style="background:var(--input-bg); color: var(--text-main);" onclick="toggleCaiDatDanhMuc(); haptic();"><i class="ph ph-faders"></i></button>
           <button class="action-btn" style="background:var(--primary-color)" onclick="document.getElementById('excel-upload').click(); haptic();"><i class="ph ph-file-xls"></i></button>
           <input type="file" id="excel-upload" style="display:none;" accept=".xlsx, .xls, .csv" onchange="xuLyFileExcel(event)">
@@ -850,6 +850,16 @@
       } else if (type === 'confirm') {
           window.execConfirm = function() { closeDialog(); if(confirmFn) confirmFn(); }
           btnContainer.innerHTML = `<button onclick="closeDialog()" class="btn-dialog" style="background:var(--input-bg); color:var(--text-main)">HỦY</button><button onclick="execConfirm()" class="btn-dialog" style="background:var(--danger-color)">ĐỒNG Ý</button>`;
+      } else if (type === 'split') {
+          // Dialog Tách xe 3 lựa chọn
+          window.execSplitYes = function() { closeDialog(); if(confirmFn) confirmFn('YES'); };
+          window.execSplitNo = function() { closeDialog(); if(confirmFn) confirmFn('NO'); };
+          window.execSplitCancel = function() { closeDialog(); };
+          btnContainer.innerHTML = `
+              <button onclick="execSplitCancel()" class="btn-dialog" style="background:var(--input-bg); color:var(--text-main); flex: 0.6;">HỦY</button>
+              <button onclick="execSplitNo()" class="btn-dialog" style="background:var(--warning-color); font-size:13px;">KHÔNG CẤP</button>
+              <button onclick="execSplitYes()" class="btn-dialog" style="background:var(--primary-color); font-size:13px;">CHUYỂN XE</button>
+          `;
       }
   };
 
@@ -1422,7 +1432,7 @@
           let record = STATE.lenh.find(l => l.id === id);
           if(!record) return;
           titleEl.innerText = "Dự kiến Lô xuất (Lệnh)";
-          nameEl.innerText = record.ten;
+          nameEl.innerHTML = `${escapeHTML(record.ten)} <br><span style="font-size:12px; color:var(--text-sub); font-weight:500; display:inline-block; margin-top:4px;">Cấp: ${escapeHTML(record.cap)} &bull; ĐVT: ${escapeHTML(record.dvt)}</span>`;
           vungNhap.style.display = 'block'; 
           vungGoiY.style.display = 'none';
           vungGoiYThongMinh.innerHTML = '';
@@ -1437,7 +1447,7 @@
           let record = STATE.thucHien.find(t => t.id === id);
           if(!record) return;
           titleEl.innerText = "Thực tế xuất Lô";
-          nameEl.innerText = record.ten;
+          nameEl.innerHTML = `${escapeHTML(record.ten)} <br><span style="font-size:12px; color:var(--text-sub); font-weight:500; display:inline-block; margin-top:4px;">Cấp: ${escapeHTML(record.cap)} &bull; ĐVT: ${escapeHTML(record.dvt)}</span>`;
           vungNhap.style.display = 'block';
           vungGoiYThongMinh.innerHTML = '';
           
@@ -1462,7 +1472,7 @@
       }
       else if (type === 'VIEW') {
           titleEl.innerText = viewData.title || "Chi tiết Lô";
-          nameEl.innerText = viewData.name || "Tên đạn";
+          nameEl.innerHTML = `${escapeHTML(viewData.name)} <br><span style="font-size:12px; color:var(--text-sub); font-weight:500; display:inline-block; margin-top:4px;">Cấp: ${escapeHTML(viewData.cap)} &bull; ĐVT: ${escapeHTML(viewData.dvt)}</span>`;
           
           vungNhap.style.display = 'none';
           vungGoiY.style.display = 'none';
@@ -1479,7 +1489,7 @@
 
           let container = document.getElementById('danh-sach-ql-lo-container');
           if (viewData.listLo.length === 0) {
-              container.innerHTML = `<div style="padding:40px; text-align:center; color:var(--text-sub);"><i class="ph-bold ph-stack" style="font-size:32px; opacity:0.5; margin-bottom:8px;"></i><br>Chưa có Lô nào được nhập.</div>`;
+              container.innerHTML = `<div style="padding:40px; text-align:center; color:var(--text-sub);"><i class="ph-bold ph-stack" style="font-size:32px; opacity:0.5; margin-bottom:8px;"></i><br>Chưa có Lô nào được lưu.</div>`;
           } else {
               container.innerHTML = viewData.listLo.map((lo, idx) => `
                   <div class="modern-list-item" style="border-radius:14px; margin-bottom:10px; border:0.5px solid var(--border-light); box-shadow: var(--card-shadow); padding: 12px 14px;">
@@ -2152,14 +2162,14 @@
               }));
 
               return `
-              <div class="modern-list-item" onclick="moModalQuanLyLo('VIEW', null, JSON.parse('${viewDataStr}'))" style="cursor: pointer; padding: 12px 16px;">
+              <div class="modern-list-item" style="padding: 12px 16px;">
                   <div class="modern-list-stt">${idx + 1}</div>
-                  <div class="modern-list-content">
+                  <div class="modern-list-content" onclick="moModalQuanLyLo('VIEW', null, JSON.parse('${viewDataStr}'))" style="cursor: pointer;">
                       <div class="modern-list-title">${escapeHTML(i.ten)}</div>
                       <div class="modern-list-subtitle">ĐVT: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.dvt) || '?'}</span> &bull; Cấp: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.cap)}</span></div>
                   </div>
                   <div style="display:flex; align-items:center; gap: 8px;">
-                      <div class="modern-list-qty">${i.sl}</div>
+                      <div class="modern-list-qty" onclick="moModalQuanLyLo('VIEW', null, JSON.parse('${viewDataStr}'))" style="cursor:pointer;">${i.sl}</div>
                       <i class="ph-bold ph-caret-right" style="color: #C7C7CC; font-size: 16px;"></i>
                   </div>
               </div>`;
@@ -2169,46 +2179,28 @@
           let dsPhieu = Object.keys(gXe.phieuGroups).sort();
           let numPhieu = dsPhieu.length;
 
-          if (numPhieu > 1) {
+          if (numPhieu >= 1) {
               dsPhieu.forEach(phieu => {
                   let gPhieu = gXe.phieuGroups[phieu];
                   let formatTanPhieu = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(gPhieu.tongKL / 1000);
 
-                  // Gộp đạn bên trong 1 Phiếu
-                  let ticketItems = [];
-                  gPhieu.items.forEach(i => {
-                      let existing = ticketItems.find(m => m.ten === i.ten && m.cap === i.cap);
-                      if(existing) { 
-                          existing.sl += i.sl; 
-                          if(i.danhSachLo) existing.danhSachLo.push(...i.danhSachLo);
-                      } else { 
-                          let newItem = {...i};
-                          newItem.danhSachLo = i.danhSachLo ? [...i.danhSachLo] : [];
-                          ticketItems.push(newItem); 
-                      }
-                  });
-
-                  let itemsHtml = ticketItems.map((i, idx) => {
+                  // Hiển thị trực tiếp từng bản ghi để có thể sửa chính xác
+                  let itemsHtml = gPhieu.items.map((i, idx) => {
                       let loGop = gopDanhSachLo(i.danhSachLo || []);
                       let viewDataStr = escapeHTML(JSON.stringify({
-                          title: `Chi tiết Lô Phiếu ${phieu}`,
-                          name: i.ten,
-                          dvt: i.dvt,
-                          cap: i.cap,
-                          total: i.sl,
-                          listLo: loGop
+                          title: `Chi tiết Lô Phiếu ${phieu}`, name: i.ten, dvt: i.dvt, cap: i.cap, total: i.sl, listLo: loGop
                       }));
 
                       return `
-                      <div class="modern-list-item" onclick="moModalQuanLyLo('VIEW', null, JSON.parse('${viewDataStr}'))" style="cursor: pointer; padding: 12px 16px;">
+                      <div class="modern-list-item" style="padding: 12px 16px;">
                           <div class="modern-list-stt">${idx + 1}</div>
-                          <div class="modern-list-content">
+                          <div class="modern-list-content" onclick="moModalQuanLyLo('VIEW', null, JSON.parse('${viewDataStr}'))" style="cursor: pointer;">
                               <div class="modern-list-title">${escapeHTML(i.ten)}</div>
                               <div class="modern-list-subtitle">ĐVT: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.dvt) || '?'}</span> &bull; Cấp: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.cap)}</span></div>
                           </div>
-                          <div style="display:flex; align-items:center; gap: 8px;">
-                              <div class="modern-list-qty">${i.sl}</div>
-                              <i class="ph-bold ph-caret-right" style="color: #C7C7CC; font-size: 16px;"></i>
+                          <div style="display:flex; align-items:center; gap: 12px;">
+                              <div class="modern-list-qty" onclick="moModalQuanLyLo('VIEW', null, JSON.parse('${viewDataStr}'))" style="cursor:pointer;">${i.sl}</div>
+                              <button onclick="suaTrucTiepTuBaoCao('${i.id}')" class="btn-sm btn-edit" style="width:36px; height:36px; border-radius:10px;"><i class="ph-bold ph-pencil-simple"></i></button>
                           </div>
                       </div>`;
                   }).join('');
@@ -2227,7 +2219,7 @@
           }
 
           let toggleButtonHtml = '';
-          if (numPhieu > 1) {
+          if (numPhieu >= 1) {
               toggleButtonHtml = `
               <div style="padding: 12px 16px; background: var(--bg-body); border-bottom: 0.5px solid var(--border-light);">
                   <button onclick="togglePhieuView('xe-${idxXe}')" id="btn-toggle-xe-${idxXe}" style="background:var(--primary-light); color:var(--primary-color); border:none; padding:10px 16px; border-radius:12px; font-size:13px; font-weight:700; cursor:pointer; width:100%; display:flex; justify-content:center; align-items:center; gap: 6px; transition: 0.2s;">
@@ -2249,7 +2241,7 @@
                   ${mergedHtml}
               </div>
               
-              ${numPhieu > 1 ? `
+              ${numPhieu >= 1 ? `
               <div id="view-grouped-xe-${idxXe}" style="background: var(--bg-card); display: none;">
                   ${phieuHtml}
               </div>
@@ -2263,107 +2255,13 @@
   function dongModalXemChiTietXe() { let w = document.getElementById('modal-chi-tiet-xe'); w.classList.remove('show'); setTimeout(() => w.style.display = 'none', 300); }
 
   function xuatExcelTienDoLenh() {
-  function moModalQuanLyLo(type, id, viewData = null) {
       haptic();
-      currentLoContext = { type, id, viewData };
-      huySuaLo(); 
-      
-      let titleEl = document.getElementById('ql-lo-title');
-      let nameEl = document.getElementById('ql-lo-ten-dan');
-      let tongEl = document.getElementById('ql-lo-sl-tong');
-      let daNhapEl = document.getElementById('ql-lo-sl-da-nhap');
-      
-      let vungNhap = document.getElementById('vung-nhap-lo-chinh');
-      let vungGoiY = document.getElementById('vung-goi-y-lo');
-      let vungGoiYThongMinh = document.getElementById('vung-goi-y-thong-minh');
-      
-      document.getElementById('input-ql-ten-lo').value = '';
-      document.getElementById('input-ql-sl-lo').value = '';
+      let exportData = [];
 
-      if (type === 'LENH') {
-          let record = STATE.lenh.find(l => l.id === id);
-          if(!record) return;
-          titleEl.innerText = "Dự kiến Lô xuất (Lệnh)";
-          nameEl.innerHTML = `${escapeHTML(record.ten)} <br><span style="font-size:12px; color:var(--text-sub); font-weight:500; display:inline-block; margin-top:4px;">Cấp: ${escapeHTML(record.cap)} &bull; ĐVT: ${escapeHTML(record.dvt)}</span>`;
-          vungNhap.style.display = 'block'; 
-          vungGoiY.style.display = 'none';
-          vungGoiYThongMinh.innerHTML = '';
-          
-          document.getElementById('btn-submit-lo').style.display = 'block';
-          document.getElementById('btn-huy-sua-lo').style.display = 'none';
-          document.getElementById('btn-thoat-lo').style.display = 'block';
-          
-          renderChiTietQuanLyLo(record);
-      } 
-      else if (type === 'THUCHIEN') {
-          let record = STATE.thucHien.find(t => t.id === id);
-          if(!record) return;
-          titleEl.innerText = "Thực tế xuất Lô";
-          nameEl.innerHTML = `${escapeHTML(record.ten)} <br><span style="font-size:12px; color:var(--text-sub); font-weight:500; display:inline-block; margin-top:4px;">Cấp: ${escapeHTML(record.cap)} &bull; ĐVT: ${escapeHTML(record.dvt)}</span>`;
-          vungNhap.style.display = 'block';
-          vungGoiYThongMinh.innerHTML = '';
-          
-          document.getElementById('btn-submit-lo').style.display = 'block';
-          document.getElementById('btn-huy-sua-lo').style.display = 'none';
-          document.getElementById('btn-thoat-lo').style.display = 'block';
-          
-          let lenhGoc = STATE.lenh.find(l => l.id === record.lenhId);
-          if (lenhGoc && lenhGoc.danhSachLo && lenhGoc.danhSachLo.length > 0) {
-              vungGoiY.style.display = 'block';
-              let chipsHtml = lenhGoc.danhSachLo.map(lo => {
-                  return `<button class="chip-lo" onclick="dienNhanhGoiYLo('${escapeHTML(lo.tenLo)}', ${lo.sl})">
-                             ${escapeHTML(lo.tenLo)} <span style="opacity:0.6; font-weight: 500;">(${lo.sl})</span>
-                          </button>`;
-              }).join('');
-              document.getElementById('danh-sach-chip-goi-y').innerHTML = chipsHtml;
-          } else {
-              vungGoiY.style.display = 'none';
-          }
-          
-          renderChiTietQuanLyLo(record);
+      if(STATE.lenh.length === 0) {
+          showDialog("Lỗi", "Chưa có dữ liệu Lệnh để tổng hợp xuất Excel.", "alert");
+          return;
       }
-      else if (type === 'VIEW') {
-          titleEl.innerText = viewData.title || "Chi tiết Lô";
-          nameEl.innerHTML = `${escapeHTML(viewData.name)} <br><span style="font-size:12px; color:var(--text-sub); font-weight:500; display:inline-block; margin-top:4px;">Cấp: ${escapeHTML(viewData.cap)} &bull; ĐVT: ${escapeHTML(viewData.dvt)}</span>`;
-          
-          vungNhap.style.display = 'none';
-          vungGoiY.style.display = 'none';
-          vungGoiYThongMinh.innerHTML = '';
-          
-          document.getElementById('btn-submit-lo').style.display = 'none';
-          document.getElementById('btn-huy-sua-lo').style.display = 'none';
-          document.getElementById('btn-thoat-lo').style.display = 'block';
-          
-          let tongDaXuat = viewData.listLo.reduce((sum, lo) => sum + lo.sl, 0);
-          tongEl.innerText = viewData.total || tongDaXuat;
-          daNhapEl.innerText = tongDaXuat;
-          daNhapEl.style.color = (tongDaXuat === viewData.total) ? 'var(--success-color)' : 'var(--warning-color)';
-
-          let container = document.getElementById('danh-sach-ql-lo-container');
-          if (viewData.listLo.length === 0) {
-              container.innerHTML = `<div style="padding:40px; text-align:center; color:var(--text-sub);"><i class="ph-bold ph-stack" style="font-size:32px; opacity:0.5; margin-bottom:8px;"></i><br>Chưa có Lô nào được lưu.</div>`;
-          } else {
-              container.innerHTML = viewData.listLo.map((lo, idx) => `
-                  <div class="modern-list-item" style="border-radius:14px; margin-bottom:10px; border:0.5px solid var(--border-light); box-shadow: var(--card-shadow); padding: 12px 14px;">
-                      <div class="modern-list-stt" style="font-size: 14px; width: 28px;">${idx + 1}</div>
-                      <div class="modern-list-content" style="padding-left: 0;">
-                          <div class="modern-list-title" style="font-size: 16px;">${escapeHTML(lo.tenLo)}</div>
-                      </div>
-                      <div class="modern-list-qty" style="font-size: 18px;">${lo.sl}</div>
-                  </div>
-              `).join('');
-          }
-      }
-      
-      let w = document.getElementById('modal-quan-ly-lo');
-      w.style.display = 'flex';
-      setTimeout(() => {
-          w.classList.add('show');
-          if (type === 'LENH' || type === 'THUCHIEN') {
-              xuLyGoiYLoAuto();
-          }
-      }, 10);
-  }
 
       STATE.lenh.forEach(item => {
           let slDaXuat = 0;
@@ -2600,6 +2498,113 @@
           let fileName = `BangKe_ChiTietXuatKho_${getTodayString()}.xlsx`;
           XLSX.writeFile(wb, fileName);
       }, 500);
+  }
+
+  // ================== CHỨC NĂNG SỬA NHANH & TÁCH XE TỪ BÁO CÁO ==================
+  window.suaTrucTiepTuBaoCao = function(idThucHien) {
+      haptic();
+      let record = STATE.thucHien.find(t => t.id === idThucHien);
+      if(!record) return;
+
+      let htmlForm = `
+          <div style="text-align:left; margin-top:16px;">
+              <label style="font-size:12px; color:var(--text-sub); font-weight:700; text-transform:uppercase;">Tên đạn đang sửa:</label>
+              <div style="font-weight:700; margin-bottom:12px; color:var(--text-main); line-height:1.4;">${escapeHTML(record.ten)}</div>
+
+              <label style="font-size:12px; color:var(--text-sub); font-weight:700; text-transform:uppercase;">Chuyển sang Xe khác:</label>
+              <input type="text" id="quick-edit-xe" class="form-control" value="${escapeHTML(record.xe)}" style="margin-bottom:12px;">
+
+              <label style="font-size:12px; color:var(--text-sub); font-weight:700; text-transform:uppercase;">Số lượng xuất thực tế:</label>
+              <input type="number" id="quick-edit-sl" inputmode="decimal" class="form-control" value="${record.sl}" style="color:var(--danger-color); font-weight:800; font-size:22px; text-align:center;">
+          </div>
+      `;
+
+      showDialog(`Chỉnh sửa Bản ghi`, htmlForm, "confirm", () => {
+          let newXe = document.getElementById('quick-edit-xe').value.trim();
+          let newSl = parseFloat(document.getElementById('quick-edit-sl').value);
+
+          if(!newXe || isNaN(newSl) || newSl <= 0) {
+              showToast("Lỗi: Số lượng và tên xe không hợp lệ!", "ph-fill ph-warning-circle", "var(--danger-color)");
+              return;
+          }
+
+          let oldSl = record.sl;
+
+          if (newSl === oldSl) {
+              record.xe = newXe;
+              hoanTatSuaNhanh("Đã cập nhật tên xe thành công!");
+          } 
+          else if (newSl > oldSl) {
+              let lenhGoc = STATE.lenh.find(l => l.id === record.lenhId);
+              let currentTotal = STATE.thucHien.filter(t => t.lenhId === record.lenhId && t.id !== record.id).reduce((sum, t) => sum + t.sl, 0);
+              
+              if (lenhGoc && (currentTotal + newSl > lenhGoc.sl)) {
+                  showDialog("Vượt Chỉ Tiêu", `Số lượng vượt quá Lệnh! Chỉ có thể thêm tối đa <b>${lenhGoc.sl - currentTotal}</b>.`, "alert");
+                  return;
+              }
+              record.xe = newXe;
+              record.sl = newSl;
+              hoanTatSuaNhanh("Đã tăng số lượng và cập nhật xe!");
+          } 
+          else {
+              let chenhLech = oldSl - newSl;
+              setTimeout(() => { 
+                  showDialog("Chuyển phần đạn dư?",
+                      `Bạn vừa giảm đi <b>${chenhLech}</b>.<br><br>Bạn có muốn cấp số lượng dư này sang một xe tiếp theo không?`,
+                      "split",
+                      (choice) => {
+                          record.xe = newXe;
+                          record.sl = newSl;
+                          kiemTraVaResetLoSuaNhanh(record); 
+
+                          if (choice === 'NO') {
+                              hoanTatSuaNhanh("Đã cập nhật lại số lượng (không cấp phần dư)!");
+                          } else if (choice === 'YES') {
+                              setTimeout(() => {
+                                  let htmlXeMoi = `<input type="text" id="quick-edit-xe-moi" class="form-control" placeholder="Nhập Biển số/Tên xe mới..." style="margin-top:16px;">`;
+                                  showDialog(`Chuyển ${chenhLech} sang xe mới`, htmlXeMoi, "confirm", () => {
+                                      let xeMoi = document.getElementById('quick-edit-xe-moi').value.trim();
+                                      if(!xeMoi) xeMoi = "Xe bổ sung";
+
+                                      STATE.thucHien.push({
+                                          id: generateID(),
+                                          lenhId: record.lenhId,
+                                          soLenh: record.soLenh,
+                                          phieu: record.phieu,
+                                          xe: xeMoi,
+                                          ngay: record.ngay,
+                                          ten: record.ten,
+                                          dvt: record.dvt,
+                                          cap: record.cap,
+                                          sl: chenhLech,
+                                          danhSachLo: [] 
+                                      });
+                                      hoanTatSuaNhanh(`Đã cập nhật xe cũ và chuyển ${chenhLech} sang ${xeMoi}!`);
+                                  });
+                              }, 350);
+                          }
+                      }
+                  );
+              }, 350);
+          }
+      });
+  }
+
+  function kiemTraVaResetLoSuaNhanh(record) {
+      if(!record.danhSachLo || record.danhSachLo.length === 0) return;
+      let slDaNhap = record.danhSachLo.reduce((sum, lo) => sum + lo.sl, 0);
+      if(slDaNhap > record.sl) {
+          record.danhSachLo = []; 
+          setTimeout(() => showToast("Lô đã bị Reset do SL xuất bị giảm!", "ph-fill ph-warning-circle", "var(--warning-color)"), 1000);
+      }
+  }
+
+  function hoanTatSuaNhanh(msg) {
+      safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
+      moModalXemChiTietXe(); 
+      renderBangThucHien();  
+      renderBaoCaoNgay();    
+      showToast(msg);
   }
 </script>
 </body>
