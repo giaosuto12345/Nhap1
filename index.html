@@ -2255,11 +2255,10 @@
           let dsPhieu = Object.keys(gXe.phieuGroups).sort();
           let numPhieu = dsPhieu.length;
 
-          // ================= VIEW MERGED (GỘP CHO GỌN - CHỈ TÊN & SL) =================
-          // Gộp đạn cho view Tổng Xe
+          // ================= VIEW MERGED (GỘP CHO GỌN) =================
           let mergedItems = [];
           gXe.items.forEach(i => {
-              let existing = mergedItems.find(m => m.ten === i.ten && m.cap === i.cap);
+              let existing = mergedItems.find(m => m.ten === i.ten);
               if(existing) { 
                   existing.sl += i.sl; 
                   if(i.danhSachLo) existing.danhSachLo.push(...i.danhSachLo);
@@ -2272,92 +2271,98 @@
           
           let mergedHtml = mergedItems.map((i, idx) => {
               let loGop = gopDanhSachLo(i.danhSachLo || []);
+              // Chỉ hiện nút sửa nếu xe chỉ có 1 phiếu (tránh lỗi logic khi gộp chéo phiếu)
+              let canEdit = (numPhieu === 1);
               let viewDataStr = encodeURIComponent(JSON.stringify({
-                  title: `Chi tiết Lô Xe ${xe}`, name: i.ten, dvt: i.dvt, cap: i.cap, total: i.sl, listLo: loGop,
-                  // Truyền ID vào nếu cần sửa lô (nhưng merged thì không sửa lô trực tiếp được, nên idThucHien = null)
-                  idThucHien: null 
+                  title: canEdit ? `Chi tiết Lô Xe ${xe}` : `Tổng Lô Xe ${xe}`, 
+                  name: i.ten, dvt: i.dvt, cap: i.cap, total: i.sl, listLo: loGop,
+                  idThucHien: canEdit ? i.id : null 
               }));
 
+              let editBtn = canEdit ? `<button class="btn-sm btn-edit item-edit-btn" onclick="event.stopPropagation(); suaTrucTiepTuBaoCao('${i.id}')" style="background: rgba(0, 122, 255, 0.15); border-radius:10px;"><i class="ph-bold ph-pencil-simple"></i></button>` : ``;
+
               return `
-              <div class="modern-list-item" style="padding: 14px 16px;">
+              <div class="modern-list-item" style="padding: 14px 16px; border-bottom: 0.5px solid var(--border-light);">
                   <div class="modern-list-stt">${idx + 1}</div>
                   <div class="modern-list-content" onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))" style="cursor: pointer;">
-                      <div class="modern-list-title">${escapeHTML(i.ten)}</div>
+                      <div class="modern-list-title" style="font-size: 16px;">${escapeHTML(i.ten)}</div>
                   </div>
                   <div style="display:flex; align-items:center;">
-                      <div class="modern-list-qty" onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))" style="cursor:pointer;">${i.sl}</div>
-                      <!-- Ẩn nút sửa ở chế độ gộp, chỉ hiển thị ở chế độ chi tiết -->
+                      <div class="modern-list-qty" onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))" style="cursor:pointer; font-size: 20px;">${i.sl}</div>
+                      ${editBtn}
                   </div>
               </div>`;
           }).join('');
 
           // ================= VIEW GROUPED (CHI TIẾT PHIẾU ĐỂ SỬA) =================
-          dsPhieu.forEach(phieu => {
-              let gPhieu = gXe.phieuGroups[phieu];
-              let formatTanPhieu = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(gPhieu.tongKL / 1000);
+          if (numPhieu > 1) {
+              dsPhieu.forEach(phieu => {
+                  let gPhieu = gXe.phieuGroups[phieu];
+                  let formatTanPhieu = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(gPhieu.tongKL / 1000);
 
-              let itemsHtml = gPhieu.items.map((i, idx) => {
-                  let loGop = gopDanhSachLo(i.danhSachLo || []);
-                  let viewDataStr = encodeURIComponent(JSON.stringify({
-                      title: `Chi tiết Lô Phiếu ${phieu}`, name: i.ten, dvt: i.dvt, cap: i.cap, total: i.sl, listLo: loGop,
-                      idThucHien: i.id // Gắn ID để sửa Lô
-                  }));
+                  let itemsHtml = gPhieu.items.map((i, idx) => {
+                      let loGop = gopDanhSachLo(i.danhSachLo || []);
+                      let viewDataStr = encodeURIComponent(JSON.stringify({
+                          title: `Chi tiết Lô Phiếu ${phieu}`, name: i.ten, dvt: i.dvt, cap: i.cap, total: i.sl, listLo: loGop,
+                          idThucHien: i.id // BẮT BUỘC ĐỂ HIỆN NÚT SỬA LÔ
+                      }));
 
-                  return `
-                  <div class="modern-list-item" style="padding: 14px 16px;">
-                      <div class="modern-list-stt">${idx + 1}</div>
-                      <div class="modern-list-content" onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))" style="cursor: pointer;">
-                          <div class="modern-list-title">${escapeHTML(i.ten)}</div>
+                      return `
+                      <div class="modern-list-item" style="padding: 14px 16px; border-bottom: 0.5px solid var(--border-light);">
+                          <div class="modern-list-stt">${idx + 1}</div>
+                          <div class="modern-list-content" onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))" style="cursor: pointer;">
+                              <div class="modern-list-title" style="font-size: 16px;">${escapeHTML(i.ten)}</div>
+                          </div>
+                          <div style="display:flex; align-items:center;">
+                              <div class="modern-list-qty" onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))" style="cursor:pointer; font-size: 20px;">${i.sl}</div>
+                              <button class="btn-sm btn-edit item-edit-btn" onclick="event.stopPropagation(); suaTrucTiepTuBaoCao('${i.id}')" style="background: rgba(0, 122, 255, 0.15); border-radius:10px;"><i class="ph-bold ph-pencil-simple"></i></button>
+                          </div>
+                      </div>`;
+                  }).join('');
+
+                  phieuHtml += `
+                  <div style="border-top: 6px solid var(--bg-body);">
+                      <div style="background: rgba(0, 122, 255, 0.05); padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 0.5px solid var(--border-light);">
+                          <span style="font-size: 12px; font-weight: 800; color: var(--primary-color); text-transform: uppercase;">Phiếu: ${escapeHTML(phieu)}</span>
+                          <span style="font-size: 13px; font-weight: 800; color: var(--danger-color);">${formatTanPhieu} Tấn</span>
                       </div>
-                      <div style="display:flex; align-items:center;">
-                          <div class="modern-list-qty" onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))" style="cursor:pointer;">${i.sl}</div>
-                          <!-- Nút Sửa mượt mà trượt ra -->
-                          <button class="btn-sm btn-edit item-edit-btn" onclick="event.stopPropagation(); suaTrucTiepTuBaoCao('${i.id}')" style="background: rgba(0, 122, 255, 0.15); border-radius:10px;"><i class="ph-bold ph-pencil-simple"></i></button>
+                      <div style="background: var(--bg-card);">
+                          ${itemsHtml}
                       </div>
                   </div>`;
-              }).join('');
-
-              phieuHtml += `
-              <div style="border-bottom: 8px solid var(--bg-body);">
-                  <div style="background: var(--bg-body); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 0.5px solid var(--border-light);">
-                      <span style="font-size: 13px; font-weight: 800; color: var(--text-main);">Phiếu: <span style="color: var(--primary-color);">${escapeHTML(phieu)}</span></span>
-                      <span style="font-size: 14px; font-weight: 800; color: var(--danger-color);">${formatTanPhieu} Tấn</span>
-                  </div>
-                  <div style="background: var(--bg-card);">
-                      ${itemsHtml}
-                  </div>
-              </div>`;
-          });
+              });
+          }
 
           // ================= RENDER CARD XE =================
-          let nhayDupText = numPhieu > 1 ? `<div style="font-size: 10px; color: var(--primary-color); opacity: 0.7; margin-top: 4px; animation: pulse 2s infinite;">Nháy đúp để xem chi tiết ${numPhieu} phiếu</div>` : ``;
+          let dblClickAttr = numPhieu > 1 ? `ondblclick="togglePhieuView('xe-${idxXe}')"` : '';
+          let hintText = numPhieu > 1 ? `<div style="font-size: 10px; color: var(--primary-color); opacity: 0.8; margin-top: 2px;">Nháy đúp để tách/gộp phiếu</div>` : '';
 
           html += `
-          <div class="modern-list" id="xe-card-${idxXe}" style="margin: 0 0 16px 0;">
-              <!-- Header Xe (Gắn sự kiện Double Click và nút Edit) -->
-              <div class="modern-list-header" ondblclick="togglePhieuView('xe-${idxXe}')" style="background: var(--primary-light); padding: 14px 16px; cursor: pointer; user-select: none;">
+          <div class="modern-list" id="xe-card-${idxXe}" style="margin: 0 0 16px 0; transition: 0.3s;">
+              <div class="modern-list-header" ${dblClickAttr} style="background: var(--primary-light); padding: 12px 16px; cursor: pointer; user-select: none;">
                   <div style="display: flex; justify-content: space-between; align-items: center;">
                       <span style="color: var(--primary-color); font-weight: 800; font-size: 16px; text-transform: uppercase;">XE SỐ: ${escapeHTML(xe)}</span>
-                      <div style="display: flex; align-items: center; gap: 10px;">
-                          <span style="color: var(--danger-color); font-weight: 800; font-size: 15px;">Tổng: ${formatTanXe} Tấn</span>
-                          <!-- Nút bật Edit Mode -->
-                          <button onclick="event.stopPropagation(); toggleEditMode('xe-card-${idxXe}')" class="btn-sm" style="background: transparent; color: var(--primary-color); border: 1px solid rgba(0,122,255,0.3); border-radius: 8px; width: 30px; height: 30px;">
+                      <div style="display: flex; align-items: center; gap: 12px;">
+                          <div style="text-align: right;">
+                              <div style="color: var(--danger-color); font-weight: 800; font-size: 15px;">${formatTanXe} Tấn</div>
+                              ${hintText}
+                          </div>
+                          <button onclick="event.stopPropagation(); toggleEditMode('xe-card-${idxXe}')" class="btn-sm" style="background: white; color: var(--primary-color); border: 1px solid rgba(0,122,255,0.2); border-radius: 10px; width: 34px; height: 34px; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                               <i class="ph-bold ph-pencil-simple"></i>
                           </button>
                       </div>
                   </div>
-                  ${nhayDupText}
               </div>
-
-              <!-- VIEW MẶC ĐỊNH (GỘP GỌN) -->
+              
               <div id="view-merged-xe-${idxXe}" style="background: var(--bg-card); display: block;">
                   ${mergedHtml}
               </div>
               
-              <!-- VIEW CHI TIẾT (PHIẾU - ẨN MẶC ĐỊNH) -->
+              ${numPhieu > 1 ? `
               <div id="view-grouped-xe-${idxXe}" style="background: var(--bg-card); display: none;">
                   ${phieuHtml}
               </div>
+              ` : ''}
           </div>`;
       });
 
