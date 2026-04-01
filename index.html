@@ -72,6 +72,9 @@
       padding-bottom: calc(85px + env(safe-area-inset-bottom)); 
       overflow-x: hidden; 
     }
+    
+    /* CLASS CHỐNG ĐƠ KHI MỞ MODAL */
+    body.modal-open { overflow: hidden; touch-action: none; height: 100dvh; }
 
     .container { max-width: 900px; margin: 0 auto; padding: 0 16px; }
     
@@ -141,7 +144,7 @@
     .set-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; font-size: 13px; font-weight: 600; padding-bottom: 8px; border-bottom: 0.5px solid var(--border-light);}
     .set-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
     
-    .table-container { overflow-x: auto; max-height: 55vh; overflow-y: auto; border-radius: 12px; border: 1px solid var(--border-light); -webkit-overflow-scrolling: touch; }
+    .table-container { overflow-x: auto; max-height: 55vh; overflow-y: auto; border-radius: 12px; border: 1px solid var(--border-light); -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
     table { table-layout: auto; width: 100%; border-collapse: separate; border-spacing: 0; min-width: 450px; background: var(--bg-card);}
     th { background: var(--bg-body); color: var(--text-sub); position: sticky; top: 0; z-index: 10; font-weight: 700; font-size: 11px; text-transform: uppercase; padding: 12px 8px; border-bottom: 1px solid var(--border-light); white-space: nowrap; text-align: center; vertical-align: middle;}
     td { padding: 14px 8px; border-bottom: 0.5px solid var(--border-light); word-wrap: break-word; white-space: normal; text-align: center; font-size: 13px; font-weight: 600; line-height: 1.4; vertical-align: middle;}
@@ -157,7 +160,8 @@
         display: flex; justify-content: space-around; 
         padding: 8px 0 calc(8px + env(safe-area-inset-bottom)) 0; 
         border-top: 0.5px solid var(--border-light); 
-        z-index: 9000; 
+        z-index: 9000;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
     }
     .nav-item { flex: 1; text-align: center; font-size: 10px; font-weight: 600; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: 0.2s; }
     .nav-item.active { color: var(--primary-color); }
@@ -171,8 +175,15 @@
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 10000; display: none; align-items: center; justify-content: center; opacity: 0; transition: 0.3s; }
     #custom-dialog-wrapper { z-index: 100500 !important; }
     .modal-overlay.show { opacity: 1; }
-    .custom-dialog-box { background: var(--bg-card); width: 85%; max-width: 340px; border-radius: 20px; padding: 24px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); transform: scale(1.1); opacity: 0; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; }
-    .modal-overlay.show .custom-dialog-box { transform: scale(1); opacity: 1; }
+    
+    /* Popup thường (Nhỏ, giữa màn hình) */
+    .custom-dialog-box:not(.modal-full) { background: var(--bg-card); width: 85%; max-width: 340px; border-radius: 20px; padding: 24px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); transform: scale(1.1); opacity: 0; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; }
+    .modal-overlay.show .custom-dialog-box:not(.modal-full) { transform: scale(1); opacity: 1; }
+    
+    /* Popup lớn (Trượt từ dưới lên như Bottom Sheet xịn xò) */
+    .custom-dialog-box.modal-full { width: 100%; max-width: 650px; background: var(--bg-body); padding: 0; display: flex; flex-direction: column; justify-content: flex-start; transform: translateY(100%); margin-top: auto; border-radius: 20px 20px 0 0; overflow: hidden; height: 92dvh; transition: transform 0.4s cubic-bezier(0.1, 0.8, 0.1, 1); box-shadow: 0 -10px 40px rgba(0,0,0,0.2);}
+    .modal-overlay.show .custom-dialog-box.modal-full { transform: translateY(0); }
+
     .dialog-buttons { display: flex; gap: 10px; margin-top: 24px;}
     .btn-dialog { flex: 1; height: 46px; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; color: white; font-size: 15px; transition: 0.2s;}
     .btn-dialog:active { transform: scale(0.95); }
@@ -190,12 +201,12 @@
     @media (prefers-color-scheme: dark) { .toast-msg { background: rgba(200, 200, 200, 0.9); color: #000; } }
     .toast-msg.show { top: calc(20px + env(safe-area-inset-top)); }
 
-    /* ================= MODAL FULL SCREEN ================= */
-    .modal-full { width: 96%; max-width: 600px; max-height: 85vh; padding: 0; display: flex; flex-direction: column; justify-content: flex-start; border-radius: 20px; overflow: hidden; background: var(--bg-body); position: relative;}
+    /* ================= CẤU TRÚC MODAL LỚN ================= */
     .modal-full-header { position: sticky; top: 0; background: var(--bg-card); padding: 16px; border-bottom: 1px solid var(--border-light); z-index: 20; display: flex; justify-content: space-between; align-items: center; }
-    .modal-list-container { flex: 1; overflow-y: auto; text-align: left; -webkit-overflow-scrolling: touch; padding: 16px; background: var(--bg-body);}
+    .modal-list-container { flex: 1; overflow-y: auto; text-align: left; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 16px; background: var(--bg-body);}
     
-    .modal-footer { position: sticky; bottom: 0; background: var(--bg-card); border-top: 0.5px solid var(--border-light); padding: 12px; display: flex; justify-content: center; z-index: 20; }
+    /* Footer được ghim dính ở đáy */
+    .modal-footer { position: sticky; bottom: 0; background: var(--bg-card); border-top: 0.5px solid var(--border-light); padding: 12px calc(12px + env(safe-area-inset-bottom)); display: flex; justify-content: center; z-index: 20; }
     .btn-modal-cancel-sm { background: var(--input-bg); color: var(--text-main); font-weight: 700; font-size: 14px; padding: 0 32px; height: 40px; border-radius: 20px; border: none; cursor: pointer; transition: 0.2s;}
     .btn-modal-cancel-sm:active { filter: brightness(0.9); transform: scale(0.95); }
 
@@ -216,6 +227,12 @@
         width: 0; opacity: 0; margin-left: 0; overflow: hidden;
     }
 
+    /* HEADER BÁM DÍNH CHO XE */
+    .sticky-list-header {
+        position: sticky; top: -1px; z-index: 10;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
     /* DANH SÁCH HIỆN ĐẠI */
     .modern-list { background: var(--bg-card); border-radius: 16px; margin: 16px 0; overflow: hidden; box-shadow: var(--card-shadow); border: 1px solid var(--border-light); transition: 0.3s; }
     .modern-list-header { padding: 14px 16px; background: var(--bg-body); color: var(--text-sub); font-size: 12px; font-weight: 700; text-transform: uppercase; border-bottom: 0.5px solid var(--border-light); }
@@ -233,8 +250,8 @@
     .dash-box-title { font-size: 10px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 6px; }
     .dash-box-val { font-size: 15px; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px;}
 
-    /* ================= BOTTOM SHEET QUẢN LÝ LÔ ================= */
-    .modal-bottom-sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); z-index: 10000; display: none; flex-direction: column; justify-content: flex-end; align-items: center; opacity: 0; transition: opacity 0.3s; }
+    /* ================= BOTTOM SHEET QUẢN LÝ LÔ (Lớp đè 2) ================= */
+    .modal-bottom-sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); z-index: 20000; display: none; flex-direction: column; justify-content: flex-end; align-items: center; opacity: 0; transition: opacity 0.3s; }
     .modal-bottom-sheet.show { opacity: 1; }
     
     .sheet-content { background: var(--bg-body); width: 100%; max-width: 650px; height: 92dvh; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.1, 0.8, 0.1, 1); box-shadow: 0 -10px 40px rgba(0,0,0,0.1);}
@@ -576,7 +593,7 @@
 
   <!-- ==================== MODALS ALERT ==================== -->
   <div id="custom-dialog-wrapper" class="modal-overlay">
-    <div class="custom-dialog-box" style="justify-content:center; padding: 20px;">
+    <div class="custom-dialog-box" id="custom-dialog-box-alert" style="justify-content:center; padding: 20px;">
       <h3 id="dialog-title" style="margin-top:0; font-size: 18px; font-weight: 800;">Thông báo</h3>
       <div id="dialog-message" style="color:var(--text-sub); font-size:15px; margin-bottom:10px; line-height: 1.4;">Nội dung</div>
       <div id="dialog-buttons" class="dialog-buttons"></div>
@@ -853,16 +870,25 @@
       });
   });
 
-  // HÀM SHOWDIALOG NÂNG CẤP HỖ TRỢ TYPE CUSTOM
+  // HÀM SHOWDIALOG NÂNG CẤP
   window.showDialog = function(title, message, type = 'alert', confirmFn = null) {
       document.getElementById('dialog-title').innerText = title;
       document.getElementById('dialog-message').innerHTML = message;
       let btnContainer = document.getElementById('dialog-buttons');
       let wrapper = document.getElementById('custom-dialog-wrapper');
       
+      // Khóa nền
+      document.body.classList.add('modal-open');
+
       window.closeDialog = function() {
           wrapper.classList.remove('show');
-          setTimeout(() => wrapper.style.display = 'none', 300);
+          setTimeout(() => {
+              wrapper.style.display = 'none';
+              // Chỉ mở khóa nền nếu không có modal nào khác đang mở
+              if(!document.querySelector('.modal-overlay.show') && !document.querySelector('.modal-bottom-sheet.show')) {
+                  document.body.classList.remove('modal-open');
+              }
+          }, 300);
       };
       
       if (type === 'alert') {
@@ -872,8 +898,13 @@
           window.execConfirm = function() { closeDialog(); if(confirmFn) confirmFn(); }
           btnContainer.innerHTML = `<button onclick="closeDialog()" class="btn-dialog" style="background:var(--input-bg); color:var(--text-main)">HỦY</button><button onclick="execConfirm()" class="btn-dialog" style="background:var(--danger-color)">ĐỒNG Ý</button>`;
       } else if (type === 'custom') {
-          // Bỏ qua Footer mặc định, để HTML bên trong message tự quản lý nút
+          // Dùng cho Sửa Bản Ghi - tự quản lý nút
           btnContainer.innerHTML = ``;
+      }
+
+      let box = document.getElementById('custom-dialog-box-alert');
+      if (box) {
+          box.classList.remove('modal-full');
       }
 
       wrapper.style.display = 'flex';
@@ -899,6 +930,26 @@
           window.toastTimer = setTimeout(() => { toast.classList.remove('show'); }, 2500);
       }, 50);
   };
+
+  // HÀM MỞ/ĐÓNG MODAL CHUNG CHO TOÀN BỘ APP
+  function openModal(id) {
+      haptic();
+      let m = document.getElementById(id);
+      m.style.display = 'flex';
+      document.body.classList.add('modal-open');
+      setTimeout(() => m.classList.add('show'), 10);
+  }
+
+  function closeModal(id) {
+      let m = document.getElementById(id);
+      m.classList.remove('show');
+      setTimeout(() => {
+          m.style.display = 'none';
+          if(!document.querySelector('.modal-overlay.show') && !document.querySelector('.modal-bottom-sheet.show')) {
+              document.body.classList.remove('modal-open');
+          }
+      }, 300);
+  }
 
   window.xuatAnhBaoCaoModal = function(elementId, fileNameSuffix) {
       haptic();
@@ -959,8 +1010,8 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function moMenuHeThong() { haptic(); let m = document.getElementById('modal-he-thong'); m.style.display = 'flex'; setTimeout(() => m.classList.add('show'), 10); }
-  function dongMenuHeThong() { let m = document.getElementById('modal-he-thong'); m.classList.remove('show'); setTimeout(() => m.style.display = 'none', 300); }
+  function moMenuHeThong() { openModal('modal-he-thong'); }
+  function dongMenuHeThong() { closeModal('modal-he-thong'); }
   function capNhatPhienBanApp() { haptic(); showDialog("Đang cập nhật", "Đang tải lại trang...", "alert"); setTimeout(() => { try { window.location.reload(); } catch(e) {} }, 1500); }
   
   function xuatDuLieu() {
@@ -1134,13 +1185,13 @@
   }
 
   function moModalChonDan() {
-      haptic(); if(STATE.excel.data.length === 0) { showDialog("Lỗi", "Vui lòng tải File Excel ở Tab Danh Mục trước.", "alert"); return; }
+      if(STATE.excel.data.length === 0) { showDialog("Lỗi", "Vui lòng tải File Excel ở Tab Danh Mục trước.", "alert"); return; }
       let currentSearch = document.getElementById('search-modal-dan').value.toLowerCase(); let dataToRender = STATE.excel.data;
       if(currentSearch) { dataToRender = STATE.excel.data.filter(h => trichXuatThongTinDan(h).ten.toLowerCase().includes(currentSearch)); }
       renderListModalDan(dataToRender);
-      let wrapper = document.getElementById('modal-chon-dan'); wrapper.style.display = 'flex'; setTimeout(() => wrapper.classList.add('show'), 10);
+      openModal('modal-chon-dan');
   }
-  function dongModalChonDan() { let w = document.getElementById('modal-chon-dan'); w.classList.remove('show'); setTimeout(() => w.style.display = 'none', 300); }
+  function dongModalChonDan() { closeModal('modal-chon-dan'); }
   function renderListModalDan(data) {
       let c = document.getElementById('modal-danh-sach-dan'); if(data.length === 0) { c.innerHTML = '<div style="padding:20px; text-align:center;">Không tìm thấy.</div>'; return; }
       c.innerHTML = data.slice(0, 100).map(hang => {
@@ -1245,7 +1296,7 @@
   }
   
   function moModalXemLenh() {
-      haptic(); if(STATE.lenh.length === 0) { showDialog("Trống", "Chưa có lệnh nào.", "alert"); return; }
+      if(STATE.lenh.length === 0) { showDialog("Trống", "Chưa có lệnh nào.", "alert"); return; }
       let groups = {};
       STATE.lenh.forEach(item => {
           if(!groups[item.soLenh]) groups[item.soLenh] = { items: [], tongKL: 0 };
@@ -1261,26 +1312,28 @@
           
           html += `
           <div class="modern-list">
-              <div class="modern-list-header" style="display:flex; justify-content:space-between;">
+              <div class="modern-list-header sticky-list-header" style="display:flex; justify-content:space-between; background: var(--primary-light);">
                   <span style="color:var(--primary-color);">LỆNH: ${escapeHTML(soLenh)}</span>
                   <span style="color:var(--danger-color); font-weight:800;">${formatTan} Tấn</span>
               </div>
-              ${g.items.map((i, idx) => `
-                  <div class="modern-list-item">
-                      <div class="modern-list-stt">${idx + 1}</div>
-                      <div class="modern-list-content">
-                          <div class="modern-list-title">${escapeHTML(i.ten)}</div>
-                          <div class="modern-list-subtitle">ĐVT: <b style="color:var(--text-main)">${escapeHTML(i.dvt) || '?'}</b> &bull; Cấp: <b style="color:var(--text-main)">${escapeHTML(i.cap) || '?'}</b></div>
+              <div style="background: var(--bg-card);">
+                  ${g.items.map((i, idx) => `
+                      <div class="modern-list-item">
+                          <div class="modern-list-stt">${idx + 1}</div>
+                          <div class="modern-list-content">
+                              <div class="modern-list-title">${escapeHTML(i.ten)}</div>
+                              <div class="modern-list-subtitle">ĐVT: <b style="color:var(--text-main)">${escapeHTML(i.dvt) || '?'}</b> &bull; Cấp: <b style="color:var(--text-main)">${escapeHTML(i.cap) || '?'}</b></div>
+                          </div>
+                          <div class="modern-list-qty">${i.sl}</div>
                       </div>
-                      <div class="modern-list-qty">${i.sl}</div>
-                  </div>
-              `).join('')}
+                  `).join('')}
+              </div>
           </div>`;
       }
       document.getElementById('noidung-xem-lenh').innerHTML = html; 
-      let w = document.getElementById('modal-xem-lenh'); w.style.display = 'flex'; setTimeout(() => w.classList.add('show'), 10);
+      openModal('modal-xem-lenh');
   }
-  function dongModalXemLenh() { let w = document.getElementById('modal-xem-lenh'); w.classList.remove('show'); setTimeout(() => w.style.display = 'none', 300); }
+  function dongModalXemLenh() { closeModal('modal-xem-lenh'); }
 
   // ==================== TAB 3: THỰC HIỆN ====================
   function capNhatDropdownSoLenh() {
@@ -1493,6 +1546,7 @@
       else if (type === 'VIEW') {
           titleEl.innerText = viewData.title || "Chi tiết Lô";
           
+          // Tính toán Khối lượng KLR hiển thị trong Modal Lô
           let klrValue = viewData.klr || layKLRTuTenDan(viewData.name);
           let tongKLTan = (viewData.total * klrValue) / 1000;
           let formatTongKL = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(tongKLTan);
@@ -1539,10 +1593,8 @@
           }
       }
       
-      let w = document.getElementById('modal-quan-ly-lo');
-      w.style.display = 'flex';
+      openModal('modal-quan-ly-lo');
       setTimeout(() => {
-          w.classList.add('show');
           if (type === 'LENH' || type === 'THUCHIEN') {
               xuLyGoiYLoAuto();
           }
@@ -1550,9 +1602,7 @@
   }
 
   function dongModalQuanLyLo() {
-      let w = document.getElementById('modal-quan-ly-lo');
-      w.classList.remove('show');
-      setTimeout(() => w.style.display = 'none', 300);
+      closeModal('modal-quan-ly-lo');
       
       if(currentLoContext.type === 'LENH') renderBangLenh();
       if(currentLoContext.type === 'THUCHIEN') renderBangThucHien();
@@ -2030,6 +2080,7 @@
           tongTanXuat += (item.slGroup * klr) / 1000;
 
           let loGop = gopDanhSachLo(item.tatCaLo);
+          // MÃ HOÁ DỮ LIỆU ĐỂ CHỐNG LỖI KẸT CHUỖI KÝ TỰ
           let viewDataStr = encodeURIComponent(JSON.stringify({
               title: "Chi tiết Lô xuất (Báo cáo)",
               name: item.ten,
@@ -2143,6 +2194,7 @@
                           let colorConLai = i.conLai < 0 ? 'var(--danger-color)' : (i.conLai === 0 ? 'var(--success-color)' : 'var(--text-main)');
                           
                           let loGop = gopDanhSachLo(i.tatCaLoDaXuat);
+                          // MÃ HOÁ DỮ LIỆU
                           let viewDataStr = encodeURIComponent(JSON.stringify({
                               title: "Chi tiết Lô thực xuất",
                               name: i.ten,
@@ -2202,6 +2254,7 @@
           let colorConLai = conLai < 0 ? 'var(--danger-color)' : (conLai === 0 ? 'var(--success-color)' : 'var(--text-main)');
           
           let loGop = gopDanhSachLo(item.dsLo);
+          // MÃ HOÁ DỮ LIỆU
           let viewDataStr = encodeURIComponent(JSON.stringify({
               title: "Tổng Lô Đã Xuất Của Đạn Này",
               name: item.ten,
@@ -2312,7 +2365,38 @@
           let dsPhieu = Object.keys(gXe.phieuGroups).sort();
           let numPhieu = dsPhieu.length;
 
-          // ================= VIEW MERGED (GỘP CHO GỌN NHƯ ẢNH 1 - CHỈ TÊN & SL) =================
+          // Hàm tạo HTML cho các dòng đạn (Tối giản như Ảnh 4, bỏ KLR/Tấn ở dòng phụ)
+          const generateItemsHtml = (items, isGrouped) => {
+              return items.map((i, idx) => {
+                  let loGop = gopDanhSachLo(i.danhSachLo || []);
+                  let klr = layKLRTuTenDan(i.ten);
+                  let idThucHienToEdit = isGrouped ? i.id : ((numPhieu === 1) ? i.id : null);
+
+                  let viewDataStr = encodeURIComponent(JSON.stringify({
+                      title: idThucHienToEdit ? `Chi tiết Lô Xe ${xe}` : `Tổng Lô Xe ${xe}`,
+                      name: i.ten, dvt: i.dvt, cap: i.cap, klr: klr, total: i.sl, listLo: loGop,
+                      idThucHien: idThucHienToEdit
+                  }));
+
+                  let editBtn = idThucHienToEdit ? `<button class="btn-sm item-edit-btn" onclick="event.stopPropagation(); suaTrucTiepTuBaoCao('${i.id}')"><i class="ph-bold ph-pencil-simple"></i></button>` : ``;
+
+                  return `
+                  <div class="modern-list-item" style="padding: 12px 16px; border-bottom: 0.5px solid var(--border-light);">
+                      <div class="modern-list-stt" style="font-size:12px; color:var(--text-sub); width:20px;">${idx + 1}</div>
+                      <div class="modern-list-content" onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))" style="cursor: pointer;">
+                          <div class="modern-list-title" style="font-size: 15px;">${escapeHTML(i.ten)}</div>
+                          <div class="modern-list-subtitle" style="color: var(--text-sub); font-size:11px;">ĐVT: <b style="color:var(--text-main)">${escapeHTML(i.dvt) || '?'}</b> &bull; Cấp: <b style="color:var(--text-main)">${escapeHTML(i.cap)}</b></div>
+                      </div>
+                      <div class="item-action-area" style="display:flex; align-items:center; text-align: right;">
+                          <div class="modern-list-qty" onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))" style="cursor:pointer; font-size: 18px; color: var(--primary-color);">${i.sl}</div>
+                          <i class="ph-bold ph-caret-right item-chevron" onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))"></i>
+                          ${editBtn}
+                      </div>
+                  </div>`;
+              }).join('');
+          };
+
+          // ================= VIEW MERGED (GỘP CHO GỌN) =================
           let mergedItems = [];
           gXe.items.forEach(i => {
               let existing = mergedItems.find(m => m.ten === i.ten && m.cap === i.cap);
@@ -2325,72 +2409,21 @@
                   mergedItems.push(newItem); 
               }
           });
-          
-          let mergedHtml = mergedItems.map((i, idx) => {
-              let loGop = gopDanhSachLo(i.danhSachLo || []);
-              
-              // Tạo viewData chuẩn. Gán idThucHien = i.id nếu xe này chỉ có 1 phiếu (để Sửa Lô). Nếu >1 phiếu, buộc phải mở Chi tiết phiếu để sửa.
-              let viewDataStr = encodeURIComponent(JSON.stringify({
-                  title: (numPhieu === 1) ? `Chi tiết Lô Xe ${xe}` : `Tổng Lô Xe ${xe} (Nhiều phiếu)`, 
-                  name: i.ten, dvt: i.dvt, cap: i.cap, total: i.sl, listLo: loGop,
-                  idThucHien: (numPhieu === 1) ? i.id : null 
-              }));
+          let mergedHtml = generateItemsHtml(mergedItems, false);
 
-              let editBtn = (numPhieu === 1) ? `<button class="btn-sm item-edit-btn" onclick="event.stopPropagation(); suaTrucTiepTuBaoCao('${i.id}')"><i class="ph-bold ph-pencil-simple"></i></button>` : ``;
-
-              // Giao diện y hệt ảnh 1: Tên đậm, Subtitle xám, Số lượng xanh to, Nút sửa (bị ẩn theo css global). Bỏ KLR.
-              return `
-              <div class="modern-list-item" style="padding: 14px 16px; border-bottom: 0.5px solid var(--border-light);">
-                  <div class="modern-list-stt">${idx + 1}</div>
-                  <!-- CLICK VÀO ĐÂY ĐỂ MỞ BẢNG QUẢN LÝ LÔ/XEM LÔ NHƯ ẢNH 3 -->
-                  <div class="modern-list-content" onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))" style="cursor: pointer;">
-                      <div class="modern-list-title" style="font-size: 15px;">${escapeHTML(i.ten)}</div>
-                      <div class="modern-list-subtitle" style="color: var(--text-sub);">ĐVT: <b style="color:var(--text-main)">${escapeHTML(i.dvt) || '?'}</b> &bull; Cấp: <b style="color:var(--text-main)">${escapeHTML(i.cap)}</b></div>
-                  </div>
-                  <div style="display:flex; align-items:center; cursor:pointer;" onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))">
-                      <div class="modern-list-qty" style="font-size: 18px; color: var(--primary-color);">${i.sl}</div>
-                      <i class="ph-bold ph-caret-right item-chevron"></i>
-                      ${editBtn}
-                  </div>
-              </div>`;
-          }).join('');
-
-          // ================= VIEW GROUPED (CHI TIẾT PHIẾU NẾU CÓ NHIỀU PHIẾU) =================
+          // ================= VIEW GROUPED (CHI TIẾT PHIẾU ĐỂ SỬA) =================
           let phieuHtml = '';
           if (numPhieu > 1) {
               dsPhieu.forEach(phieu => {
                   let gPhieu = gXe.phieuGroups[phieu];
                   let formatTanPhieu = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(gPhieu.tongKL / 1000);
-
-                  let itemsHtml = gPhieu.items.map((i, idx) => {
-                      let loGop = gopDanhSachLo(i.danhSachLo || []);
-                      let viewDataStr = encodeURIComponent(JSON.stringify({
-                          title: `Chi tiết Lô Phiếu ${phieu}`, name: i.ten, dvt: i.dvt, cap: i.cap, total: i.sl, listLo: loGop,
-                          idThucHien: i.id // BẮT BUỘC ĐỂ HIỆN NÚT SỬA LÔ TRONG MODAL
-                      }));
-
-                      return `
-                      <div class="modern-list-item" style="padding: 14px 16px; border-bottom: 0.5px solid var(--border-light);">
-                          <div class="modern-list-stt">${idx + 1}</div>
-                          <!-- MỞ MODAL XEM/SỬA LÔ -->
-                          <div class="modern-list-content" onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))" style="cursor: pointer;">
-                              <div class="modern-list-title" style="font-size: 15px;">${escapeHTML(i.ten)}</div>
-                              <div class="modern-list-subtitle" style="color: var(--text-sub);">ĐVT: <b style="color:var(--text-main)">${escapeHTML(i.dvt) || '?'}</b> &bull; Cấp: <b style="color:var(--text-main)">${escapeHTML(i.cap)}</b></div>
-                          </div>
-                          <div style="display:flex; align-items:center; cursor:pointer;" onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))">
-                              <div class="modern-list-qty" style="font-size: 18px; color: var(--primary-color);">${i.sl}</div>
-                              <i class="ph-bold ph-caret-right item-chevron"></i>
-                              <!-- NÚT SỬA BẢN GHI (SẼ TRƯỢT RA) -->
-                              <button class="btn-sm item-edit-btn" onclick="event.stopPropagation(); suaTrucTiepTuBaoCao('${i.id}')"><i class="ph-bold ph-pencil-simple"></i></button>
-                          </div>
-                      </div>`;
-                  }).join('');
+                  let itemsHtml = generateItemsHtml(gPhieu.items, true);
 
                   phieuHtml += `
-                  <div style="border-top: 1px solid var(--border-light);">
-                      <div style="background: var(--bg-body); padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 0.5px solid var(--border-light);">
-                          <span style="font-size: 13px; font-weight: 800; color: var(--text-main);">Phiếu: <span style="color: var(--primary-color);">${escapeHTML(phieu)}</span></span>
-                          <span style="font-size: 14px; font-weight: 800; color: var(--danger-color);">${formatTanPhieu} Tấn</span>
+                  <div style="border-top: 6px solid #F2F2F7;">
+                      <div style="background: var(--bg-card); padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 0.5px solid var(--border-light);">
+                          <span style="font-size: 12px; font-weight: 800; color: var(--text-main);">Phiếu: <span style="color: var(--primary-color);">${escapeHTML(phieu)}</span></span>
+                          <span style="font-size: 13px; font-weight: 800; color: var(--danger-color);">${formatTanPhieu} Tấn</span>
                       </div>
                       <div style="background: var(--bg-card);">
                           ${itemsHtml}
@@ -2406,7 +2439,7 @@
           if (numPhieu > 1) {
               toggleButtonHtml = `
               <div style="padding: 10px 16px; background: var(--bg-card); border-bottom: 0.5px solid var(--border-light); text-align: center;">
-                  <button onclick="togglePhieuView('xe-${idxXe}')" id="btn-toggle-xe-${idxXe}" style="background:var(--input-bg); color:var(--text-main); border:none; padding:8px 16px; border-radius:12px; font-size:12px; font-weight:700; cursor:pointer; width:100%; display:flex; justify-content:center; align-items:center; gap: 6px; transition: 0.2s;">
+                  <button onclick="togglePhieuView('xe-${idxXe}')" id="btn-toggle-xe-${idxXe}" style="background:var(--primary-light); color:var(--primary-color); border:none; padding:8px 16px; border-radius:12px; font-size:12px; font-weight:700; cursor:pointer; width:100%; display:flex; justify-content:center; align-items:center; gap: 6px; transition: 0.2s;">
                       <i class="ph-bold ph-list"></i> CHI TIẾT THEO PHIẾU (${numPhieu})
                   </button>
               </div>`;
@@ -2415,7 +2448,7 @@
           html += `
           <div class="modern-list" id="xe-card-${idxXe}" style="margin: 0 0 16px 0; border-radius: 12px; border: 1px solid var(--border-light); overflow: visible !important;">
               <!-- Header bám dính khi cuộn (Sticky) -->
-              <div class="modern-list-header" ${dblClickAttr} style="background: var(--primary-light); padding: 14px 16px; cursor: ${numPhieu > 1 ? 'pointer' : 'default'}; user-select: none; position: sticky; top: -1px; z-index: 10; border-top-left-radius: 11px; border-top-right-radius: 11px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+              <div class="modern-list-header sticky-list-header" ${dblClickAttr} style="background: var(--primary-light); padding: 14px 16px; cursor: ${numPhieu > 1 ? 'pointer' : 'default'}; user-select: none; border-top-left-radius: 11px; border-top-right-radius: 11px; border-bottom: 1px solid var(--border-light);">
                   <div style="display: flex; justify-content: space-between; align-items: center;">
                       <span style="color: var(--primary-color); font-weight: 800; font-size: 15px; text-transform: uppercase;">XE SỐ: ${escapeHTML(xe)}</span>
                       <span style="color: var(--danger-color); font-weight: 800; font-size: 14px;">TỔNG: ${formatTanXe} TẤN</span>
@@ -2445,10 +2478,10 @@
       }
 
       container.innerHTML = html; 
-      let w = document.getElementById('modal-chi-tiet-xe'); w.style.display = 'flex'; setTimeout(() => w.classList.add('show'), 10);
+      openModal('modal-chi-tiet-xe');
   }
 
-  function dongModalXemChiTietXe() { let w = document.getElementById('modal-chi-tiet-xe'); w.classList.remove('show'); setTimeout(() => w.style.display = 'none', 300); }
+  function dongModalXemChiTietXe() { closeModal('modal-chi-tiet-xe'); }
 
   function xuatExcelTienDoLenh() {
       haptic();
@@ -2488,98 +2521,80 @@
 
   function moModalTongHopToanBoLo() {
       haptic();
-      let html = '';
+      let locNgay = document.getElementById('bc-ngay').value; 
+      let locXe = document.getElementById('bc-xe').value.toLowerCase().trim();
+      let dataLoc = STATE.thucHien;
       
       if (currentBaoCaoMode === 'ngay') {
-          let locNgay = document.getElementById('bc-ngay').value; 
-          let locXe = document.getElementById('bc-xe').value.toLowerCase().trim();
-          let dataLoc = STATE.thucHien.filter(item => { return (!locNgay || item.ngay === locNgay) && (!locXe || item.xe.toLowerCase().includes(locXe)); });
-          
-          if(dataLoc.length === 0) {
-              showDialog("Trống", "Không có dữ liệu trong kỳ này để tổng hợp.", "alert"); return;
-          }
-
-          let danGop = {};
-          dataLoc.forEach(item => {
-              let key = item.ten + '_' + item.cap;
-              if(!danGop[key]) danGop[key] = { ten: item.ten, cap: item.cap, dvt: item.dvt, tatCaLo: [] };
-              if(item.danhSachLo) danGop[key].tatCaLo.push(...item.danhSachLo);
-          });
-
-          html = Object.values(danGop).map(d => {
-              let loGop = gopDanhSachLo(d.tatCaLo);
-              if(loGop.length === 0) return '';
-              let rowHtml = loGop.map((lo, idx) => `
-                  <div class="modern-list-item">
-                      <div class="modern-list-stt">${idx + 1}</div>
-                      <div class="modern-list-content">
-                          <div class="modern-list-title">${escapeHTML(lo.tenLo)}</div>
-                      </div>
-                      <div class="modern-list-qty">${lo.sl}</div>
-                  </div>`).join('');
-              
-              return `
-              <div class="modern-list" style="margin: 0 0 16px 0;">
-                 <div class="modern-list-header" style="background: var(--primary-light); color: var(--primary-color);">
-                    Đạn: <span style="font-weight:800">${escapeHTML(d.ten)}</span> 
-                    <span style="color:var(--text-main); font-weight:600; text-transform:none;">(Cấp ${d.cap} &bull; ${d.dvt})</span>
-                 </div>
-                 <div>
-                     ${rowHtml}
-                 </div>
-              </div>`;
-          }).join('');
-
-      } else {
-          let danGop = {};
-          STATE.lenh.forEach(item => {
-              let key = item.ten + '_' + item.cap;
-              if(!danGop[key]) danGop[key] = { ten: item.ten, cap: item.cap, dvt: item.dvt, tatCaLo: [] };
-              STATE.thucHien.filter(t => t.lenhId === item.id).forEach(t => {
-                  if(t.danhSachLo) danGop[key].tatCaLo.push(...t.danhSachLo);
-              });
-          });
-
-          html = Object.values(danGop).map(d => {
-              let loGop = gopDanhSachLo(d.tatCaLo);
-              if(loGop.length === 0) return '';
-              let rowHtml = loGop.map((lo, idx) => `
-                  <div class="modern-list-item">
-                      <div class="modern-list-stt">${idx + 1}</div>
-                      <div class="modern-list-content">
-                          <div class="modern-list-title">${escapeHTML(lo.tenLo)}</div>
-                      </div>
-                      <div class="modern-list-qty">${lo.sl}</div>
-                  </div>`).join('');
-              
-              return `
-              <div class="modern-list" style="margin: 0 0 16px 0;">
-                 <div class="modern-list-header" style="background: var(--primary-light); color: var(--primary-color);">
-                    Đạn: <span style="font-weight:800">${escapeHTML(d.ten)}</span> 
-                    <span style="color:var(--text-main); font-weight:600; text-transform:none;">(Cấp ${d.cap} &bull; ${d.dvt})</span>
-                 </div>
-                 <div>
-                     ${rowHtml}
-                 </div>
-              </div>`;
-          }).join('');
-      }
-
-      if(!html.trim()) {
-           document.getElementById('noidung-tong-hop-lo').innerHTML = `<div style="padding:40px; text-align:center; color:var(--text-sub);"><i class="ph-bold ph-stack" style="font-size:32px; opacity:0.5; margin-bottom:8px;"></i><br>Chưa có Lô nào được lưu.</div>`;
-      } else {
-           document.getElementById('noidung-tong-hop-lo').innerHTML = html;
+          dataLoc = STATE.thucHien.filter(item => { return (!locNgay || item.ngay === locNgay) && (!locXe || item.xe.toLowerCase().includes(locXe)); });
       }
       
-      let w = document.getElementById('modal-tong-hop-lo');
-      w.style.display = 'flex';
-      setTimeout(() => w.classList.add('show'), 10);
+      if(dataLoc.length === 0) {
+          showDialog("Trống", "Không có dữ liệu trong kỳ này để tổng hợp.", "alert"); return;
+      }
+
+      let danGop = {};
+      let tongNgayKL = 0;
+
+      dataLoc.forEach(item => {
+          let key = item.ten + '_' + item.cap;
+          if(!danGop[key]) danGop[key] = { ten: item.ten, cap: item.cap, dvt: item.dvt, sl: 0, tatCaLo: [] };
+          danGop[key].sl += item.sl;
+          if(item.danhSachLo) danGop[key].tatCaLo.push(...item.danhSachLo);
+          
+          let klr = layKLRTuTenDan(item.ten);
+          tongNgayKL += (item.sl * klr);
+      });
+
+      let formatTongNgay = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(tongNgayKL / 1000);
+      let tieuDeNgay = locNgay && currentBaoCaoMode === 'ngay' ? `BÁO CÁO NGÀY ${formatShortDate(locNgay)}` : `BÁO CÁO TỔNG HỢP`;
+
+      let arr = Object.values(danGop).sort((a,b) => a.ten.localeCompare(b.ten));
+
+      let listHtml = arr.map((d, idx) => {
+          let loGop = gopDanhSachLo(d.tatCaLo);
+          let klr = layKLRTuTenDan(d.ten);
+          let khoiLuongTan = (d.sl * klr) / 1000;
+          let formatTanItem = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(khoiLuongTan);
+          
+          let viewDataStr = encodeURIComponent(JSON.stringify({
+              title: `Chi tiết Lô Xuất`, name: d.ten, dvt: d.dvt, cap: d.cap, klr: klr, total: d.sl, listLo: loGop, idThucHien: null
+          }));
+
+          return `
+          <div class="modern-list-item" style="padding: 12px 16px; border-bottom: 0.5px solid var(--border-light); cursor: pointer;" onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))">
+              <div class="modern-list-stt" style="font-size:12px; color:var(--text-sub); width:24px;">${idx + 1}</div>
+              <div class="modern-list-content">
+                  <div class="modern-list-title" style="font-size: 15px;">${escapeHTML(d.ten)}</div>
+                  <div class="modern-list-subtitle" style="color: var(--text-sub); font-size:11px;">ĐVT: <b style="color:var(--text-main)">${escapeHTML(d.dvt)}</b> &bull; Cấp: <b style="color:var(--text-main)">${escapeHTML(d.cap)}</b> &bull; KLR: <b style="color:var(--text-main)">${klr}</b></div>
+              </div>
+              <div style="display:flex; align-items:center; text-align: right; margin-right: 8px;">
+                  <div style="display:flex; flex-direction:column; justify-content:center;">
+                      <div style="font-size: 18px; font-weight: 800; color: var(--primary-color); line-height: 1;">${d.sl}</div>
+                      <div style="font-size: 11px; font-weight: 700; color: var(--danger-color); margin-top: 4px;">${formatTanItem} Tấn</div>
+                  </div>
+              </div>
+              <i class="ph-bold ph-caret-right item-chevron"></i>
+          </div>`;
+      }).join('');
+
+      let html = `
+      <div class="modern-list" style="margin: 0; border-radius: 12px; border: 1px solid var(--border-light); overflow: hidden;">
+          <div class="modern-list-header sticky-list-header" style="background: var(--primary-light); padding: 14px 16px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: var(--primary-color); font-weight: 800; font-size: 15px; text-transform: uppercase;">${tieuDeNgay}</span>
+              <span style="color: var(--danger-color); font-weight: 800; font-size: 14px;">TỔNG: ${formatTongNgay} TẤN</span>
+          </div>
+          <div style="background: var(--bg-card);">
+              ${listHtml}
+          </div>
+      </div>`;
+
+      document.getElementById('noidung-tong-hop-lo').innerHTML = html;
+      openModal('modal-tong-hop-lo');
   }
 
   function dongModalTongHopToanBoLo() {
-      let w = document.getElementById('modal-tong-hop-lo');
-      w.classList.remove('show');
-      setTimeout(() => w.style.display = 'none', 300);
+      closeModal('modal-tong-hop-lo');
   }
 
   function xuatExcelBaoCaoDan() {
@@ -2696,7 +2711,7 @@
       }, 500);
   }
 
-  // ================== CHỨC NĂNG SỬA NHANH BẢN GHI NHƯ ẢNH 4,5 ==================
+  // ================== CHỨC NĂNG SỬA NHANH BẢN GHI ==================
   window.checkQESplit = function(oldSl) {
       let newSl = parseFloat(document.getElementById('qe-sl').value) || 0;
       let splitSec = document.getElementById('qe-split-section');
@@ -2742,7 +2757,7 @@
               <label style="font-size:11px; color:var(--text-sub); font-weight:700; text-transform:uppercase; letter-spacing: 0.5px;">Số lượng xuất thực tế:</label>
               <input type="number" id="qe-sl" inputmode="decimal" class="form-control" value="${record.sl}" style="color:var(--danger-color); background: #E5E5EA; font-weight:800; font-size:28px; height:64px; text-align:center; border:2px solid var(--danger-color); border-radius: 12px;" oninput="checkQESplit(${record.sl})">
 
-              <!-- Khu vực trượt ra thông minh khi giảm số lượng (Ảnh 5) -->
+              <!-- Khu vực trượt ra thông minh -->
               <div id="qe-split-section" style="display:none; margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--border-light);">
                   <div style="font-size:13px; font-weight:600; color:var(--warning-color); margin-bottom:12px; line-height:1.4;">
                       ⚠️ Số lượng bị giảm đi <b id="qe-chenh-lech" style="font-size:16px;">0</b>. Xử lý phần dư này:
@@ -2759,7 +2774,7 @@
                   </div>
               </div>
 
-              <!-- Hai nút tùy chỉnh thay thế nút mặc định -->
+              <!-- Hai nút tùy chỉnh -->
               <div style="display:flex; gap:10px; margin-top: 24px;">
                   <button onclick="closeDialog()" class="btn-dialog" style="background:var(--input-bg); color:var(--text-main); height: 48px; border-radius: 12px;">HỦY</button>
                   <button onclick="xacNhanSuaBanGhi()" class="btn-dialog" style="background:var(--danger-color); height: 48px; border-radius: 12px;">ĐỒNG Ý</button>
@@ -2791,7 +2806,6 @@
               let currentTotal = STATE.thucHien.filter(t => t.lenhId === record.lenhId && t.id !== record.id).reduce((sum, t) => sum + t.sl, 0);
               
               if (lenhGoc && (currentTotal + newSl > lenhGoc.sl)) {
-                  // Cảnh báo ngay trong UI hiện tại
                   showToast(`Vượt Lệnh! Chỉ được thêm tối đa ${lenhGoc.sl - currentTotal}`, "ph-fill ph-warning-circle", "var(--danger-color)");
                   return;
               }
