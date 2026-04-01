@@ -251,6 +251,7 @@
     <div id="tab-danh-muc" class="tab-content active">
       <div class="card">
         <div class="search-bar-container">
+          <!-- INPUT TÌM KIẾM ĐÃ TÍCH HỢP ONKEYUP ĐỂ LỌC TRỰC TIẾP -->
           <input type="text" id="search-danh-muc" class="search-input" placeholder="🔍 Tìm kiếm đạn..." onkeyup="debounceTimKiem()">
           <button class="action-btn" style="background:var(--input-bg); color: var(--text-main);" onclick="toggleCaiDatDanhMuc(); haptic();"><i class="ph ph-faders"></i></button>
           <button class="action-btn" style="background:var(--primary-color)" onclick="document.getElementById('excel-upload').click(); haptic();"><i class="ph ph-file-xls"></i></button>
@@ -850,16 +851,6 @@
       } else if (type === 'confirm') {
           window.execConfirm = function() { closeDialog(); if(confirmFn) confirmFn(); }
           btnContainer.innerHTML = `<button onclick="closeDialog()" class="btn-dialog" style="background:var(--input-bg); color:var(--text-main)">HỦY</button><button onclick="execConfirm()" class="btn-dialog" style="background:var(--danger-color)">ĐỒNG Ý</button>`;
-      } else if (type === 'split') {
-          // Dialog Tách xe 3 lựa chọn
-          window.execSplitYes = function() { closeDialog(); if(confirmFn) confirmFn('YES'); };
-          window.execSplitNo = function() { closeDialog(); if(confirmFn) confirmFn('NO'); };
-          window.execSplitCancel = function() { closeDialog(); };
-          btnContainer.innerHTML = `
-              <button onclick="execSplitCancel()" class="btn-dialog" style="background:var(--input-bg); color:var(--text-main); flex: 0.6;">HỦY</button>
-              <button onclick="execSplitNo()" class="btn-dialog" style="background:var(--warning-color); font-size:13px;">KHÔNG CẤP</button>
-              <button onclick="execSplitYes()" class="btn-dialog" style="background:var(--primary-color); font-size:13px;">CHUYỂN XE</button>
-          `;
       }
   };
 
@@ -2086,13 +2077,13 @@
       if(mergedView.style.display === 'none') {
           mergedView.style.display = 'block';
           groupedView.style.display = 'none';
-          btn.innerHTML = '<i class="ph-bold ph-receipt"></i> CHI TIẾT THEO PHIẾU';
+          btn.innerHTML = '<i class="ph-bold ph-receipt"></i> CHI TIẾT THEO PHIẾU ĐỂ SỬA';
           btn.style.background = 'var(--primary-light)';
           btn.style.color = 'var(--primary-color)';
       } else {
           mergedView.style.display = 'none';
           groupedView.style.display = 'block';
-          btn.innerHTML = '<i class="ph-bold ph-list"></i> THU GỌN VỀ 1 DANH SÁCH';
+          btn.innerHTML = '<i class="ph-bold ph-list"></i> THU GỌN VỀ 1 DANH SÁCH (ẨN NÚT SỬA)';
           btn.style.background = 'var(--input-bg)';
           btn.style.color = 'var(--text-main)';
       }
@@ -2184,7 +2175,7 @@
                   let gPhieu = gXe.phieuGroups[phieu];
                   let formatTanPhieu = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(gPhieu.tongKL / 1000);
 
-                  // Hiển thị trực tiếp từng bản ghi để có thể sửa chính xác
+                  // CHI TIẾT ĐỂ SỬA (Giữ nguyên bản ghi thô, không gộp)
                   let itemsHtml = gPhieu.items.map((i, idx) => {
                       let loGop = gopDanhSachLo(i.danhSachLo || []);
                       let viewDataStr = escapeHTML(JSON.stringify({
@@ -2200,7 +2191,7 @@
                           </div>
                           <div style="display:flex; align-items:center; gap: 12px;">
                               <div class="modern-list-qty" onclick="moModalQuanLyLo('VIEW', null, JSON.parse('${viewDataStr}'))" style="cursor:pointer;">${i.sl}</div>
-                              <button onclick="suaTrucTiepTuBaoCao('${i.id}')" class="btn-sm btn-edit" style="width:36px; height:36px; border-radius:10px;"><i class="ph-bold ph-pencil-simple"></i></button>
+                              <button onclick="suaTrucTiepTuBaoCao('${i.id}')" class="btn-sm btn-edit" style="width:36px; height:36px; border-radius:10px; background: rgba(0, 122, 255, 0.15);"><i class="ph-bold ph-pencil-simple"></i></button>
                           </div>
                       </div>`;
                   }).join('');
@@ -2222,8 +2213,8 @@
           if (numPhieu >= 1) {
               toggleButtonHtml = `
               <div style="padding: 12px 16px; background: var(--bg-body); border-bottom: 0.5px solid var(--border-light);">
-                  <button onclick="togglePhieuView('xe-${idxXe}')" id="btn-toggle-xe-${idxXe}" style="background:var(--primary-light); color:var(--primary-color); border:none; padding:10px 16px; border-radius:12px; font-size:13px; font-weight:700; cursor:pointer; width:100%; display:flex; justify-content:center; align-items:center; gap: 6px; transition: 0.2s;">
-                      <i class="ph-bold ph-receipt"></i> CHI TIẾT THEO PHIẾU (${numPhieu})
+                  <button onclick="togglePhieuView('xe-${idxXe}')" id="btn-toggle-xe-${idxXe}" style="background:var(--input-bg); color:var(--text-main); border:none; padding:10px 16px; border-radius:12px; font-size:13px; font-weight:700; cursor:pointer; width:100%; display:flex; justify-content:center; align-items:center; gap: 6px; transition: 0.2s;">
+                      <i class="ph-bold ph-list"></i> THU GỌN VỀ 1 DANH SÁCH (ẨN NÚT SỬA)
                   </button>
               </div>`;
           }
@@ -2237,12 +2228,13 @@
               
               ${toggleButtonHtml}
 
-              <div id="view-merged-xe-${idxXe}" style="background: var(--bg-card); display: block;">
+              <!-- Ẩn View Merged đi, Mở View Detail làm mặc định để thấy ngay nút SỬA -->
+              <div id="view-merged-xe-${idxXe}" style="background: var(--bg-card); display: none;">
                   ${mergedHtml}
               </div>
               
               ${numPhieu >= 1 ? `
-              <div id="view-grouped-xe-${idxXe}" style="background: var(--bg-card); display: none;">
+              <div id="view-grouped-xe-${idxXe}" style="background: var(--bg-card); display: block;">
                   ${phieuHtml}
               </div>
               ` : ''}
@@ -2500,28 +2492,59 @@
       }, 500);
   }
 
-  // ================== CHỨC NĂNG SỬA NHANH & TÁCH XE TỪ BÁO CÁO ==================
+  // ================== CHỨC NĂNG SỬA NHANH & TÁCH XE TỪ BÁO CÁO (NÂNG CẤP) ==================
+  window.checkQESplit = function(oldSl) {
+      let newSl = parseFloat(document.getElementById('qe-sl').value) || 0;
+      let splitSec = document.getElementById('qe-split-section');
+      if (newSl > 0 && newSl < oldSl) {
+          splitSec.style.display = 'block';
+          document.getElementById('qe-chenh-lech').innerText = oldSl - newSl;
+          toggleQENewCar(); // Cập nhật ô nhập xe mới
+      } else {
+          splitSec.style.display = 'none';
+      }
+  }
+  window.toggleQENewCar = function() {
+      let action = document.getElementById('qe-split-action').value;
+      document.getElementById('qe-xe-moi').style.display = action === 'CHUYỂN' ? 'block' : 'none';
+  }
+
   window.suaTrucTiepTuBaoCao = function(idThucHien) {
       haptic();
       let record = STATE.thucHien.find(t => t.id === idThucHien);
       if(!record) return;
 
+      // Giao diện Form linh hoạt (Dynamic UI)
       let htmlForm = `
           <div style="text-align:left; margin-top:16px;">
               <label style="font-size:12px; color:var(--text-sub); font-weight:700; text-transform:uppercase;">Tên đạn đang sửa:</label>
               <div style="font-weight:700; margin-bottom:12px; color:var(--text-main); line-height:1.4;">${escapeHTML(record.ten)}</div>
 
-              <label style="font-size:12px; color:var(--text-sub); font-weight:700; text-transform:uppercase;">Chuyển sang Xe khác:</label>
-              <input type="text" id="quick-edit-xe" class="form-control" value="${escapeHTML(record.xe)}" style="margin-bottom:12px;">
+              <label style="font-size:12px; color:var(--text-sub); font-weight:700; text-transform:uppercase;">Xe hiện tại (đổi nếu muốn):</label>
+              <input type="text" id="qe-xe" class="form-control" value="${escapeHTML(record.xe)}" style="margin-bottom:12px; border:1px solid var(--primary-light);">
 
               <label style="font-size:12px; color:var(--text-sub); font-weight:700; text-transform:uppercase;">Số lượng xuất thực tế:</label>
-              <input type="number" id="quick-edit-sl" inputmode="decimal" class="form-control" value="${record.sl}" style="color:var(--danger-color); font-weight:800; font-size:22px; text-align:center;">
+              <input type="number" id="qe-sl" inputmode="decimal" class="form-control" value="${record.sl}" style="color:var(--danger-color); font-weight:800; font-size:22px; text-align:center; border:2px solid var(--danger-color);" oninput="checkQESplit(${record.sl})">
+
+              <!-- Khu vực trượt ra tự động khi SL bị hạ thấp -->
+              <div id="qe-split-section" style="display:none; margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--border-light);">
+                  <div style="font-size:13px; font-weight:600; color:var(--warning-color); margin-bottom:8px; line-height:1.4;">
+                      ⚠️ Số lượng bị giảm đi <b id="qe-chenh-lech" style="font-size:16px;">0</b>. Xử lý phần dư này:
+                  </div>
+                  <select id="qe-split-action" class="form-control" style="margin-bottom:8px; border:1px solid var(--warning-color);" onchange="toggleQENewCar()">
+                      <option value="HỦY">Không cấp (Xóa bỏ phần dư)</option>
+                      <option value="CHUYỂN" selected>Cấp tiếp sang xe khác</option>
+                  </select>
+                  <input type="text" id="qe-xe-moi" class="form-control" placeholder="Nhập tên xe mới..." style="border:1px solid var(--primary-light);">
+              </div>
           </div>
       `;
 
       showDialog(`Chỉnh sửa Bản ghi`, htmlForm, "confirm", () => {
-          let newXe = document.getElementById('quick-edit-xe').value.trim();
-          let newSl = parseFloat(document.getElementById('quick-edit-sl').value);
+          let newXe = document.getElementById('qe-xe').value.trim();
+          let newSl = parseFloat(document.getElementById('qe-sl').value);
+          let splitAction = document.getElementById('qe-split-action').value;
+          let xeMoi = document.getElementById('qe-xe-moi').value.trim();
 
           if(!newXe || isNaN(newSl) || newSl <= 0) {
               showToast("Lỗi: Số lượng và tên xe không hợp lệ!", "ph-fill ph-warning-circle", "var(--danger-color)");
@@ -2530,62 +2553,53 @@
 
           let oldSl = record.sl;
 
+          // 1. Trường hợp chỉ đổi xe hoặc giữ nguyên
           if (newSl === oldSl) {
               record.xe = newXe;
-              hoanTatSuaNhanh("Đã cập nhật tên xe thành công!");
+              hoanTatSuaNhanh("Đã cập nhật dữ liệu xe thành công!");
           } 
+          // 2. Trường hợp số lượng tăng
           else if (newSl > oldSl) {
               let lenhGoc = STATE.lenh.find(l => l.id === record.lenhId);
               let currentTotal = STATE.thucHien.filter(t => t.lenhId === record.lenhId && t.id !== record.id).reduce((sum, t) => sum + t.sl, 0);
               
               if (lenhGoc && (currentTotal + newSl > lenhGoc.sl)) {
-                  showDialog("Vượt Chỉ Tiêu", `Số lượng vượt quá Lệnh! Chỉ có thể thêm tối đa <b>${lenhGoc.sl - currentTotal}</b>.`, "alert");
+                  // Dùng setTimeout để không vấp hàm closeDialog trước đó
+                  setTimeout(() => showDialog("Vượt Chỉ Tiêu", `Số lượng vượt quá Lệnh! Chỉ có thể thêm tối đa <b>${lenhGoc.sl - currentTotal}</b>.`, "alert"), 350);
                   return;
               }
               record.xe = newXe;
               record.sl = newSl;
               hoanTatSuaNhanh("Đã tăng số lượng và cập nhật xe!");
           } 
+          // 3. Trường hợp số lượng giảm (Chia phần dư)
           else {
               let chenhLech = oldSl - newSl;
-              setTimeout(() => { 
-                  showDialog("Chuyển phần đạn dư?",
-                      `Bạn vừa giảm đi <b>${chenhLech}</b>.<br><br>Bạn có muốn cấp số lượng dư này sang một xe tiếp theo không?`,
-                      "split",
-                      (choice) => {
-                          record.xe = newXe;
-                          record.sl = newSl;
-                          kiemTraVaResetLoSuaNhanh(record); 
+              record.xe = newXe;
+              record.sl = newSl;
+              kiemTraVaResetLoSuaNhanh(record); // Bảo vệ dữ liệu Lô đã quét
 
-                          if (choice === 'NO') {
-                              hoanTatSuaNhanh("Đã cập nhật lại số lượng (không cấp phần dư)!");
-                          } else if (choice === 'YES') {
-                              setTimeout(() => {
-                                  let htmlXeMoi = `<input type="text" id="quick-edit-xe-moi" class="form-control" placeholder="Nhập Biển số/Tên xe mới..." style="margin-top:16px;">`;
-                                  showDialog(`Chuyển ${chenhLech} sang xe mới`, htmlXeMoi, "confirm", () => {
-                                      let xeMoi = document.getElementById('quick-edit-xe-moi').value.trim();
-                                      if(!xeMoi) xeMoi = "Xe bổ sung";
-
-                                      STATE.thucHien.push({
-                                          id: generateID(),
-                                          lenhId: record.lenhId,
-                                          soLenh: record.soLenh,
-                                          phieu: record.phieu,
-                                          xe: xeMoi,
-                                          ngay: record.ngay,
-                                          ten: record.ten,
-                                          dvt: record.dvt,
-                                          cap: record.cap,
-                                          sl: chenhLech,
-                                          danhSachLo: [] 
-                                      });
-                                      hoanTatSuaNhanh(`Đã cập nhật xe cũ và chuyển ${chenhLech} sang ${xeMoi}!`);
-                                  });
-                              }, 350);
-                          }
-                      }
-                  );
-              }, 350);
+              if (splitAction === 'HỦY') {
+                  hoanTatSuaNhanh("Đã cập nhật lại số lượng (xóa bỏ phần dư)!");
+              } else if (splitAction === 'CHUYỂN') {
+                  if (!xeMoi) xeMoi = "Xe bổ sung";
+                  
+                  // Sinh xe mới để gánh tiếp đạn
+                  STATE.thucHien.push({
+                      id: generateID(),
+                      lenhId: record.lenhId,
+                      soLenh: record.soLenh,
+                      phieu: record.phieu,
+                      xe: xeMoi,
+                      ngay: record.ngay,
+                      ten: record.ten,
+                      dvt: record.dvt,
+                      cap: record.cap,
+                      sl: chenhLech,
+                      danhSachLo: [] // Xe mới phải đi nhập lô mới
+                  });
+                  hoanTatSuaNhanh(`Đã cập nhật và tạo xe [${xeMoi}] để chở tiếp ${chenhLech} đạn!`);
+              }
           }
       });
   }
@@ -2595,12 +2609,13 @@
       let slDaNhap = record.danhSachLo.reduce((sum, lo) => sum + lo.sl, 0);
       if(slDaNhap > record.sl) {
           record.danhSachLo = []; 
-          setTimeout(() => showToast("Lô đã bị Reset do SL xuất bị giảm!", "ph-fill ph-warning-circle", "var(--warning-color)"), 1000);
+          setTimeout(() => showToast("Lô đã bị Reset do SL xuất giảm thấp hơn Lô đã quét!", "ph-fill ph-warning-circle", "var(--warning-color)"), 1000);
       }
   }
 
   function hoanTatSuaNhanh(msg) {
       safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
+      // Tự động load lại giao diện ngay tức thì
       moModalXemChiTietXe(); 
       renderBangThucHien();  
       renderBaoCaoNgay();    
