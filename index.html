@@ -675,10 +675,9 @@
       </div>
 
       <div id="vung-nut-lo-bottom" style="padding: 16px 20px calc(16px + env(safe-area-inset-bottom)); background: var(--bg-card); border-top: 0.5px solid var(--border-light); flex-shrink: 0; display: flex; gap: 12px;">
-          <button id="btn-thoat-lo" onclick="dongModalQuanLyLo()" style="flex: 1; height: 50px; border-radius: 14px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--text-main); font-weight: 700; font-size: 16px; transition: 0.2s;">THOÁT</button>
-          <button id="btn-huy-sua-lo" onclick="huySuaLo()" style="flex: 1; height: 50px; border-radius: 14px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--danger-color); font-weight: 700; font-size: 16px; display: none; transition: 0.2s;">HỦY SỬA</button>
-          <button id="btn-submit-lo" onclick="xuLyThemQuanLyLo()" style="flex: 1.5; height: 50px; border-radius: 14px; border: none; background: var(--primary-color); color: white; font-weight: 700; font-size: 16px; transition: 0.2s; box-shadow: 0 4px 12px rgba(0,122,255,0.3);">NHẬP LÔ</button>
-      </div>
+      <button id="btn-thoat-lo" onclick="dongModalQuanLyLo()" style="flex: 1; height: 50px; border-radius: 14px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--text-main); font-weight: 700; font-size: 16px; transition: 0.2s;">THOÁT</button>
+      <button id="btn-submit-lo" onclick="xuLyThemQuanLyLo()" style="flex: 1.5; height: 50px; border-radius: 14px; border: none; background: var(--primary-color); color: white; font-weight: 700; font-size: 16px; transition: 0.2s; box-shadow: 0 4px 12px rgba(0,122,255,0.3);">NHẬP LÔ</button>
+  </div>
 
     </div>
   </div>
@@ -1568,6 +1567,14 @@
       document.getElementById('input-ql-sl-lo').focus(); 
   }
 
+  // ================= TẠO LIST XE & PHIẾU CHO DROPDOWN =================
+  function getDanhSachXeVaPhieu() {
+      let xeSet = new Set(), phieuSet = new Set();
+      STATE.thucHien.forEach(t => { if(t.xe) xeSet.add(t.xe); if(t.phieu) phieuSet.add(t.phieu); });
+      return { xe: Array.from(xeSet).sort(), phieu: Array.from(phieuSet).sort() };
+  }
+
+  // ================= NÂNG CẤP POPUP SỬA LÔ THÔNG MINH =================
   function batDauSuaLo(idLo) {
       haptic();
       idLoDangSua = idLo;
@@ -1579,14 +1586,110 @@
       let loInfo = record.danhSachLo.find(l => l.id === idLo);
       if(!loInfo) return;
 
-      document.getElementById('input-ql-ten-lo').value = loInfo.tenLo;
-      document.getElementById('input-ql-sl-lo').value = loInfo.sl;
+      let lists = getDanhSachXeVaPhieu();
+      let dlXe = `<datalist id="dl-xe-lo">${lists.xe.map(x=>`<option value="${escapeHTML(x)}">`).join('')}</datalist>`;
+      let dlPhieu = `<datalist id="dl-phieu-lo">${lists.phieu.map(x=>`<option value="${escapeHTML(x)}">`).join('')}</datalist>`;
 
-      let btnSubmit = document.getElementById('btn-submit-lo');
-      btnSubmit.innerText = 'CẬP NHẬT';
-      
-      document.getElementById('btn-thoat-lo').style.display = 'none';
-      document.getElementById('btn-huy-sua-lo').style.display = 'block';
+      let splitHtml = '';
+      if (currentLoContext.type === 'THUCHIEN') {
+           splitHtml = `
+              <div id="qe-lo-split-section" style="display:none; margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--border-light);">
+                  <div style="font-size:13px; font-weight:600; color:var(--warning-color); margin-bottom:12px; line-height:1.4;">
+                      ⚠️ Số lượng lô bị giảm đi <b id="qe-lo-chenh-lech" style="font-size:16px;">0</b>. Xử lý phần dư này:
+                  </div>
+                  <div style="background: rgba(255, 149, 0, 0.05); padding: 12px; border-radius: 12px; border: 1px solid rgba(255, 149, 0, 0.3);">
+                      <select id="qe-lo-split-action" class="form-control" style="margin-bottom:8px; border: 1px solid var(--warning-color); background: var(--bg-card);" onchange="toggleQELoNewCar()">
+                          <option value="HỦY">Chỉ giảm số lượng (Không cấp tiếp)</option>
+                          <option value="CHUYỂN" selected>Cấp phần dư này sang Xe khác</option>
+                      </select>
+                      <div id="qe-lo-xe-moi-wrapper">
+                          <input type="text" id="qe-lo-xe-moi" list="dl-xe-lo" class="form-control" placeholder="Chọn hoặc nhập Xe mới..." style="margin-bottom:8px; border: 1px solid var(--border-light);">
+                          <input type="text" id="qe-lo-phieu-moi" list="dl-phieu-lo" class="form-control" placeholder="Số phiếu xe mới (tùy chọn)" style="border: 1px solid var(--border-light);">
+                      </div>
+                  </div>
+              </div>
+           `;
+      }
+
+      let htmlForm = `
+          ${dlXe}${dlPhieu}
+          <div style="text-align:left; margin-top:16px;">
+              <label style="font-size:11px; color:var(--text-sub); font-weight:700; text-transform:uppercase; letter-spacing: 0.5px;">Tên Lô đang sửa:</label>
+              <input type="text" id="qe-lo-ten" class="form-control" value="${escapeHTML(loInfo.tenLo)}" style="margin-bottom:16px; font-weight:800; border: 1px solid var(--border-light);">
+
+              <label style="font-size:11px; color:var(--text-sub); font-weight:700; text-transform:uppercase; letter-spacing: 0.5px;">Số lượng Lô thực tế:</label>
+              <input type="number" id="qe-lo-sl" inputmode="decimal" class="form-control" value="${loInfo.sl}" style="color:var(--danger-color); font-weight:800; font-size:24px; text-align:center; border: 2px solid var(--danger-color); height: 54px;" oninput="checkQELoSplit(${loInfo.sl}, '${currentLoContext.type}')">
+
+              ${splitHtml}
+          </div>
+      `;
+
+      showDialog(`Chỉnh sửa Bản ghi Lô`, htmlForm, "confirm", () => {
+          let newTen = document.getElementById('qe-lo-ten').value.trim();
+          let newSl = parseFloat(document.getElementById('qe-lo-sl').value);
+
+          if(!newTen || isNaN(newSl) || newSl <= 0) {
+              showToast("Lỗi: Dữ liệu Lô không hợp lệ!", "ph-fill ph-warning-circle", "var(--danger-color)");
+              return;
+          }
+
+          let oldSl = loInfo.sl;
+
+          if (currentLoContext.type === 'LENH' || newSl >= oldSl) {
+              loInfo.tenLo = newTen; loInfo.sl = newSl;
+              if (currentLoContext.type === 'LENH') safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh));
+              else safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
+              
+              idLoDangSua = null; // Reset
+              renderChiTietQuanLyLo(record);
+              showToast("Cập nhật Lô thành công!");
+              return;
+          }
+
+          let splitAction = document.getElementById('qe-lo-split-action').value;
+          let diff = oldSl - newSl;
+
+          loInfo.tenLo = newTen; loInfo.sl = newSl;
+
+          if (splitAction === 'HỦY') {
+              safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
+              idLoDangSua = null; renderChiTietQuanLyLo(record); showToast("Đã giảm số lượng Lô!");
+          } else if (splitAction === 'CHUYỂN') {
+              let xeMoi = document.getElementById('qe-lo-xe-moi').value.trim() || "Xe chuyển lô";
+              let phieuMoi = document.getElementById('qe-lo-phieu-moi').value.trim();
+
+              // Điều chỉnh tổng của bản ghi hiện tại để kho không bị lệch
+              record.sl -= diff;
+
+              // Tạo bản ghi thực hiện mới mang theo Lô này
+              STATE.thucHien.push({
+                  id: generateID(), lenhId: record.lenhId, soLenh: record.soLenh, phieu: phieuMoi, xe: xeMoi,
+                  ngay: record.ngay, ten: record.ten, dvt: record.dvt, cap: record.cap, sl: diff,
+                  danhSachLo: [{ id: generateID(), tenLo: newTen, sl: diff }]
+              });
+
+              safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
+              idLoDangSua = null; renderChiTietQuanLyLo(record);
+              showToast(`Đã chuyển ${diff} Lô sang ${xeMoi}!`);
+              
+              // Render lại các bảng phía sau Modal
+              renderBangThucHien(); renderBaoCaoNgay();
+          }
+      });
+  }
+
+  // Helper UX cho Split Lô
+  window.checkQELoSplit = function(oldSl, type) {
+      if(type !== 'THUCHIEN') return;
+      let newSl = parseFloat(document.getElementById('qe-lo-sl').value) || 0;
+      let splitSec = document.getElementById('qe-lo-split-section');
+      if (newSl > 0 && newSl < oldSl) {
+          splitSec.style.display = 'block'; document.getElementById('qe-lo-chenh-lech').innerText = oldSl - newSl; toggleQELoNewCar();
+      } else { splitSec.style.display = 'none'; }
+  }
+  window.toggleQELoNewCar = function() {
+      let action = document.getElementById('qe-lo-split-action').value;
+      document.getElementById('qe-lo-xe-moi-wrapper').style.display = action === 'CHUYỂN' ? 'block' : 'none';
   }
 
   function huySuaLo() {
@@ -2184,20 +2287,16 @@
                   // CHI TIẾT ĐỂ SỬA (Giữ nguyên bản ghi thô, không gộp)
                   let itemsHtml = gPhieu.items.map((i, idx) => {
                       let loGop = gopDanhSachLo(i.danhSachLo || []);
-                      // MÃ HOÁ DỮ LIỆU CHỐNG SẬP SCRIPT
-                      let viewDataStr = encodeURIComponent(JSON.stringify({
-                          title: `Chi tiết Lô Phiếu ${phieu}`, name: i.ten, dvt: i.dvt, cap: i.cap, total: i.sl, listLo: loGop
-                      }));
-
+                      
                       return `
                       <div class="modern-list-item" style="padding: 12px 16px;">
                           <div class="modern-list-stt">${idx + 1}</div>
-                          <div class="modern-list-content" onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))" style="cursor: pointer;">
+                          <div class="modern-list-content" onclick="moModalQuanLyLo('THUCHIEN', '${i.id}')" style="cursor: pointer;">
                               <div class="modern-list-title">${escapeHTML(i.ten)}</div>
                               <div class="modern-list-subtitle">ĐVT: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.dvt) || '?'}</span> &bull; Cấp: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.cap)}</span></div>
                           </div>
                           <div style="display:flex; align-items:center; gap: 12px;">
-                              <div class="modern-list-qty" onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))" style="cursor:pointer;">${i.sl}</div>
+                              <div class="modern-list-qty" onclick="moModalQuanLyLo('THUCHIEN', '${i.id}')" style="cursor:pointer;">${i.sl}</div>
                               <button onclick="event.stopPropagation(); suaTrucTiepTuBaoCao('${i.id}')" class="btn-sm btn-edit" style="width:36px; height:36px; border-radius:10px; background: rgba(0, 122, 255, 0.15);"><i class="ph-bold ph-pencil-simple"></i></button>
                           </div>
                       </div>`;
@@ -2498,22 +2597,21 @@
           XLSX.writeFile(wb, fileName);
       }, 500);
   }
-
-  // ================== CHỨC NĂNG SỬA NHANH & TÁCH XE TỪ BÁO CÁO (NÂNG CẤP) ==================
+  // ================== CHỨC NĂNG SỬA NHANH BẢN GHI (PRO UI) ==================
   window.checkQESplit = function(oldSl) {
       let newSl = parseFloat(document.getElementById('qe-sl').value) || 0;
       let splitSec = document.getElementById('qe-split-section');
       if (newSl > 0 && newSl < oldSl) {
           splitSec.style.display = 'block';
           document.getElementById('qe-chenh-lech').innerText = oldSl - newSl;
-          toggleQENewCar(); // Cập nhật ô nhập xe mới
+          toggleQENewCar();
       } else {
           splitSec.style.display = 'none';
       }
   }
   window.toggleQENewCar = function() {
       let action = document.getElementById('qe-split-action').value;
-      document.getElementById('qe-xe-moi').style.display = action === 'CHUYỂN' ? 'block' : 'none';
+      document.getElementById('qe-xe-moi-wrapper').style.display = action === 'CHUYỂN' ? 'block' : 'none';
   }
 
   window.suaTrucTiepTuBaoCao = function(idThucHien) {
@@ -2521,91 +2619,92 @@
       let record = STATE.thucHien.find(t => t.id === idThucHien);
       if(!record) return;
 
-      // Giao diện Form linh hoạt (Dynamic UI)
+      let lists = getDanhSachXeVaPhieu();
+      let dlXe = `<datalist id="dl-xe-edit">${lists.xe.map(x=>`<option value="${escapeHTML(x)}">`).join('')}</datalist>`;
+      let dlPhieu = `<datalist id="dl-phieu-edit">${lists.phieu.map(x=>`<option value="${escapeHTML(x)}">`).join('')}</datalist>`;
+
       let htmlForm = `
+          ${dlXe}${dlPhieu}
           <div style="text-align:left; margin-top:16px;">
-              <label style="font-size:12px; color:var(--text-sub); font-weight:700; text-transform:uppercase;">Tên đạn đang sửa:</label>
-              <div style="font-weight:700; margin-bottom:12px; color:var(--text-main); line-height:1.4;">${escapeHTML(record.ten)}</div>
+              <label style="font-size:11px; color:var(--text-sub); font-weight:700; text-transform:uppercase; letter-spacing: 0.5px;">Tên đạn đang sửa:</label>
+              <div style="font-weight:800; margin-bottom:16px; color:var(--text-main); font-size:15px; line-height:1.4;">${escapeHTML(record.ten)}</div>
 
-              <label style="font-size:12px; color:var(--text-sub); font-weight:700; text-transform:uppercase;">Xe hiện tại (đổi nếu muốn):</label>
-              <input type="text" id="qe-xe" class="form-control" value="${escapeHTML(record.xe)}" style="margin-bottom:12px; border:1px solid var(--primary-light);">
+              <div style="display:flex; gap:10px; margin-bottom:16px;">
+                  <div style="flex:1;">
+                      <label style="font-size:11px; color:var(--text-sub); font-weight:700; text-transform:uppercase;">Xe hiện tại:</label>
+                      <input type="text" id="qe-xe" list="dl-xe-edit" class="form-control" value="${escapeHTML(record.xe)}" style="border:1px solid var(--border-light); font-weight:700; background: var(--bg-body);">
+                  </div>
+                  <div style="flex:1;">
+                      <label style="font-size:11px; color:var(--text-sub); font-weight:700; text-transform:uppercase;">Số Phiếu:</label>
+                      <input type="text" id="qe-phieu" list="dl-phieu-edit" class="form-control" value="${escapeHTML(record.phieu || '')}" placeholder="Trống" style="border:1px solid var(--border-light); background: var(--bg-body);">
+                  </div>
+              </div>
 
-              <label style="font-size:12px; color:var(--text-sub); font-weight:700; text-transform:uppercase;">Số lượng xuất thực tế:</label>
-              <input type="number" id="qe-sl" inputmode="decimal" class="form-control" value="${record.sl}" style="color:var(--danger-color); font-weight:800; font-size:22px; text-align:center; border:2px solid var(--danger-color);" oninput="checkQESplit(${record.sl})">
+              <label style="font-size:11px; color:var(--text-sub); font-weight:700; text-transform:uppercase; letter-spacing: 0.5px;">Số lượng xuất thực tế:</label>
+              <input type="number" id="qe-sl" inputmode="decimal" class="form-control" value="${record.sl}" style="color:var(--danger-color); font-weight:800; font-size:26px; height:60px; text-align:center; border:2px solid var(--danger-color);" oninput="checkQESplit(${record.sl})">
 
-              <!-- Khu vực trượt ra tự động khi SL bị hạ thấp -->
+              <!-- Khu vực trượt ra thông minh -->
               <div id="qe-split-section" style="display:none; margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--border-light);">
-                  <div style="font-size:13px; font-weight:600; color:var(--warning-color); margin-bottom:8px; line-height:1.4;">
+                  <div style="font-size:13px; font-weight:600; color:var(--warning-color); margin-bottom:12px; line-height:1.4;">
                       ⚠️ Số lượng bị giảm đi <b id="qe-chenh-lech" style="font-size:16px;">0</b>. Xử lý phần dư này:
                   </div>
-                  <select id="qe-split-action" class="form-control" style="margin-bottom:8px; border:1px solid var(--warning-color);" onchange="toggleQENewCar()">
-                      <option value="HỦY">Không cấp (Xóa bỏ phần dư)</option>
-                      <option value="CHUYỂN" selected>Cấp tiếp sang xe khác</option>
-                  </select>
-                  <input type="text" id="qe-xe-moi" class="form-control" placeholder="Nhập tên xe mới..." style="border:1px solid var(--primary-light);">
+                  <div style="background: rgba(255, 149, 0, 0.05); padding: 12px; border-radius: 12px; border: 1px solid rgba(255, 149, 0, 0.3);">
+                      <select id="qe-split-action" class="form-control" style="margin-bottom:8px; border:1px solid var(--warning-color); background: var(--bg-card);" onchange="toggleQENewCar()">
+                          <option value="HỦY">Không cấp (Xóa bỏ phần dư)</option>
+                          <option value="CHUYỂN" selected>Cấp tiếp sang xe khác</option>
+                      </select>
+                      <div id="qe-xe-moi-wrapper">
+                          <input type="text" id="qe-xe-moi" list="dl-xe-edit" class="form-control" placeholder="Chọn hoặc nhập Xe mới..." style="margin-bottom:8px; border:1px solid var(--border-light);">
+                          <input type="text" id="qe-phieu-moi" list="dl-phieu-edit" class="form-control" placeholder="Số phiếu mới (tùy chọn)" style="border:1px solid var(--border-light);">
+                      </div>
+                  </div>
               </div>
           </div>
       `;
 
       showDialog(`Chỉnh sửa Bản ghi`, htmlForm, "confirm", () => {
           let newXe = document.getElementById('qe-xe').value.trim();
+          let newPhieu = document.getElementById('qe-phieu').value.trim();
           let newSl = parseFloat(document.getElementById('qe-sl').value);
           let splitAction = document.getElementById('qe-split-action') ? document.getElementById('qe-split-action').value : null;
-          let xeMoi = document.getElementById('qe-xe-moi') ? document.getElementById('qe-xe-moi').value.trim() : null;
-
+          
           if(!newXe || isNaN(newSl) || newSl <= 0) {
-              showToast("Lỗi: Số lượng và tên xe không hợp lệ!", "ph-fill ph-warning-circle", "var(--danger-color)");
-              return;
+              showToast("Lỗi: Số lượng và tên xe không hợp lệ!", "ph-fill ph-warning-circle", "var(--danger-color)"); return;
           }
 
           let oldSl = record.sl;
 
-          // 1. Trường hợp chỉ đổi xe hoặc giữ nguyên
           if (newSl === oldSl) {
-              record.xe = newXe;
-              hoanTatSuaNhanh("Đã cập nhật dữ liệu xe thành công!");
+              record.xe = newXe; record.phieu = newPhieu;
+              hoanTatSuaNhanh("Đã cập nhật dữ liệu thành công!");
           } 
-          // 2. Trường hợp số lượng tăng
           else if (newSl > oldSl) {
               let lenhGoc = STATE.lenh.find(l => l.id === record.lenhId);
               let currentTotal = STATE.thucHien.filter(t => t.lenhId === record.lenhId && t.id !== record.id).reduce((sum, t) => sum + t.sl, 0);
               
               if (lenhGoc && (currentTotal + newSl > lenhGoc.sl)) {
-                  // Dùng setTimeout để không vấp hàm closeDialog trước đó
-                  setTimeout(() => showDialog("Vượt Chỉ Tiêu", `Số lượng vượt quá Lệnh! Chỉ có thể thêm tối đa <b>${lenhGoc.sl - currentTotal}</b>.`, "alert"), 350);
+                  setTimeout(() => showDialog("Vượt Chỉ Tiêu", `Số lượng vượt Lệnh! Chỉ có thể thêm tối đa <b>${lenhGoc.sl - currentTotal}</b>.`, "alert"), 350);
                   return;
               }
-              record.xe = newXe;
-              record.sl = newSl;
-              hoanTatSuaNhanh("Đã tăng số lượng và cập nhật xe!");
+              record.xe = newXe; record.phieu = newPhieu; record.sl = newSl;
+              hoanTatSuaNhanh("Đã tăng số lượng và cập nhật bản ghi!");
           } 
-          // 3. Trường hợp số lượng giảm (Chia phần dư)
           else {
               let chenhLech = oldSl - newSl;
-              record.xe = newXe;
-              record.sl = newSl;
-              kiemTraVaResetLoSuaNhanh(record); // Bảo vệ dữ liệu Lô đã quét
+              record.xe = newXe; record.phieu = newPhieu; record.sl = newSl;
+              kiemTraVaResetLoSuaNhanh(record); 
 
               if (splitAction === 'HỦY') {
                   hoanTatSuaNhanh("Đã cập nhật lại số lượng (xóa bỏ phần dư)!");
               } else if (splitAction === 'CHUYỂN') {
-                  if (!xeMoi) xeMoi = "Xe bổ sung";
+                  let xeMoi = document.getElementById('qe-xe-moi').value.trim() || "Xe chuyển";
+                  let phieuMoi = document.getElementById('qe-phieu-moi').value.trim();
                   
-                  // Sinh xe mới để gánh tiếp đạn
                   STATE.thucHien.push({
-                      id: generateID(),
-                      lenhId: record.lenhId,
-                      soLenh: record.soLenh,
-                      phieu: record.phieu,
-                      xe: xeMoi,
-                      ngay: record.ngay,
-                      ten: record.ten,
-                      dvt: record.dvt,
-                      cap: record.cap,
-                      sl: chenhLech,
-                      danhSachLo: [] // Xe mới phải đi nhập lô mới
+                      id: generateID(), lenhId: record.lenhId, soLenh: record.soLenh, phieu: phieuMoi, xe: xeMoi,
+                      ngay: record.ngay, ten: record.ten, dvt: record.dvt, cap: record.cap, sl: chenhLech, danhSachLo: [] 
                   });
-                  hoanTatSuaNhanh(`Đã cập nhật và tạo xe [${xeMoi}] để chở tiếp ${chenhLech} đạn!`);
+                  hoanTatSuaNhanh(`Đã tạo xe [${xeMoi}] để chở tiếp ${chenhLech} đạn!`);
               }
           }
       });
