@@ -214,7 +214,7 @@
     .dash-box-title { font-size: 10px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 6px; }
     .dash-box-val { font-size: 15px; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px;}
 
-    /* ================= BOTTOM SHEET QUẢN LÝ LÔ (TỐI ƯU PC LẪN MOBILE) ================= */
+    /* ================= BOTTOM SHEET QUẢN LÝ LÔ ================= */
     .modal-bottom-sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); z-index: 10000; display: none; flex-direction: column; justify-content: flex-end; align-items: center; opacity: 0; transition: opacity 0.3s; }
     .modal-bottom-sheet.show { opacity: 1; }
     
@@ -442,7 +442,7 @@
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px;">
               <button class="btn" style="background:var(--warning-color); margin:0; height:44px; font-size:12px;" onclick="moModalXemChiTietXe()"><i class="ph-fill ph-truck"></i> TẢI TRỌNG XE</button>
-              <button class="btn" style="background:var(--info-color); margin:0; height:44px; font-size:12px;" onclick="moModalTongHopToanBoLo()"><i class="ph-fill ph-stack"></i> TẤT CẢ LÔ</button>
+              <button class="btn" style="background:var(--info-color); margin:0; height:44px; font-size:12px;" onclick="moModalTongHopToanBoLo()"><i class="ph-fill ph-clipboard-text"></i> BÁO CÁO CHUNG</button>
               <button class="btn" style="background:var(--primary-light); color:var(--primary-color); margin:0; height:44px; font-size:12px;" onclick="xuatAnhBaoCaoModal('khu-vuc-chup-anh-ngay', 'BaoCaoXuatKho_Ngay')"><i class="ph-bold ph-camera"></i> XUẤT ẢNH</button>
               <button class="btn" style="background:var(--success-color); margin:0; height:44px; font-size:12px;" onclick="xuatExcelToanBoLo()"><i class="ph-bold ph-file-xls"></i> XUẤT EXCEL</button>
           </div>
@@ -470,7 +470,7 @@
                       <th style="width: 30px;">STT</th>
                       <th style="width: 130px; text-align: left;">Tên đạn</th>
                       <th style="width: 30px;">ĐVT</th>
-                      <th style="width: 30px;">Cấp</th>
+                      <th style="width: 40px;">Cấp/KLR</th>
                       <th style="width: 40px;">Lệnh</th>
                       <th style="width: 40px;">Đã Cấp</th>
                       <th style="width: 40px; background: rgba(255, 149, 0, 0.1); color: var(--warning-color);">Xuất</th>
@@ -486,7 +486,7 @@
       <!-- VÙNG BÁO CÁO LỆNH -->
       <div id="vung-bao-cao-lenh" style="display:none;">
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; margin-bottom: 16px;">
-              <button class="btn" style="background:var(--info-color); margin:0; height:44px; font-size:12px;" onclick="moModalTongHopToanBoLo()"><i class="ph-fill ph-stack"></i> LÔ ĐÃ XUẤT</button>
+              <button class="btn" style="background:var(--info-color); margin:0; height:44px; font-size:12px;" onclick="moModalTongHopToanBoLo()"><i class="ph-fill ph-clipboard-text"></i> BÁO CÁO CHUNG</button>
               <button class="btn" style="background:var(--success-color); margin:0; height:44px; font-size:12px;" onclick="xuatExcelTienDoLenh()"><i class="ph-fill ph-file-xls"></i> EXCEL TIẾN ĐỘ</button>
               <button class="btn" style="background:var(--primary-light); color:var(--primary-color); margin:0; height:44px; font-size:12px; grid-column: span 2;" onclick="xuatAnhBaoCaoModal('danh-sach-tinh-trang-lenh', 'BaoCaoTienDo_Lenh')"><i class="ph-bold ph-camera"></i> XUẤT ẢNH TIẾN ĐỘ LỆNH</button>
           </div>
@@ -497,7 +497,7 @@
                   <div class="dash-box-val val-success" id="dash-tong-lenh">0 Tấn</div>
               </div>
               <div class="dash-box">
-                  <div class="dash-box-title">ĐÃ XUẤT</div>
+                  <div class="dash-box-title">Đã XUẤT</div>
                   <div class="dash-box-val val-warning" id="dash-tong-xuat">0 Tấn</div>
               </div>
               <div class="dash-box">
@@ -613,9 +613,9 @@
   <div id="modal-tong-hop-lo" class="modal-overlay">
     <div class="custom-dialog-box modal-full">
       <div class="modal-full-header">
-         <h3 style="font-weight: 800; margin:0; font-size: 16px;">Tổng Hợp Lô Xuất</h3>
+         <h3 id="title-modal-tong-hop-lo" style="font-weight: 800; margin:0; font-size: 16px;">Báo Cáo Chung</h3>
          <div style="display:flex; gap:6px;">
-             <button class="btn-sm" style="background:var(--primary-light); color:var(--primary-color); width:auto; padding: 0 10px; font-size: 12px; height: 30px;" onclick="xuatAnhBaoCaoModal('noidung-tong-hop-lo', 'TongHopLo')"><i class="ph-bold ph-camera"></i></button>
+             <button class="btn-sm" style="background:var(--primary-light); color:var(--primary-color); width:auto; padding: 0 10px; font-size: 12px; height: 30px;" onclick="xuatAnhBaoCaoModal('noidung-tong-hop-lo', 'BaoCaoChung')"><i class="ph-bold ph-camera"></i></button>
              <button class="btn-sm" style="background:var(--success-color); width:auto; padding: 0 10px; font-size: 12px; height: 30px;" onclick="xuatExcelToanBoLo()"><i class="ph-bold ph-file-xls"></i></button>
          </div>
       </div>
@@ -1889,7 +1889,10 @@
                  <div style="font-size:11px; color:var(--primary-color); margin-top:3px;"><i class="ph-bold ph-stack"></i> Xem Lô xuất</div>
               </td>
               <td style="color:var(--text-sub);">${escapeHTML(item.dvt)}</td>
-              <td style="color:var(--text-sub);">${escapeHTML(item.cap)}</td>
+              <td style="color:var(--text-sub);">
+                  <span style="font-weight:700; color:var(--text-main);">${escapeHTML(item.cap)}</span><br>
+                  <span style="font-size:10px;">${klr}</span>
+              </td>
               <td style="color:var(--primary-color); font-weight:700;">${slLenh}</td>
               <td style="color:var(--text-sub); font-weight:700;">${tongDaCap}</td>
               <td style="color:var(--warning-color); font-weight:800; font-size:14px; background: rgba(255, 149, 0, 0.05);">${item.slGroup}</td>
@@ -1976,14 +1979,14 @@
                       <tr style="color:var(--text-sub); background: var(--bg-card);">
                         <th style="padding:10px 4px; text-align:left; width: 150px; background: transparent;">Tên đạn</th>
                         <th style="padding:10px 4px; width: 40px; background: transparent;">ĐVT</th>
-                        <th style="padding:10px 4px; width: 40px; background: transparent;">Cấp</th>
+                        <th style="padding:10px 4px; width: 45px; background: transparent;">Cấp/KLR</th>
                         <th style="padding:10px 4px; width: 60px; background: transparent;">Kế Hoạch</th>
                         <th style="padding:10px 4px; width: 60px; background: transparent;">Đã Cấp</th>
                         <th style="padding:10px 4px; width: 60px; background: transparent;">Còn Lại</th>
                       </tr>
                       ${g.items.map(i => {
                           let colorConLai = i.conLai < 0 ? 'var(--danger-color)' : (i.conLai === 0 ? 'var(--success-color)' : 'var(--text-main)');
-                          
+                          let klr = layKLRTuTenDan(i.ten);
                           let loGop = gopDanhSachLo(i.tatCaLoDaXuat);
                           let viewDataStr = escapeHTML(JSON.stringify({
                               title: "Chi tiết Lô thực xuất",
@@ -2001,7 +2004,10 @@
                                   <div style="font-size:11px; color:var(--primary-color); margin-top:3px;"><i class="ph-bold ph-stack"></i> Xem Lô đã xuất</div>
                               </td>
                               <td style="padding:12px 4px; color:var(--text-sub);">${escapeHTML(i.dvt)}</td>
-                              <td style="padding:12px 4px; color:var(--text-sub);">${escapeHTML(i.cap)}</td>
+                              <td style="padding:12px 4px; color:var(--text-sub);">
+                                  <span style="font-weight:700; color:var(--text-main);">${escapeHTML(i.cap)}</span><br>
+                                  <span style="font-size:10px;">${klr}</span>
+                              </td>
                               <td style="padding:12px 4px; font-weight:700; color:var(--primary-color);">${i.slLenh}</td>
                               <td style="padding:12px 4px; font-weight:700; color:var(--warning-color);">${i.slDaXuat}</td>
                               <td style="padding:12px 4px; font-weight:800; color:${colorConLai};">${i.conLai}</td>
@@ -2142,6 +2148,10 @@
           });
           
           let mergedHtml = mergedItems.map((i, idx) => {
+              let klr = layKLRTuTenDan(i.ten);
+              let khoiLuongItem = (i.sl * klr) / 1000;
+              let formatKLItem = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(khoiLuongItem);
+
               let loGop = gopDanhSachLo(i.danhSachLo || []);
               let viewDataStr = escapeHTML(JSON.stringify({
                   title: `Chi tiết Lô Xe ${xe}`,
@@ -2157,12 +2167,17 @@
                   <div class="modern-list-stt">${idx + 1}</div>
                   <div class="modern-list-content">
                       <div class="modern-list-title">${escapeHTML(i.ten)}</div>
-                      <div class="modern-list-subtitle">ĐVT: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.dvt) || '?'}</span> &bull; Cấp: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.cap)}</span></div>
+                      <div class="modern-list-subtitle">
+                          ĐVT: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.dvt) || '?'}</span> &bull; 
+                          Cấp: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.cap)}</span> &bull; 
+                          KLR: <span style="color:var(--text-main); font-weight:600">${klr}</span>
+                      </div>
                   </div>
-                  <div style="display:flex; align-items:center; gap: 8px;">
+                  <div style="display:flex; flex-direction: column; align-items:flex-end; gap: 4px;">
                       <div class="modern-list-qty">${i.sl}</div>
-                      <i class="ph-bold ph-caret-right" style="color: #C7C7CC; font-size: 16px;"></i>
+                      <div style="font-size:11px; color:var(--danger-color); font-weight:700;">${formatKLItem} Tấn</div>
                   </div>
+                  <i class="ph-bold ph-caret-right" style="color: #C7C7CC; font-size: 16px; margin-left: 10px;"></i>
               </div>`;
           }).join('');
 
@@ -2190,6 +2205,10 @@
                   });
 
                   let itemsHtml = ticketItems.map((i, idx) => {
+                      let klr = layKLRTuTenDan(i.ten);
+                      let khoiLuongItem = (i.sl * klr) / 1000;
+                      let formatKLItem = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(khoiLuongItem);
+
                       let loGop = gopDanhSachLo(i.danhSachLo || []);
                       let viewDataStr = escapeHTML(JSON.stringify({
                           title: `Chi tiết Lô Phiếu ${phieu}`,
@@ -2205,12 +2224,17 @@
                           <div class="modern-list-stt">${idx + 1}</div>
                           <div class="modern-list-content">
                               <div class="modern-list-title">${escapeHTML(i.ten)}</div>
-                              <div class="modern-list-subtitle">ĐVT: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.dvt) || '?'}</span> &bull; Cấp: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.cap)}</span></div>
+                              <div class="modern-list-subtitle">
+                                  ĐVT: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.dvt) || '?'}</span> &bull; 
+                                  Cấp: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.cap)}</span> &bull; 
+                                  KLR: <span style="color:var(--text-main); font-weight:600">${klr}</span>
+                              </div>
                           </div>
-                          <div style="display:flex; align-items:center; gap: 8px;">
+                          <div style="display:flex; flex-direction: column; align-items:flex-end; gap: 4px;">
                               <div class="modern-list-qty">${i.sl}</div>
-                              <i class="ph-bold ph-caret-right" style="color: #C7C7CC; font-size: 16px;"></i>
+                              <div style="font-size:11px; color:var(--danger-color); font-weight:700;">${formatKLItem} Tấn</div>
                           </div>
+                          <i class="ph-bold ph-caret-right" style="color: #C7C7CC; font-size: 16px; margin-left: 10px;"></i>
                       </div>`;
                   }).join('');
 
@@ -2263,7 +2287,6 @@
   }
   function dongModalXemChiTietXe() { let w = document.getElementById('modal-chi-tiet-xe'); w.classList.remove('show'); setTimeout(() => w.style.display = 'none', 300); }
 
-  // =========== HÀM ĐÃ SỬA LỖI ============
   function xuatExcelTienDoLenh() {
       haptic();
       let exportData = [];
@@ -2307,88 +2330,96 @@
 
   function moModalTongHopToanBoLo() {
       haptic();
-      let html = '';
+      let locNgay = document.getElementById('bc-ngay').value; 
+      let locXe = document.getElementById('bc-xe').value.toLowerCase().trim();
       
+      let dataLoc = [];
+      let tieuDe = "Báo Cáo Chung";
+
       if (currentBaoCaoMode === 'ngay') {
-          let locNgay = document.getElementById('bc-ngay').value; 
-          let locXe = document.getElementById('bc-xe').value.toLowerCase().trim();
-          let dataLoc = STATE.thucHien.filter(item => { return (!locNgay || item.ngay === locNgay) && (!locXe || item.xe.toLowerCase().includes(locXe)); });
-          
-          if(dataLoc.length === 0) {
-              showDialog("Trống", "Không có dữ liệu trong kỳ này để tổng hợp.", "alert"); return;
+          dataLoc = STATE.thucHien.filter(item => { return (!locNgay || item.ngay === locNgay) && (!locXe || item.xe.toLowerCase().includes(locXe)); });
+          tieuDe = locNgay ? `Báo Cáo Ngày ${formatShortDate(locNgay)}` : "Báo Cáo Tất Cả Ngày";
+          if(locXe) tieuDe += ` (Lọc Xe: ${locXe.toUpperCase()})`;
+      } else {
+          dataLoc = [...STATE.thucHien];
+          tieuDe = "Báo Cáo Toàn Bộ Quá Trình";
+      }
+      
+      if(dataLoc.length === 0) {
+          showDialog("Trống", "Không có dữ liệu để tổng hợp báo cáo chung.", "alert"); return;
+      }
+
+      // Gộp đạn (Merge toàn bộ item)
+      let mergedItems = [];
+      let tongKLToanBo = 0;
+
+      dataLoc.forEach(i => {
+          let klr = layKLRTuTenDan(i.ten);
+          tongKLToanBo += i.sl * klr;
+
+          let existing = mergedItems.find(m => m.ten === i.ten && m.cap === i.cap);
+          if(existing) {
+              existing.sl += i.sl;
+              if(i.danhSachLo) existing.danhSachLo.push(...i.danhSachLo);
+          } else {
+              let newItem = {...i};
+              newItem.danhSachLo = i.danhSachLo ? [...i.danhSachLo] : [];
+              mergedItems.push(newItem);
           }
+      });
 
-          let danGop = {};
-          dataLoc.forEach(item => {
-              let key = item.ten + '_' + item.cap;
-              if(!danGop[key]) danGop[key] = { ten: item.ten, cap: item.cap, dvt: item.dvt, tatCaLo: [] };
-              if(item.danhSachLo) danGop[key].tatCaLo.push(...item.danhSachLo);
-          });
+      // Sắp xếp theo tên đạn
+      mergedItems.sort((a, b) => a.ten.localeCompare(b.ten));
 
-          html = Object.values(danGop).map(d => {
-              let loGop = gopDanhSachLo(d.tatCaLo);
-              if(loGop.length === 0) return '';
-              let rowHtml = loGop.map((lo, idx) => `
-                  <div class="modern-list-item">
-                      <div class="modern-list-stt">${idx + 1}</div>
-                      <div class="modern-list-content">
-                          <div class="modern-list-title">${escapeHTML(lo.tenLo)}</div>
-                      </div>
-                      <div class="modern-list-qty">${lo.sl}</div>
-                  </div>`).join('');
-              
-              return `
-              <div class="modern-list" style="margin: 0 0 16px 0;">
-                 <div class="modern-list-header" style="background: var(--primary-light); color: var(--primary-color);">
-                    Đạn: <span style="font-weight:800">${escapeHTML(d.ten)}</span> 
-                    <span style="color:var(--text-main); font-weight:600; text-transform:none;">(Cấp ${d.cap} &bull; ${d.dvt})</span>
-                 </div>
-                 <div>
-                     ${rowHtml}
-                 </div>
-              </div>`;
-          }).join('');
+      let formatTongTan = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(tongKLToanBo / 1000);
 
-      } else {
-          let danGop = {};
-          STATE.lenh.forEach(item => {
-              let key = item.ten + '_' + item.cap;
-              if(!danGop[key]) danGop[key] = { ten: item.ten, cap: item.cap, dvt: item.dvt, tatCaLo: [] };
-              STATE.thucHien.filter(t => t.lenhId === item.id).forEach(t => {
-                  if(t.danhSachLo) danGop[key].tatCaLo.push(...t.danhSachLo);
-              });
-          });
+      // Render danh sách gộp (như giao diện Tải trọng xe)
+      let htmlList = mergedItems.map((i, idx) => {
+          let klr = layKLRTuTenDan(i.ten);
+          let khoiLuongItem = (i.sl * klr) / 1000;
+          let formatKLItem = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(khoiLuongItem);
 
-          html = Object.values(danGop).map(d => {
-              let loGop = gopDanhSachLo(d.tatCaLo);
-              if(loGop.length === 0) return '';
-              let rowHtml = loGop.map((lo, idx) => `
-                  <div class="modern-list-item">
-                      <div class="modern-list-stt">${idx + 1}</div>
-                      <div class="modern-list-content">
-                          <div class="modern-list-title">${escapeHTML(lo.tenLo)}</div>
-                      </div>
-                      <div class="modern-list-qty">${lo.sl}</div>
-                  </div>`).join('');
-              
-              return `
-              <div class="modern-list" style="margin: 0 0 16px 0;">
-                 <div class="modern-list-header" style="background: var(--primary-light); color: var(--primary-color);">
-                    Đạn: <span style="font-weight:800">${escapeHTML(d.ten)}</span> 
-                    <span style="color:var(--text-main); font-weight:600; text-transform:none;">(Cấp ${d.cap} &bull; ${d.dvt})</span>
-                 </div>
-                 <div>
-                     ${rowHtml}
-                 </div>
-              </div>`;
-          }).join('');
-      }
+          let loGop = gopDanhSachLo(i.danhSachLo || []);
+          let viewDataStr = escapeHTML(JSON.stringify({
+              title: `Chi tiết Lô (Báo cáo chung)`,
+              name: i.ten,
+              dvt: i.dvt,
+              cap: i.cap,
+              total: i.sl,
+              listLo: loGop
+          }));
 
-      if(!html.trim()) {
-           document.getElementById('noidung-tong-hop-lo').innerHTML = `<div style="padding:40px; text-align:center; color:var(--text-sub);"><i class="ph-bold ph-stack" style="font-size:32px; opacity:0.5; margin-bottom:8px;"></i><br>Chưa có Lô nào được lưu.</div>`;
-      } else {
-           document.getElementById('noidung-tong-hop-lo').innerHTML = html;
-      }
+          return `
+          <div class="modern-list-item" onclick="moModalQuanLyLo('VIEW', null, JSON.parse('${viewDataStr}'))" style="cursor: pointer; padding: 12px 16px;">
+              <div class="modern-list-stt">${idx + 1}</div>
+              <div class="modern-list-content">
+                  <div class="modern-list-title">${escapeHTML(i.ten)}</div>
+                  <div class="modern-list-subtitle">
+                      ĐVT: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.dvt) || '?'}</span> &bull; 
+                      Cấp: <span style="color:var(--text-main); font-weight:600">${escapeHTML(i.cap)}</span> &bull; 
+                      KLR: <span style="color:var(--text-main); font-weight:600">${klr}</span>
+                  </div>
+              </div>
+              <div style="display:flex; flex-direction: column; align-items:flex-end; gap: 4px;">
+                  <div class="modern-list-qty">${i.sl}</div>
+                  <div style="font-size:11px; color:var(--danger-color); font-weight:700;">${formatKLItem} Tấn</div>
+              </div>
+              <i class="ph-bold ph-caret-right" style="color: #C7C7CC; font-size: 16px; margin-left: 10px;"></i>
+          </div>`;
+      }).join('');
+
+      let html = `
+      <div class="modern-list" style="margin: 0 0 16px 0;">
+          <div class="modern-list-header" style="background: var(--primary-light); padding: 14px 16px; display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: var(--primary-color); font-weight: 800; font-size: 16px; text-transform: uppercase;">${tieuDe}</span>
+              <span style="color: var(--danger-color); font-weight: 800; font-size: 15px;">Tổng: ${formatTongTan} Tấn</span>
+          </div>
+          <div style="background: var(--bg-card);">
+              ${htmlList}
+          </div>
+      </div>`;
+
+      document.getElementById('noidung-tong-hop-lo').innerHTML = html;
       
       let w = document.getElementById('modal-tong-hop-lo');
       w.style.display = 'flex';
