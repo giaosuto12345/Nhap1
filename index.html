@@ -479,11 +479,11 @@
               <div class="form-row" style="margin-bottom:0;">
                   <div class="form-group" style="flex:1.5;">
                       <label>Ngày xuất</label>
-                      <input type="date" id="bc-ngay" class="form-control" onchange="capNhatGoiYXe();" style="color: var(--primary-color);">
+                      <input type="date" id="bc-ngay" class="form-control" onchange="capNhatGoiYXe(); renderBaoCaoNgay();" style="color: var(--primary-color);">
                   </div>
                   <div class="form-group" style="flex:1;">
                       <label>Lọc Số Xe</label>
-                      <select id="bc-xe" class="form-control">
+                      <select id="bc-xe" class="form-control" onchange="renderBaoCaoNgay()">
                           <option value="">Tất cả xe...</option>
                       </select>
                   </div>
@@ -494,6 +494,9 @@
               <button class="btn" style="background:var(--warning-color); margin:0; height:44px; font-size:12px;" onclick="moModalXemChiTietXe()"><i class="ph-fill ph-truck"></i> TẢI TRỌNG XE</button>
               <button class="btn" style="background:var(--info-color); margin:0; height:44px; font-size:12px;" onclick="moModalTongHopToanBoLo()"><i class="ph-fill ph-clipboard-text"></i> BÁO CÁO CHUNG</button>
           </div>
+          
+          <!-- Bảng kê chi tiết container -->
+          <div id="bang-ke-chi-tiet-container"></div>
       </div>
 
       <!-- VÙNG BÁO CÁO LỆNH -->
@@ -1491,7 +1494,6 @@
       else if (type === 'VIEW') {
           titleEl.innerText = viewData.title || "Chi tiết Lô";
           
-          // Tính toán Khối lượng KLR hiển thị trong Modal Lô
           let klrValue = viewData.klr || layKLRTuTenDan(viewData.name);
           let tongKLTan = (viewData.total * klrValue) / 1000;
           let formatTongKL = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(tongKLTan);
@@ -1526,15 +1528,48 @@
           if (viewData.listLo.length === 0) {
               container.innerHTML = `<div style="padding:40px; text-align:center; color:var(--text-sub);"><i class="ph-bold ph-stack" style="font-size:32px; opacity:0.5; margin-bottom:8px;"></i><br>Chưa có Lô nào được lưu.</div>`;
           } else {
-              container.innerHTML = viewData.listLo.map((lo, idx) => `
-                  <div class="modern-list-item" style="border-radius:14px; margin-bottom:10px; border:0.5px solid var(--border-light); box-shadow: var(--card-shadow); padding: 12px 14px;">
-                      <div class="modern-list-stt" style="font-size: 14px; width: 28px; color: var(--text-sub);">${idx + 1}</div>
-                      <div class="modern-list-content" style="padding-left: 0;">
-                          <div class="modern-list-title" style="font-size: 16px;">${escapeHTML(lo.tenLo)}</div>
-                      </div>
-                      <div class="modern-list-qty" style="font-size: 18px; color: var(--primary-color);">${lo.sl}</div>
+              // --- XỬ LÝ RENDER TABLE NẾU LÀ VIEW TỪ BẢNG KÊ ---
+              if (viewData.isBangKeMode) {
+                  container.innerHTML = `
+                  <div class="table-container" style="border: 1px solid var(--border-light); border-radius: 12px; box-shadow: var(--card-shadow); padding: 0; background: var(--bg-card); overflow: hidden;">
+                      <table style="width: 100%; min-width: 500px;">
+                          <thead>
+                              <tr style="background: var(--input-bg);">
+                                  <th style="width: 40px; border-bottom: none;">STT</th>
+                                  <th style="text-align: left; border-bottom: none;">TÊN LÔ</th>
+                                  <th style="width: 70px; border-bottom: none;">LỆNH</th>
+                                  <th style="width: 70px; border-bottom: none;">ĐÃ CẤP</th>
+                                  <th style="width: 80px; color: var(--warning-color); border-bottom: none;">XUẤT (LÔ)</th>
+                                  <th style="width: 70px; border-bottom: none;">CÒN</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              ${viewData.listLo.map((lo, idx) => `
+                              <tr>
+                                  <td style="color: var(--text-sub); font-weight: 600;">${idx + 1}</td>
+                                  <td style="text-align: left; font-weight: 800; font-size: 15px; color: var(--primary-color);">${escapeHTML(lo.tenLo)}</td>
+                                  <td style="font-weight: 700; color: var(--text-sub);">${idx === 0 ? viewData.slLenh : '<span style="opacity:0.3">-</span>'}</td>
+                                  <td style="font-weight: 700; color: var(--text-sub);">${idx === 0 ? viewData.slDaCap : '<span style="opacity:0.3">-</span>'}</td>
+                                  <td style="font-weight: 900; color: var(--warning-color); font-size: 16px;">${lo.sl}</td>
+                                  <td style="font-weight: 800; color: var(--text-main);">${idx === 0 ? viewData.conLai : '<span style="opacity:0.3">-</span>'}</td>
+                              </tr>
+                              `).join('')}
+                          </tbody>
+                      </table>
                   </div>
-              `).join('');
+                  <div style="font-size: 11px; color: var(--text-sub); text-align: center; margin-top: 12px;"><i class="ph ph-info"></i> Chỉ số Lệnh/Đã Cấp/Còn hiển thị đại diện ở dòng đầu.</div>`;
+              } else {
+                  // Render kiểu thẻ Card mặc định cho các màn hình khác
+                  container.innerHTML = viewData.listLo.map((lo, idx) => `
+                      <div class="modern-list-item" style="border-radius:14px; margin-bottom:10px; border:0.5px solid var(--border-light); box-shadow: var(--card-shadow); padding: 12px 14px;">
+                          <div class="modern-list-stt" style="font-size: 14px; width: 28px; color: var(--text-sub);">${idx + 1}</div>
+                          <div class="modern-list-content" style="padding-left: 0;">
+                              <div class="modern-list-title" style="font-size: 16px; color: var(--primary-color);">${escapeHTML(lo.tenLo)}</div>
+                          </div>
+                          <div class="modern-list-qty" style="font-size: 18px; color: var(--warning-color);">${lo.sl}</div>
+                      </div>
+                  `).join('');
+              }
           }
       }
       
@@ -1978,25 +2013,104 @@
       let locXe = document.getElementById('bc-xe').value.toLowerCase().trim();
       let dataLoc = STATE.thucHien.filter(item => { return (!locNgay || item.ngay === locNgay) && (!locXe || item.xe.toLowerCase().includes(locXe)); });
 
+      let container = document.getElementById('bang-ke-chi-tiet-container');
+      if (!container) {
+          container = document.createElement('div');
+          container.id = 'bang-ke-chi-tiet-container';
+          document.getElementById('vung-bao-cao-ngay').appendChild(container);
+      }
+
       if(dataLoc.length === 0) { 
+          container.innerHTML = `<div style="padding:40px; text-align:center; color:var(--text-sub);"><i class="ph-bold ph-calendar-blank" style="font-size:32px; opacity:0.5; margin-bottom:8px;"></i><br>Chưa có dữ liệu xuất.</div>`;
           return; 
       }
 
       let groupedData = {};
+      let tongNgayKL = 0;
+
       dataLoc.forEach(item => {
           let key = item.lenhId + "_" + item.cap; 
-          if (!groupedData[key]) { groupedData[key] = { ...item, slGroup: 0, tatCaLo: [] }; }
+          if (!groupedData[key]) { 
+              let lenhGoc = STATE.lenh.find(l => l.id === item.lenhId);
+              let slLenh = lenhGoc ? lenhGoc.sl : 0;
+              let slDaCap = STATE.thucHien.filter(t => t.lenhId === item.lenhId).reduce((sum, t) => sum + t.sl, 0);
+
+              groupedData[key] = { 
+                  ...item, 
+                  slGroup: 0, 
+                  tatCaLo: [],
+                  slLenh: slLenh,
+                  slDaCap: slDaCap
+              }; 
+          }
           groupedData[key].slGroup += item.sl; 
           if(item.danhSachLo) groupedData[key].tatCaLo.push(...item.danhSachLo);
+          
+          let klr = layKLRTuTenDan(item.ten);
+          tongNgayKL += (item.sl * klr);
       });
 
       let finalData = Object.values(groupedData);
-      let tongTanXuat = 0; 
+      let formatTongNgay = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(tongNgayKL / 1000);
       
-      finalData.forEach((item, index) => {
-          let klr = layKLRTuTenDan(item.ten);
-          tongTanXuat += (item.slGroup * klr) / 1000;
-      });
+      let html = `
+      <div class="card" style="padding: 0; overflow: hidden; margin-top: 16px;">
+          <div style="background: var(--bg-body); padding: 14px 16px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center;">
+              <h3 style="margin: 0; font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">BẢNG KÊ CHI TIẾT</h3>
+              <div style="color: var(--danger-color); font-weight: 900; font-size: 16px;">${formatTongNgay} TẤN</div>
+          </div>
+          <div class="table-container" style="border: none; border-radius: 0;">
+              <table style="width: 100%; min-width: 800px;">
+                  <thead>
+                      <tr>
+                          <th style="width: 40px;">STT</th>
+                          <th style="text-align: left; width: 250px;">TÊN ĐẠN</th>
+                          <th style="width: 50px;">ĐVT</th>
+                          <th style="width: 70px;">CẤP/KLR</th>
+                          <th style="width: 70px;">LỆNH</th>
+                          <th style="width: 70px;">ĐÃ CẤP</th>
+                          <th style="width: 70px; color: var(--warning-color); font-weight: 900;">XUẤT</th>
+                          <th style="width: 70px;">CÒN</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      ${finalData.map((d, idx) => {
+                          let klr = layKLRTuTenDan(d.ten);
+                          let conLai = d.slLenh - d.slDaCap;
+
+                          let loGop = gopDanhSachLo(d.tatCaLo);
+                          let viewDataStr = encodeURIComponent(JSON.stringify({
+                              title: "Chi tiết Lô xuất (Báo cáo)",
+                              name: d.ten, dvt: d.dvt, cap: d.cap, klr: klr, total: d.slGroup, listLo: loGop,
+                              slLenh: d.slLenh, slDaCap: d.slDaCap, conLai: conLai, isBangKeMode: true
+                          }));
+
+                          return `
+                          <tr>
+                              <td style="color: var(--text-sub); font-weight: 700;">${idx + 1}</td>
+                              <td style="text-align: left;">
+                                  <div style="font-weight: 800; color: var(--text-main); font-size: 14px; line-height: 1.3;">${escapeHTML(d.ten)}</div>
+                                  <div style="margin-top: 6px; cursor: pointer; color: var(--primary-color); font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;"
+                                       onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))">
+                                      <i class="ph-bold ph-stack"></i> Xem Lô xuất
+                                  </div>
+                              </td>
+                              <td style="color: var(--text-sub); font-weight: 600;">${escapeHTML(d.dvt)}</td>
+                              <td>
+                                  <div style="font-weight: 800; color: var(--text-main);">${escapeHTML(d.cap)}</div>
+                                  <div style="font-size: 11px; color: var(--text-sub); margin-top:2px;">${klr}</div>
+                              </td>
+                              <td style="font-weight: 800; color: var(--primary-color);">${d.slLenh}</td>
+                              <td style="font-weight: 600; color: var(--text-sub);">${d.slDaCap}</td>
+                              <td style="font-weight: 900; color: var(--warning-color); font-size: 16px;">${d.slGroup}</td>
+                              <td style="font-weight: 800; color: var(--text-main);">${conLai}</td>
+                          </tr>`;
+                      }).join('')}
+                  </tbody>
+              </table>
+          </div>
+      </div>`;
+      container.innerHTML = html;
   }
 
   function renderTinhTrangLenh() {
@@ -2422,8 +2536,8 @@
               <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
                   <button onclick="toggleSelectAllBaoCao()" id="btn-select-all-bc" style="background: white; border: 1px solid var(--primary-color); color: var(--primary-color); padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.2s;">CHỌN TẤT CẢ</button>
                   <div style="text-align: right;">
-                      <div style="color: var(--text-sub); font-weight: 700; font-size: 11px; text-transform: uppercase;">TỔNG: ${formatTongNgay} TẤN</div>
-                      <div id="bc-selected-weight" style="color: var(--warning-color); font-weight: 800; font-size: 14px; margin-top: 4px;">ĐÃ CHỌN: 0 TẤN</div>
+                      <div style="color: var(--danger-color); font-weight: 900; font-size: 15px; text-transform: uppercase;">TỔNG: ${formatTongNgay} TẤN</div>
+                      <div id="bc-selected-weight" style="color: var(--warning-color); font-weight: 800; font-size: 13px; margin-top: 4px;">ĐÃ CHỌN: 0 TẤN</div>
                   </div>
               </div>
               <div style="position: relative;">
