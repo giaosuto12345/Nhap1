@@ -445,6 +445,15 @@
             <input type="number" inputmode="decimal" pattern="[0-9]*" id="th-sl" class="form-control" placeholder="0" style="text-align:center; font-weight: 800; font-size: 18px; color: var(--danger-color);">
           </div>
         </div>
+
+        <!-- NEW: HELPER QUY ĐỔI BAO GÓI Ở THỰC HIỆN -->
+        <div id="th-bg-helper" style="display:none; background: var(--primary-light); padding: 10px; border-radius: 12px; margin-top: 10px; border: 1px dashed var(--primary-color);">
+            <div style="font-size: 11px; font-weight: 700; color: var(--primary-color); margin-bottom: 6px;">QUY ĐỔI NHANH: <span id="th-bg-he-so-text"></span></div>
+            <div style="display: flex; gap: 8px;">
+                <input type="number" id="th-bg-chan" class="form-control" placeholder="Số Cốp/Hòm..." oninput="tinhNhanhSlThucHien()" style="height: 38px; font-size: 14px; flex: 1;">
+                <input type="number" id="th-bg-le" class="form-control" placeholder="Số lẻ..." oninput="tinhNhanhSlThucHien()" style="height: 38px; font-size: 14px; flex: 1;">
+            </div>
+        </div>
         
         <div style="display:flex; gap:12px; margin-top: 16px;">
             <button class="btn" id="btn-ghi-xe" onclick="xuLyGhiXe()" style="margin-bottom:0; background:var(--warning-color); flex:1;"><i class="ph-bold ph-check"></i> GHI SỔ XE</button>
@@ -1460,14 +1469,30 @@
   
   function tuDongDienCapTuLenh() {
       let selectEl = document.getElementById('th-chon-dan'); let idLenh = selectEl.value; 
-      if(!idLenh) { document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; return; }
+      if(!idLenh) { document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; document.getElementById('th-bg-helper').style.display = 'none'; return; }
       let lenhGoc = STATE.lenh.find(l => l.id === idLenh); 
       if(lenhGoc) {
           let capSelect = document.getElementById('th-cap'); let optionExists = Array.from(capSelect.options).some(opt => opt.value == lenhGoc.cap);
           capSelect.value = optionExists ? lenhGoc.cap : '';
           let selectedOption = selectEl.options[selectEl.selectedIndex]; let conLai = selectedOption.getAttribute('data-conlai');
           if(conLai && parseFloat(conLai) > 0) { document.getElementById('th-sl').value = conLai; } else { document.getElementById('th-sl').value = ''; }
+          
+          if (lenhGoc.slPerBaoGoi && lenhGoc.slPerBaoGoi > 0) {
+              document.getElementById('th-bg-helper').style.display = 'block';
+              document.getElementById('th-bg-he-so-text').innerText = `1 ${lenhGoc.tenBaoGoi || 'Bao gói'} = ${lenhGoc.slPerBaoGoi}`;
+              window.currentThucHienBaoGoiHeSo = lenhGoc.slPerBaoGoi;
+          } else {
+              document.getElementById('th-bg-helper').style.display = 'none';
+          }
       } 
+  }
+
+  window.tinhNhanhSlThucHien = function() {
+      let chan = parseFloat(document.getElementById('th-bg-chan').value) || 0;
+      let le = parseFloat(document.getElementById('th-bg-le').value) || 0;
+      let total = chan * (window.currentThucHienBaoGoiHeSo || 0) + le;
+      if(total > 0) document.getElementById('th-sl').value = total;
+      else document.getElementById('th-sl').value = '';
   }
   
   function xuLyGhiXe() {
@@ -1499,6 +1524,7 @@
       } else {
           STATE.thucHien.push({ id: generateID(), lenhId: idLenh, soLenh: lenhGoc.soLenh, phieu: phieu, xe, ngay, ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap, sl: parseFloat(sl), tenBaoGoi: lenhGoc.tenBaoGoi, slPerBaoGoi: lenhGoc.slPerBaoGoi, danhSachLo: [] });
           document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; document.getElementById('th-chon-dan').value = ''; 
+          document.getElementById('th-bg-helper').style.display = 'none'; document.getElementById('th-bg-chan').value = ''; document.getElementById('th-bg-le').value = '';
           showToast(`Đã xuất vào xe ${xe} ${phieu ? '(P:'+phieu+')' : ''}`); loadDanTheoLenh(); 
       }
       safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien)); 
@@ -1524,6 +1550,7 @@
       document.getElementById('th-so-lenh').value = item.soLenh; loadDanTheoLenh();
       setTimeout(() => { 
           document.getElementById('th-chon-dan').value = item.lenhId; 
+          tuDongDienCapTuLenh();
           let capSelect = document.getElementById('th-cap'); let optionExists = Array.from(capSelect.options).some(opt => opt.value == item.cap); capSelect.value = optionExists ? item.cap : '';
           document.getElementById('th-sl').value = item.sl; 
       }, 50);
@@ -1535,6 +1562,7 @@
       idThucHienDangSua = null; 
       document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; document.getElementById('th-phieu').value = '';
       document.getElementById('th-xe-select').value = 'AUTO'; document.getElementById('th-xe-input').style.display = 'none'; document.getElementById('th-xe-input').value = '';
+      document.getElementById('th-bg-helper').style.display = 'none'; document.getElementById('th-bg-chan').value = ''; document.getElementById('th-bg-le').value = '';
       document.getElementById('btn-ghi-xe').innerHTML = "<i class='ph-bold ph-check'></i> GHI SỔ XE"; document.getElementById('btn-ghi-xe').style.background = "var(--warning-color)"; document.getElementById('btn-huy-xe').style.display = "none";
   }
   function xoaThucHien(id) { 
@@ -1602,6 +1630,15 @@
           } else {
               record = STATE.thucHien.find(t => t.id === id);
               titleEl.innerText = "Thực tế xuất Lô";
+              
+              if (record && (!record.slPerBaoGoi || record.slPerBaoGoi <= 0)) {
+                  let lenhGoc = STATE.lenh.find(l => l.id === record.lenhId);
+                  if (lenhGoc && lenhGoc.slPerBaoGoi > 0) {
+                      record.tenBaoGoi = lenhGoc.tenBaoGoi;
+                      record.slPerBaoGoi = lenhGoc.slPerBaoGoi;
+                      safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
+                  }
+              }
           }
           if(!record) return;
 
