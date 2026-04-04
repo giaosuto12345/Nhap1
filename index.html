@@ -719,7 +719,7 @@
           <div style="text-align: left; font-size: 15px; font-weight: 600; color: var(--text-sub); margin-bottom: 16px; line-height: 1.3;" id="ql-lo-ten-dan">Tên đạn</div>
           
           <div style="display:flex; justify-content:space-between; font-weight:600; font-size: 14px; background: var(--bg-card); border: none; padding: 16px; border-radius: 16px; margin-bottom: 0; box-shadow: var(--card-shadow);">
-             <span style="color:var(--text-sub)">Mục tiêu: <span id="ql-lo-sl-tong" style="color:var(--text-main); font-weight:800; font-size:16px;">0</span></span>
+             <span style="color:var(--text-sub)" id="ql-lo-lbl-muctieu">Mục tiêu: <span id="ql-lo-sl-tong" style="color:var(--text-main); font-weight:800; font-size:16px;">0</span></span>
              <span style="color:var(--text-sub)">Đã nhập lô: <span id="ql-lo-sl-da-nhap" style="color:var(--warning-color); font-weight:800; font-size:16px;">0</span></span>
           </div>
       </div>
@@ -883,7 +883,7 @@
           if (lo.isBaoGoi) {
               grouped[ten].slChan += (lo.slChan || 0);
               if(lo.mangLe) grouped[ten].mangLe.push(...lo.mangLe);
-              if(lo.tenBaoGoi) grouped[ten].tenBaoGoi = lo.tenBaoGoi; 
+              if(lo.tenBaoGoi) grouped[ten].tenBaoGoi = lo.tenBaoGoi; // Prefer saved package name
           } else {
               if (lo.sl > 0) grouped[ten].mangLe.push(lo.sl);
           }
@@ -999,7 +999,7 @@
       let usedLoaiBG = record.tenBaoGoi || 'Cốp';
 
       record.danhSachLo.forEach(lo => {
-          if (lo.tenBaoGoi) usedLoaiBG = lo.tenBaoGoi;
+          if (lo.tenBaoGoi) usedLoaiBG = lo.tenBaoGoi; // Prefer the batch's saved string
           if (lo.isBaoGoi || lo.slChan > 0) {
               totalChan += (lo.slChan || 0);
               if (lo.mangLe) allLe.push(...lo.mangLe);
@@ -1294,12 +1294,12 @@
       if(!soLenhChon) { selectDan.innerHTML = '<option value="">-- Vui lòng chọn Lệnh trước --</option>'; return; }
       let danTrongLenh = STATE.lenh.filter(l => l.soLenh === soLenhChon);
       let danKemConLai = danTrongLenh.map(l => {
-          let daXuat = STATE.thucHien.filter(t => t.lenhId === l.id).reduce((sum, current) => sum + current.sl, 0);
+          let daXuat = STATE.thucHien.filter(t => t.soLenh === l.soLenh && t.ten === l.ten && t.cap == l.cap).reduce((sum, current) => sum + current.sl, 0);
           let conLai = l.sl - daXuat; return { ...l, conLai: conLai };
       });
       danKemConLai.sort((a, b) => { let aHet = a.conLai <= 0 ? 1 : 0; let bHet = b.conLai <= 0 ? 1 : 0; return aHet - bHet; });
       selectDan.innerHTML = '<option value="">-- Chọn loại đạn --</option>' + danKemConLai.map(l => { 
-          let textDisplay = `${escapeHTML(l.ten)} - (Còn: ${fmtNum(l.conLai)} ${escapeHTML(l.dvt)})`; if (l.conLai <= 0) { textDisplay = `[ĐÃ ĐỦ] ` + textDisplay; }
+          let textDisplay = `${escapeHTML(l.ten)} (Cấp ${l.cap}) - Còn: ${fmtNum(l.conLai)} ${escapeHTML(l.dvt)}`; if (l.conLai <= 0) { textDisplay = `[ĐÃ ĐỦ] ` + textDisplay; }
           return `<option value="${l.id}" data-conlai="${l.conLai}">${textDisplay}</option>`; 
       }).join('');
   }
@@ -1309,12 +1309,12 @@
       if(!soLenhChon) { selectDan.innerHTML = '<option value="">-- Vui lòng chọn Lệnh trước --</option>'; return; }
       let danTrongLenh = STATE.lenh.filter(l => l.soLenh === soLenhChon);
       let danKemConLai = danTrongLenh.map(l => {
-          let daXuat = STATE.thucHien.filter(t => t.lenhId === l.id).reduce((sum, current) => sum + current.sl, 0);
+          let daXuat = STATE.thucHien.filter(t => t.soLenh === l.soLenh && t.ten === l.ten && t.cap == l.cap).reduce((sum, current) => sum + current.sl, 0);
           let conLai = l.sl - daXuat; return { ...l, conLai: conLai };
       });
       danKemConLai.sort((a, b) => { let aHet = a.conLai <= 0 ? 1 : 0; let bHet = b.conLai <= 0 ? 1 : 0; return aHet - bHet; });
       selectDan.innerHTML = '<option value="">-- Chọn loại đạn --</option>' + danKemConLai.map(l => { 
-          let textDisplay = `${escapeHTML(l.ten)} - (Còn: ${fmtNum(l.conLai)} ${escapeHTML(l.dvt)})`; if (l.conLai <= 0) { textDisplay = `[ĐÃ ĐỦ] ` + textDisplay; }
+          let textDisplay = `${escapeHTML(l.ten)} (Cấp ${l.cap}) - Còn: ${fmtNum(l.conLai)} ${escapeHTML(l.dvt)}`; if (l.conLai <= 0) { textDisplay = `[ĐÃ ĐỦ] ` + textDisplay; }
           return `<option value="${l.id}" data-conlai="${l.conLai}">${textDisplay}</option>`; 
       }).join('');
   }
@@ -1478,7 +1478,7 @@
               <div class="modern-list-stt" style="color: var(--primary-color);">${idx + 1}</div>
               <div class="modern-list-content">
                   <div class="modern-list-title">${escapeHTML(item.ten)}</div>
-                  <div style="font-size: 11px; font-weight: 700; color: var(--success-color); margin-top: 4px;">SL: ${fmtNum(item.sl)} ${escapeHTML(item.dvt)}</div>
+                  <div style="font-size: 11px; font-weight: 700; color: var(--success-color); margin-top: 4px;">Cấp ${item.cap} &bull; SL: ${fmtNum(item.sl)} ${escapeHTML(item.dvt)}</div>
                   <div style="margin-top: 4px; background: var(--bg-body); padding: 6px; border-radius: 8px;">
                       ${summaryHTML}
                   </div>
@@ -1525,6 +1525,7 @@
       if (!ngay) { showDialog("Thiếu thông tin", "Vui lòng chọn Ngày xuất.", "alert"); return; }
       if (window.draftXeData.items.length === 0) { showDialog("Xe trống", "Chưa có đạn nào được soạn lên xe.", "alert"); return; }
 
+      // Ghi đè xe (Xóa cũ)
       if (xeSelectVal !== 'NEW') {
           STATE.thucHien = STATE.thucHien.filter(t => !(t.ngay === ngay && t.xe === xeSelectVal));
       }
@@ -1540,7 +1541,7 @@
                   phieu: phieu,
                   xe: xe,
                   ngay: ngay,
-                  time: now + idx,
+                  time: now + idx, // time để sort lên top
                   ten: item.ten,
                   dvt: item.dvt,
                   cap: item.cap,
@@ -2092,10 +2093,10 @@
               ${editBtnHtml}
           `;
 
-          // TÍNH TOÁN LẠI TỔNG LỆNH & ĐÃ CẤP CỦA TOÀN BỘ ĐẠN NÀY (ĐỂ HIỂN THỊ TRÊN HEADER)
-          let lenhGoc = STATE.lenh.find(l => l.id === viewData.lenhId);
+          // TÍNH TOÁN LẠI TỔNG LỆNH & ĐÃ CẤP CỦA TOÀN BỘ ĐẠN NÀY (ĐỂ HIỂN TRÊN HEADER)
+          let lenhGoc = STATE.lenh.find(l => l.soLenh === viewData.soLenh && l.ten === viewData.name && l.cap == viewData.cap);
           let dsLoLenh = lenhGoc && lenhGoc.danhSachLo ? lenhGoc.danhSachLo : [];
-          let tatCaThucHienLenh = STATE.thucHien.filter(t => t.lenhId === viewData.lenhId);
+          let tatCaThucHienLenh = STATE.thucHien.filter(t => t.soLenh === viewData.soLenh && t.ten === viewData.name && t.cap == viewData.cap);
 
           let slLenhTong = lenhGoc ? lenhGoc.sl : 0;
           let slDaCapTong = tatCaThucHienLenh.reduce((sum, t) => sum + t.sl, 0);
@@ -2429,7 +2430,7 @@
           record.slPerBaoGoi = formHeSo;
           
           if (currentLoContext.type === 'THUCHIEN') {
-              let lenhGoc = STATE.lenh.find(l => l.id === record.lenhId);
+              let lenhGoc = STATE.lenh.find(l => l.soLenh === record.soLenh && l.ten === record.ten && l.cap == record.cap);
               if(lenhGoc) {
                   lenhGoc.tenBaoGoi = record.tenBaoGoi;
                   lenhGoc.slPerBaoGoi = record.slPerBaoGoi;
@@ -2468,7 +2469,7 @@
           record.danhSachLo.push({ id: generateID(), tenLo, sl: slLo, isBaoGoi, slChan, mangLe, tenBaoGoi: formLoaiBg });
       }
       
-      // Xoá dòng này để không overwrite lại SL của THUCHIEN
+      // Xoá dòng tự gán SL bằng tổng lô đối với THỰC HIỆN, để giữ nguyên mục tiêu
       if (currentLoContext.type === 'DRAFT_XE_ITEM') {
           record.sl = record.danhSachLo.reduce((sum, l) => sum + l.sl, 0);
       }
@@ -2653,11 +2654,11 @@
       let tongNgayKL = 0;
 
       dataLoc.forEach(item => {
-          let key = item.lenhId + "_" + item.cap; 
+          let key = item.soLenh + "_" + item.ten + "_" + item.cap; 
           if (!groupedData[key]) { 
-              let lenhGoc = STATE.lenh.find(l => l.id === item.lenhId);
+              let lenhGoc = STATE.lenh.find(l => l.soLenh === item.soLenh && l.ten === item.ten && l.cap == item.cap);
               let slLenh = lenhGoc ? lenhGoc.sl : 0;
-              let slDaCap = STATE.thucHien.filter(t => t.lenhId === item.lenhId).reduce((sum, t) => sum + t.sl, 0);
+              let slDaCap = STATE.thucHien.filter(t => t.soLenh === item.soLenh && t.ten === item.ten && t.cap == item.cap).reduce((sum, t) => sum + t.sl, 0);
 
               groupedData[key] = { 
                   ...item, 
@@ -2667,7 +2668,7 @@
                   tatCaLo: [],
                   slLenh: slLenh,
                   slDaCap: slDaCap,
-                  lenhId: item.lenhId
+                  soLenh: item.soLenh
               }; 
           }
           groupedData[key].slGroup += item.sl; 
@@ -2687,17 +2688,17 @@
               <div style="color: var(--danger-color); font-weight: 900; font-size: 16px;">${formatTongNgay} TẤN</div>
           </div>
           <div class="table-container" style="border: none; border-radius: 0;">
-              <table style="width: 100%; min-width: 800px;">
+              <table style="width: 100%; min-width: 800px; border-collapse: collapse;">
                   <thead>
-                      <tr>
-                          <th style="width: 40px;">STT</th>
-                          <th style="text-align: left; width: 250px;">TÊN ĐẠN / TÊN LÔ</th>
-                          <th style="width: 50px;">ĐVT</th>
-                          <th style="width: 70px;">CẤP/KLR</th>
-                          <th style="width: 70px;">LỆNH</th>
-                          <th style="width: 70px;">ĐÃ CẤP</th>
-                          <th style="width: 70px; color: var(--warning-color); font-weight: 900;">XUẤT</th>
-                          <th style="width: 70px;">CÒN</th>
+                      <tr style="background: var(--bg-card);">
+                          <th style="width: 40px; border-bottom: 1px solid var(--border-light); padding: 12px 8px;">STT</th>
+                          <th style="text-align: left; width: 250px; border-bottom: 1px solid var(--border-light); padding: 12px 8px;">TÊN ĐẠN / TÊN LÔ</th>
+                          <th style="width: 50px; border-bottom: 1px solid var(--border-light); padding: 12px 8px;">ĐVT</th>
+                          <th style="width: 70px; border-bottom: 1px solid var(--border-light); padding: 12px 8px;">CẤP/KLR</th>
+                          <th style="width: 70px; border-bottom: 1px solid var(--border-light); padding: 12px 8px;">LỆNH</th>
+                          <th style="width: 70px; border-bottom: 1px solid var(--border-light); padding: 12px 8px;">ĐÃ CẤP</th>
+                          <th style="width: 80px; color: var(--warning-color); font-weight: 900; border-bottom: 1px solid var(--border-light); padding: 12px 8px;">XUẤT (LÔ)</th>
+                          <th style="width: 70px; border-bottom: 1px solid var(--border-light); padding: 12px 8px;">CÒN</th>
                       </tr>
                   </thead>
                   <tbody>
@@ -2711,28 +2712,28 @@
                               name: d.ten, dvt: d.dvt, cap: d.cap, klr: klr, total: d.slGroup, listLo: loGop,
                               tenBaoGoi: d.tenBaoGoi, slPerBaoGoi: d.slPerBaoGoi,
                               slLenh: d.slLenh, slDaCap: d.slDaCap, conLai: conLai, isBangKeMode: true,
-                              lenhId: d.lenhId
+                              soLenh: d.soLenh
                           }));
 
                           return `
-                          <tr>
-                              <td style="color: var(--text-sub); font-weight: 700;">${idx + 1}</td>
-                              <td style="text-align: left;">
+                          <tr style="border-bottom: 1px solid var(--border-light);">
+                              <td style="color: var(--text-sub); font-weight: 700; vertical-align: top; padding-top: 14px;">${idx + 1}</td>
+                              <td style="text-align: left; vertical-align: top; padding-top: 14px;">
                                   <div style="font-weight: 800; color: var(--text-main); font-size: 14px; line-height: 1.3;">${escapeHTML(d.ten)}</div>
                                   <div style="margin-top: 6px; cursor: pointer; color: var(--primary-color); font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;"
                                        onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))">
                                       <i class="ph-bold ph-stack"></i> Xem Lô xuất
                                   </div>
                               </td>
-                              <td style="color: var(--text-sub); font-weight: 600;">${escapeHTML(d.dvt)}</td>
-                              <td>
+                              <td style="color: var(--text-sub); font-weight: 600; vertical-align: top; padding-top: 14px;">${escapeHTML(d.dvt)}</td>
+                              <td style="vertical-align: top; padding-top: 14px;">
                                   <div style="font-weight: 800; color: var(--text-main);">${escapeHTML(d.cap)}</div>
                                   <div style="font-size: 11px; color: var(--text-sub); margin-top:2px;">${klr}</div>
                               </td>
-                              <td style="font-weight: 800; color: var(--primary-color);">${fmtNum(d.slLenh)}</td>
-                              <td style="font-weight: 600; color: var(--text-sub);">${fmtNum(d.slDaCap)}</td>
-                              <td style="font-weight: 900; color: var(--warning-color); font-size: 16px;">${fmtNum(d.slGroup)}</td>
-                              <td style="font-weight: 800; color: var(--text-main);">${fmtNum(conLai)}</td>
+                              <td style="font-weight: 800; color: var(--primary-color); vertical-align: top; padding-top: 14px;">${fmtNum(d.slLenh)}</td>
+                              <td style="font-weight: 600; color: var(--text-sub); vertical-align: top; padding-top: 14px;">${fmtNum(d.slDaCap)}</td>
+                              <td style="font-weight: 900; color: var(--warning-color); font-size: 16px; vertical-align: top; padding-top: 14px;">${fmtNum(d.slGroup)}</td>
+                              <td style="font-weight: 800; color: var(--text-main); vertical-align: top; padding-top: 14px;">${fmtNum(conLai)}</td>
                           </tr>`;
                       }).join('')}
                   </tbody>
@@ -2762,9 +2763,8 @@
           let klr = layKLRTuTenDan(item.ten);
           
           let tatCaLoDaXuat = [];
-          let slDaXuat = 0;
-          STATE.thucHien.filter(t => t.lenhId === item.id).forEach(t => {
-              slDaXuat += t.sl;
+          let slDaXuat = STATE.thucHien.filter(t => t.soLenh === item.soLenh && t.ten === item.ten && t.cap == item.cap).reduce((sum, t) => sum + t.sl, 0);
+          STATE.thucHien.filter(t => t.soLenh === item.soLenh && t.ten === item.ten && t.cap == item.cap).forEach(t => {
               if(t.danhSachLo) tatCaLoDaXuat.push(...t.danhSachLo);
           });
           
@@ -2778,7 +2778,7 @@
 
           groups[item.soLenh].items.push({ 
               id: item.id, ten: item.ten, dvt: item.dvt, cap: item.cap, slLenh: item.sl, slDaXuat: slDaXuat, conLai: item.sl - slDaXuat,
-              tenBaoGoi: item.tenBaoGoi, slPerBaoGoi: item.slPerBaoGoi,
+              tenBaoGoi: item.tenBaoGoi, slPerBaoGoi: item.slPerBaoGoi, soLenh: item.soLenh,
               tatCaLoDaXuat: tatCaLoDaXuat
           });
       });
@@ -2813,12 +2813,12 @@
               <div class="table-container" style="border: none; border-radius: 0; max-height: none;">
                   <table style="width:100%; min-width: 500px; font-size:11px; text-align:center; border-collapse: collapse;">
                       <tr style="color:var(--text-sub); background: var(--bg-card);">
-                        <th style="padding:10px 4px; text-align:left; width: 150px; background: transparent;">Tên đạn</th>
-                        <th style="padding:10px 4px; width: 40px; background: transparent;">ĐVT</th>
-                        <th style="padding:10px 4px; width: 40px; background: transparent;">Cấp</th>
-                        <th style="padding:10px 4px; width: 60px; background: transparent;">Kế Hoạch</th>
-                        <th style="padding:10px 4px; width: 60px; background: transparent;">Đã Cấp</th>
-                        <th style="padding:10px 4px; width: 60px; background: transparent;">Còn Lại</th>
+                        <th style="padding:10px 4px; text-align:left; width: 150px; background: transparent; border-bottom: 1px solid var(--border-light);">Tên đạn</th>
+                        <th style="padding:10px 4px; width: 40px; background: transparent; border-bottom: 1px solid var(--border-light);">ĐVT</th>
+                        <th style="padding:10px 4px; width: 40px; background: transparent; border-bottom: 1px solid var(--border-light);">Cấp</th>
+                        <th style="padding:10px 4px; width: 60px; background: transparent; border-bottom: 1px solid var(--border-light);">Kế Hoạch</th>
+                        <th style="padding:10px 4px; width: 60px; background: transparent; border-bottom: 1px solid var(--border-light);">Đã Cấp</th>
+                        <th style="padding:10px 4px; width: 60px; background: transparent; border-bottom: 1px solid var(--border-light);">Còn Lại</th>
                       </tr>
                       ${g.items.map(i => {
                           let colorConLai = i.conLai < 0 ? 'var(--danger-color)' : (i.conLai === 0 ? 'var(--success-color)' : 'var(--text-main)');
@@ -2828,11 +2828,11 @@
                               title: "Chi tiết Lô thực xuất",
                               name: i.ten, dvt: i.dvt, cap: i.cap, total: i.slDaXuat, listLo: loGop,
                               tenBaoGoi: i.tenBaoGoi, slPerBaoGoi: i.slPerBaoGoi,
-                              isBangKeMode: true, lenhId: i.id
+                              isBangKeMode: true, soLenh: i.soLenh
                           }));
 
                           return `
-                          <tr style="border-top:0.5px solid var(--border-light); background: var(--bg-card);">
+                          <tr style="border-bottom:0.5px solid var(--border-light); background: var(--bg-card);">
                               <td style="padding:12px 6px; text-align:left; cursor:pointer;" onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))">
                                   <div style="font-weight:700; color:var(--text-main); line-height: 1.3;">${escapeHTML(i.ten)}</div>
                                   <div style="font-size:11px; color:var(--primary-color); margin-top:3px;"><i class="ph-bold ph-stack"></i> Xem tổng Lô đã xuất</div>
@@ -2957,7 +2957,7 @@
                       name: i.ten, dvt: i.dvt, cap: i.cap, klr: klr, total: i.sl, listLo: loGop,
                       tenBaoGoi: i.tenBaoGoi, slPerBaoGoi: i.slPerBaoGoi,
                       idThucHien: idThucHienToEdit,
-                      isBangKeMode: false, lenhId: i.lenhId
+                      isBangKeMode: false, soLenh: i.soLenh
                   }));
 
                   let editBtn = idThucHienToEdit ? `<button class="btn-sm item-edit-btn" onclick="event.stopPropagation(); suaTrucTiepTuBaoCao('${i.id}')"><i class="ph-bold ph-pencil-simple"></i></button>` : ``;
@@ -3077,7 +3077,7 @@
 
       STATE.lenh.forEach(item => {
           let slDaXuat = 0;
-          STATE.thucHien.filter(t => t.lenhId === item.id).forEach(t => {
+          STATE.thucHien.filter(t => t.soLenh === item.soLenh && t.ten === item.ten && t.cap == item.cap).forEach(t => {
               slDaXuat += t.sl;
           });
           
@@ -3120,8 +3120,8 @@
       let tongNgayKL = 0;
 
       dataLoc.forEach(item => {
-          let key = item.lenhId + '_' + item.cap;
-          if(!danGop[key]) danGop[key] = { lenhId: item.lenhId, ten: item.ten, cap: item.cap, dvt: item.dvt, sl: 0, tenBaoGoi: item.tenBaoGoi, slPerBaoGoi: item.slPerBaoGoi, tatCaLo: [] };
+          let key = item.ten + '_' + item.cap;
+          if(!danGop[key]) danGop[key] = { soLenh: item.soLenh, ten: item.ten, cap: item.cap, dvt: item.dvt, sl: 0, tenBaoGoi: item.tenBaoGoi, slPerBaoGoi: item.slPerBaoGoi, tatCaLo: [] };
           danGop[key].sl += item.sl;
           if(item.danhSachLo) danGop[key].tatCaLo.push(...item.danhSachLo);
           
@@ -3136,7 +3136,6 @@
       window.currentBaoCaoChungData = arr; 
 
       let listHtml = arr.map((d, idx) => {
-          // Sort raw batches by name for cleaner look if they have duplicates from different records
           let sortedBatches = d.tatCaLo.sort((a,b)=> a.tenLo.localeCompare(b.tenLo));
           let klr = layKLRTuTenDan(d.ten);
           let khoiLuongTan = (d.sl * klr) / 1000;
@@ -3145,7 +3144,7 @@
           let viewDataStr = encodeURIComponent(JSON.stringify({
               title: `Chi tiết Lô Xuất`, name: d.ten, dvt: d.dvt, cap: d.cap, klr: klr, total: d.sl, listLo: sortedBatches, idThucHien: null,
               tenBaoGoi: d.tenBaoGoi, slPerBaoGoi: d.slPerBaoGoi,
-              isBangKeMode: false, lenhId: d.lenhId
+              isBangKeMode: false, soLenh: d.soLenh
           }));
 
           return `
@@ -3283,7 +3282,7 @@
                   if (lo.isBaoGoi || lo.slChan > 0 || (lo.mangLe && lo.mangLe.length > 1)) {
                       let parts = [];
                       if (lo.slChan > 0) parts.push(`${lo.slChan} ${item.tenBaoGoi || 'Cốp'}`);
-                      if (lo.mangLe && lo.mangLe.length > 0) parts.push(lo.mangLe.join(' + '));
+                      if (lo.mangLe && lo.mangLe.length > 0) parts.push(lo.mangLe.map(n=>fmtNum(n)).join(' + '));
                       congThuc = parts.join(' + ');
                   }
 
