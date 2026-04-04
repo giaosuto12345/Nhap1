@@ -247,14 +247,18 @@
     .dash-box-title { font-size: 10px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 6px; }
     .dash-box-val { font-size: 15px; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px;}
 
-    /* ================= BOTTOM SHEET QUẢN LÝ LÔ ================= */
+    /* ================= BOTTOM SHEET QUẢN LÝ LÔ (CẤU TRÚC MỚI FIX LỖI CUỘN) ================= */
     .modal-bottom-sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); z-index: 20000; display: none; flex-direction: column; justify-content: flex-end; align-items: center; opacity: 0; transition: opacity 0.3s; }
     .modal-bottom-sheet.show { opacity: 1; }
     
-    .sheet-content { background: var(--bg-body); width: 100%; max-width: 650px; height: 92dvh; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.1, 0.8, 0.1, 1); box-shadow: 0 -10px 40px rgba(0,0,0,0.1);}
+    .sheet-content { background: var(--bg-body); width: 100%; max-width: 650px; height: 95dvh; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.1, 0.8, 0.1, 1); box-shadow: 0 -10px 40px rgba(0,0,0,0.1);}
     .modal-bottom-sheet.show .sheet-content { transform: translateY(0); }
     
-    .sheet-pill-wrapper { padding: 10px 0; display: flex; justify-content: center; background: var(--bg-card); border-radius: 20px 20px 0 0; }
+    .sheet-header-fixed { flex-shrink: 0; padding: 10px 20px 12px 20px; background: var(--bg-body); border-bottom: 0.5px solid var(--border-light); z-index: 10; border-radius: 20px 20px 0 0;}
+    .sheet-body-scrollable { flex: 1; overflow-y: auto; padding: 16px 20px 40px 20px; background: var(--bg-body); -webkit-overflow-scrolling: touch; }
+    .sheet-footer-fixed { flex-shrink: 0; padding: 16px 20px calc(16px + env(safe-area-inset-bottom)); background: var(--bg-card); border-top: 0.5px solid var(--border-light); display: flex; gap: 12px; z-index: 20; }
+
+    .sheet-pill-wrapper { display: flex; justify-content: center; margin-bottom: 12px; }
     .sheet-pill { width: 40px; height: 5px; background: rgba(0,0,0,0.2); border-radius: 3px; }
     @media (prefers-color-scheme: dark) { .sheet-pill { background: rgba(255,255,255,0.3); } }
 
@@ -434,6 +438,15 @@
           <select id="th-chon-dan" class="form-control" onchange="tuDongDienCapTuLenh()"><option value="">-- Chọn đạn --</option></select>
         </div>
         
+        <!-- KHU VỰC DRAFT LÔ (SOẠN LÔ TRƯỚC KHI GHI XE) -->
+        <div id="th-draft-lo-section" style="display:none; background: var(--bg-body); padding: 16px; border-radius: 12px; margin-bottom: 16px; border: 1px dashed var(--border-light);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <label style="font-size:12px; font-weight:700; color:var(--text-main); text-transform:uppercase; margin:0;">Bước 3: Danh sách Lô sẽ xuất</label>
+                <span id="th-draft-count" style="font-size:12px; font-weight:800; color:var(--primary-color); background:var(--primary-light); padding:4px 10px; border-radius:12px;">0 Lô</span>
+            </div>
+            <button class="btn" onclick="moModalDraftLo()" style="height: 44px; font-size: 13px; background: var(--bg-card); color: var(--primary-color); border: 1px solid var(--primary-color); box-shadow: var(--card-shadow);"><i class="ph-bold ph-list-plus"></i> THÊM / CHỈNH SỬA LÔ</button>
+        </div>
+
         <div class="form-row" style="margin-bottom:0;">
           <div class="form-group" style="flex: 1;">
             <label>Cấp</label>
@@ -443,17 +456,9 @@
             </select>
           </div>
           <div class="form-group" style="flex: 1.5;">
-            <label style="text-align: center;">Số Lượng Xuất</label>
-            <input type="number" inputmode="decimal" pattern="[0-9]*" id="th-sl" class="form-control" placeholder="0" style="text-align:center; font-weight: 800; font-size: 18px; color: var(--danger-color);">
+            <label style="text-align: center;">Tổng Số Lượng</label>
+            <input type="number" inputmode="decimal" pattern="[0-9]*" id="th-sl" class="form-control" placeholder="0" style="text-align:center; font-weight: 800; font-size: 20px; color: var(--danger-color);">
           </div>
-        </div>
-
-        <div id="th-bg-helper" style="display:none; background: var(--primary-light); padding: 12px; border-radius: 12px; margin-top: 12px; border: 1px dashed var(--primary-color);">
-            <div style="font-size: 11px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">QUY ĐỔI NHANH BAO GÓI: <span id="th-bg-he-so-text" style="color:var(--text-main);"></span></div>
-            <div style="display: flex; gap: 8px;">
-                <input type="number" id="th-bg-chan" class="form-control" placeholder="Số Cốp/Hòm..." oninput="tinhNhanhSlThucHien()" style="height: 40px; font-size: 15px; font-weight: 700; flex: 1; border: 1px solid rgba(0,0,0,0.1);">
-                <input type="number" id="th-bg-le" class="form-control" placeholder="Cộng lẻ..." oninput="tinhNhanhSlThucHien()" style="height: 40px; font-size: 15px; font-weight: 700; flex: 1; border: 1px solid rgba(0,0,0,0.1);">
-            </div>
         </div>
         
         <div style="display:flex; gap:12px; margin-top: 16px;">
@@ -639,25 +644,26 @@
   <div id="modal-quan-ly-lo" class="modal-bottom-sheet">
     <div class="sheet-content">
       
-      <div class="sheet-pill-wrapper"><div class="sheet-pill"></div></div>
-
-      <div style="padding: 4px 20px 12px 20px; flex-shrink: 0; background: var(--bg-body); border-bottom: 0.5px solid var(--border-light); z-index: 10;">
+      <!-- PHẦN HEADER CỐ ĐỊNH -->
+      <div class="sheet-header-fixed">
+          <div class="sheet-pill-wrapper"><div class="sheet-pill"></div></div>
           <h3 id="ql-lo-title" style="font-weight: 800; text-align: left; margin: 0 0 4px 0; font-size: 22px; letter-spacing: -0.5px;">Chi tiết Lô xuất</h3>
           <div style="text-align: left; font-size: 15px; font-weight: 600; color: var(--text-sub); margin-bottom: 16px; line-height: 1.3;" id="ql-lo-ten-dan">Tên đạn</div>
           
-          <div style="display:flex; justify-content:space-between; font-weight:600; font-size: 14px; background: var(--bg-card); border: none; padding: 16px; border-radius: 16px; margin-bottom: 16px; box-shadow: var(--card-shadow);">
-             <span style="color:var(--text-sub)">Tổng xuất: <span id="ql-lo-sl-tong" style="color:var(--text-main); font-weight:800; font-size:16px;">0</span></span>
+          <div style="display:flex; justify-content:space-between; font-weight:600; font-size: 14px; background: var(--bg-card); border: none; padding: 16px; border-radius: 16px; margin-bottom: 0; box-shadow: var(--card-shadow);">
+             <span style="color:var(--text-sub)">Mục tiêu: <span id="ql-lo-sl-tong" style="color:var(--text-main); font-weight:800; font-size:16px;">0</span></span>
              <span style="color:var(--text-sub)">Đã nhập lô: <span id="ql-lo-sl-da-nhap" style="color:var(--warning-color); font-weight:800; font-size:16px;">0</span></span>
-          </div>
-
-          <div id="ql-lo-tong-hop-bg" style="display:none; font-size: 13px; font-weight: 700; color: var(--primary-color); background: var(--primary-light); padding: 8px 16px; border-radius: 12px; margin-bottom: 16px; text-align: center; border: 1px dashed var(--primary-color);">
-             Tổng hợp: <span id="lbl-tong-hop-bg">...</span>
           </div>
       </div>
 
-      <!-- VÙNG CUỘN (SCROLLABLE AREA) MỚI CHỨA CẢ FORM VÀ DANH SÁCH -->
-      <div class="sheet-body" style="flex: 1; overflow-y: auto; padding: 16px 20px; background: var(--bg-body); -webkit-overflow-scrolling: touch;">
+      <!-- VÙNG CUỘN (SCROLLABLE AREA) CHỨA CẢ FORM VÀ DANH SÁCH -->
+      <div class="sheet-body-scrollable">
           
+          <!-- HIỂN THỊ TỔNG HỢP BAO GÓI CHUNG -->
+          <div id="ql-lo-tong-hop-bg" style="display:none; font-size: 13px; font-weight: 700; color: var(--primary-color); background: var(--primary-light); padding: 8px 16px; border-radius: 12px; margin-bottom: 16px; text-align: center; border: 1px dashed var(--primary-color);">
+             Tổng hợp: <span id="lbl-tong-hop-bg">...</span>
+          </div>
+
           <div id="vung-goi-y-lo" style="display: none; margin-bottom: 16px; background: var(--bg-card); padding: 16px; border-radius: 16px; box-shadow: var(--card-shadow);">
               <div style="font-size: 13px; font-weight: 700; color: var(--text-sub); margin-bottom: 10px; text-transform: uppercase;"><i class="ph-bold ph-magic-wand"></i> Chọn nhanh Lô:</div>
               <div id="danh-sach-chip-goi-y" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
@@ -712,14 +718,15 @@
                   
                   <label style="font-size:12px; font-weight:700; color:var(--text-sub); margin-top: 12px; display: block;">Nhập số lẻ (+)</label>
                   <div id="bg-ds-le" class="bg-input-le-container"></div>
-                  <button onclick="themOLeBaoGoi()" style="background:var(--primary-light); color:var(--primary-color); border:none; padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor:pointer; width: 100%;"><i class="ph-bold ph-plus"></i> THÊM KHUNG NHẬP LẺ</button>
+                  <button onclick="themOLeBaoGoi()" style="background:var(--primary-light); color:var(--primary-color); border:none; padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor:pointer; width: 100%; transition: 0.2s;"><i class="ph-bold ph-plus"></i> THÊM KHUNG NHẬP LẺ</button>
               </div>
           </div>
 
           <div id="danh-sach-ql-lo-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
       </div>
 
-      <div id="vung-nut-lo-bottom" style="padding: 16px 20px calc(16px + env(safe-area-inset-bottom)); background: var(--bg-card); border-top: 0.5px solid var(--border-light); flex-shrink: 0; display: flex; gap: 12px; z-index: 20;">
+      <!-- PHẦN FOOTER CỐ ĐỊNH -->
+      <div id="vung-nut-lo-bottom" class="sheet-footer-fixed">
           <!-- Content injected dynamically -->
       </div>
 
@@ -795,11 +802,12 @@
       let grouped = {};
       dsLo.forEach(lo => {
           let ten = lo.tenLo.trim();
-          if(!grouped[ten]) grouped[ten] = { tenLo: ten, sl: 0, isBaoGoi: lo.isBaoGoi, slChan: 0, mangLe: [] };
+          if(!grouped[ten]) grouped[ten] = { tenLo: ten, sl: 0, isBaoGoi: lo.isBaoGoi, slChan: 0, mangLe: [], tenBaoGoi: lo.tenBaoGoi };
           grouped[ten].sl += lo.sl;
           if (lo.isBaoGoi) {
               grouped[ten].slChan += (lo.slChan || 0);
               if(lo.mangLe) grouped[ten].mangLe.push(...lo.mangLe);
+              if(lo.tenBaoGoi) grouped[ten].tenBaoGoi = lo.tenBaoGoi; // Giữ lại tên bao gói
           } else {
               grouped[ten].mangLe.push(lo.sl);
           }
@@ -816,6 +824,13 @@
   let currentLoContext = { type: null, id: null, viewData: null }; 
   let idLoDangSua = null; 
 
+  // --- STATE CHO DRAFT MODE (LẬP LÔ TRƯỚC KHI GHI XE) ---
+  window.draftLoData = {
+      list: [],
+      tenBaoGoi: '',
+      slPerBaoGoi: 0
+  };
+
   let cheDoNhapHienTai = 'SL';
 
   function chuyenTabNhapLo(mode) {
@@ -831,6 +846,7 @@
   }
 
   function themOLeBaoGoi(value = '') {
+      haptic();
       let container = document.getElementById('bg-ds-le');
       let div = document.createElement('div');
       div.className = 'bg-input-le-item';
@@ -840,8 +856,8 @@
       
       // Tự động cuộn xuống khi thêm ô lẻ để không bị lấp
       setTimeout(() => {
-          let sheetBody = document.querySelector('.sheet-body');
-          if(sheetBody) sheetBody.scrollBy({ top: 60, behavior: 'smooth' });
+          let sheetBody = document.querySelector('.sheet-body-scrollable');
+          if(sheetBody) sheetBody.scrollBy({ top: 80, behavior: 'smooth' });
       }, 50);
   }
 
@@ -872,13 +888,19 @@
       return arr;
   }
 
-  function formatLoWithBaoGoi(lo, tenBaoGoi) {
-      if (!lo.isBaoGoi || (!tenBaoGoi && !lo.slChan)) return `<div style="font-size:18px; color: var(--primary-color); font-weight:800;">${lo.sl}</div>`;
+  function formatLoWithBaoGoi(lo, tenBaoGoiFallback) {
+      let loaiBG = lo.tenBaoGoi || tenBaoGoiFallback || 'BG';
+      if (!lo.isBaoGoi && !lo.slChan && (!lo.mangLe || lo.mangLe.length === 0)) {
+          return `<div style="font-size:18px; color: var(--primary-color); font-weight:800;">${lo.sl}</div>`;
+      }
+
       let parts = [];
-      if (lo.slChan > 0) parts.push(`${lo.slChan} ${tenBaoGoi || 'BG'}`);
+      if (lo.slChan > 0) parts.push(`${lo.slChan} ${loaiBG}`);
       if (lo.mangLe && lo.mangLe.length > 0) parts.push(lo.mangLe.join(' + '));
       let formula = parts.join(' + ');
       
+      if (!formula) return `<div style="font-size:18px; color: var(--primary-color); font-weight:800;">${lo.sl}</div>`;
+
       return `
         <div style="display:flex; flex-direction:column; align-items:flex-end;">
             <div style="font-size:18px; color: var(--primary-color); font-weight:800; line-height: 1;">${lo.sl}</div>
@@ -889,13 +911,16 @@
 
   function updateHienThiTongHopBaoGoi(record) {
       let divTongHop = document.getElementById('ql-lo-tong-hop-bg');
-      if (!record.tenBaoGoi || !record.slPerBaoGoi || !record.danhSachLo || record.danhSachLo.length === 0) {
+      if (!record.danhSachLo || record.danhSachLo.length === 0) {
           divTongHop.style.display = 'none'; return;
       }
 
       let totalChan = 0; let allLe = []; let rawNonBaoGoi = 0;
+      let usedLoaiBG = record.tenBaoGoi || 'BG';
+
       record.danhSachLo.forEach(lo => {
-          if (lo.isBaoGoi) {
+          if (lo.tenBaoGoi) usedLoaiBG = lo.tenBaoGoi; // Prefer the batch's saved string
+          if (lo.isBaoGoi || lo.slChan > 0) {
               totalChan += (lo.slChan || 0);
               if (lo.mangLe) allLe.push(...lo.mangLe);
           } else {
@@ -905,7 +930,7 @@
       if (rawNonBaoGoi > 0) allLe.push(rawNonBaoGoi);
 
       let parts = [];
-      if (totalChan > 0) parts.push(`${totalChan} ${record.tenBaoGoi}`);
+      if (totalChan > 0) parts.push(`${totalChan} ${usedLoaiBG}`);
       if (allLe.length > 0) parts.push(allLe.join(' + '));
       
       if(parts.length > 0) {
@@ -1066,7 +1091,7 @@
       let target = document.getElementById(elementId);
       if (!target) return;
 
-      let scrollContainer = target.querySelector('.table-container') || target.querySelector('.modal-list-container') || target;
+      let scrollContainer = target.querySelector('.table-container') || target.querySelector('.modal-list-container') || target.querySelector('.sheet-body-scrollable') || target;
       
       let oldMaxHeight = scrollContainer.style.maxHeight;
       let oldOverflowY = scrollContainer.style.overflowY;
@@ -1479,38 +1504,47 @@
   
   function tuDongDienCapTuLenh() {
       let selectEl = document.getElementById('th-chon-dan'); let idLenh = selectEl.value; 
-      if(!idLenh) { document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; document.getElementById('th-bg-helper').style.display = 'none'; return; }
+      if(!idLenh) { 
+          document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; 
+          document.getElementById('th-draft-lo-section').style.display = 'none'; 
+          return; 
+      }
       let lenhGoc = STATE.lenh.find(l => l.id === idLenh); 
       if(lenhGoc) {
           let capSelect = document.getElementById('th-cap'); let optionExists = Array.from(capSelect.options).some(opt => opt.value == lenhGoc.cap);
           capSelect.value = optionExists ? lenhGoc.cap : '';
+          
           let selectedOption = selectEl.options[selectEl.selectedIndex]; let conLai = selectedOption.getAttribute('data-conlai');
           if(conLai && parseFloat(conLai) > 0) { document.getElementById('th-sl').value = conLai; } else { document.getElementById('th-sl').value = ''; }
           
-          if (lenhGoc.slPerBaoGoi && lenhGoc.slPerBaoGoi > 0) {
-              document.getElementById('th-bg-helper').style.display = 'block';
-              document.getElementById('th-bg-he-so-text').innerText = `1 ${lenhGoc.tenBaoGoi || 'Bao gói'} = ${lenhGoc.slPerBaoGoi}`;
-              window.currentThucHienBaoGoiHeSo = lenhGoc.slPerBaoGoi;
-          } else {
-              document.getElementById('th-bg-helper').style.display = 'none';
-          }
+          // SETUP DRAFT MODE
+          window.draftLoData.list = [];
+          window.draftLoData.lenhId = lenhGoc.id;
+          window.draftLoData.tenBaoGoi = lenhGoc.tenBaoGoi || 'Cốp';
+          window.draftLoData.slPerBaoGoi = lenhGoc.slPerBaoGoi || 0;
+          document.getElementById('th-draft-lo-section').style.display = 'block';
+          renderDraftLoCount();
       } 
   }
 
-  window.tinhNhanhSlThucHien = function() {
-      let chan = parseFloat(document.getElementById('th-bg-chan').value) || 0;
-      let le = parseFloat(document.getElementById('th-bg-le').value) || 0;
-      let total = chan * (window.currentThucHienBaoGoiHeSo || 0) + le;
-      if(total > 0) document.getElementById('th-sl').value = total;
-      else document.getElementById('th-sl').value = '';
+  function renderDraftLoCount() {
+      let sl = window.draftLoData.list.reduce((sum, l) => sum + l.sl, 0);
+      document.getElementById('th-draft-count').innerText = `${window.draftLoData.list.length} Lô (${sl})`;
+      if(window.draftLoData.list.length > 0) {
+          document.getElementById('th-sl').value = sl; // Tự động cập nhật tổng
+      }
+  }
+
+  function moModalDraftLo() {
+      moModalQuanLyLo('DRAFT', null);
   }
   
   function xuLyGhiXe() {
       haptic();
       let ngay = document.getElementById('th-ngay').value; let phieu = document.getElementById('th-phieu').value.trim();
-      let idLenh = document.getElementById('th-chon-dan').value; let cap = document.getElementById('th-cap').value.trim(); let sl = document.getElementById('th-sl').value.trim();
+      let idLenh = document.getElementById('th-chon-dan').value; let cap = document.getElementById('th-cap').value.trim(); let sl = parseFloat(document.getElementById('th-sl').value.trim());
 
-      if(!idLenh || !sl || !ngay) { showDialog("Lỗi", "Vui lòng điền đủ Ngày, Chọn Đạn và Số lượng.", "alert"); return; }
+      if(!idLenh || isNaN(sl) || sl <= 0 || !ngay) { showDialog("Lỗi", "Vui lòng điền đủ Ngày, Chọn Đạn và Số lượng xuất > 0.", "alert"); return; }
       
       let xeSelectVal = document.getElementById('th-xe-select').value;
       let xe = "";
@@ -1526,15 +1560,28 @@
 
       let lenhGoc = STATE.lenh.find(l => l.id === idLenh); if(!lenhGoc) return; 
 
+      // Kiểm tra xem user có đang dùng Draft Mode không
+      let dsLoToSave = [];
+      if (window.draftLoData.lenhId === idLenh && window.draftLoData.list.length > 0) {
+          let sumDraft = window.draftLoData.list.reduce((sum, l) => sum + l.sl, 0);
+          if (sumDraft !== sl) {
+              showDialog("Cảnh báo", `Số lượng tổng (${sl}) không khớp với tổng các Lô đã soạn (${sumDraft}). Vui lòng kiểm tra lại.`, "alert");
+              return;
+          }
+          // Clone the array
+          dsLoToSave = [...window.draftLoData.list];
+      }
+
       if(idThucHienDangSua) {
           let index = STATE.thucHien.findIndex(t => t.id === idThucHienDangSua);
-          let dsLoCu = STATE.thucHien[index].danhSachLo || [];
-          STATE.thucHien[index] = { id: idThucHienDangSua, lenhId: idLenh, soLenh: lenhGoc.soLenh, phieu: phieu, xe, ngay, ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap, sl: parseFloat(sl), tenBaoGoi: lenhGoc.tenBaoGoi, slPerBaoGoi: lenhGoc.slPerBaoGoi, danhSachLo: dsLoCu };
+          let dsLoCu = dsLoToSave.length > 0 ? dsLoToSave : (STATE.thucHien[index].danhSachLo || []);
+          STATE.thucHien[index] = { id: idThucHienDangSua, lenhId: idLenh, soLenh: lenhGoc.soLenh, phieu: phieu, xe, ngay, ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap, sl: sl, tenBaoGoi: lenhGoc.tenBaoGoi, slPerBaoGoi: lenhGoc.slPerBaoGoi, danhSachLo: dsLoCu };
           huySuaThucHien(); showToast("Đã cập nhật xe!");
       } else {
-          STATE.thucHien.push({ id: generateID(), lenhId: idLenh, soLenh: lenhGoc.soLenh, phieu: phieu, xe, ngay, ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap, sl: parseFloat(sl), tenBaoGoi: lenhGoc.tenBaoGoi, slPerBaoGoi: lenhGoc.slPerBaoGoi, danhSachLo: [] });
+          STATE.thucHien.push({ id: generateID(), lenhId: idLenh, soLenh: lenhGoc.soLenh, phieu: phieu, xe, ngay, ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap, sl: sl, tenBaoGoi: lenhGoc.tenBaoGoi, slPerBaoGoi: lenhGoc.slPerBaoGoi, danhSachLo: dsLoToSave });
           document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; document.getElementById('th-chon-dan').value = ''; 
-          document.getElementById('th-bg-helper').style.display = 'none'; document.getElementById('th-bg-chan').value = ''; document.getElementById('th-bg-le').value = '';
+          document.getElementById('th-draft-lo-section').style.display = 'none';
+          window.draftLoData.list = [];
           showToast(`Đã xuất vào xe ${xe} ${phieu ? '(P:'+phieu+')' : ''}`); loadDanTheoLenh(); 
       }
       safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien)); 
@@ -1560,7 +1607,15 @@
       document.getElementById('th-so-lenh').value = item.soLenh; loadDanTheoLenh();
       setTimeout(() => { 
           document.getElementById('th-chon-dan').value = item.lenhId; 
-          tuDongDienCapTuLenh();
+          
+          // Populate draft mode for editing
+          window.draftLoData.list = item.danhSachLo ? [...item.danhSachLo] : [];
+          window.draftLoData.lenhId = item.lenhId;
+          window.draftLoData.tenBaoGoi = item.tenBaoGoi || 'Cốp';
+          window.draftLoData.slPerBaoGoi = item.slPerBaoGoi || 0;
+          document.getElementById('th-draft-lo-section').style.display = 'block';
+          renderDraftLoCount();
+
           let capSelect = document.getElementById('th-cap'); let optionExists = Array.from(capSelect.options).some(opt => opt.value == item.cap); capSelect.value = optionExists ? item.cap : '';
           document.getElementById('th-sl').value = item.sl; 
       }, 50);
@@ -1568,13 +1623,15 @@
       document.getElementById('btn-ghi-xe').innerHTML = "<i class='ph-bold ph-floppy-disk'></i> CẬP NHẬT SỔ"; document.getElementById('btn-ghi-xe').style.background = "var(--primary-color)";
       document.getElementById('btn-huy-xe').style.display = "flex"; window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+  
   function huySuaThucHien() {
       idThucHienDangSua = null; 
       document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; document.getElementById('th-phieu').value = '';
       document.getElementById('th-xe-select').value = 'AUTO'; document.getElementById('th-xe-input').style.display = 'none'; document.getElementById('th-xe-input').value = '';
-      document.getElementById('th-bg-helper').style.display = 'none'; document.getElementById('th-bg-chan').value = ''; document.getElementById('th-bg-le').value = '';
+      document.getElementById('th-draft-lo-section').style.display = 'none'; window.draftLoData.list = [];
       document.getElementById('btn-ghi-xe').innerHTML = "<i class='ph-bold ph-check'></i> GHI SỔ XE"; document.getElementById('btn-ghi-xe').style.background = "var(--warning-color)"; document.getElementById('btn-huy-xe').style.display = "none";
   }
+
   function xoaThucHien(id) { 
       showDialog("Xác nhận", "Xóa lịch sử xuất của xe này?", "confirm", () => { 
           STATE.thucHien = STATE.thucHien.filter(i => i.id !== id); safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien)); 
@@ -1582,6 +1639,7 @@
           if(document.getElementById('tab-thuc-hien').classList.contains('active')) loadDanTheoLenh();
       }); 
   }
+
   function renderBangThucHien() {
       let tbody = document.getElementById('tbody-thuc-hien');
       if(STATE.thucHien.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="padding:40px; text-align:center; color:var(--text-sub);"><i class="ph ph-truck" style="font-size:32px; opacity:0.5; margin-bottom:8px;"></i><br>Chưa có dữ liệu xuất.</td></tr>`; return; }
@@ -1632,12 +1690,12 @@
       document.getElementById('input-ql-ten-lo').value = '';
       document.getElementById('input-ql-sl-lo').value = '';
 
-      if (type === 'LENH' || type === 'THUCHIEN') {
+      if (type === 'LENH' || type === 'THUCHIEN' || type === 'DRAFT') {
           let record = null;
           if (type === 'LENH') {
               record = STATE.lenh.find(l => l.id === id);
               titleEl.innerText = "Dự kiến Lô xuất (Lệnh)";
-          } else {
+          } else if (type === 'THUCHIEN') {
               record = STATE.thucHien.find(t => t.id === id);
               titleEl.innerText = "Thực tế xuất Lô";
               
@@ -1649,6 +1707,16 @@
                       safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
                   }
               }
+          } else if (type === 'DRAFT') {
+              let lenhGoc = STATE.lenh.find(l => l.id === window.draftLoData.lenhId);
+              record = {
+                  id: 'DRAFT', ten: lenhGoc ? lenhGoc.ten : 'Chưa rõ', cap: lenhGoc ? lenhGoc.cap : '', dvt: lenhGoc ? lenhGoc.dvt : '',
+                  sl: window.draftLoData.list.reduce((sum,l)=>sum+l.sl, 0), // Sl is sum of current drafts
+                  slPerBaoGoi: window.draftLoData.slPerBaoGoi,
+                  tenBaoGoi: window.draftLoData.tenBaoGoi,
+                  danhSachLo: window.draftLoData.list
+              };
+              titleEl.innerText = "Soạn Lô xuất (Chưa ghi sổ)";
           }
           if(!record) return;
 
@@ -1656,7 +1724,6 @@
           vungNhap.style.display = 'block'; 
           vungGoiYThongMinh.innerHTML = '';
           
-          // LUÔN HIỂN THỊ SEGMENT VÀ CHO PHÉP NHẬP NHANH CONFIG
           let segUI = document.getElementById('segment-che-do-nhap');
           segUI.style.display = 'flex'; 
           
@@ -1672,8 +1739,9 @@
               chuyenTabNhapLo('SL');
           }
 
-          if (type === 'THUCHIEN') {
-              let lenhGoc = STATE.lenh.find(l => l.id === record.lenhId);
+          if (type === 'THUCHIEN' || type === 'DRAFT') {
+              let targetLenhId = type === 'DRAFT' ? window.draftLoData.lenhId : record.lenhId;
+              let lenhGoc = STATE.lenh.find(l => l.id === targetLenhId);
               if (lenhGoc && lenhGoc.danhSachLo && lenhGoc.danhSachLo.length > 0) {
                   vungGoiY.style.display = 'block';
                   let chipsHtml = lenhGoc.danhSachLo.map(lo => {
@@ -1690,9 +1758,9 @@
           }
 
           document.getElementById('vung-nut-lo-bottom').innerHTML = `
-              <button id="btn-thoat-lo" onclick="dongModalQuanLyLo()" style="flex: 1; height: 50px; border-radius: 14px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--text-main); font-weight: 700; font-size: 16px; transition: 0.2s;">THOÁT</button>
+              <button id="btn-thoat-lo" onclick="dongModalQuanLyLo()" style="flex: 1; height: 50px; border-radius: 14px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--text-main); font-weight: 700; font-size: 16px; transition: 0.2s;">ĐÓNG</button>
               <button id="btn-huy-sua-lo" onclick="huySuaLo()" style="flex: 1; height: 50px; border-radius: 14px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--danger-color); font-weight: 700; font-size: 16px; display: none; transition: 0.2s;">HỦY SỬA</button>
-              <button id="btn-submit-lo" onclick="xuLyThemQuanLyLo()" style="flex: 1.5; height: 50px; border-radius: 14px; border: none; background: var(--primary-color); color: white; font-weight: 700; font-size: 16px; transition: 0.2s; box-shadow: 0 4px 12px rgba(0,122,255,0.3);">NHẬP LÔ</button>
+              <button id="btn-submit-lo" onclick="xuLyThemQuanLyLo()" style="flex: 1.5; height: 50px; border-radius: 14px; border: none; background: var(--primary-color); color: white; font-weight: 700; font-size: 16px; transition: 0.2s; box-shadow: 0 4px 12px rgba(0,122,255,0.3);">LƯU LÔ</button>
           `;
           renderChiTietQuanLyLo(record);
       } 
@@ -1721,7 +1789,7 @@
           }
           
           document.getElementById('vung-nut-lo-bottom').innerHTML = `
-              <button onclick="dongModalQuanLyLo()" style="flex: 1; height: 50px; border-radius: 14px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--text-main); font-weight: 700; font-size: 16px; transition: 0.2s;">THOÁT</button>
+              <button onclick="dongModalQuanLyLo()" style="flex: 1; height: 50px; border-radius: 14px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--text-main); font-weight: 700; font-size: 16px; transition: 0.2s;">ĐÓNG</button>
               ${editBtnHtml}
           `;
           
@@ -1789,7 +1857,7 @@
       
       openModal('modal-quan-ly-lo');
       setTimeout(() => {
-          if (type === 'LENH' || type === 'THUCHIEN') {
+          if (type === 'LENH' || type === 'THUCHIEN' || type === 'DRAFT') {
               xuLyGoiYLoAuto();
           }
       }, 10);
@@ -1800,6 +1868,7 @@
       
       if(currentLoContext.type === 'LENH') renderBangLenh();
       if(currentLoContext.type === 'THUCHIEN') renderBangThucHien();
+      if(currentLoContext.type === 'DRAFT') renderDraftLoCount();
       
       currentLoContext = { type: null, id: null, viewData: null };
   }
@@ -1869,6 +1938,7 @@
       let record = null;
       if (currentLoContext.type === 'LENH') record = STATE.lenh.find(l => l.id === currentLoContext.id);
       else if (currentLoContext.type === 'THUCHIEN') record = STATE.thucHien.find(t => t.id === currentLoContext.id);
+      else if (currentLoContext.type === 'DRAFT') record = { danhSachLo: window.draftLoData.list };
       
       if(!record || !record.danhSachLo) return;
       let loInfo = record.danhSachLo.find(l => l.id === idLo);
@@ -1897,7 +1967,7 @@
       let btnThoat = document.getElementById('btn-thoat-lo');
       if(btnThoat) btnThoat.style.display = 'none';
 
-      let container = document.querySelector('.sheet-body');
+      let container = document.querySelector('.sheet-body-scrollable');
       if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -1911,7 +1981,7 @@
 
       let btnSubmit = document.getElementById('btn-submit-lo');
       if(btnSubmit) {
-          btnSubmit.innerHTML = 'NHẬP LÔ';
+          btnSubmit.innerText = 'LƯU LÔ';
           btnSubmit.style.background = 'var(--primary-color)';
       }
       
@@ -1928,13 +1998,18 @@
 
       document.getElementById('ql-lo-sl-tong').innerText = record.sl;
       document.getElementById('ql-lo-sl-da-nhap').innerText = slDaNhap;
-      document.getElementById('ql-lo-sl-da-nhap').style.color = (slDaNhap === record.sl) ? 'var(--success-color)' : 'var(--warning-color)';
+      if(currentLoContext.type === 'DRAFT') {
+           document.getElementById('ql-lo-sl-da-nhap').style.color = 'var(--primary-color)';
+           document.getElementById('ql-lo-sl-tong').innerText = slDaNhap;
+      } else {
+           document.getElementById('ql-lo-sl-da-nhap').style.color = (slDaNhap === record.sl) ? 'var(--success-color)' : 'var(--warning-color)';
+      }
 
       updateHienThiTongHopBaoGoi(record);
 
       let container = document.getElementById('danh-sach-ql-lo-container');
       if(dsLo.length === 0) {
-          container.innerHTML = `<div style="padding:40px; text-align:center; color:var(--text-sub);"><i class="ph-bold ph-stack" style="font-size:32px; opacity:0.5; margin-bottom:8px;"></i><br>Chưa có Lô nào được nhập.</div>`;
+          container.innerHTML = `<div style="padding:40px; text-align:center; color:var(--text-sub);"><i class="ph-bold ph-stack" style="font-size:32px; opacity:0.5; margin-bottom:8px;"></i><br>Chưa có Lô nào được lưu.</div>`;
       } else {
           let dsHienThi = [...dsLo];
           if (currentLoContext.type === 'LENH') dsHienThi.reverse(); 
@@ -1970,6 +2045,12 @@
               document.getElementById('input-ql-sl-lo').value = Math.min(slGoiY, slConLaiThemDuoc);
               document.getElementById('input-ql-sl-lo').focus(); 
           }
+      } else if (currentLoContext.type === 'DRAFT') {
+          if(cheDoNhapHienTai === 'BG') document.getElementById('bg-input-chan').focus();
+          else {
+              document.getElementById('input-ql-sl-lo').value = slGoiY;
+              document.getElementById('input-ql-sl-lo').focus(); 
+          }
       }
   }
 
@@ -1978,6 +2059,8 @@
       let record = null;
       if (currentLoContext.type === 'LENH') record = STATE.lenh.find(l => l.id === currentLoContext.id);
       else if (currentLoContext.type === 'THUCHIEN') record = STATE.thucHien.find(t => t.id === currentLoContext.id);
+      else if (currentLoContext.type === 'DRAFT') record = { danhSachLo: window.draftLoData.list, sl: 99999999 }; // Dummy SL to bypass max check in draft
+
       if(!record) return;
 
       let tenLo = document.getElementById('input-ql-ten-lo').value.trim();
@@ -1995,8 +2078,7 @@
           slChan = parseFloat(document.getElementById('bg-input-chan').value) || 0;
           mangLe = getMangLeTuUI();
 
-          // TỰ ĐỘNG LƯU NGƯỢC LẠI CONFIG NẾU CHƯA CÓ HOẶC CÓ SỰ THAY ĐỔI
-          record.tenBaoGoi = formLoaiBg || record.tenBaoGoi || 'Bao';
+          record.tenBaoGoi = formLoaiBg || record.tenBaoGoi || 'Cốp';
           record.slPerBaoGoi = formHeSo;
           
           if (currentLoContext.type === 'THUCHIEN') {
@@ -2006,6 +2088,9 @@
                   lenhGoc.slPerBaoGoi = record.slPerBaoGoi;
                   safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh));
               }
+          } else if (currentLoContext.type === 'DRAFT') {
+              window.draftLoData.tenBaoGoi = record.tenBaoGoi;
+              window.draftLoData.slPerBaoGoi = record.slPerBaoGoi;
           }
       } else {
           slLo = parseFloat(document.getElementById('input-ql-sl-lo').value.trim());
@@ -2020,21 +2105,26 @@
       }
       let slConLaiThemDuoc = record.sl - currentDaNhap;
 
-      if (slLo > slConLaiThemDuoc) {
+      if (currentLoContext.type !== 'DRAFT' && slLo > slConLaiThemDuoc) {
           showDialog("Vượt Quá Giới Hạn", `Tổng Lô không được vượt quá số lượng gốc (${record.sl}). Bạn chỉ có thể lưu tối đa <b>${slConLaiThemDuoc}</b> cho thao tác này.`, "alert"); return;
       }
 
       if (idLoDangSua) {
           let indexLo = record.danhSachLo.findIndex(l => l.id === idLoDangSua);
           if (indexLo !== -1) {
-              record.danhSachLo[indexLo] = { ...record.danhSachLo[indexLo], tenLo, sl: slLo, isBaoGoi, slChan, mangLe };
+              record.danhSachLo[indexLo] = { ...record.danhSachLo[indexLo], tenLo, sl: slLo, isBaoGoi, slChan, mangLe, tenBaoGoi: formLoaiBg };
           }
       } else {
-          record.danhSachLo.push({ id: generateID(), tenLo, sl: slLo, isBaoGoi, slChan, mangLe });
+          record.danhSachLo.push({ id: generateID(), tenLo, sl: slLo, isBaoGoi, slChan, mangLe, tenBaoGoi: formLoaiBg });
       }
       
       if (currentLoContext.type === 'LENH') safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh));
-      else safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
+      else if (currentLoContext.type === 'THUCHIEN') safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
+      else if (currentLoContext.type === 'DRAFT') {
+          // Gán lại tham chiếu nếu có lỗi
+          window.draftLoData.list = record.danhSachLo;
+          record.sl = record.danhSachLo.reduce((sum, l)=>sum+l.sl, 0);
+      }
       
       huySuaLo(); renderChiTietQuanLyLo(record); xuLyGoiYLoAuto(); 
   }
@@ -2047,6 +2137,7 @@
       let record = null;
       if (currentLoContext.type === 'LENH') record = STATE.lenh.find(l => l.id === currentLoContext.id);
       else if (currentLoContext.type === 'THUCHIEN') record = STATE.thucHien.find(t => t.id === currentLoContext.id);
+      else if (currentLoContext.type === 'DRAFT') record = { danhSachLo: window.draftLoData.list, sl: 99999999 };
 
       if (!record) return;
 
@@ -2097,7 +2188,7 @@
                   return;
               }
 
-              if (totalNewSl > slConLaiThemDuoc) {
+              if (currentLoContext.type !== 'DRAFT' && totalNewSl > slConLaiThemDuoc) {
                   showDialog("Vượt Quá Giới Hạn", `File Excel có tổng SL (${totalNewSl}) vượt quá SL còn lại cho phép nhập (${slConLaiThemDuoc}).`, "alert");
                   e.target.value = '';
                   return;
@@ -2106,7 +2197,11 @@
               record.danhSachLo.push(...newBatches);
 
               if (currentLoContext.type === 'LENH') safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh));
-              else safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
+              else if (currentLoContext.type === 'THUCHIEN') safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
+              else if (currentLoContext.type === 'DRAFT') {
+                  window.draftLoData.list = record.danhSachLo;
+                  record.sl = record.danhSachLo.reduce((sum, l)=>sum+l.sl, 0);
+              }
 
               renderChiTietQuanLyLo(record);
               xuLyGoiYLoAuto();
@@ -2125,13 +2220,15 @@
       let record = null;
       if (currentLoContext.type === 'LENH') record = STATE.lenh.find(l => l.id === currentLoContext.id);
       else if (currentLoContext.type === 'THUCHIEN') record = STATE.thucHien.find(t => t.id === currentLoContext.id);
+      else if (currentLoContext.type === 'DRAFT') record = { danhSachLo: window.draftLoData.list, sl: 99999999 };
       
       if(!record) return;
 
       record.danhSachLo = record.danhSachLo.filter(lo => lo.id !== idLo);
       
       if (currentLoContext.type === 'LENH') safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh));
-      else safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
+      else if (currentLoContext.type === 'THUCHIEN') safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
+      else if (currentLoContext.type === 'DRAFT') window.draftLoData.list = record.danhSachLo;
 
       if (idLoDangSua === idLo) huySuaLo();
 
