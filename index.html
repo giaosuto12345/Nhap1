@@ -411,7 +411,7 @@
           <div class="form-row" style="margin-bottom: 12px;">
               <div class="form-group" style="flex: 1.5;">
                   <label style="color: var(--primary-color);">Ngày xuất</label>
-                  <input type="date" id="sx-ngay" class="form-control" style="background: var(--bg-card); color: var(--primary-color);">
+                  <input type="date" id="sx-ngay" class="form-control" style="background: var(--bg-card); color: var(--primary-color);" onchange="capNhatGoiYXe(); xuLyChonXeSoanXe();">
               </div>
               <div class="form-group" style="flex: 1;">
                   <label style="color: var(--primary-color);">Số phiếu</label>
@@ -420,7 +420,11 @@
           </div>
           <div class="form-group" style="margin-bottom: 0;">
               <label style="color: var(--primary-color);">Xe nhận (Bắt buộc)</label>
-              <input type="text" id="sx-xe-input" class="form-control" placeholder="Nhập tên/số xe..." style="font-weight: 800; font-size: 18px; color: var(--danger-color); background: var(--bg-card);">
+              <select id="sx-xe-select" class="form-control" style="font-weight: 800; font-size: 16px; color: var(--danger-color); background: var(--bg-card); margin-bottom: 8px;" onchange="xuLyChonXeSoanXe()">
+                  <option value="AUTO">-- Xe mới (Tự động tăng) --</option>
+                  <option value="MANUAL">✍️ Nhập số/tên xe khác...</option>
+              </select>
+              <input type="text" id="sx-xe-input" class="form-control" placeholder="Nhập tên/số xe mới..." style="display:none; font-weight: 800; font-size: 16px; color: var(--danger-color); background: var(--bg-card);">
           </div>
       </div>
 
@@ -616,7 +620,7 @@
     <div class="nav-item" id="nav-lenh" onclick="chuyenTab('tab-lenh', 'LỆNH XUẤT', 'nav-lenh')">
       <i class="ph-fill ph-receipt nav-icon"></i><div>Lệnh Xuất</div>
     </div>
-    <div class="nav-item" id="nav-soan-xe" onclick="chuyenTab('tab-soan-xe', 'SOẠN XE', 'nav-soan-xe')">
+    <div class="nav-item" id="nav-soan-xe" onclick="chuyenTab('tab-soan-xe', 'SOẠN XE CHI TIẾT', 'nav-soan-xe')">
       <div style="position: relative;">
           <i class="ph-fill ph-truck-trailer nav-icon"></i>
           <span id="cart-badge" class="nav-badge">0</span>
@@ -882,7 +886,8 @@
               if(lo.mangLe) grouped[ten].mangLe.push(...lo.mangLe);
               if(lo.tenBaoGoi) grouped[ten].tenBaoGoi = lo.tenBaoGoi; // Prefer saved package name
           } else {
-              grouped[ten].mangLe.push(lo.sl);
+              // Xử lý an toàn nếu ko dùng bao gói
+              if (lo.sl > 0) grouped[ten].mangLe.push(lo.sl);
           }
       });
       let result = Object.values(grouped);
@@ -962,18 +967,24 @@
       return arr;
   }
 
+  // --- FIX UI CỘNG DỒN SỐ LẺ ---
   function formatLoWithBaoGoi(lo, tenBaoGoiFallback) {
       let loaiBG = lo.tenBaoGoi || tenBaoGoiFallback || 'Cốp';
-      if (!lo.isBaoGoi && !lo.slChan && (!lo.mangLe || lo.mangLe.length === 0)) {
-          return `<div style="font-size:18px; color: var(--primary-color); font-weight:800;">${fmtNum(lo.sl)}</div>`;
-      }
-
+      
       let parts = [];
-      if (lo.slChan > 0) parts.push(`${lo.slChan} ${loaiBG}`);
-      if (lo.mangLe && lo.mangLe.length > 0) parts.push(lo.mangLe.join(' + '));
+      if (lo.isBaoGoi && lo.slChan > 0) parts.push(`${lo.slChan} ${loaiBG}`);
+      if (lo.mangLe && lo.mangLe.length > 0) {
+          // Chỉ hiện chuỗi cộng lẻ nếu nó là Bao gói thực sự, hoặc có nhiều hơn 1 số lẻ được gộp lại
+          if (lo.isBaoGoi || lo.mangLe.length > 1) {
+              parts.push(lo.mangLe.join(' + '));
+          }
+      }
       let formula = parts.join(' + ');
       
-      if (!formula) return `<div style="font-size:18px; color: var(--primary-color); font-weight:800;">${fmtNum(lo.sl)}</div>`;
+      // Nếu không có formula, hoặc formula sinh ra lại chính là bằng cái số lượng tổng -> Trả về dạng Đơn giản
+      if (!formula || formula === String(lo.sl) || formula === fmtNum(lo.sl)) {
+          return `<div style="font-size:18px; color: var(--primary-color); font-weight:800;">${fmtNum(lo.sl)}</div>`;
+      }
 
       return `
         <div style="display:flex; flex-direction:column; align-items:flex-end;">
@@ -1046,7 +1057,6 @@
       renderBangThucHien(); 
       capNhatDropdownSoLenh();
       capNhatGoiYXe(); 
-      capNhatGoiYSoLenh();
 
       document.addEventListener('keydown', function(e) {
           if (e.key === 'Enter') {
@@ -1268,14 +1278,20 @@
       let uniqueLenh = [...new Set(STATE.lenh.map(l => l.soLenh))];
       
       let selectTh = document.getElementById('th-so-lenh'); 
+      let currentValTh = selectTh.value;
       if(uniqueLenh.length === 0) { selectTh.innerHTML = '<option value="">-- Trống --</option>'; }
-      else { selectTh.innerHTML = '<option value="">-- Chọn Số Lệnh --</option>' + uniqueLenh.map(sl => `<option value="${escapeHTML(sl)}">${escapeHTML(sl)}</option>`).join(''); }
-      document.getElementById('th-chon-dan').innerHTML = '<option value="">-- Vui lòng chọn Lệnh trước --</option>';
-
+      else { 
+          selectTh.innerHTML = '<option value="">-- Chọn Số Lệnh --</option>' + uniqueLenh.map(sl => `<option value="${escapeHTML(sl)}">${escapeHTML(sl)}</option>`).join(''); 
+          selectTh.value = currentValTh;
+      }
+      
       let selectSx = document.getElementById('sx-so-lenh'); 
+      let currentValSx = selectSx.value;
       if(uniqueLenh.length === 0) { selectSx.innerHTML = '<option value="">-- Trống --</option>'; }
-      else { selectSx.innerHTML = '<option value="">-- Chọn Số Lệnh --</option>' + uniqueLenh.map(sl => `<option value="${escapeHTML(sl)}">${escapeHTML(sl)}</option>`).join(''); }
-      document.getElementById('sx-chon-dan').innerHTML = '<option value="">-- Vui lòng chọn Lệnh trước --</option>';
+      else { 
+          selectSx.innerHTML = '<option value="">-- Chọn Số Lệnh --</option>' + uniqueLenh.map(sl => `<option value="${escapeHTML(sl)}">${escapeHTML(sl)}</option>`).join(''); 
+          selectSx.value = currentValSx;
+      }
   }
 
   function loadDanTheoLenh() {
@@ -1295,30 +1311,75 @@
 
   function capNhatGoiYXe() {
       let ngayThucHien = document.getElementById('th-ngay').value;
+      let ngaySoanXe = document.getElementById('sx-ngay').value;
       let ngayBaoCao = document.getElementById('bc-ngay').value;
+      
       let dsXeThucHien = [...new Set(STATE.thucHien.filter(t => t.ngay === ngayThucHien && t.xe).map(t => t.xe))].sort();
+      let dsXeSoanXe = [...new Set(STATE.thucHien.filter(t => t.ngay === ngaySoanXe && t.xe).map(t => t.xe))].sort();
       let dsXeBaoCao = [...new Set(STATE.thucHien.filter(t => t.ngay === ngayBaoCao && t.xe).map(t => t.xe))].sort();
       
+      // Update Tab Nhập Nhanh
       let selectThucHien = document.getElementById('th-xe-select');
       let currentVal = selectThucHien.value;
       let htmlThucHien = `<option value="AUTO">-- Tự động tăng xe mới --</option>`;
       dsXeThucHien.forEach(x => { htmlThucHien += `<option value="${escapeHTML(x)}">Xe: ${escapeHTML(x)}</option>`; });
       htmlThucHien += `<option value="MANUAL">✍️ Nhập số/tên xe khác...</option>`;
       selectThucHien.innerHTML = htmlThucHien;
-      
-      if (currentVal === 'MANUAL' || dsXeThucHien.includes(currentVal)) {
-          selectThucHien.value = currentVal;
-      } else {
-          selectThucHien.value = 'AUTO';
-          document.getElementById('th-xe-input').style.display = 'none';
+      if (currentVal === 'MANUAL' || dsXeThucHien.includes(currentVal)) { selectThucHien.value = currentVal; } 
+      else { selectThucHien.value = 'AUTO'; document.getElementById('th-xe-input').style.display = 'none'; }
+
+      // Update Tab Soạn Xe
+      let selectSx = document.getElementById('sx-xe-select');
+      let currentValSx = selectSx ? selectSx.value : '';
+      let htmlSx = `<option value="AUTO">-- Xe mới (Tự động tăng) --</option>`;
+      dsXeSoanXe.forEach(x => { htmlSx += `<option value="${escapeHTML(x)}">Đang sửa: Xe ${escapeHTML(x)}</option>`; });
+      htmlSx += `<option value="MANUAL">✍️ Nhập số/tên xe khác...</option>`;
+      if (selectSx) {
+          selectSx.innerHTML = htmlSx;
+          if (currentValSx === 'MANUAL' || dsXeSoanXe.includes(currentValSx)) { selectSx.value = currentValSx; } 
+          else { selectSx.value = 'AUTO'; document.getElementById('sx-xe-input').style.display = 'none'; }
       }
 
+      // Update Tab Báo Cáo
       let selectBaoCao = document.getElementById('bc-xe');
       let currentBcVal = selectBaoCao.value;
       let htmlBaoCao = `<option value="">Tất cả xe...</option>`;
       dsXeBaoCao.forEach(x => { htmlBaoCao += `<option value="${escapeHTML(x)}">Xe: ${escapeHTML(x)}</option>`; });
       selectBaoCao.innerHTML = htmlBaoCao;
       if (dsXeBaoCao.includes(currentBcVal)) selectBaoCao.value = currentBcVal;
+  }
+
+  window.xuLyChonXeSoanXe = function() {
+      let val = document.getElementById('sx-xe-select').value;
+      let inputEl = document.getElementById('sx-xe-input');
+      let ngay = document.getElementById('sx-ngay').value;
+
+      if (val === 'MANUAL') {
+          inputEl.style.display = 'block';
+          inputEl.focus();
+          window.draftXeData.items = [];
+          renderDraftXeCart();
+      } else if (val === 'AUTO') {
+          inputEl.style.display = 'none';
+          inputEl.value = '';
+          window.draftXeData.items = [];
+          renderDraftXeCart();
+      } else {
+          inputEl.style.display = 'none';
+          inputEl.value = val;
+
+          // Load existing items into draft (EDIT MODE for existing car)
+          let itemsForXe = STATE.thucHien.filter(t => t.ngay === ngay && t.xe === val);
+          window.draftXeData.items = JSON.parse(JSON.stringify(itemsForXe));
+
+          if (itemsForXe.length > 0 && itemsForXe[0].phieu) {
+              document.getElementById('sx-phieu').value = itemsForXe[0].phieu;
+          } else {
+              document.getElementById('sx-phieu').value = '';
+          }
+
+          renderDraftXeCart();
+      }
   }
 
   function xuLyChonXeThucHien() {
@@ -1514,7 +1575,7 @@
 
   function renderBangLenh() {
       let tbody = document.getElementById('tbody-lenh');
-      if(STATE.lenh.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="padding:40px; text-align:center; color:var(--text-sub);"><i class="ph ph-receipt" style="font-size:32px; opacity:0.5; margin-bottom:8px;"></i><br>Chưa có lệnh xuất.</td></tr>`; return; }
+      if(STATE.lenh.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="padding:40px; text-align:center; color:var(--text-sub);"><i class="ph-bold ph-receipt" style="font-size:32px; opacity:0.5; margin-bottom:8px;"></i><br>Chưa có lệnh xuất.</td></tr>`; return; }
       let reversedLenh = [...STATE.lenh].reverse();
       tbody.innerHTML = reversedLenh.map(item => {
           let dsLo = item.danhSachLo || [];
@@ -1667,8 +1728,14 @@
               if (lo.isBaoGoi || lo.slChan > 0) {
                   let parts = [];
                   if (lo.slChan > 0) parts.push(`${lo.slChan} ${loaiBG}`);
-                  if (lo.mangLe && lo.mangLe.length > 0) parts.push(lo.mangLe.join(' + '));
-                  text += ` (${parts.join(' + ')})`;
+                  if (lo.mangLe && lo.mangLe.length > 0) {
+                      if (lo.isBaoGoi || lo.mangLe.length > 1) {
+                          parts.push(lo.mangLe.join(' + '));
+                      }
+                  }
+                  if (parts.length > 0) {
+                       text += ` (${parts.join(' + ')})`;
+                  }
               }
               return `<div style="font-size: 11px; color: var(--text-sub); margin-top: 4px;"><i class="ph-bold ph-caret-right"></i> ${escapeHTML(text)}</div>`;
           }).join('');
@@ -1693,24 +1760,46 @@
       container.innerHTML = html;
       tongTanEl.innerText = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(totalWeight / 1000) + " Tấn";
       
-      // Auto reset selection to make it ready for next
       document.getElementById('sx-chon-dan').value = '';
   }
 
   function chotXuatXe() {
       haptic();
-      let xe = document.getElementById('sx-xe-input').value.trim();
       let ngay = document.getElementById('sx-ngay').value;
       let phieu = document.getElementById('sx-phieu').value.trim();
+      let xeSelectVal = document.getElementById('sx-xe-select').value;
+      let xe = "";
 
-      if (!xe) { showDialog("Thiếu thông tin", "Vui lòng nhập Biển số Xe nhận.", "alert"); return; }
+      if (xeSelectVal === 'MANUAL') {
+          xe = document.getElementById('sx-xe-input').value.trim();
+          if (!xe) { showDialog("Thiếu thông tin", "Vui lòng nhập Biển số Xe nhận.", "alert"); return; }
+      } else if (xeSelectVal === 'AUTO') {
+          let maxNum = 0; 
+          let uniqueXeToday = [...new Set(STATE.thucHien.filter(t => t.ngay === ngay).map(t => t.xe))];
+          uniqueXeToday.forEach(x => { 
+              let num = parseInt(x, 10); 
+              if (!isNaN(num) && String(num) === x.trim()) { 
+                  if (num > maxNum) maxNum = num; 
+              } 
+          });
+          xe = String(maxNum + 1); 
+      } else {
+          xe = xeSelectVal; 
+      }
+
       if (!ngay) { showDialog("Thiếu thông tin", "Vui lòng chọn Ngày xuất.", "alert"); return; }
       if (window.draftXeData.items.length === 0) { showDialog("Xe trống", "Chưa có đạn nào được soạn lên xe.", "alert"); return; }
+
+      // Check if we are appending to an existing vehicle, filter out old items
+      if (xeSelectVal !== 'AUTO' && xeSelectVal !== 'MANUAL') {
+          // Editing existing vehicle on that day
+          STATE.thucHien = STATE.thucHien.filter(t => !(t.ngay === ngay && t.xe === xeSelectVal));
+      }
 
       showDialog("Xác nhận", `Chốt xuất ${window.draftXeData.items.length} loại đạn lên xe <b>${escapeHTML(xe)}</b>?`, "confirm", () => {
           let count = 0;
           let now = Date.now();
-          window.draftXeData.items.forEach(item => {
+          window.draftXeData.items.forEach((item, idx) => {
               STATE.thucHien.push({
                   id: generateID(),
                   lenhId: item.lenhId,
@@ -1718,7 +1807,7 @@
                   phieu: phieu,
                   xe: xe,
                   ngay: ngay,
-                  time: now,
+                  time: now + idx, // Đảm bảo time khác nhau để sort chính xác
                   ten: item.ten,
                   dvt: item.dvt,
                   cap: item.cap,
@@ -1732,11 +1821,19 @@
           
           safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
           
-          // Clear form
           document.getElementById('sx-xe-input').value = '';
           document.getElementById('sx-phieu').value = '';
           window.draftXeData.items = [];
           renderDraftXeCart();
+          
+          // Re-populate options in case we created a new vehicle
+          capNhatGoiYXe();
+
+          // Move back to AUTO
+          let selectSx = document.getElementById('sx-xe-select');
+          if(selectSx) selectSx.value = 'AUTO';
+          document.getElementById('sx-xe-input').style.display = 'none';
+
           renderBangThucHien();
           
           showDialog("Thành công", `Đã xuất thành công ${count} loại đạn lên xe ${escapeHTML(xe)}! Bạn có thể xem lại tại tab Nhập Nhanh hoặc Báo Cáo.`, "alert");
@@ -1781,7 +1878,7 @@
       if(idThucHienDangSua) {
           let index = STATE.thucHien.findIndex(t => t.id === idThucHienDangSua);
           let dsLoCu = STATE.thucHien[index].danhSachLo || [];
-          STATE.thucHien[index] = { id: idThucHienDangSua, lenhId: idLenh, soLenh: lenhGoc.soLenh, phieu: phieu, xe, ngay, time: STATE.thucHien[index].time || Date.now(), ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap, sl: parseFloat(sl), tenBaoGoi: lenhGoc.tenBaoGoi, slPerBaoGoi: lenhGoc.slPerBaoGoi, danhSachLo: dsLoCu };
+          STATE.thucHien[index] = { id: idThucHienDangSua, lenhId: idLenh, soLenh: lenhGoc.soLenh, phieu: phieu, xe, ngay, time: Date.now(), ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap, sl: parseFloat(sl), tenBaoGoi: lenhGoc.tenBaoGoi, slPerBaoGoi: lenhGoc.slPerBaoGoi, danhSachLo: dsLoCu };
           huySuaThucHien(); showToast("Đã cập nhật xe!");
       } else {
           STATE.thucHien.push({ id: generateID(), lenhId: idLenh, soLenh: lenhGoc.soLenh, phieu: phieu, xe, ngay, time: Date.now(), ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap, sl: parseFloat(sl), tenBaoGoi: lenhGoc.tenBaoGoi, slPerBaoGoi: lenhGoc.slPerBaoGoi, danhSachLo: [] });
@@ -1913,7 +2010,7 @@
               
               record = {
                   id: 'DRAFT', lenhId: lenhGoc.id, soLenh: lenhGoc.soLenh, ten: lenhGoc.ten, cap: lenhGoc.cap, dvt: lenhGoc.dvt,
-                  sl: existingList.reduce((sum,l)=>sum+l.sl, 0), // Tính tổng draft hiện tại
+                  sl: existingList.reduce((sum,l)=>sum+l.sl, 0), 
                   slPerBaoGoi: lenhGoc.slPerBaoGoi || 0,
                   tenBaoGoi: lenhGoc.tenBaoGoi || 'Cốp',
                   danhSachLo: existingList
@@ -1927,7 +2024,6 @@
           vungNhap.style.display = 'block'; 
           vungGoiYThongMinh.innerHTML = '';
           
-          // LUÔN HIỂN THỊ SEGMENT VÀ CHO PHÉP NHẬP NHANH CONFIG
           let segUI = document.getElementById('segment-che-do-nhap');
           segUI.style.display = 'flex'; 
           
@@ -1999,7 +2095,7 @@
           `;
           
           let tongDaXuat = viewData.listLo.reduce((sum, lo) => sum + lo.sl, 0);
-          document.getElementById('ql-lo-sl-tong').innerText = fmtNum(viewData.total) || fmtNum(tongDaXuat);
+          document.getElementById('ql-lo-sl-tong').innerText = viewData.isBangKeMode ? `Mục tiêu: ${fmtNum(viewData.slLenh)}` : fmtNum(viewData.total) || fmtNum(tongDaXuat);
           document.getElementById('ql-lo-sl-da-nhap').innerText = fmtNum(tongDaXuat);
           document.getElementById('ql-lo-sl-da-nhap').style.color = (tongDaXuat === viewData.total) ? 'var(--success-color)' : 'var(--warning-color)';
 
@@ -2032,18 +2128,17 @@
                               <tr>
                                   <td style="color: var(--text-sub); font-weight: 600;">${idx + 1}</td>
                                   <td style="text-align: left; font-weight: 800; font-size: 15px; color: var(--primary-color);">${escapeHTML(lo.tenLo)}</td>
-                                  <td style="font-weight: 700; color: var(--text-sub);">${idx === 0 ? fmtNum(viewData.slLenh) : '<span style="opacity:0.3">-</span>'}</td>
-                                  <td style="font-weight: 700; color: var(--text-sub);">${idx === 0 ? fmtNum(viewData.slDaCap) : '<span style="opacity:0.3">-</span>'}</td>
+                                  <td style="font-weight: 700; color: var(--text-sub);">${fmtNum(viewData.slLenh)}</td>
+                                  <td style="font-weight: 700; color: var(--text-sub);">${fmtNum(viewData.slDaCap)}</td>
                                   <td style="font-weight: 900; color: var(--warning-color); font-size: 16px;">
                                       ${formatLoWithBaoGoi(lo, viewData.tenBaoGoi)}
                                   </td>
-                                  <td style="font-weight: 800; color: var(--text-main);">${idx === 0 ? fmtNum(viewData.conLai) : '<span style="opacity:0.3">-</span>'}</td>
+                                  <td style="font-weight: 800; color: var(--text-main);">${fmtNum(viewData.conLai)}</td>
                               </tr>
                               `).join('')}
                           </tbody>
                       </table>
-                  </div>
-                  <div style="font-size: 11px; color: var(--text-sub); text-align: center; margin-top: 12px;"><i class="ph ph-info"></i> Chỉ số Lệnh/Đã Cấp/Còn hiển thị đại diện ở dòng đầu.</div>`;
+                  </div>`;
               } else {
                   container.innerHTML = viewData.listLo.map((lo, idx) => `
                       <div class="modern-list-item" style="border-radius:14px; margin-bottom:10px; border:0.5px solid var(--border-light); box-shadow: var(--card-shadow); padding: 12px 14px;">
@@ -3126,9 +3221,9 @@
               let loGop = gopDanhSachLo(item.tatCaLo);
               loGop.forEach(lo => {
                   let congThuc = "";
-                  if (lo.isBaoGoi) {
+                  if (lo.isBaoGoi || lo.slChan > 0 || (lo.mangLe && lo.mangLe.length > 1)) {
                       let parts = [];
-                      if (lo.slChan > 0) parts.push(`${lo.slChan} ${item.tenBaoGoi || 'BG'}`);
+                      if (lo.slChan > 0) parts.push(`${lo.slChan} ${item.tenBaoGoi || 'Cốp'}`);
                       if (lo.mangLe && lo.mangLe.length > 0) parts.push(lo.mangLe.join(' + '));
                       congThuc = parts.join(' + ');
                   }
