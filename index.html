@@ -272,15 +272,18 @@
     @media (prefers-color-scheme: dark) { ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); } }
 
     /* ================= GIAO DIỆN NHẬP BAO GÓI ================= */
-    .bg-segment-wrapper { background: var(--input-bg); padding: 3px; border-radius: 10px; display: flex; margin-bottom: 12px; }
-    .bg-segment-btn { flex: 1; text-align: center; font-size: 13px; font-weight: 700; padding: 8px 0; border-radius: 8px; color: var(--text-sub); transition: 0.2s; border: none; background: transparent; cursor: pointer; }
-    .bg-segment-btn.active { background: var(--bg-card); color: var(--text-main); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .bg-segment-wrapper { background: var(--input-bg); padding: 4px; border-radius: 12px; display: flex; margin-bottom: 16px; }
+    .bg-segment-btn { flex: 1; text-align: center; font-size: 13px; font-weight: 700; padding: 10px 0; border-radius: 10px; color: var(--text-sub); transition: 0.2s; border: none; background: transparent; cursor: pointer; }
+    .bg-segment-btn.active { background: var(--bg-card); color: var(--text-main); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     
-    .bg-input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-    .bg-input-le-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
-    .bg-input-le-item { display: flex; align-items: center; background: var(--input-bg); border-radius: 10px; padding: 4px; padding-left: 10px; flex: 1; min-width: 100px; }
-    .bg-input-le-item input { border: none; background: transparent; width: 100%; font-size: 15px; font-weight: 700; color: var(--danger-color); outline: none; padding: 4px 0;}
-    .bg-input-le-item .del-le-btn { color: var(--text-sub); padding: 4px; cursor: pointer; font-size: 16px; }
+    .bg-input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .bg-input-le-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+    .bg-input-le-item { display: flex; align-items: center; background: var(--input-bg); border-radius: 12px; padding: 6px; padding-left: 12px; flex: 1; min-width: 100px; border: 1px solid var(--border-light);}
+    .bg-input-le-item input { border: none; background: transparent; width: 100%; font-size: 16px; font-weight: 800; color: var(--danger-color); outline: none; padding: 4px 0;}
+    .bg-input-le-item .del-le-btn { color: var(--text-sub); padding: 4px; cursor: pointer; font-size: 18px; transition: 0.2s;}
+    .bg-input-le-item .del-le-btn:active { color: var(--danger-color); transform: scale(0.9); }
+
+    .bg-config-box { background: var(--bg-body); padding: 12px; border-radius: 12px; margin-bottom: 16px; border: 1px solid var(--border-light); }
   </style>
 </head>
 <body>
@@ -360,7 +363,6 @@
           </div>
         </div>
 
-        <!-- NEW: HÀNG NHẬP BAO GÓI -->
         <div class="form-row" style="margin-bottom:0;">
             <div class="form-group" style="flex: 1.5;">
                 <label>Loại bao gói (Trong)</label>
@@ -446,12 +448,11 @@
           </div>
         </div>
 
-        <!-- NEW: HELPER QUY ĐỔI BAO GÓI Ở THỰC HIỆN -->
-        <div id="th-bg-helper" style="display:none; background: var(--primary-light); padding: 10px; border-radius: 12px; margin-top: 10px; border: 1px dashed var(--primary-color);">
-            <div style="font-size: 11px; font-weight: 700; color: var(--primary-color); margin-bottom: 6px;">QUY ĐỔI NHANH: <span id="th-bg-he-so-text"></span></div>
+        <div id="th-bg-helper" style="display:none; background: var(--primary-light); padding: 12px; border-radius: 12px; margin-top: 12px; border: 1px dashed var(--primary-color);">
+            <div style="font-size: 11px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">QUY ĐỔI NHANH BAO GÓI: <span id="th-bg-he-so-text" style="color:var(--text-main);"></span></div>
             <div style="display: flex; gap: 8px;">
-                <input type="number" id="th-bg-chan" class="form-control" placeholder="Số Cốp/Hòm..." oninput="tinhNhanhSlThucHien()" style="height: 38px; font-size: 14px; flex: 1;">
-                <input type="number" id="th-bg-le" class="form-control" placeholder="Số lẻ..." oninput="tinhNhanhSlThucHien()" style="height: 38px; font-size: 14px; flex: 1;">
+                <input type="number" id="th-bg-chan" class="form-control" placeholder="Số Cốp/Hòm..." oninput="tinhNhanhSlThucHien()" style="height: 40px; font-size: 15px; font-weight: 700; flex: 1; border: 1px solid rgba(0,0,0,0.1);">
+                <input type="number" id="th-bg-le" class="form-control" placeholder="Cộng lẻ..." oninput="tinhNhanhSlThucHien()" style="height: 40px; font-size: 15px; font-weight: 700; flex: 1; border: 1px solid rgba(0,0,0,0.1);">
             </div>
         </div>
         
@@ -649,80 +650,76 @@
              <span style="color:var(--text-sub)">Đã nhập lô: <span id="ql-lo-sl-da-nhap" style="color:var(--warning-color); font-weight:800; font-size:16px;">0</span></span>
           </div>
 
-          <!-- NEW: HIỂN THỊ TỔNG HỢP BAO GÓI CHUNG -->
           <div id="ql-lo-tong-hop-bg" style="display:none; font-size: 13px; font-weight: 700; color: var(--primary-color); background: var(--primary-light); padding: 8px 16px; border-radius: 12px; margin-bottom: 16px; text-align: center; border: 1px dashed var(--primary-color);">
              Tổng hợp: <span id="lbl-tong-hop-bg">...</span>
           </div>
+      </div>
 
+      <!-- VÙNG CUỘN (SCROLLABLE AREA) MỚI CHỨA CẢ FORM VÀ DANH SÁCH -->
+      <div class="sheet-body" style="flex: 1; overflow-y: auto; padding: 16px 20px; background: var(--bg-body); -webkit-overflow-scrolling: touch;">
+          
           <div id="vung-goi-y-lo" style="display: none; margin-bottom: 16px; background: var(--bg-card); padding: 16px; border-radius: 16px; box-shadow: var(--card-shadow);">
               <div style="font-size: 13px; font-weight: 700; color: var(--text-sub); margin-bottom: 10px; text-transform: uppercase;"><i class="ph-bold ph-magic-wand"></i> Chọn nhanh Lô:</div>
-              <div id="danh-sach-chip-goi-y" style="display: flex; flex-wrap: wrap; gap: 8px; max-height: 250px; overflow-y: auto; padding-bottom: 4px;"></div>
+              <div id="danh-sach-chip-goi-y" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
           </div>
 
-          <div id="vung-nhap-lo-chinh">
+          <div id="vung-nhap-lo-chinh" style="background: var(--bg-card); padding: 16px; border-radius: 16px; box-shadow: var(--card-shadow); margin-bottom: 20px;">
               <div id="vung-goi-y-thong-minh" style="display: flex; gap: 8px; overflow-x: auto; margin-bottom: 10px; white-space: nowrap; -webkit-overflow-scrolling: touch; min-height: 0;"></div>
               
-              <!-- Segment Chuyển Đổi Chế Độ Nhập LUÔN HIỂN THỊ -->
               <div class="bg-segment-wrapper" id="segment-che-do-nhap" style="display: flex;">
                   <button class="bg-segment-btn active" id="btn-tab-nhap-sl" onclick="chuyenTabNhapLo('SL')">NHẬP SỐ LƯỢNG</button>
                   <button class="bg-segment-btn" id="btn-tab-nhap-bg" onclick="chuyenTabNhapLo('BG')">NHẬP BAO GÓI</button>
               </div>
 
-              <!-- Tiêu đề & Nút Excel -->
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding: 0 2px;">
-                  <label id="lbl-nhap-lo-title" style="font-size:12px; font-weight:700; color:var(--text-sub); text-transform: uppercase; margin:0;">Nhập Lô (Thủ công)</label>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 2px;">
+                  <label id="lbl-nhap-lo-title" style="font-size:12px; font-weight:700; color:var(--text-sub); text-transform: uppercase; margin:0;">Tên Lô (Thủ công)</label>
                   <button onclick="document.getElementById('excel-upload-lo').click()" style="background:var(--success-color); color:white; border:none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; display:flex; align-items:center; gap:4px; cursor:pointer;">
                       <i class="ph-bold ph-file-xls"></i> TỪ EXCEL
                   </button>
                   <input type="file" id="excel-upload-lo" style="display:none;" accept=".xlsx, .xls, .csv" onchange="xuLyNhapsLoTuExcel(event)">
               </div>
 
-              <!-- KHU VỰC CHUNG (LUÔN HIỂN THỊ TÊN LÔ) -->
-              <input type="text" id="input-ql-ten-lo" class="form-control" style="font-weight:700; font-size: 16px; margin-bottom: 8px;" placeholder="Tên Lô (VD: 203)" autocomplete="off" oninput="xuLyGoiYLoAuto()">
+              <input type="text" id="input-ql-ten-lo" class="form-control" style="font-weight:800; font-size: 18px; margin-bottom: 12px; border: 1px solid var(--border-light);" placeholder="VD: 203" autocomplete="off" oninput="xuLyGoiYLoAuto()">
 
-              <!-- VIEW 1: NHẬP SL TRỰC TIẾP -->
               <div id="view-nhap-sl" style="display: block;">
-                  <input type="number" id="input-ql-sl-lo" class="form-control" style="font-weight:800; color:var(--danger-color); text-align:center; font-size: 18px;" placeholder="Số Lượng Trực Tiếp" inputmode="decimal" pattern="[0-9]*">
+                  <input type="number" id="input-ql-sl-lo" class="form-control" style="font-weight:800; color:var(--danger-color); text-align:center; font-size: 22px; height: 56px; border: 2px solid var(--border-light);" placeholder="Số lượng trực tiếp" inputmode="decimal" pattern="[0-9]*">
               </div>
 
-              <!-- VIEW 2: NHẬP BAO GÓI (Tự động tính) -->
-              <div id="view-nhap-bg" style="display: none; background: var(--bg-card); padding: 12px; border-radius: 12px; border: 1px solid var(--primary-light);">
-                  
-                  <!-- Cấu hình hệ số linh hoạt -->
-                  <div style="display:flex; gap:8px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed var(--border-light);">
-                      <div style="flex: 1.5;">
-                          <label style="font-size:10px; font-weight:700; color:var(--text-sub); text-transform: uppercase;">Loại bao gói</label>
-                          <input type="text" id="bg-input-loai" class="form-control" placeholder="VD: Cốp, Hòm..." style="height: 38px; font-size:14px; background: var(--bg-body);">
-                      </div>
-                      <div style="flex: 1;">
-                          <label style="font-size:10px; font-weight:700; color:var(--text-sub); text-transform: uppercase;">SL đạn / 1 Bao</label>
-                          <input type="number" id="bg-input-he-so" class="form-control" placeholder="VD: 920" oninput="tinhToanTongBaoGoi()" style="height: 38px; font-size:15px; font-weight:800; color: var(--primary-color); background: var(--bg-body);">
+              <div id="view-nhap-bg" style="display: none;">
+                  <div class="bg-config-box">
+                      <div style="display:flex; gap:12px;">
+                          <div style="flex: 1.5;">
+                              <label style="font-size:10px; font-weight:700; color:var(--text-sub); text-transform: uppercase;">Loại bao gói</label>
+                              <input type="text" id="bg-input-loai" class="form-control" placeholder="Cốp, Hòm..." style="height: 40px; font-size:15px; font-weight: 700;">
+                          </div>
+                          <div style="flex: 1;">
+                              <label style="font-size:10px; font-weight:700; color:var(--text-sub); text-transform: uppercase;">SL đạn/1 Bao</label>
+                              <input type="number" id="bg-input-he-so" class="form-control" placeholder="920" oninput="tinhToanTongBaoGoi()" style="height: 40px; font-size:16px; font-weight:800; color: var(--primary-color);">
+                          </div>
                       </div>
                   </div>
 
                   <div class="bg-input-grid">
                       <div>
-                          <label style="font-size:11px; font-weight:700; color:var(--text-sub);">Số Bao Gói chẵn</label>
-                          <input type="number" id="bg-input-chan" class="form-control" placeholder="0" inputmode="decimal" oninput="tinhToanTongBaoGoi()" style="font-weight:800;">
+                          <label style="font-size:12px; font-weight:700; color:var(--text-sub);">Số Bao Gói chẵn</label>
+                          <input type="number" id="bg-input-chan" class="form-control" placeholder="0" inputmode="decimal" oninput="tinhToanTongBaoGoi()" style="font-weight:800; font-size: 18px; height: 50px;">
                       </div>
                       <div style="display:flex; flex-direction:column; justify-content:flex-end;">
-                          <div style="font-size:11px; font-weight:700; color:var(--text-sub); margin-bottom:4px; text-align:right;">Tổng quy đổi</div>
-                          <div id="bg-tong-hien-thi" style="font-size:22px; font-weight:900; color:var(--danger-color); text-align:right;">0</div>
+                          <div style="font-size:11px; font-weight:700; color:var(--text-sub); margin-bottom:6px; text-align:right;">Tổng quy đổi</div>
+                          <div id="bg-tong-hien-thi" style="font-size:26px; font-weight:900; color:var(--danger-color); text-align:right;">0</div>
                       </div>
                   </div>
                   
-                  <label style="font-size:11px; font-weight:700; color:var(--text-sub); margin-top: 8px;">Nhập số lẻ (+)</label>
+                  <label style="font-size:12px; font-weight:700; color:var(--text-sub); margin-top: 12px; display: block;">Nhập số lẻ (+)</label>
                   <div id="bg-ds-le" class="bg-input-le-container"></div>
-                  <button onclick="themOLeBaoGoi()" style="background:var(--primary-light); color:var(--primary-color); border:none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor:pointer;"><i class="ph-bold ph-plus"></i> THÊM Ô LẺ</button>
+                  <button onclick="themOLeBaoGoi()" style="background:var(--primary-light); color:var(--primary-color); border:none; padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor:pointer; width: 100%;"><i class="ph-bold ph-plus"></i> THÊM KHUNG NHẬP LẺ</button>
               </div>
           </div>
-      </div>
 
-      <div style="flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; background: var(--bg-body);">
           <div id="danh-sach-ql-lo-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
       </div>
 
-      <div id="vung-nut-lo-bottom" style="padding: 16px 20px calc(16px + env(safe-area-inset-bottom)); background: var(--bg-card); border-top: 0.5px solid var(--border-light); flex-shrink: 0; display: flex; gap: 12px;">
+      <div id="vung-nut-lo-bottom" style="padding: 16px 20px calc(16px + env(safe-area-inset-bottom)); background: var(--bg-card); border-top: 0.5px solid var(--border-light); flex-shrink: 0; display: flex; gap: 12px; z-index: 20;">
           <!-- Content injected dynamically -->
       </div>
 
@@ -794,7 +791,6 @@
       });
   }
 
-  // --- HÀM GỘP LÔ MỚI (Xử lý mảng lẻ) ---
   function gopDanhSachLo(dsLo) {
       let grouped = {};
       dsLo.forEach(lo => {
@@ -805,7 +801,6 @@
               grouped[ten].slChan += (lo.slChan || 0);
               if(lo.mangLe) grouped[ten].mangLe.push(...lo.mangLe);
           } else {
-              // Nếu xuất hiện dòng không dùng bao gói, coi nó như 1 khoản lẻ cộng vào
               grouped[ten].mangLe.push(lo.sl);
           }
       });
@@ -821,7 +816,6 @@
   let currentLoContext = { type: null, id: null, viewData: null }; 
   let idLoDangSua = null; 
 
-  // --- CÁC HÀM XỬ LÝ BAO GÓI MỚI ---
   let cheDoNhapHienTai = 'SL';
 
   function chuyenTabNhapLo(mode) {
@@ -841,8 +835,14 @@
       let div = document.createElement('div');
       div.className = 'bg-input-le-item';
       div.innerHTML = `<input type="number" inputmode="decimal" class="bg-in-le" value="${value}" placeholder="0" oninput="tinhToanTongBaoGoi()">
-                       <i class="ph-bold ph-x del-le-btn" onclick="xoaOLeBaoGoi(this)"></i>`;
+                       <i class="ph-bold ph-x-circle del-le-btn" onclick="xoaOLeBaoGoi(this)"></i>`;
       container.appendChild(div);
+      
+      // Tự động cuộn xuống khi thêm ô lẻ để không bị lấp
+      setTimeout(() => {
+          let sheetBody = document.querySelector('.sheet-body');
+          if(sheetBody) sheetBody.scrollBy({ top: 60, behavior: 'smooth' });
+      }, 50);
   }
 
   function xoaOLeBaoGoi(btn) {
@@ -882,7 +882,7 @@
       return `
         <div style="display:flex; flex-direction:column; align-items:flex-end;">
             <div style="font-size:18px; color: var(--primary-color); font-weight:800; line-height: 1;">${lo.sl}</div>
-            <div style="font-size:11px; color: var(--warning-color); font-weight:700; margin-top:2px;">(${formula})</div>
+            <div style="font-size:11px; color: var(--text-sub); background: var(--input-bg); padding: 2px 6px; border-radius: 6px; font-weight:700; margin-top:4px;">${formula}</div>
         </div>
       `;
   }
@@ -1897,7 +1897,7 @@
       let btnThoat = document.getElementById('btn-thoat-lo');
       if(btnThoat) btnThoat.style.display = 'none';
 
-      let container = document.querySelector('.modal-bottom-sheet .sheet-content .modal-list-container');
+      let container = document.querySelector('.sheet-body');
       if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -1911,7 +1911,7 @@
 
       let btnSubmit = document.getElementById('btn-submit-lo');
       if(btnSubmit) {
-          btnSubmit.innerText = 'NHẬP LÔ';
+          btnSubmit.innerHTML = 'NHẬP LÔ';
           btnSubmit.style.background = 'var(--primary-color)';
       }
       
