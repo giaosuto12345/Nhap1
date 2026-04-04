@@ -421,10 +421,9 @@
           <div class="form-group" style="margin-bottom: 0;">
               <label style="color: var(--primary-color);">Xe nhận (Bắt buộc)</label>
               <select id="sx-xe-select" class="form-control" style="font-weight: 800; font-size: 16px; color: var(--danger-color); background: var(--bg-card); margin-bottom: 8px;" onchange="xuLyChonXeSoanXe()">
-                  <option value="AUTO">-- Xe mới (Tự động tăng) --</option>
-                  <option value="MANUAL">✍️ Nhập số/tên xe khác...</option>
+                  <option value="NEW">✍️ Nhập số/tên xe mới...</option>
               </select>
-              <input type="text" id="sx-xe-input" class="form-control" placeholder="Nhập tên/số xe mới..." style="display:none; font-weight: 800; font-size: 16px; color: var(--danger-color); background: var(--bg-card);">
+              <input type="text" id="sx-xe-input" class="form-control" placeholder="Nhập tên/số xe mới..." style="font-weight: 800; font-size: 16px; color: var(--danger-color); background: var(--bg-card);">
           </div>
       </div>
 
@@ -1328,16 +1327,20 @@
       if (currentVal === 'MANUAL' || dsXeThucHien.includes(currentVal)) { selectThucHien.value = currentVal; } 
       else { selectThucHien.value = 'AUTO'; document.getElementById('th-xe-input').style.display = 'none'; }
 
-      // Update Tab Soạn Xe
+      // Update Tab Soạn Xe (FIXED)
       let selectSx = document.getElementById('sx-xe-select');
       let currentValSx = selectSx ? selectSx.value : '';
-      let htmlSx = `<option value="AUTO">-- Xe mới (Tự động tăng) --</option>`;
-      dsXeSoanXe.forEach(x => { htmlSx += `<option value="${escapeHTML(x)}">Đang sửa: Xe ${escapeHTML(x)}</option>`; });
-      htmlSx += `<option value="MANUAL">✍️ Nhập số/tên xe khác...</option>`;
+      let htmlSx = `<option value="NEW">✍️ Nhập xe mới...</option>`;
+      dsXeSoanXe.forEach(x => { htmlSx += `<option value="${escapeHTML(x)}">Sửa chuyến: Xe ${escapeHTML(x)}</option>`; });
       if (selectSx) {
           selectSx.innerHTML = htmlSx;
-          if (currentValSx === 'MANUAL' || dsXeSoanXe.includes(currentValSx)) { selectSx.value = currentValSx; } 
-          else { selectSx.value = 'AUTO'; document.getElementById('sx-xe-input').style.display = 'none'; }
+          if (currentValSx === 'NEW' || dsXeSoanXe.includes(currentValSx)) { 
+              selectSx.value = currentValSx; 
+              if (currentValSx === 'NEW') document.getElementById('sx-xe-input').style.display = 'block';
+          } 
+          else { 
+              selectSx.value = 'NEW'; document.getElementById('sx-xe-input').style.display = 'block'; 
+          }
       }
 
       // Update Tab Báo Cáo
@@ -1354,15 +1357,12 @@
       let inputEl = document.getElementById('sx-xe-input');
       let ngay = document.getElementById('sx-ngay').value;
 
-      if (val === 'MANUAL') {
+      if (val === 'NEW') {
           inputEl.style.display = 'block';
+          inputEl.value = '';
           inputEl.focus();
           window.draftXeData.items = [];
-          renderDraftXeCart();
-      } else if (val === 'AUTO') {
-          inputEl.style.display = 'none';
-          inputEl.value = '';
-          window.draftXeData.items = [];
+          document.getElementById('sx-phieu').value = '';
           renderDraftXeCart();
       } else {
           inputEl.style.display = 'none';
@@ -1765,7 +1765,8 @@
 
   function chotXuatXe() {
       haptic();
-      let xe = document.getElementById('sx-xe-input').value.trim();
+      let xeSelectVal = document.getElementById('sx-xe-select').value;
+      let xe = xeSelectVal === 'NEW' ? document.getElementById('sx-xe-input').value.trim() : xeSelectVal;
       let ngay = document.getElementById('sx-ngay').value;
       let phieu = document.getElementById('sx-phieu').value.trim();
 
@@ -1773,11 +1774,9 @@
       if (!ngay) { showDialog("Thiếu thông tin", "Vui lòng chọn Ngày xuất.", "alert"); return; }
       if (window.draftXeData.items.length === 0) { showDialog("Xe trống", "Chưa có đạn nào được soạn lên xe.", "alert"); return; }
 
-      // Check if we are appending to an existing vehicle, filter out old items
-      let selectXeVal = document.getElementById('sx-xe-select').value;
-      if (selectXeVal !== 'AUTO' && selectXeVal !== 'MANUAL') {
-          // Editing existing vehicle on that day
-          STATE.thucHien = STATE.thucHien.filter(t => !(t.ngay === ngay && t.xe === selectXeVal));
+      // Check if we are appending to an existing vehicle, filter out old items to overwrite
+      if (xeSelectVal !== 'NEW') {
+          STATE.thucHien = STATE.thucHien.filter(t => !(t.ngay === ngay && t.xe === xeSelectVal));
       }
 
       showDialog("Xác nhận", `Chốt xuất ${window.draftXeData.items.length} loại đạn lên xe <b>${escapeHTML(xe)}</b>?`, "confirm", () => {
@@ -1791,7 +1790,7 @@
                   phieu: phieu,
                   xe: xe,
                   ngay: ngay,
-                  time: now + idx, // Đảm bảo time khác nhau để sort chính xác
+                  time: now + idx, // Đảm bảo time khác nhau để sort chính xác lên top
                   ten: item.ten,
                   dvt: item.dvt,
                   cap: item.cap,
@@ -1810,13 +1809,11 @@
           window.draftXeData.items = [];
           renderDraftXeCart();
           
-          // Re-populate options in case we created a new vehicle
           capNhatGoiYXe();
 
-          // Move back to AUTO
           let selectSx = document.getElementById('sx-xe-select');
-          if(selectSx) selectSx.value = 'AUTO';
-          document.getElementById('sx-xe-input').style.display = 'none';
+          if(selectSx) selectSx.value = 'NEW';
+          document.getElementById('sx-xe-input').style.display = 'block';
 
           renderBangThucHien();
           
@@ -2423,10 +2420,16 @@
           record.danhSachLo.push({ id: generateID(), tenLo, sl: slLo, isBaoGoi, slChan, mangLe, tenBaoGoi: formLoaiBg });
       }
       
-      record.sl = record.danhSachLo.reduce((sum, l) => sum + l.sl, 0);
+      // Xoá dòng này để không overwrite lại SL của THUCHIEN
+      if (currentLoContext.type === 'DRAFT_XE_ITEM') {
+          record.sl = record.danhSachLo.reduce((sum, l) => sum + l.sl, 0);
+      }
 
       if (currentLoContext.type === 'LENH') safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh));
-      else if (currentLoContext.type === 'THUCHIEN') safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
+      else if (currentLoContext.type === 'THUCHIEN') {
+          record.time = Date.now(); // Cập nhật giờ lên top
+          safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
+      }
       else if (currentLoContext.type === 'DRAFT_XE_ITEM') {
           if (window.currentDraftItemIndex === -1) {
               window.draftXeData.items.push(record);
@@ -2509,10 +2512,15 @@
               }
 
               record.danhSachLo.push(...newBatches);
-              record.sl = record.danhSachLo.reduce((sum, l) => sum + l.sl, 0);
+              if (currentLoContext.type === 'DRAFT_XE_ITEM') {
+                  record.sl = record.danhSachLo.reduce((sum, l) => sum + l.sl, 0);
+              }
 
               if (currentLoContext.type === 'LENH') safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh));
-              else if (currentLoContext.type === 'THUCHIEN') safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
+              else if (currentLoContext.type === 'THUCHIEN') {
+                  record.time = Date.now();
+                  safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
+              }
               else if (currentLoContext.type === 'DRAFT_XE_ITEM' && window.currentDraftItemIndex === -1) {
                   window.draftXeData.items.push(record);
                   window.currentDraftItemIndex = window.draftXeData.items.length - 1;
@@ -2540,10 +2548,16 @@
       if(!record) return;
 
       record.danhSachLo = record.danhSachLo.filter(lo => lo.id !== idLo);
-      record.sl = record.danhSachLo.reduce((sum, l) => sum + l.sl, 0);
+      
+      if (currentLoContext.type === 'DRAFT_XE_ITEM') {
+          record.sl = record.danhSachLo.reduce((sum, l) => sum + l.sl, 0);
+      }
       
       if (currentLoContext.type === 'LENH') safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh));
-      else if (currentLoContext.type === 'THUCHIEN') safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
+      else if (currentLoContext.type === 'THUCHIEN') {
+          record.time = Date.now();
+          safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
+      }
 
       if (idLoDangSua === idLo) huySuaLo();
 
@@ -2628,7 +2642,7 @@
                   <thead>
                       <tr>
                           <th style="width: 40px;">STT</th>
-                          <th style="text-align: left; width: 250px;">TÊN ĐẠN</th>
+                          <th style="text-align: left; width: 250px;">TÊN ĐẠN / TÊN LÔ</th>
                           <th style="width: 50px;">ĐVT</th>
                           <th style="width: 70px;">CẤP/KLR</th>
                           <th style="width: 70px;">LỆNH</th>
@@ -2642,10 +2656,9 @@
                           let klr = layKLRTuTenDan(d.ten);
                           let conLai = d.slLenh - d.slDaCap;
 
-                          let loGop = gopDanhSachLo(d.tatCaLo);
                           let viewDataStr = encodeURIComponent(JSON.stringify({
                               title: "Chi tiết Lô xuất (Báo cáo)",
-                              name: d.ten, dvt: d.dvt, cap: d.cap, klr: klr, total: d.slGroup, listLo: loGop,
+                              name: d.ten, dvt: d.dvt, cap: d.cap, klr: klr, total: d.slGroup, listLo: d.tatCaLo,
                               tenBaoGoi: d.tenBaoGoi, slPerBaoGoi: d.slPerBaoGoi,
                               slLenh: d.slLenh, slDaCap: d.slDaCap, conLai: conLai, isBangKeMode: true
                           }));
@@ -2759,10 +2772,9 @@
                       ${g.items.map(i => {
                           let colorConLai = i.conLai < 0 ? 'var(--danger-color)' : (i.conLai === 0 ? 'var(--success-color)' : 'var(--text-main)');
                           
-                          let loGop = gopDanhSachLo(i.tatCaLoDaXuat);
                           let viewDataStr = encodeURIComponent(JSON.stringify({
                               title: "Chi tiết Lô thực xuất",
-                              name: i.ten, dvt: i.dvt, cap: i.cap, total: i.slDaXuat, listLo: loGop,
+                              name: i.ten, dvt: i.dvt, cap: i.cap, total: i.slDaXuat, listLo: i.tatCaLoDaXuat,
                               tenBaoGoi: i.tenBaoGoi, slPerBaoGoi: i.slPerBaoGoi
                           }));
 
@@ -2880,7 +2892,6 @@
 
           const generateItemsHtml = (items, isGrouped) => {
               return items.map((i, idx) => {
-                  let loGop = gopDanhSachLo(i.danhSachLo || []);
                   let klr = layKLRTuTenDan(i.ten);
                   let khoiLuongTan = (i.sl * klr) / 1000;
                   let formatTanItem = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(khoiLuongTan);
@@ -2889,7 +2900,7 @@
 
                   let viewDataStr = encodeURIComponent(JSON.stringify({
                       title: idThucHienToEdit ? `Chi tiết Lô Xe ${xe}` : `Tổng Lô Xe ${xe}`,
-                      name: i.ten, dvt: i.dvt, cap: i.cap, klr: klr, total: i.sl, listLo: loGop,
+                      name: i.ten, dvt: i.dvt, cap: i.cap, klr: klr, total: i.sl, listLo: i.danhSachLo,
                       tenBaoGoi: i.tenBaoGoi, slPerBaoGoi: i.slPerBaoGoi,
                       idThucHien: idThucHienToEdit
                   }));
@@ -3070,13 +3081,16 @@
       window.currentBaoCaoChungData = arr; 
 
       let listHtml = arr.map((d, idx) => {
-          let loGop = gopDanhSachLo(d.tatCaLo);
+          // Báo Cáo Chung (Tổng hợp) thì chúng ta không gộp các lô theo tên lô nữa
+          // Mà sẽ list các lô thô ra (d.tatCaLo).
+          // Sort raw batches by name for cleaner look if they have duplicates from different records
+          let sortedBatches = d.tatCaLo.sort((a,b)=> a.tenLo.localeCompare(b.tenLo));
           let klr = layKLRTuTenDan(d.ten);
           let khoiLuongTan = (d.sl * klr) / 1000;
           let formatTanItem = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(khoiLuongTan);
           
           let viewDataStr = encodeURIComponent(JSON.stringify({
-              title: `Chi tiết Lô Xuất`, name: d.ten, dvt: d.dvt, cap: d.cap, klr: klr, total: d.sl, listLo: loGop, idThucHien: null,
+              title: `Chi tiết Lô Xuất`, name: d.ten, dvt: d.dvt, cap: d.cap, klr: klr, total: d.sl, listLo: sortedBatches, idThucHien: null,
               tenBaoGoi: d.tenBaoGoi, slPerBaoGoi: d.slPerBaoGoi
           }));
 
