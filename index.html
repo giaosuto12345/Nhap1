@@ -163,9 +163,10 @@
         z-index: 9000;
         box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
     }
-    .nav-item { flex: 1; text-align: center; font-size: 9px; font-weight: 600; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: 0.2s; }
+    .nav-item { position: relative; flex: 1; text-align: center; font-size: 9px; font-weight: 600; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: 0.2s; }
     .nav-item.active { color: var(--primary-color); }
     .nav-icon { font-size: 22px; margin-bottom: 0; }
+    .nav-badge { position: absolute; top: 0px; right: 15%; background: var(--danger-color); color: white; border-radius: 50%; padding: 2px 6px; font-size: 9px; font-weight: 800; border: 2px solid var(--nav-bg); display: none; }
 
     .tab-content { display: none; animation: fadeIn 0.2s ease-out; }
     .tab-content.active { display: block; }
@@ -247,7 +248,7 @@
     .dash-box-title { font-size: 10px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 6px; }
     .dash-box-val { font-size: 15px; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px;}
 
-    /* ================= BOTTOM SHEET QUẢN LÝ LÔ ================= */
+    /* ================= BOTTOM SHEET QUẢN LÝ LÔ (CẤU TRÚC MỚI FIX LỖI CUỘN) ================= */
     .modal-bottom-sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); z-index: 20000; display: none; flex-direction: column; justify-content: flex-end; align-items: center; opacity: 0; transition: opacity 0.3s; }
     .modal-bottom-sheet.show { opacity: 1; }
     
@@ -468,7 +469,7 @@
       </div>
     </div>
 
-    <!-- ==================== TAB 4: THỰC HIỆN (BẢN CŨ NHẬP TỔNG) ==================== -->
+    <!-- ==================== TAB 4: THỰC HIỆN (NHẬP NHANH CŨ) ==================== -->
     <div id="tab-thuc-hien" class="tab-content">
       <div class="card">
         
@@ -523,11 +524,14 @@
       </div>
 
       <div class="card" style="padding:0; overflow:hidden; border:none; background: transparent; box-shadow: none;">
+        <div style="font-size: 12px; font-weight: 800; color: var(--text-main); text-transform: uppercase; margin-bottom: 8px; padding-left: 4px;">
+            LỊCH SỬ XUẤT
+        </div>
         <div class="table-container" style="background: var(--bg-card); border-radius: 16px; box-shadow: var(--card-shadow); border: none;">
           <table>
             <thead>
               <tr>
-                <th style="width: 50px;">Ngày</th>
+                <th style="width: 50px;">Thời gian</th>
                 <th style="width: 50px;">Xe (Phiếu)</th>
                 <th style="width: 120px;">Đạn (Nhập Lô)</th>
                 <th style="width: 30px;">Cấp</th>
@@ -612,13 +616,17 @@
     <div class="nav-item" id="nav-lenh" onclick="chuyenTab('tab-lenh', 'LỆNH XUẤT', 'nav-lenh')">
       <i class="ph-fill ph-receipt nav-icon"></i><div>Lệnh Xuất</div>
     </div>
-    <div class="nav-item" id="nav-soan-xe" onclick="chuyenTab('tab-soan-xe', 'SOẠN XE CHI TIẾT', 'nav-soan-xe')">
-      <i class="ph-fill ph-truck-trailer nav-icon"></i><div>Soạn Xe</div>
+    <div class="nav-item" id="nav-soan-xe" onclick="chuyenTab('tab-soan-xe', 'SOẠN XE', 'nav-soan-xe')">
+      <div style="position: relative;">
+          <i class="ph-fill ph-truck-trailer nav-icon"></i>
+          <span id="cart-badge" class="nav-badge">0</span>
+      </div>
+      <div>Soạn Xe</div>
     </div>
     <div class="nav-item" id="nav-thuc-hien" onclick="chuyenTab('tab-thuc-hien', 'NHẬP NHANH', 'nav-thuc-hien')">
       <i class="ph-fill ph-lightning nav-icon"></i><div>Nhập Nhanh</div>
     </div>
-    <div class="nav-item" id="nav-bao-cao" onclick="chuyenTab('tab-bao-cao', 'BÁO CÁO', 'nav-bao-cao')">
+    <div class="nav-item" id="nav-bao-cao" onclick="chuyenTab('tab-bao-cao', 'BÁO CÁO KẾT QUẢ', 'nav-bao-cao')">
       <i class="ph-fill ph-chart-pie-slice nav-icon"></i><div>Báo Cáo</div>
     </div>
   </div>
@@ -697,7 +705,7 @@
     </div>
   </div>
 
-  <!-- ==================== MODAL BOTTOM SHEET QUẢN LÝ LÔ (ĐÃ SỬA LỖI SCROLL) ==================== -->
+  <!-- ==================== MODAL BOTTOM SHEET QUẢN LÝ LÔ ==================== -->
   <div id="modal-quan-ly-lo" class="modal-bottom-sheet">
     <div class="sheet-content">
       
@@ -828,8 +836,16 @@
       const month = String(d.getMonth() + 1).padStart(2, '0');
       const day = String(d.getDate()).padStart(2, '0'); return `${year}-${month}-${day}`;
   }
+  function formatTime(timestamp) {
+      if(!timestamp) return ''; const d = new Date(timestamp);
+      return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  }
   function formatShortDate(dateStr) {
       if(!dateStr) return ''; let parts = dateStr.split('-'); if(parts.length !== 3) return dateStr; return `${parts[2]}/${parts[1]}`;
+  }
+  function fmtNum(num) {
+      if (isNaN(num)) return 0;
+      return new Intl.NumberFormat('vi-VN').format(num);
   }
 
   function sortBatchesCustom(batches) {
@@ -864,7 +880,7 @@
           if (lo.isBaoGoi) {
               grouped[ten].slChan += (lo.slChan || 0);
               if(lo.mangLe) grouped[ten].mangLe.push(...lo.mangLe);
-              if(lo.tenBaoGoi) grouped[ten].tenBaoGoi = lo.tenBaoGoi; // Giữ lại tên bao gói
+              if(lo.tenBaoGoi) grouped[ten].tenBaoGoi = lo.tenBaoGoi; // Prefer saved package name
           } else {
               grouped[ten].mangLe.push(lo.sl);
           }
@@ -886,9 +902,9 @@
       ngay: '',
       xe: '',
       phieu: '',
-      items: [] // { id, lenhId, soLenh, ten, dvt, cap, sl, tenBaoGoi, slPerBaoGoi, danhSachLo: [] }
+      items: [] 
   };
-  window.currentDraftItemIndex = -1; // -1 = đang tạo mới, >= 0 là đang sửa item trong giỏ
+  window.currentDraftItemIndex = -1;
 
   let cheDoNhapHienTai = 'SL';
 
@@ -933,7 +949,7 @@
       inLes.forEach(input => {
           total += (parseFloat(input.value) || 0);
       });
-      document.getElementById('bg-tong-hien-thi').innerText = total;
+      document.getElementById('bg-tong-hien-thi').innerText = fmtNum(total);
       return total;
   }
 
@@ -947,9 +963,9 @@
   }
 
   function formatLoWithBaoGoi(lo, tenBaoGoiFallback) {
-      let loaiBG = lo.tenBaoGoi || tenBaoGoiFallback || 'BG';
+      let loaiBG = lo.tenBaoGoi || tenBaoGoiFallback || 'Cốp';
       if (!lo.isBaoGoi && !lo.slChan && (!lo.mangLe || lo.mangLe.length === 0)) {
-          return `<div style="font-size:18px; color: var(--primary-color); font-weight:800;">${lo.sl}</div>`;
+          return `<div style="font-size:18px; color: var(--primary-color); font-weight:800;">${fmtNum(lo.sl)}</div>`;
       }
 
       let parts = [];
@@ -957,11 +973,11 @@
       if (lo.mangLe && lo.mangLe.length > 0) parts.push(lo.mangLe.join(' + '));
       let formula = parts.join(' + ');
       
-      if (!formula) return `<div style="font-size:18px; color: var(--primary-color); font-weight:800;">${lo.sl}</div>`;
+      if (!formula) return `<div style="font-size:18px; color: var(--primary-color); font-weight:800;">${fmtNum(lo.sl)}</div>`;
 
       return `
         <div style="display:flex; flex-direction:column; align-items:flex-end;">
-            <div style="font-size:18px; color: var(--primary-color); font-weight:800; line-height: 1;">${lo.sl}</div>
+            <div style="font-size:18px; color: var(--primary-color); font-weight:800; line-height: 1;">${fmtNum(lo.sl)}</div>
             <div style="font-size:11px; color: var(--text-sub); background: var(--input-bg); padding: 2px 6px; border-radius: 6px; font-weight:700; margin-top:4px;">${formula}</div>
         </div>
       `;
@@ -974,7 +990,7 @@
       }
 
       let totalChan = 0; let allLe = []; let rawNonBaoGoi = 0;
-      let usedLoaiBG = record.tenBaoGoi || 'BG';
+      let usedLoaiBG = record.tenBaoGoi || 'Cốp';
 
       record.danhSachLo.forEach(lo => {
           if (lo.tenBaoGoi) usedLoaiBG = lo.tenBaoGoi; // Prefer the batch's saved string
@@ -1193,7 +1209,7 @@
       document.getElementById(navId).classList.add('active'); 
       document.getElementById('app-title').innerText = title;
       
-      if(tabId === 'tab-thuc-hien' || tabId === 'tab-soan-xe') { capNhatDropdownSoLenh(); capNhatGoiYXe(); }
+      if(tabId === 'tab-thuc-hien' || tabId === 'tab-soan-xe') { capNhatDropdownSoLenh(); capNhatGoiYXe(); renderBangThucHien(); }
       if(tabId === 'tab-bao-cao') { 
           capNhatGoiYXe(); 
           if(currentBaoCaoMode === 'ngay') renderBaoCaoNgay();
@@ -1246,6 +1262,35 @@
   function capNhatGoiYSoLenh() {
       let uniqueLenh = [...new Set(STATE.lenh.map(l => l.soLenh))];
       document.getElementById('ds-so-lenh').innerHTML = uniqueLenh.map(sl => `<option value="${escapeHTML(sl)}">`).join('');
+  }
+
+  function capNhatDropdownSoLenh() {
+      let uniqueLenh = [...new Set(STATE.lenh.map(l => l.soLenh))];
+      
+      let selectTh = document.getElementById('th-so-lenh'); 
+      if(uniqueLenh.length === 0) { selectTh.innerHTML = '<option value="">-- Trống --</option>'; }
+      else { selectTh.innerHTML = '<option value="">-- Chọn Số Lệnh --</option>' + uniqueLenh.map(sl => `<option value="${escapeHTML(sl)}">${escapeHTML(sl)}</option>`).join(''); }
+      document.getElementById('th-chon-dan').innerHTML = '<option value="">-- Vui lòng chọn Lệnh trước --</option>';
+
+      let selectSx = document.getElementById('sx-so-lenh'); 
+      if(uniqueLenh.length === 0) { selectSx.innerHTML = '<option value="">-- Trống --</option>'; }
+      else { selectSx.innerHTML = '<option value="">-- Chọn Số Lệnh --</option>' + uniqueLenh.map(sl => `<option value="${escapeHTML(sl)}">${escapeHTML(sl)}</option>`).join(''); }
+      document.getElementById('sx-chon-dan').innerHTML = '<option value="">-- Vui lòng chọn Lệnh trước --</option>';
+  }
+
+  function loadDanTheoLenh() {
+      let soLenhChon = document.getElementById('th-so-lenh').value; let selectDan = document.getElementById('th-chon-dan');
+      if(!soLenhChon) { selectDan.innerHTML = '<option value="">-- Vui lòng chọn Lệnh trước --</option>'; return; }
+      let danTrongLenh = STATE.lenh.filter(l => l.soLenh === soLenhChon);
+      let danKemConLai = danTrongLenh.map(l => {
+          let daXuat = STATE.thucHien.filter(t => t.lenhId === l.id).reduce((sum, current) => sum + current.sl, 0);
+          let conLai = l.sl - daXuat; return { ...l, conLai: conLai };
+      });
+      danKemConLai.sort((a, b) => { let aHet = a.conLai <= 0 ? 1 : 0; let bHet = b.conLai <= 0 ? 1 : 0; return aHet - bHet; });
+      selectDan.innerHTML = '<option value="">-- Chọn loại đạn --</option>' + danKemConLai.map(l => { 
+          let textDisplay = `${escapeHTML(l.ten)} - (Còn: ${fmtNum(l.conLai)} ${escapeHTML(l.dvt)})`; if (l.conLai <= 0) { textDisplay = `[ĐÃ ĐỦ] ` + textDisplay; }
+          return `<option value="${l.id}" data-conlai="${l.conLai}">${textDisplay}</option>`; 
+      }).join('');
   }
 
   function capNhatGoiYXe() {
@@ -1482,11 +1527,11 @@
               <td style="text-align:left; cursor:pointer;" onclick="moModalQuanLyLo('LENH', '${item.id}')">
                   <div style="color:var(--text-main); font-weight:700;">${escapeHTML(item.ten)}</div>
                   <div style="font-size:10px; color:${trangThaiLoColor}; margin-top:3px; font-weight: 700;">
-                     <i class="ph-bold ph-stack"></i> Dự kiến Lô: ${slDaNhapLo} / ${item.sl}
+                     <i class="ph-bold ph-stack"></i> Dự kiến Lô: ${fmtNum(slDaNhapLo)} / ${fmtNum(item.sl)}
                   </div>
               </td>
               <td style="color:var(--text-sub);">${escapeHTML(item.dvt)}</td><td style="color:var(--text-sub);">${escapeHTML(item.cap)}</td>
-              <td style="color:var(--danger-color); font-weight:800;">${item.sl}</td>
+              <td style="color:var(--danger-color); font-weight:800;">${fmtNum(item.sl)}</td>
               <td>
                   <div style="display:flex; flex-direction:column; gap:6px; align-items:center;">
                       <button class="btn-sm btn-edit" onclick="batDauSuaLenh('${item.id}')"><i class="ph-bold ph-pencil-simple"></i></button>
@@ -1501,10 +1546,11 @@
       if(STATE.lenh.length === 0) { showDialog("Trống", "Chưa có lệnh nào.", "alert"); return; }
       let groups = {};
       STATE.lenh.forEach(item => {
-          if(!groups[item.soLenh]) groups[item.soLenh] = { items: [], tongKL: 0 };
+          if(!groups[item.soLenh]) groups[item.soLenh] = { items: [], tongKL: 0, tongSL: 0 };
           
           let klr = layKLRTuTenDan(item.ten);
           groups[item.soLenh].tongKL += (item.sl * klr);
+          groups[item.soLenh].tongSL += item.sl;
           groups[item.soLenh].items.push(item);
       });
       let html = '';
@@ -1516,7 +1562,7 @@
           <div class="modern-list">
               <div class="modern-list-header sticky-list-header" style="display:flex; justify-content:space-between; background: var(--primary-light);">
                   <span style="color:var(--primary-color);">LỆNH: ${escapeHTML(soLenh)}</span>
-                  <span style="color:var(--danger-color); font-weight:800;">${formatTan} Tấn</span>
+                  <span style="color:var(--danger-color); font-weight:800;">${fmtNum(g.tongSL)} ĐẠN / ${formatTan} TẤN</span>
               </div>
               <div style="background: var(--bg-card);">
                   ${g.items.map((i, idx) => `
@@ -1526,7 +1572,7 @@
                               <div class="modern-list-title">${escapeHTML(i.ten)}</div>
                               <div class="modern-list-subtitle">ĐVT: <b style="color:var(--text-main)">${escapeHTML(i.dvt) || '?'}</b> &bull; Cấp: <b style="color:var(--text-main)">${escapeHTML(i.cap) || '?'}</b></div>
                           </div>
-                          <div class="modern-list-qty">${i.sl}</div>
+                          <div class="modern-list-qty">${fmtNum(i.sl)}</div>
                       </div>
                   `).join('')}
               </div>
@@ -1548,7 +1594,7 @@
       });
       danKemConLai.sort((a, b) => { let aHet = a.conLai <= 0 ? 1 : 0; let bHet = b.conLai <= 0 ? 1 : 0; return aHet - bHet; });
       selectDan.innerHTML = '<option value="">-- Chọn loại đạn --</option>' + danKemConLai.map(l => { 
-          let textDisplay = `${escapeHTML(l.ten)} - (Còn: ${l.conLai} ${escapeHTML(l.dvt)})`; if (l.conLai <= 0) { textDisplay = `[ĐÃ ĐỦ] ` + textDisplay; }
+          let textDisplay = `${escapeHTML(l.ten)} - (Còn: ${fmtNum(l.conLai)} ${escapeHTML(l.dvt)})`; if (l.conLai <= 0) { textDisplay = `[ĐÃ ĐỦ] ` + textDisplay; }
           return `<option value="${l.id}" data-conlai="${l.conLai}">${textDisplay}</option>`; 
       }).join('');
   }
@@ -1558,7 +1604,18 @@
       let idLenh = document.getElementById('sx-chon-dan').value;
       if (!idLenh) { showDialog("Lưu ý", "Vui lòng chọn Loại đạn để soạn lô.", "alert"); return; }
       
-      window.currentDraftItemIndex = -1; // Create new mode
+      let lenhGoc = STATE.lenh.find(l => l.id === idLenh);
+      if(lenhGoc) {
+          let capSelect = document.getElementById('sx-chon-dan');
+          let selectedOption = capSelect.options[capSelect.selectedIndex];
+          let conLai = parseFloat(selectedOption.getAttribute('data-conlai'));
+          if (conLai <= 0) {
+              showDialog("Đã cấp đủ", "Loại đạn này đã được xuất đủ số lượng theo Lệnh.", "alert");
+              return;
+          }
+      }
+
+      window.currentDraftItemIndex = -1; 
       moModalQuanLyLo('DRAFT_XE_ITEM', idLenh);
   }
 
@@ -1579,12 +1636,22 @@
       let container = document.getElementById('sx-danh-sach-item');
       let tongTanEl = document.getElementById('sx-tong-tan');
       
+      let badge = document.getElementById('cart-badge');
+      if (window.draftXeData.items.length > 0) {
+          badge.innerText = window.draftXeData.items.length;
+          badge.style.display = 'block';
+      } else {
+          badge.style.display = 'none';
+      }
+
       if (window.draftXeData.items.length === 0) {
           container.innerHTML = `
               <div style="text-align: center; padding: 40px; color: var(--text-sub); background: var(--bg-card); border-radius: 16px;">
                   <i class="ph-bold ph-shopping-cart" style="font-size: 32px; opacity: 0.5; margin-bottom: 8px;"></i><br>Chưa có đạn nào trên xe.
               </div>`;
           tongTanEl.innerText = "0 Tấn";
+          
+          document.getElementById('sx-chon-dan').value = '';
           return;
       }
 
@@ -1595,10 +1662,11 @@
           
           let loGop = gopDanhSachLo(item.danhSachLo);
           let summaryHTML = loGop.map(lo => {
-              let text = lo.tenLo + ": " + lo.sl;
-              if (lo.isBaoGoi) {
+              let text = lo.tenLo + ": " + fmtNum(lo.sl);
+              let loaiBG = lo.tenBaoGoi || item.tenBaoGoi || 'Cốp';
+              if (lo.isBaoGoi || lo.slChan > 0) {
                   let parts = [];
-                  if (lo.slChan > 0) parts.push(`${lo.slChan} ${item.tenBaoGoi || 'BG'}`);
+                  if (lo.slChan > 0) parts.push(`${lo.slChan} ${loaiBG}`);
                   if (lo.mangLe && lo.mangLe.length > 0) parts.push(lo.mangLe.join(' + '));
                   text += ` (${parts.join(' + ')})`;
               }
@@ -1610,7 +1678,7 @@
               <div class="modern-list-stt" style="color: var(--primary-color);">${idx + 1}</div>
               <div class="modern-list-content">
                   <div class="modern-list-title">${escapeHTML(item.ten)}</div>
-                  <div style="font-size: 11px; font-weight: 700; color: var(--success-color); margin-top: 4px;">SL: ${item.sl} ${escapeHTML(item.dvt)}</div>
+                  <div style="font-size: 11px; font-weight: 700; color: var(--success-color); margin-top: 4px;">SL: ${fmtNum(item.sl)} ${escapeHTML(item.dvt)}</div>
                   <div style="margin-top: 4px; background: var(--bg-body); padding: 6px; border-radius: 8px;">
                       ${summaryHTML}
                   </div>
@@ -1624,6 +1692,9 @@
 
       container.innerHTML = html;
       tongTanEl.innerText = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(totalWeight / 1000) + " Tấn";
+      
+      // Auto reset selection to make it ready for next
+      document.getElementById('sx-chon-dan').value = '';
   }
 
   function chotXuatXe() {
@@ -1638,6 +1709,7 @@
 
       showDialog("Xác nhận", `Chốt xuất ${window.draftXeData.items.length} loại đạn lên xe <b>${escapeHTML(xe)}</b>?`, "confirm", () => {
           let count = 0;
+          let now = Date.now();
           window.draftXeData.items.forEach(item => {
               STATE.thucHien.push({
                   id: generateID(),
@@ -1646,6 +1718,7 @@
                   phieu: phieu,
                   xe: xe,
                   ngay: ngay,
+                  time: now,
                   ten: item.ten,
                   dvt: item.dvt,
                   cap: item.cap,
@@ -1664,47 +1737,14 @@
           document.getElementById('sx-phieu').value = '';
           window.draftXeData.items = [];
           renderDraftXeCart();
+          renderBangThucHien();
           
-          showToast(`Đã xuất thành công ${count} loại đạn!`, "ph-fill ph-check-circle");
-          
-          // Redirect to Bao Cao Tab to see results
-          setTimeout(() => { chuyenTab('tab-bao-cao', 'BÁO CÁO KẾT QUẢ', 'nav-bao-cao'); }, 500);
+          showDialog("Thành công", `Đã xuất thành công ${count} loại đạn lên xe ${escapeHTML(xe)}! Bạn có thể xem lại tại tab Nhập Nhanh hoặc Báo Cáo.`, "alert");
       });
   }
 
 
   // ==================== TAB 4: THỰC HIỆN (NHẬP NHANH CŨ) ====================
-  function capNhatDropdownSoLenh() {
-      let uniqueLenh = [...new Set(STATE.lenh.map(l => l.soLenh))];
-      
-      // Update cho Tab Thực Hiện Nhập Nhanh
-      let selectTh = document.getElementById('th-so-lenh'); 
-      if(uniqueLenh.length === 0) { selectTh.innerHTML = '<option value="">-- Trống --</option>'; }
-      else { selectTh.innerHTML = '<option value="">-- Chọn Số Lệnh --</option>' + uniqueLenh.map(sl => `<option value="${escapeHTML(sl)}">${escapeHTML(sl)}</option>`).join(''); }
-      document.getElementById('th-chon-dan').innerHTML = '<option value="">-- Vui lòng chọn Lệnh trước --</option>';
-
-      // Update cho Tab Soạn Xe
-      let selectSx = document.getElementById('sx-so-lenh'); 
-      if(uniqueLenh.length === 0) { selectSx.innerHTML = '<option value="">-- Trống --</option>'; }
-      else { selectSx.innerHTML = '<option value="">-- Chọn Số Lệnh --</option>' + uniqueLenh.map(sl => `<option value="${escapeHTML(sl)}">${escapeHTML(sl)}</option>`).join(''); }
-      document.getElementById('sx-chon-dan').innerHTML = '<option value="">-- Vui lòng chọn Lệnh trước --</option>';
-  }
-  
-  function loadDanTheoLenh() {
-      let soLenhChon = document.getElementById('th-so-lenh').value; let selectDan = document.getElementById('th-chon-dan');
-      if(!soLenhChon) { selectDan.innerHTML = '<option value="">-- Vui lòng chọn Lệnh trước --</option>'; return; }
-      let danTrongLenh = STATE.lenh.filter(l => l.soLenh === soLenhChon);
-      let danKemConLai = danTrongLenh.map(l => {
-          let daXuat = STATE.thucHien.filter(t => t.lenhId === l.id).reduce((sum, current) => sum + current.sl, 0);
-          let conLai = l.sl - daXuat; return { ...l, conLai: conLai };
-      });
-      danKemConLai.sort((a, b) => { let aHet = a.conLai <= 0 ? 1 : 0; let bHet = b.conLai <= 0 ? 1 : 0; return aHet - bHet; });
-      selectDan.innerHTML = '<option value="">-- Chọn loại đạn --</option>' + danKemConLai.map(l => { 
-          let textDisplay = `${escapeHTML(l.ten)} - (Còn: ${l.conLai} ${escapeHTML(l.dvt)})`; if (l.conLai <= 0) { textDisplay = `[ĐÃ ĐỦ] ` + textDisplay; }
-          return `<option value="${l.id}" data-conlai="${l.conLai}">${textDisplay}</option>`; 
-      }).join('');
-  }
-  
   function tuDongDienCapTuLenh() {
       let selectEl = document.getElementById('th-chon-dan'); let idLenh = selectEl.value; 
       if(!idLenh) { document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; return; }
@@ -1741,10 +1781,10 @@
       if(idThucHienDangSua) {
           let index = STATE.thucHien.findIndex(t => t.id === idThucHienDangSua);
           let dsLoCu = STATE.thucHien[index].danhSachLo || [];
-          STATE.thucHien[index] = { id: idThucHienDangSua, lenhId: idLenh, soLenh: lenhGoc.soLenh, phieu: phieu, xe, ngay, ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap, sl: parseFloat(sl), tenBaoGoi: lenhGoc.tenBaoGoi, slPerBaoGoi: lenhGoc.slPerBaoGoi, danhSachLo: dsLoCu };
+          STATE.thucHien[index] = { id: idThucHienDangSua, lenhId: idLenh, soLenh: lenhGoc.soLenh, phieu: phieu, xe, ngay, time: STATE.thucHien[index].time || Date.now(), ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap, sl: parseFloat(sl), tenBaoGoi: lenhGoc.tenBaoGoi, slPerBaoGoi: lenhGoc.slPerBaoGoi, danhSachLo: dsLoCu };
           huySuaThucHien(); showToast("Đã cập nhật xe!");
       } else {
-          STATE.thucHien.push({ id: generateID(), lenhId: idLenh, soLenh: lenhGoc.soLenh, phieu: phieu, xe, ngay, ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap, sl: parseFloat(sl), tenBaoGoi: lenhGoc.tenBaoGoi, slPerBaoGoi: lenhGoc.slPerBaoGoi, danhSachLo: [] });
+          STATE.thucHien.push({ id: generateID(), lenhId: idLenh, soLenh: lenhGoc.soLenh, phieu: phieu, xe, ngay, time: Date.now(), ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap, sl: parseFloat(sl), tenBaoGoi: lenhGoc.tenBaoGoi, slPerBaoGoi: lenhGoc.slPerBaoGoi, danhSachLo: [] });
           document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; document.getElementById('th-chon-dan').value = ''; 
           showToast(`Đã xuất vào xe ${xe} ${phieu ? '(P:'+phieu+')' : ''}`); loadDanTheoLenh(); 
       }
@@ -1794,15 +1834,20 @@
   function renderBangThucHien() {
       let tbody = document.getElementById('tbody-thuc-hien');
       if(STATE.thucHien.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="padding:40px; text-align:center; color:var(--text-sub);"><i class="ph ph-truck" style="font-size:32px; opacity:0.5; margin-bottom:8px;"></i><br>Chưa có dữ liệu xuất.</td></tr>`; return; }
-      let reversed = [...STATE.thucHien].reverse();
-      tbody.innerHTML = reversed.map((item) => {
+      
+      let sorted = [...STATE.thucHien].sort((a,b) => (b.time || 0) - (a.time || 0)); 
+      
+      tbody.innerHTML = sorted.map((item) => {
           let dsLo = item.danhSachLo || [];
           let slDaNhapLo = dsLo.reduce((sum, lo) => sum + lo.sl, 0);
           let trangThaiLoColor = slDaNhapLo === item.sl ? "var(--success-color)" : (slDaNhapLo > 0 ? "var(--warning-color)" : "var(--primary-color)");
 
           return `
           <tr style="${idThucHienDangSua === item.id ? 'background-color: var(--primary-light);' : ''}">
-              <td style="font-size:10px; color:var(--text-sub);">${formatShortDate(item.ngay)}</td>
+              <td style="font-size:10px; color:var(--text-sub);">
+                  <div style="font-weight: 700; color: var(--text-main);">${formatTime(item.time)}</div>
+                  ${formatShortDate(item.ngay)}
+              </td>
               <td style="font-weight:800; color:var(--text-main); line-height:1.3;">
                  ${escapeHTML(item.xe)}
                  ${item.phieu ? `<div style="font-size:10px; color:var(--info-color); font-weight:700; margin-top:3px;">P: ${escapeHTML(item.phieu)}</div>` : ''}
@@ -1810,11 +1855,11 @@
               <td style="text-align:left; cursor:pointer;" onclick="moModalQuanLyLo('THUCHIEN', '${item.id}')">
                   <div style="color:var(--text-main); font-weight:700;">${escapeHTML(item.ten)}</div>
                   <div style="font-size:10px; color:${trangThaiLoColor}; margin-top:3px; font-weight: 700;">
-                     <i class="ph-bold ph-stack"></i> Nhập Lô: ${slDaNhapLo} / ${item.sl}
+                     <i class="ph-bold ph-stack"></i> Lô: ${fmtNum(slDaNhapLo)} / ${fmtNum(item.sl)}
                   </div>
               </td>
               <td style="color:var(--text-sub);">${escapeHTML(item.cap)}</td>
-              <td style="color:var(--success-color); font-weight:800;">${item.sl}</td>
+              <td style="color:var(--success-color); font-weight:800;">${fmtNum(item.sl)}</td>
               <td>
                   <div style="display:flex; flex-direction:column; gap:6px; align-items:center;">
                       <button class="btn-sm btn-edit" onclick="batDauSuaThucHien('${item.id}')"><i class="ph-bold ph-pencil-simple"></i></button>
@@ -1905,7 +1950,7 @@
                   vungGoiY.style.display = 'block';
                   let chipsHtml = lenhGoc.danhSachLo.map(lo => {
                       return `<button class="chip-lo" onclick="dienNhanhGoiYLo('${escapeHTML(lo.tenLo)}', ${lo.sl})">
-                                   ${escapeHTML(lo.tenLo)} <span style="opacity:0.6; font-weight: 500;">(${lo.sl})</span>
+                                   ${escapeHTML(lo.tenLo)} <span style="opacity:0.6; font-weight: 500;">(${fmtNum(lo.sl)})</span>
                                </button>`;
                   }).join('');
                   document.getElementById('danh-sach-chip-goi-y').innerHTML = chipsHtml;
@@ -1954,8 +1999,8 @@
           `;
           
           let tongDaXuat = viewData.listLo.reduce((sum, lo) => sum + lo.sl, 0);
-          document.getElementById('ql-lo-sl-tong').innerText = viewData.total || tongDaXuat;
-          document.getElementById('ql-lo-sl-da-nhap').innerText = tongDaXuat;
+          document.getElementById('ql-lo-sl-tong').innerText = fmtNum(viewData.total) || fmtNum(tongDaXuat);
+          document.getElementById('ql-lo-sl-da-nhap').innerText = fmtNum(tongDaXuat);
           document.getElementById('ql-lo-sl-da-nhap').style.color = (tongDaXuat === viewData.total) ? 'var(--success-color)' : 'var(--warning-color)';
 
           updateHienThiTongHopBaoGoi({
@@ -1987,12 +2032,12 @@
                               <tr>
                                   <td style="color: var(--text-sub); font-weight: 600;">${idx + 1}</td>
                                   <td style="text-align: left; font-weight: 800; font-size: 15px; color: var(--primary-color);">${escapeHTML(lo.tenLo)}</td>
-                                  <td style="font-weight: 700; color: var(--text-sub);">${idx === 0 ? viewData.slLenh : '<span style="opacity:0.3">-</span>'}</td>
-                                  <td style="font-weight: 700; color: var(--text-sub);">${idx === 0 ? viewData.slDaCap : '<span style="opacity:0.3">-</span>'}</td>
+                                  <td style="font-weight: 700; color: var(--text-sub);">${idx === 0 ? fmtNum(viewData.slLenh) : '<span style="opacity:0.3">-</span>'}</td>
+                                  <td style="font-weight: 700; color: var(--text-sub);">${idx === 0 ? fmtNum(viewData.slDaCap) : '<span style="opacity:0.3">-</span>'}</td>
                                   <td style="font-weight: 900; color: var(--warning-color); font-size: 16px;">
                                       ${formatLoWithBaoGoi(lo, viewData.tenBaoGoi)}
                                   </td>
-                                  <td style="font-weight: 800; color: var(--text-main);">${idx === 0 ? viewData.conLai : '<span style="opacity:0.3">-</span>'}</td>
+                                  <td style="font-weight: 800; color: var(--text-main);">${idx === 0 ? fmtNum(viewData.conLai) : '<span style="opacity:0.3">-</span>'}</td>
                               </tr>
                               `).join('')}
                           </tbody>
@@ -2158,8 +2203,8 @@
       let dsLo = record.danhSachLo;
       let slDaNhap = dsLo.reduce((sum, lo) => sum + lo.sl, 0);
 
-      document.getElementById('ql-lo-sl-tong').innerText = currentLoContext.type === 'DRAFT_XE_ITEM' ? "---" : record.sl;
-      document.getElementById('ql-lo-sl-da-nhap').innerText = slDaNhap;
+      document.getElementById('ql-lo-sl-tong').innerText = currentLoContext.type === 'DRAFT_XE_ITEM' ? "---" : fmtNum(record.sl);
+      document.getElementById('ql-lo-sl-da-nhap').innerText = fmtNum(slDaNhap);
       if(currentLoContext.type === 'DRAFT_XE_ITEM') {
            document.getElementById('ql-lo-sl-da-nhap').style.color = 'var(--primary-color)';
       } else {
@@ -2225,7 +2270,6 @@
           if (window.currentDraftItemIndex >= 0) {
               record = window.draftXeData.items[window.currentDraftItemIndex];
           } else {
-              // Creating a temporary record to append batches
               record = { 
                   lenhId: lenhGoc.id, soLenh: lenhGoc.soLenh, ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap: lenhGoc.cap,
                   danhSachLo: [], sl: 0, tenBaoGoi: lenhGoc.tenBaoGoi, slPerBaoGoi: lenhGoc.slPerBaoGoi 
@@ -2260,6 +2304,9 @@
                   lenhGoc.slPerBaoGoi = record.slPerBaoGoi;
                   safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh));
               }
+          } else if (currentLoContext.type === 'DRAFT_XE_ITEM') {
+              window.draftXeData.tenBaoGoi = record.tenBaoGoi;
+              window.draftXeData.slPerBaoGoi = record.slPerBaoGoi;
           }
       } else {
           slLo = parseFloat(document.getElementById('input-ql-sl-lo').value.trim());
@@ -2277,7 +2324,7 @@
       if (currentLoContext.type !== 'DRAFT_XE_ITEM') {
           let slConLaiThemDuoc = record.sl - currentDaNhap;
           if (slLo > slConLaiThemDuoc) {
-              showDialog("Vượt Quá Giới Hạn", `Tổng Lô không được vượt quá số lượng gốc (${record.sl}). Bạn chỉ có thể lưu tối đa <b>${slConLaiThemDuoc}</b> cho thao tác này.`, "alert"); return;
+              showDialog("Vượt Quá Giới Hạn", `Tổng Lô không được vượt quá số lượng gốc (${fmtNum(record.sl)}). Bạn chỉ có thể lưu tối đa <b>${fmtNum(slConLaiThemDuoc)}</b> cho thao tác này.`, "alert"); return;
           }
       }
 
@@ -2297,9 +2344,8 @@
       else if (currentLoContext.type === 'DRAFT_XE_ITEM') {
           if (window.currentDraftItemIndex === -1) {
               window.draftXeData.items.push(record);
-              window.currentDraftItemIndex = window.draftXeData.items.length - 1; // Now we are editing
+              window.currentDraftItemIndex = window.draftXeData.items.length - 1; 
           }
-          // The reference is updated, just re-render
       }
       
       huySuaLo(); renderChiTietQuanLyLo(record); xuLyGoiYLoAuto(); 
@@ -2371,7 +2417,7 @@
               }
 
               if (currentLoContext.type !== 'DRAFT_XE_ITEM' && totalNewSl > slConLaiThemDuoc) {
-                  showDialog("Vượt Quá Giới Hạn", `File Excel có tổng SL (${totalNewSl}) vượt quá SL còn lại cho phép nhập (${slConLaiThemDuoc}).`, "alert");
+                  showDialog("Vượt Quá Giới Hạn", `File Excel có tổng SL (${fmtNum(totalNewSl)}) vượt quá SL còn lại cho phép nhập (${fmtNum(slConLaiThemDuoc)}).`, "alert");
                   e.target.value = '';
                   return;
               }
@@ -2533,10 +2579,10 @@
                                   <div style="font-weight: 800; color: var(--text-main);">${escapeHTML(d.cap)}</div>
                                   <div style="font-size: 11px; color: var(--text-sub); margin-top:2px;">${klr}</div>
                               </td>
-                              <td style="font-weight: 800; color: var(--primary-color);">${d.slLenh}</td>
-                              <td style="font-weight: 600; color: var(--text-sub);">${d.slDaCap}</td>
-                              <td style="font-weight: 900; color: var(--warning-color); font-size: 16px;">${d.slGroup}</td>
-                              <td style="font-weight: 800; color: var(--text-main);">${conLai}</td>
+                              <td style="font-weight: 800; color: var(--primary-color);">${fmtNum(d.slLenh)}</td>
+                              <td style="font-weight: 600; color: var(--text-sub);">${fmtNum(d.slDaCap)}</td>
+                              <td style="font-weight: 900; color: var(--warning-color); font-size: 16px;">${fmtNum(d.slGroup)}</td>
+                              <td style="font-weight: 800; color: var(--text-main);">${fmtNum(conLai)}</td>
                           </tr>`;
                       }).join('')}
                   </tbody>
@@ -2642,9 +2688,9 @@
                               </td>
                               <td style="padding:12px 4px; color:var(--text-sub);">${escapeHTML(i.dvt)}</td>
                               <td style="padding:12px 4px; color:var(--text-sub);">${escapeHTML(i.cap)}</td>
-                              <td style="padding:12px 4px; font-weight:700; color:var(--primary-color);">${i.slLenh}</td>
-                              <td style="padding:12px 4px; font-weight:700; color:var(--warning-color);">${i.slDaXuat}</td>
-                              <td style="padding:12px 4px; font-weight:800; color:${colorConLai};">${i.conLai}</td>
+                              <td style="padding:12px 4px; font-weight:700; color:var(--primary-color);">${fmtNum(i.slLenh)}</td>
+                              <td style="padding:12px 4px; font-weight:700; color:var(--warning-color);">${fmtNum(i.slDaXuat)}</td>
+                              <td style="padding:12px 4px; font-weight:800; color:${colorConLai};">${fmtNum(i.conLai)}</td>
                           </tr>
                           `;
                       }).join('')}
@@ -2709,26 +2755,32 @@
 
       let xeGroups = {};
       let tongNgayKL = 0;
+      let tongNgaySL = 0;
 
       dataTrongNgay.forEach(item => {
           let xe = item.xe;
           let phieu = item.phieu || "Không ghi phiếu";
 
-          if (!xeGroups[xe]) xeGroups[xe] = { tongKL: 0, items: [], phieuGroups: {} };
+          if (!xeGroups[xe]) xeGroups[xe] = { tongKL: 0, tongSL: 0, items: [], phieuGroups: {} };
           if (!xeGroups[xe].phieuGroups[phieu]) xeGroups[xe].phieuGroups[phieu] = { items: [], tongKL: 0 };
 
           let klr = layKLRTuTenDan(item.ten); 
           let khoiLuong = item.sl * klr;
           
           xeGroups[xe].tongKL += khoiLuong;
+          xeGroups[xe].tongSL += item.sl;
           xeGroups[xe].items.push(item);
           xeGroups[xe].phieuGroups[phieu].tongKL += khoiLuong;
           xeGroups[xe].phieuGroups[phieu].items.push(item);
           tongNgayKL += khoiLuong;
+          tongNgaySL += item.sl;
       });
       
       let formatTongNgay = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(tongNgayKL / 1000);
-      document.getElementById('tieu-de-chi-tiet-xe').innerHTML = `Tải Trọng Ngày ${formatShortDate(locNgay)}<br><span style="color:var(--danger-color); font-size: 14px; font-weight: 700;">Tổng ngày: ${formatTongNgay} Tấn</span>`;
+      document.getElementById('tieu-de-chi-tiet-xe').innerHTML = `
+        <div style="font-size: 16px; margin-bottom: 4px;">Tải Trọng Ngày ${formatShortDate(locNgay)}</div>
+        <div style="font-size: 13px; color: var(--text-sub);">Tổng khối lượng: <b style="color:var(--danger-color)">${formatTongNgay} Tấn</b> &bull; Tổng SL: <b style="color:var(--primary-color)">${fmtNum(tongNgaySL)}</b></div>
+      `;
 
       let html = '';
       let dsXe = Object.keys(xeGroups).sort((a,b) => a.localeCompare(b));
@@ -2767,7 +2819,7 @@
                       </div>
                       <div class="item-action-area" style="display:flex; align-items:center; text-align: right;">
                           <div onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))" style="cursor:pointer; display:flex; flex-direction:column; align-items:flex-end; justify-content:center;">
-                              <div style="font-size: 17px; font-weight: 800; color: var(--primary-color); line-height: 1;">${i.sl}</div>
+                              <div style="font-size: 17px; font-weight: 800; color: var(--primary-color); line-height: 1;">${fmtNum(i.sl)}</div>
                           </div>
                           <i class="ph-bold ph-caret-right item-chevron" onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))"></i>
                           ${editBtn}
@@ -2827,7 +2879,10 @@
               <div class="modern-list-header sticky-list-header" ${dblClickAttr} style="background: var(--primary-light); padding: 14px 16px; cursor: ${numPhieu > 1 ? 'pointer' : 'default'}; user-select: none; border-top-left-radius: 11px; border-top-right-radius: 11px; border-bottom: 1px solid var(--border-light);">
                   <div style="display: flex; justify-content: space-between; align-items: center;">
                       <span style="color: var(--primary-color); font-weight: 800; font-size: 15px; text-transform: uppercase;">XE SỐ: ${escapeHTML(xe)}</span>
-                      <span style="color: var(--danger-color); font-weight: 800; font-size: 14px;">TỔNG: ${formatTanXe} TẤN</span>
+                      <div style="text-align: right;">
+                          <div style="color: var(--danger-color); font-weight: 800; font-size: 14px;">${formatTanXe} TẤN</div>
+                          <div style="color: var(--primary-color); font-weight: 700; font-size: 11px; margin-top: 2px;">SL: ${fmtNum(gXe.tongSL)}</div>
+                      </div>
                   </div>
               </div>
               
@@ -2948,7 +3003,7 @@
               </div>
               <div style="display:flex; align-items:center; text-align: right; cursor: pointer;" onclick="moModalQuanLyLo('VIEW', null, JSON.parse(decodeURIComponent('${viewDataStr}')))">
                   <div style="display:flex; flex-direction:column; justify-content:center; align-items:flex-end;">
-                      <div style="font-size: 18px; font-weight: 800; color: var(--primary-color); line-height: 1;">${d.sl}</div>
+                      <div style="font-size: 18px; font-weight: 800; color: var(--primary-color); line-height: 1;">${fmtNum(d.sl)}</div>
                       <div style="font-size: 11px; font-weight: 700; color: var(--danger-color); margin-top: 4px;">${formatTanItem} Tấn</div>
                   </div>
                   <i class="ph-bold ph-caret-right item-chevron" style="margin-left: 8px;"></i>
@@ -3120,7 +3175,7 @@
       let splitSec = document.getElementById('qe-split-section');
       if (newSl > 0 && newSl < oldSl) {
           splitSec.style.display = 'block';
-          document.getElementById('qe-chenh-lech').innerText = oldSl - newSl;
+          document.getElementById('qe-chenh-lech').innerText = fmtNum(oldSl - newSl);
           toggleQENewCar();
       } else {
           splitSec.style.display = 'none';
@@ -3207,7 +3262,7 @@
               let currentTotal = STATE.thucHien.filter(t => t.lenhId === record.lenhId && t.id !== record.id).reduce((sum, t) => sum + t.sl, 0);
               
               if (lenhGoc && (currentTotal + newSl > lenhGoc.sl)) {
-                  showToast(`Vượt Lệnh! Chỉ được thêm tối đa ${lenhGoc.sl - currentTotal}`, "ph-fill ph-warning-circle", "var(--danger-color)");
+                  showToast(`Vượt Lệnh! Chỉ được thêm tối đa ${fmtNum(lenhGoc.sl - currentTotal)}`, "ph-fill ph-warning-circle", "var(--danger-color)");
                   return;
               }
               record.xe = newXe; record.phieu = newPhieu; record.sl = newSl;
@@ -3228,11 +3283,11 @@
                   
                   STATE.thucHien.push({
                       id: generateID(), lenhId: record.lenhId, soLenh: record.soLenh, phieu: phieuMoi, xe: xeMoi,
-                      ngay: record.ngay, ten: record.ten, dvt: record.dvt, cap: record.cap, sl: chenhLech, danhSachLo: [],
+                      ngay: record.ngay, time: Date.now(), ten: record.ten, dvt: record.dvt, cap: record.cap, sl: chenhLech, danhSachLo: [],
                       tenBaoGoi: record.tenBaoGoi, slPerBaoGoi: record.slPerBaoGoi
                   });
                   closeDialog();
-                  hoanTatSuaNhanh(`Đã tạo xe [${xeMoi}] để chở tiếp ${chenhLech} đạn!`);
+                  hoanTatSuaNhanh(`Đã tạo xe [${xeMoi}] để chở tiếp ${fmtNum(chenhLech)} đạn!`);
               }
           }
       };
