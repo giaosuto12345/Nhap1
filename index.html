@@ -662,8 +662,8 @@
           <div id="vung-nhap-lo-chinh">
               <div id="vung-goi-y-thong-minh" style="display: flex; gap: 8px; overflow-x: auto; margin-bottom: 10px; white-space: nowrap; -webkit-overflow-scrolling: touch; min-height: 0;"></div>
               
-              <!-- Segment Chuyển Đổi Chế Độ Nhập -->
-              <div class="bg-segment-wrapper" id="segment-che-do-nhap" style="display: none;">
+              <!-- Segment Chuyển Đổi Chế Độ Nhập LUÔN HIỂN THỊ -->
+              <div class="bg-segment-wrapper" id="segment-che-do-nhap" style="display: flex;">
                   <button class="bg-segment-btn active" id="btn-tab-nhap-sl" onclick="chuyenTabNhapLo('SL')">NHẬP SỐ LƯỢNG</button>
                   <button class="bg-segment-btn" id="btn-tab-nhap-bg" onclick="chuyenTabNhapLo('BG')">NHẬP BAO GÓI</button>
               </div>
@@ -687,21 +687,32 @@
 
               <!-- VIEW 2: NHẬP BAO GÓI (Tự động tính) -->
               <div id="view-nhap-bg" style="display: none; background: var(--bg-card); padding: 12px; border-radius: 12px; border: 1px solid var(--primary-light);">
+                  
+                  <!-- Cấu hình hệ số linh hoạt -->
+                  <div style="display:flex; gap:8px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed var(--border-light);">
+                      <div style="flex: 1.5;">
+                          <label style="font-size:10px; font-weight:700; color:var(--text-sub); text-transform: uppercase;">Loại bao gói</label>
+                          <input type="text" id="bg-input-loai" class="form-control" placeholder="VD: Cốp, Hòm..." style="height: 38px; font-size:14px; background: var(--bg-body);">
+                      </div>
+                      <div style="flex: 1;">
+                          <label style="font-size:10px; font-weight:700; color:var(--text-sub); text-transform: uppercase;">SL đạn / 1 Bao</label>
+                          <input type="number" id="bg-input-he-so" class="form-control" placeholder="VD: 920" oninput="tinhToanTongBaoGoi()" style="height: 38px; font-size:15px; font-weight:800; color: var(--primary-color); background: var(--bg-body);">
+                      </div>
+                  </div>
+
                   <div class="bg-input-grid">
                       <div>
-                          <label style="font-size:11px; font-weight:700; color:var(--text-sub);">Số <span id="bg-lbl-loai">Bao Gói</span> chẵn (x<span id="bg-lbl-he-so">0</span>)</label>
+                          <label style="font-size:11px; font-weight:700; color:var(--text-sub);">Số Bao Gói chẵn</label>
                           <input type="number" id="bg-input-chan" class="form-control" placeholder="0" inputmode="decimal" oninput="tinhToanTongBaoGoi()" style="font-weight:800;">
                       </div>
                       <div style="display:flex; flex-direction:column; justify-content:flex-end;">
-                          <div style="font-size:11px; font-weight:700; color:var(--text-sub); margin-bottom:4px; text-align:right;">Tổng cộng quy đổi</div>
+                          <div style="font-size:11px; font-weight:700; color:var(--text-sub); margin-bottom:4px; text-align:right;">Tổng quy đổi</div>
                           <div id="bg-tong-hien-thi" style="font-size:22px; font-weight:900; color:var(--danger-color); text-align:right;">0</div>
                       </div>
                   </div>
                   
-                  <label style="font-size:11px; font-weight:700; color:var(--text-sub);">Nhập số lẻ (+)</label>
-                  <div id="bg-ds-le" class="bg-input-le-container">
-                      <!-- Render động JS -->
-                  </div>
+                  <label style="font-size:11px; font-weight:700; color:var(--text-sub); margin-top: 8px;">Nhập số lẻ (+)</label>
+                  <div id="bg-ds-le" class="bg-input-le-container"></div>
                   <button onclick="themOLeBaoGoi()" style="background:var(--primary-light); color:var(--primary-color); border:none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor:pointer;"><i class="ph-bold ph-plus"></i> THÊM Ô LẺ</button>
               </div>
           </div>
@@ -812,8 +823,6 @@
 
   // --- CÁC HÀM XỬ LÝ BAO GÓI MỚI ---
   let cheDoNhapHienTai = 'SL';
-  let bGoi_Ten = '';
-  let bGoi_HeSo = 0;
 
   function chuyenTabNhapLo(mode) {
       cheDoNhapHienTai = mode;
@@ -842,8 +851,9 @@
   }
 
   function tinhToanTongBaoGoi() {
+      let heSo = parseFloat(document.getElementById('bg-input-he-so').value) || 0;
       let chan = parseFloat(document.getElementById('bg-input-chan').value) || 0;
-      let total = chan * bGoi_HeSo;
+      let total = chan * heSo;
       
       let inLes = document.querySelectorAll('.bg-in-le');
       inLes.forEach(input => {
@@ -863,9 +873,9 @@
   }
 
   function formatLoWithBaoGoi(lo, tenBaoGoi) {
-      if (!lo.isBaoGoi || !tenBaoGoi) return `<div style="font-size:18px; color: var(--primary-color); font-weight:800;">${lo.sl}</div>`;
+      if (!lo.isBaoGoi || (!tenBaoGoi && !lo.slChan)) return `<div style="font-size:18px; color: var(--primary-color); font-weight:800;">${lo.sl}</div>`;
       let parts = [];
-      if (lo.slChan > 0) parts.push(`${lo.slChan} ${tenBaoGoi}`);
+      if (lo.slChan > 0) parts.push(`${lo.slChan} ${tenBaoGoi || 'BG'}`);
       if (lo.mangLe && lo.mangLe.length > 0) parts.push(lo.mangLe.join(' + '));
       let formula = parts.join(' + ');
       
@@ -1646,16 +1656,19 @@
           vungNhap.style.display = 'block'; 
           vungGoiYThongMinh.innerHTML = '';
           
+          // LUÔN HIỂN THỊ SEGMENT VÀ CHO PHÉP NHẬP NHANH CONFIG
           let segUI = document.getElementById('segment-che-do-nhap');
-          if (record.slPerBaoGoi && record.slPerBaoGoi > 0) {
-              segUI.style.display = 'flex';
-              bGoi_Ten = record.tenBaoGoi || 'Bao Gói';
-              bGoi_HeSo = record.slPerBaoGoi;
-              document.getElementById('bg-lbl-loai').innerText = bGoi_Ten;
-              document.getElementById('bg-lbl-he-so').innerText = bGoi_HeSo;
+          segUI.style.display = 'flex'; 
+          
+          let heSo = record.slPerBaoGoi || 0;
+          let loaiBg = record.tenBaoGoi || '';
+          
+          document.getElementById('bg-input-loai').value = loaiBg;
+          document.getElementById('bg-input-he-so').value = heSo || '';
+
+          if (heSo > 0) {
               chuyenTabNhapLo('BG'); 
           } else {
-              segUI.style.display = 'none';
               chuyenTabNhapLo('SL');
           }
 
@@ -1700,6 +1713,7 @@
           vungNhap.style.display = 'none';
           vungGoiY.style.display = 'none';
           vungGoiYThongMinh.innerHTML = '';
+          document.getElementById('segment-che-do-nhap').style.display = 'none';
           
           let editBtnHtml = '';
           if(viewData.idThucHien) {
@@ -1862,7 +1876,7 @@
 
       document.getElementById('input-ql-ten-lo').value = loInfo.tenLo;
 
-      if (loInfo.isBaoGoi && record.slPerBaoGoi > 0) {
+      if (loInfo.isBaoGoi) {
           chuyenTabNhapLo('BG');
           document.getElementById('bg-input-chan').value = loInfo.slChan || '';
           document.getElementById('bg-ds-le').innerHTML = '';
@@ -1969,12 +1983,30 @@
       let tenLo = document.getElementById('input-ql-ten-lo').value.trim();
       let slLo = 0;
       let isBaoGoi = false, slChan = 0, mangLe = [];
+      let formLoaiBg = document.getElementById('bg-input-loai').value.trim();
+      let formHeSo = parseFloat(document.getElementById('bg-input-he-so').value) || 0;
 
-      if (cheDoNhapHienTai === 'BG' && record.slPerBaoGoi > 0) {
+      if (cheDoNhapHienTai === 'BG') {
+          if (formHeSo <= 0) {
+              showDialog("Lỗi", "Vui lòng nhập SL đạn / 1 Bao (Hệ số quy đổi) lớn hơn 0.", "alert"); return;
+          }
           slLo = tinhToanTongBaoGoi();
           isBaoGoi = true;
           slChan = parseFloat(document.getElementById('bg-input-chan').value) || 0;
           mangLe = getMangLeTuUI();
+
+          // TỰ ĐỘNG LƯU NGƯỢC LẠI CONFIG NẾU CHƯA CÓ HOẶC CÓ SỰ THAY ĐỔI
+          record.tenBaoGoi = formLoaiBg || record.tenBaoGoi || 'Bao';
+          record.slPerBaoGoi = formHeSo;
+          
+          if (currentLoContext.type === 'THUCHIEN') {
+              let lenhGoc = STATE.lenh.find(l => l.id === record.lenhId);
+              if(lenhGoc) {
+                  lenhGoc.tenBaoGoi = record.tenBaoGoi;
+                  lenhGoc.slPerBaoGoi = record.slPerBaoGoi;
+                  safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh));
+              }
+          }
       } else {
           slLo = parseFloat(document.getElementById('input-ql-sl-lo').value.trim());
       }
