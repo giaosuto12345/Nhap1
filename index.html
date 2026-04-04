@@ -163,9 +163,9 @@
         z-index: 9000;
         box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
     }
-    .nav-item { flex: 1; text-align: center; font-size: 10px; font-weight: 600; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: 0.2s; }
+    .nav-item { flex: 1; text-align: center; font-size: 9px; font-weight: 600; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: 0.2s; }
     .nav-item.active { color: var(--primary-color); }
-    .nav-icon { font-size: 24px; margin-bottom: 0; }
+    .nav-icon { font-size: 22px; margin-bottom: 0; }
 
     .tab-content { display: none; animation: fadeIn 0.2s ease-out; }
     .tab-content.active { display: block; }
@@ -247,7 +247,7 @@
     .dash-box-title { font-size: 10px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 6px; }
     .dash-box-val { font-size: 15px; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px;}
 
-    /* ================= BOTTOM SHEET QUẢN LÝ LÔ (CẤU TRÚC MỚI FIX LỖI CUỘN) ================= */
+    /* ================= BOTTOM SHEET QUẢN LÝ LÔ ================= */
     .modal-bottom-sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); z-index: 20000; display: none; flex-direction: column; justify-content: flex-end; align-items: center; opacity: 0; transition: opacity 0.3s; }
     .modal-bottom-sheet.show { opacity: 1; }
     
@@ -404,7 +404,71 @@
       </div>
     </div>
 
-    <!-- ==================== TAB 3: THỰC HIỆN ==================== -->
+    <!-- ==================== TAB 3: SOẠN XE (MỚI) ==================== -->
+    <div id="tab-soan-xe" class="tab-content">
+      <div class="card" style="background: var(--primary-light); border: 1px dashed var(--primary-color);">
+          <div class="form-row" style="margin-bottom: 12px;">
+              <div class="form-group" style="flex: 1.5;">
+                  <label style="color: var(--primary-color);">Ngày xuất</label>
+                  <input type="date" id="sx-ngay" class="form-control" style="background: var(--bg-card); color: var(--primary-color);">
+              </div>
+              <div class="form-group" style="flex: 1;">
+                  <label style="color: var(--primary-color);">Số phiếu</label>
+                  <input type="text" id="sx-phieu" class="form-control" placeholder="Tùy chọn" style="background: var(--bg-card);">
+              </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+              <label style="color: var(--primary-color);">Xe nhận (Bắt buộc)</label>
+              <input type="text" id="sx-xe-input" class="form-control" placeholder="Nhập tên/số xe..." style="font-weight: 800; font-size: 18px; color: var(--danger-color); background: var(--bg-card);">
+          </div>
+      </div>
+
+      <div class="card">
+        <div style="font-size: 12px; font-weight: 800; color: var(--text-main); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+            <i class="ph-bold ph-plus-circle" style="color: var(--primary-color); font-size: 18px;"></i> THÊM ĐẠN VÀO XE NÀY
+        </div>
+        <div class="form-group">
+          <label>Chọn Lệnh</label>
+          <select id="sx-so-lenh" class="form-control" style="color: var(--info-color);" onchange="loadDanTheoLenhSoanXe()"><option value="">-- Chọn lệnh --</option></select>
+        </div>
+
+        <div class="form-group">
+          <label>Chọn Đạn</label>
+          <select id="sx-chon-dan" class="form-control"><option value="">-- Chọn đạn --</option></select>
+        </div>
+
+        <button class="btn" onclick="batDauSoanLoChoXe()" style="height: 46px; background: var(--text-main); color: white; margin-top: 16px;">
+            <i class="ph-bold ph-stack"></i> SOẠN LÔ & THÊM VÀO XE
+        </button>
+      </div>
+
+      <div class="card" style="padding: 0; overflow: hidden; background: transparent; box-shadow: none; border: none;">
+          <div style="font-size: 12px; font-weight: 800; color: var(--text-main); text-transform: uppercase; margin-bottom: 8px; padding-left: 4px;">
+              GIỎ HÀNG: ĐẠN ĐÃ XẾP LÊN XE
+          </div>
+          <div id="sx-danh-sach-item" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 80px;">
+              <!-- Items rendered here -->
+              <div style="text-align: center; padding: 40px; color: var(--text-sub); background: var(--bg-card); border-radius: 16px;">
+                  <i class="ph-bold ph-shopping-cart" style="font-size: 32px; opacity: 0.5; margin-bottom: 8px;"></i><br>Chưa có đạn nào trên xe.
+              </div>
+          </div>
+      </div>
+      
+      <!-- Footer chốt xe -->
+      <div style="position: fixed; bottom: calc(80px + env(safe-area-inset-bottom)); left: 0; right: 0; padding: 12px 16px; background: var(--bg-card); border-top: 1px solid var(--border-light); z-index: 100; box-shadow: 0 -4px 12px rgba(0,0,0,0.05);">
+          <div class="container" style="display: flex; justify-content: space-between; align-items: center; padding: 0;">
+              <div>
+                  <div style="font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase;">Tổng tải trọng</div>
+                  <div id="sx-tong-tan" style="font-size: 18px; font-weight: 900; color: var(--danger-color);">0 Tấn</div>
+              </div>
+              <button onclick="chotXuatXe()" style="background: var(--warning-color); color: white; border: none; padding: 0 24px; height: 46px; border-radius: 14px; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(255, 149, 0, 0.3);">
+                  <i class="ph-bold ph-check-square-offset"></i> CHỐT XUẤT XE
+              </button>
+          </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB 4: THỰC HIỆN (BẢN CŨ NHẬP TỔNG) ==================== -->
     <div id="tab-thuc-hien" class="tab-content">
       <div class="card">
         
@@ -438,15 +502,6 @@
           <select id="th-chon-dan" class="form-control" onchange="tuDongDienCapTuLenh()"><option value="">-- Chọn đạn --</option></select>
         </div>
         
-        <!-- KHU VỰC DRAFT LÔ (SOẠN LÔ TRƯỚC KHI GHI XE) -->
-        <div id="th-draft-lo-section" style="display:none; background: var(--bg-body); padding: 16px; border-radius: 12px; margin-bottom: 16px; border: 1px dashed var(--border-light);">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <label style="font-size:12px; font-weight:700; color:var(--text-main); text-transform:uppercase; margin:0;">Bước 3: Danh sách Lô sẽ xuất</label>
-                <span id="th-draft-count" style="font-size:12px; font-weight:800; color:var(--primary-color); background:var(--primary-light); padding:4px 10px; border-radius:12px;">0 Lô</span>
-            </div>
-            <button class="btn" onclick="moModalDraftLo()" style="height: 44px; font-size: 13px; background: var(--bg-card); color: var(--primary-color); border: 1px solid var(--primary-color); box-shadow: var(--card-shadow);"><i class="ph-bold ph-list-plus"></i> THÊM / CHỈNH SỬA LÔ</button>
-        </div>
-
         <div class="form-row" style="margin-bottom:0;">
           <div class="form-group" style="flex: 1;">
             <label>Cấp</label>
@@ -456,7 +511,7 @@
             </select>
           </div>
           <div class="form-group" style="flex: 1.5;">
-            <label style="text-align: center;">Tổng Số Lượng</label>
+            <label style="text-align: center;">Số Lượng Xuất</label>
             <input type="number" inputmode="decimal" pattern="[0-9]*" id="th-sl" class="form-control" placeholder="0" style="text-align:center; font-weight: 800; font-size: 20px; color: var(--danger-color);">
           </div>
         </div>
@@ -486,7 +541,7 @@
       </div>
     </div>
 
-    <!-- ==================== TAB 4: BÁO CÁO ==================== -->
+    <!-- ==================== TAB 5: BÁO CÁO ==================== -->
     <div id="tab-bao-cao" class="tab-content">
       
       <div class="bc-tab-container" style="margin-top: 12px;">
@@ -554,13 +609,16 @@
     <div class="nav-item active" id="nav-danh-muc" onclick="chuyenTab('tab-danh-muc', 'DANH MỤC ĐẠN', 'nav-danh-muc')">
       <i class="ph-fill ph-list-bullets nav-icon"></i><div>Danh Mục</div>
     </div>
-    <div class="nav-item" id="nav-lenh" onclick="chuyenTab('tab-lenh', 'LỆNH PHẢI XUẤT', 'nav-lenh')">
+    <div class="nav-item" id="nav-lenh" onclick="chuyenTab('tab-lenh', 'LỆNH XUẤT', 'nav-lenh')">
       <i class="ph-fill ph-receipt nav-icon"></i><div>Lệnh Xuất</div>
     </div>
-    <div class="nav-item" id="nav-thuc-hien" onclick="chuyenTab('tab-thuc-hien', 'THỰC XUẤT', 'nav-thuc-hien')">
-      <i class="ph-fill ph-truck nav-icon"></i><div>Thực Hiện</div>
+    <div class="nav-item" id="nav-soan-xe" onclick="chuyenTab('tab-soan-xe', 'SOẠN XE CHI TIẾT', 'nav-soan-xe')">
+      <i class="ph-fill ph-truck-trailer nav-icon"></i><div>Soạn Xe</div>
     </div>
-    <div class="nav-item" id="nav-bao-cao" onclick="chuyenTab('tab-bao-cao', 'BÁO CÁO KẾT QUẢ', 'nav-bao-cao')">
+    <div class="nav-item" id="nav-thuc-hien" onclick="chuyenTab('tab-thuc-hien', 'NHẬP NHANH', 'nav-thuc-hien')">
+      <i class="ph-fill ph-lightning nav-icon"></i><div>Nhập Nhanh</div>
+    </div>
+    <div class="nav-item" id="nav-bao-cao" onclick="chuyenTab('tab-bao-cao', 'BÁO CÁO', 'nav-bao-cao')">
       <i class="ph-fill ph-chart-pie-slice nav-icon"></i><div>Báo Cáo</div>
     </div>
   </div>
@@ -612,7 +670,6 @@
       <div class="modal-full-header">
          <h3 id="tieu-de-chi-tiet-xe" style="font-weight: 800; margin:0; text-align: left; font-size: 15px; line-height: 1.4;">Chi Tiết Tải Trọng Xe</h3>
          <div style="display: flex; gap: 8px;">
-             <!-- Nút Edit Toàn cục (Global) -->
              <button class="btn-sm" id="btn-global-edit-xe" style="background:var(--primary-light); color:var(--primary-color); width:32px; height: 32px;" onclick="toggleGlobalEditModeXe()"><i class="ph-bold ph-pencil-simple"></i></button>
              <button class="btn-sm" style="background:var(--primary-light); color:var(--primary-color); width:32px; height: 32px;" onclick="xuatAnhBaoCaoModal('noidung-chi-tiet-xe', 'TaiTrongXe')"><i class="ph-bold ph-camera"></i></button>
          </div>
@@ -640,7 +697,7 @@
     </div>
   </div>
 
-  <!-- ==================== MODAL BOTTOM SHEET QUẢN LÝ LÔ ==================== -->
+  <!-- ==================== MODAL BOTTOM SHEET QUẢN LÝ LÔ (ĐÃ SỬA LỖI SCROLL) ==================== -->
   <div id="modal-quan-ly-lo" class="modal-bottom-sheet">
     <div class="sheet-content">
       
@@ -824,12 +881,14 @@
   let currentLoContext = { type: null, id: null, viewData: null }; 
   let idLoDangSua = null; 
 
-  // --- STATE CHO DRAFT MODE (LẬP LÔ TRƯỚC KHI GHI XE) ---
-  window.draftLoData = {
-      list: [],
-      tenBaoGoi: '',
-      slPerBaoGoi: 0
+  // --- STATE CHO DRAFT MODE (TAB SOẠN XE MỚI) ---
+  window.draftXeData = {
+      ngay: '',
+      xe: '',
+      phieu: '',
+      items: [] // { id, lenhId, soLenh, ten, dvt, cap, sl, tenBaoGoi, slPerBaoGoi, danhSachLo: [] }
   };
+  window.currentDraftItemIndex = -1; // -1 = đang tạo mới, >= 0 là đang sửa item trong giỏ
 
   let cheDoNhapHienTai = 'SL';
 
@@ -854,7 +913,6 @@
                        <i class="ph-bold ph-x-circle del-le-btn" onclick="xoaOLeBaoGoi(this)"></i>`;
       container.appendChild(div);
       
-      // Tự động cuộn xuống khi thêm ô lẻ để không bị lấp
       setTimeout(() => {
           let sheetBody = document.querySelector('.sheet-body-scrollable');
           if(sheetBody) sheetBody.scrollBy({ top: 80, behavior: 'smooth' });
@@ -945,7 +1003,7 @@
   document.addEventListener('DOMContentLoaded', () => { 
       let today = getTodayString();
       try {
-          document.getElementById('th-ngay').value = today; document.getElementById('bc-ngay').value = today;
+          document.getElementById('th-ngay').value = today; document.getElementById('bc-ngay').value = today; document.getElementById('sx-ngay').value = today;
           let savedExcel = safeStorage.getItem('duLieuExcelOffline'); 
           if (savedExcel) { 
               STATE.excel.data = JSON.parse(savedExcel); 
@@ -1135,7 +1193,7 @@
       document.getElementById(navId).classList.add('active'); 
       document.getElementById('app-title').innerText = title;
       
-      if(tabId === 'tab-thuc-hien') { capNhatDropdownSoLenh(); capNhatGoiYXe(); }
+      if(tabId === 'tab-thuc-hien' || tabId === 'tab-soan-xe') { capNhatDropdownSoLenh(); capNhatGoiYXe(); }
       if(tabId === 'tab-bao-cao') { 
           capNhatGoiYXe(); 
           if(currentBaoCaoMode === 'ngay') renderBaoCaoNgay();
@@ -1479,12 +1537,157 @@
   }
   function dongModalXemLenh() { closeModal('modal-xem-lenh'); }
 
-  // ==================== TAB 3: THỰC HIỆN ====================
+  // ==================== TAB 3: SOẠN XE (GIỎ HÀNG) ====================
+  function loadDanTheoLenhSoanXe() {
+      let soLenhChon = document.getElementById('sx-so-lenh').value; let selectDan = document.getElementById('sx-chon-dan');
+      if(!soLenhChon) { selectDan.innerHTML = '<option value="">-- Vui lòng chọn Lệnh trước --</option>'; return; }
+      let danTrongLenh = STATE.lenh.filter(l => l.soLenh === soLenhChon);
+      let danKemConLai = danTrongLenh.map(l => {
+          let daXuat = STATE.thucHien.filter(t => t.lenhId === l.id).reduce((sum, current) => sum + current.sl, 0);
+          let conLai = l.sl - daXuat; return { ...l, conLai: conLai };
+      });
+      danKemConLai.sort((a, b) => { let aHet = a.conLai <= 0 ? 1 : 0; let bHet = b.conLai <= 0 ? 1 : 0; return aHet - bHet; });
+      selectDan.innerHTML = '<option value="">-- Chọn loại đạn --</option>' + danKemConLai.map(l => { 
+          let textDisplay = `${escapeHTML(l.ten)} - (Còn: ${l.conLai} ${escapeHTML(l.dvt)})`; if (l.conLai <= 0) { textDisplay = `[ĐÃ ĐỦ] ` + textDisplay; }
+          return `<option value="${l.id}" data-conlai="${l.conLai}">${textDisplay}</option>`; 
+      }).join('');
+  }
+
+  function batDauSoanLoChoXe() {
+      haptic();
+      let idLenh = document.getElementById('sx-chon-dan').value;
+      if (!idLenh) { showDialog("Lưu ý", "Vui lòng chọn Loại đạn để soạn lô.", "alert"); return; }
+      
+      window.currentDraftItemIndex = -1; // Create new mode
+      moModalQuanLyLo('DRAFT_XE_ITEM', idLenh);
+  }
+
+  function suaSoanLoChoXe(index) {
+      haptic();
+      window.currentDraftItemIndex = index;
+      let item = window.draftXeData.items[index];
+      moModalQuanLyLo('DRAFT_XE_ITEM', item.lenhId, { draftIndex: index });
+  }
+
+  function xoaDanKhoiXe(index) {
+      haptic();
+      window.draftXeData.items.splice(index, 1);
+      renderDraftXeCart();
+  }
+
+  function renderDraftXeCart() {
+      let container = document.getElementById('sx-danh-sach-item');
+      let tongTanEl = document.getElementById('sx-tong-tan');
+      
+      if (window.draftXeData.items.length === 0) {
+          container.innerHTML = `
+              <div style="text-align: center; padding: 40px; color: var(--text-sub); background: var(--bg-card); border-radius: 16px;">
+                  <i class="ph-bold ph-shopping-cart" style="font-size: 32px; opacity: 0.5; margin-bottom: 8px;"></i><br>Chưa có đạn nào trên xe.
+              </div>`;
+          tongTanEl.innerText = "0 Tấn";
+          return;
+      }
+
+      let totalWeight = 0;
+      let html = window.draftXeData.items.map((item, idx) => {
+          let klr = layKLRTuTenDan(item.ten);
+          totalWeight += (item.sl * klr);
+          
+          let loGop = gopDanhSachLo(item.danhSachLo);
+          let summaryHTML = loGop.map(lo => {
+              let text = lo.tenLo + ": " + lo.sl;
+              if (lo.isBaoGoi) {
+                  let parts = [];
+                  if (lo.slChan > 0) parts.push(`${lo.slChan} ${item.tenBaoGoi || 'BG'}`);
+                  if (lo.mangLe && lo.mangLe.length > 0) parts.push(lo.mangLe.join(' + '));
+                  text += ` (${parts.join(' + ')})`;
+              }
+              return `<div style="font-size: 11px; color: var(--text-sub); margin-top: 4px;"><i class="ph-bold ph-caret-right"></i> ${escapeHTML(text)}</div>`;
+          }).join('');
+
+          return `
+          <div class="modern-list-item" style="border-radius: 14px; border: 1px solid var(--border-light); padding: 12px 16px; margin-bottom: 10px;">
+              <div class="modern-list-stt" style="color: var(--primary-color);">${idx + 1}</div>
+              <div class="modern-list-content">
+                  <div class="modern-list-title">${escapeHTML(item.ten)}</div>
+                  <div style="font-size: 11px; font-weight: 700; color: var(--success-color); margin-top: 4px;">SL: ${item.sl} ${escapeHTML(item.dvt)}</div>
+                  <div style="margin-top: 4px; background: var(--bg-body); padding: 6px; border-radius: 8px;">
+                      ${summaryHTML}
+                  </div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                  <button class="btn-sm btn-edit" onclick="suaSoanLoChoXe(${idx})"><i class="ph-bold ph-pencil-simple"></i></button>
+                  <button class="btn-sm btn-del" onclick="xoaDanKhoiXe(${idx})"><i class="ph-bold ph-trash"></i></button>
+              </div>
+          </div>`;
+      }).join('');
+
+      container.innerHTML = html;
+      tongTanEl.innerText = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 3 }).format(totalWeight / 1000) + " Tấn";
+  }
+
+  function chotXuatXe() {
+      haptic();
+      let xe = document.getElementById('sx-xe-input').value.trim();
+      let ngay = document.getElementById('sx-ngay').value;
+      let phieu = document.getElementById('sx-phieu').value.trim();
+
+      if (!xe) { showDialog("Thiếu thông tin", "Vui lòng nhập Biển số Xe nhận.", "alert"); return; }
+      if (!ngay) { showDialog("Thiếu thông tin", "Vui lòng chọn Ngày xuất.", "alert"); return; }
+      if (window.draftXeData.items.length === 0) { showDialog("Xe trống", "Chưa có đạn nào được soạn lên xe.", "alert"); return; }
+
+      showDialog("Xác nhận", `Chốt xuất ${window.draftXeData.items.length} loại đạn lên xe <b>${escapeHTML(xe)}</b>?`, "confirm", () => {
+          let count = 0;
+          window.draftXeData.items.forEach(item => {
+              STATE.thucHien.push({
+                  id: generateID(),
+                  lenhId: item.lenhId,
+                  soLenh: item.soLenh,
+                  phieu: phieu,
+                  xe: xe,
+                  ngay: ngay,
+                  ten: item.ten,
+                  dvt: item.dvt,
+                  cap: item.cap,
+                  sl: item.sl,
+                  tenBaoGoi: item.tenBaoGoi,
+                  slPerBaoGoi: item.slPerBaoGoi,
+                  danhSachLo: [...item.danhSachLo]
+              });
+              count++;
+          });
+          
+          safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
+          
+          // Clear form
+          document.getElementById('sx-xe-input').value = '';
+          document.getElementById('sx-phieu').value = '';
+          window.draftXeData.items = [];
+          renderDraftXeCart();
+          
+          showToast(`Đã xuất thành công ${count} loại đạn!`, "ph-fill ph-check-circle");
+          
+          // Redirect to Bao Cao Tab to see results
+          setTimeout(() => { chuyenTab('tab-bao-cao', 'BÁO CÁO KẾT QUẢ', 'nav-bao-cao'); }, 500);
+      });
+  }
+
+
+  // ==================== TAB 4: THỰC HIỆN (NHẬP NHANH CŨ) ====================
   function capNhatDropdownSoLenh() {
-      let select = document.getElementById('th-so-lenh'); let uniqueLenh = [...new Set(STATE.lenh.map(l => l.soLenh))];
-      if(uniqueLenh.length === 0) { select.innerHTML = '<option value="">-- Trống --</option>'; return; }
-      select.innerHTML = '<option value="">-- Chọn Số Lệnh --</option>' + uniqueLenh.map(sl => `<option value="${escapeHTML(sl)}">${escapeHTML(sl)}</option>`).join('');
+      let uniqueLenh = [...new Set(STATE.lenh.map(l => l.soLenh))];
+      
+      // Update cho Tab Thực Hiện Nhập Nhanh
+      let selectTh = document.getElementById('th-so-lenh'); 
+      if(uniqueLenh.length === 0) { selectTh.innerHTML = '<option value="">-- Trống --</option>'; }
+      else { selectTh.innerHTML = '<option value="">-- Chọn Số Lệnh --</option>' + uniqueLenh.map(sl => `<option value="${escapeHTML(sl)}">${escapeHTML(sl)}</option>`).join(''); }
       document.getElementById('th-chon-dan').innerHTML = '<option value="">-- Vui lòng chọn Lệnh trước --</option>';
+
+      // Update cho Tab Soạn Xe
+      let selectSx = document.getElementById('sx-so-lenh'); 
+      if(uniqueLenh.length === 0) { selectSx.innerHTML = '<option value="">-- Trống --</option>'; }
+      else { selectSx.innerHTML = '<option value="">-- Chọn Số Lệnh --</option>' + uniqueLenh.map(sl => `<option value="${escapeHTML(sl)}">${escapeHTML(sl)}</option>`).join(''); }
+      document.getElementById('sx-chon-dan').innerHTML = '<option value="">-- Vui lòng chọn Lệnh trước --</option>';
   }
   
   function loadDanTheoLenh() {
@@ -1504,47 +1707,22 @@
   
   function tuDongDienCapTuLenh() {
       let selectEl = document.getElementById('th-chon-dan'); let idLenh = selectEl.value; 
-      if(!idLenh) { 
-          document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; 
-          document.getElementById('th-draft-lo-section').style.display = 'none'; 
-          return; 
-      }
+      if(!idLenh) { document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; return; }
       let lenhGoc = STATE.lenh.find(l => l.id === idLenh); 
       if(lenhGoc) {
           let capSelect = document.getElementById('th-cap'); let optionExists = Array.from(capSelect.options).some(opt => opt.value == lenhGoc.cap);
           capSelect.value = optionExists ? lenhGoc.cap : '';
-          
           let selectedOption = selectEl.options[selectEl.selectedIndex]; let conLai = selectedOption.getAttribute('data-conlai');
           if(conLai && parseFloat(conLai) > 0) { document.getElementById('th-sl').value = conLai; } else { document.getElementById('th-sl').value = ''; }
-          
-          // SETUP DRAFT MODE
-          window.draftLoData.list = [];
-          window.draftLoData.lenhId = lenhGoc.id;
-          window.draftLoData.tenBaoGoi = lenhGoc.tenBaoGoi || 'Cốp';
-          window.draftLoData.slPerBaoGoi = lenhGoc.slPerBaoGoi || 0;
-          document.getElementById('th-draft-lo-section').style.display = 'block';
-          renderDraftLoCount();
       } 
-  }
-
-  function renderDraftLoCount() {
-      let sl = window.draftLoData.list.reduce((sum, l) => sum + l.sl, 0);
-      document.getElementById('th-draft-count').innerText = `${window.draftLoData.list.length} Lô (${sl})`;
-      if(window.draftLoData.list.length > 0) {
-          document.getElementById('th-sl').value = sl; // Tự động cập nhật tổng
-      }
-  }
-
-  function moModalDraftLo() {
-      moModalQuanLyLo('DRAFT', null);
   }
   
   function xuLyGhiXe() {
       haptic();
       let ngay = document.getElementById('th-ngay').value; let phieu = document.getElementById('th-phieu').value.trim();
-      let idLenh = document.getElementById('th-chon-dan').value; let cap = document.getElementById('th-cap').value.trim(); let sl = parseFloat(document.getElementById('th-sl').value.trim());
+      let idLenh = document.getElementById('th-chon-dan').value; let cap = document.getElementById('th-cap').value.trim(); let sl = document.getElementById('th-sl').value.trim();
 
-      if(!idLenh || isNaN(sl) || sl <= 0 || !ngay) { showDialog("Lỗi", "Vui lòng điền đủ Ngày, Chọn Đạn và Số lượng xuất > 0.", "alert"); return; }
+      if(!idLenh || !sl || !ngay) { showDialog("Lỗi", "Vui lòng điền đủ Ngày, Chọn Đạn và Số lượng.", "alert"); return; }
       
       let xeSelectVal = document.getElementById('th-xe-select').value;
       let xe = "";
@@ -1560,28 +1738,14 @@
 
       let lenhGoc = STATE.lenh.find(l => l.id === idLenh); if(!lenhGoc) return; 
 
-      // Kiểm tra xem user có đang dùng Draft Mode không
-      let dsLoToSave = [];
-      if (window.draftLoData.lenhId === idLenh && window.draftLoData.list.length > 0) {
-          let sumDraft = window.draftLoData.list.reduce((sum, l) => sum + l.sl, 0);
-          if (sumDraft !== sl) {
-              showDialog("Cảnh báo", `Số lượng tổng (${sl}) không khớp với tổng các Lô đã soạn (${sumDraft}). Vui lòng kiểm tra lại.`, "alert");
-              return;
-          }
-          // Clone the array
-          dsLoToSave = [...window.draftLoData.list];
-      }
-
       if(idThucHienDangSua) {
           let index = STATE.thucHien.findIndex(t => t.id === idThucHienDangSua);
-          let dsLoCu = dsLoToSave.length > 0 ? dsLoToSave : (STATE.thucHien[index].danhSachLo || []);
-          STATE.thucHien[index] = { id: idThucHienDangSua, lenhId: idLenh, soLenh: lenhGoc.soLenh, phieu: phieu, xe, ngay, ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap, sl: sl, tenBaoGoi: lenhGoc.tenBaoGoi, slPerBaoGoi: lenhGoc.slPerBaoGoi, danhSachLo: dsLoCu };
+          let dsLoCu = STATE.thucHien[index].danhSachLo || [];
+          STATE.thucHien[index] = { id: idThucHienDangSua, lenhId: idLenh, soLenh: lenhGoc.soLenh, phieu: phieu, xe, ngay, ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap, sl: parseFloat(sl), tenBaoGoi: lenhGoc.tenBaoGoi, slPerBaoGoi: lenhGoc.slPerBaoGoi, danhSachLo: dsLoCu };
           huySuaThucHien(); showToast("Đã cập nhật xe!");
       } else {
-          STATE.thucHien.push({ id: generateID(), lenhId: idLenh, soLenh: lenhGoc.soLenh, phieu: phieu, xe, ngay, ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap, sl: sl, tenBaoGoi: lenhGoc.tenBaoGoi, slPerBaoGoi: lenhGoc.slPerBaoGoi, danhSachLo: dsLoToSave });
+          STATE.thucHien.push({ id: generateID(), lenhId: idLenh, soLenh: lenhGoc.soLenh, phieu: phieu, xe, ngay, ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap, sl: parseFloat(sl), tenBaoGoi: lenhGoc.tenBaoGoi, slPerBaoGoi: lenhGoc.slPerBaoGoi, danhSachLo: [] });
           document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; document.getElementById('th-chon-dan').value = ''; 
-          document.getElementById('th-draft-lo-section').style.display = 'none';
-          window.draftLoData.list = [];
           showToast(`Đã xuất vào xe ${xe} ${phieu ? '(P:'+phieu+')' : ''}`); loadDanTheoLenh(); 
       }
       safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien)); 
@@ -1607,15 +1771,6 @@
       document.getElementById('th-so-lenh').value = item.soLenh; loadDanTheoLenh();
       setTimeout(() => { 
           document.getElementById('th-chon-dan').value = item.lenhId; 
-          
-          // Populate draft mode for editing
-          window.draftLoData.list = item.danhSachLo ? [...item.danhSachLo] : [];
-          window.draftLoData.lenhId = item.lenhId;
-          window.draftLoData.tenBaoGoi = item.tenBaoGoi || 'Cốp';
-          window.draftLoData.slPerBaoGoi = item.slPerBaoGoi || 0;
-          document.getElementById('th-draft-lo-section').style.display = 'block';
-          renderDraftLoCount();
-
           let capSelect = document.getElementById('th-cap'); let optionExists = Array.from(capSelect.options).some(opt => opt.value == item.cap); capSelect.value = optionExists ? item.cap : '';
           document.getElementById('th-sl').value = item.sl; 
       }, 50);
@@ -1623,15 +1778,12 @@
       document.getElementById('btn-ghi-xe').innerHTML = "<i class='ph-bold ph-floppy-disk'></i> CẬP NHẬT SỔ"; document.getElementById('btn-ghi-xe').style.background = "var(--primary-color)";
       document.getElementById('btn-huy-xe').style.display = "flex"; window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-  
   function huySuaThucHien() {
       idThucHienDangSua = null; 
       document.getElementById('th-cap').value = ''; document.getElementById('th-sl').value = ''; document.getElementById('th-phieu').value = '';
       document.getElementById('th-xe-select').value = 'AUTO'; document.getElementById('th-xe-input').style.display = 'none'; document.getElementById('th-xe-input').value = '';
-      document.getElementById('th-draft-lo-section').style.display = 'none'; window.draftLoData.list = [];
       document.getElementById('btn-ghi-xe').innerHTML = "<i class='ph-bold ph-check'></i> GHI SỔ XE"; document.getElementById('btn-ghi-xe').style.background = "var(--warning-color)"; document.getElementById('btn-huy-xe').style.display = "none";
   }
-
   function xoaThucHien(id) { 
       showDialog("Xác nhận", "Xóa lịch sử xuất của xe này?", "confirm", () => { 
           STATE.thucHien = STATE.thucHien.filter(i => i.id !== id); safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien)); 
@@ -1639,7 +1791,6 @@
           if(document.getElementById('tab-thuc-hien').classList.contains('active')) loadDanTheoLenh();
       }); 
   }
-
   function renderBangThucHien() {
       let tbody = document.getElementById('tbody-thuc-hien');
       if(STATE.thucHien.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="padding:40px; text-align:center; color:var(--text-sub);"><i class="ph ph-truck" style="font-size:32px; opacity:0.5; margin-bottom:8px;"></i><br>Chưa có dữ liệu xuất.</td></tr>`; return; }
@@ -1690,7 +1841,7 @@
       document.getElementById('input-ql-ten-lo').value = '';
       document.getElementById('input-ql-sl-lo').value = '';
 
-      if (type === 'LENH' || type === 'THUCHIEN' || type === 'DRAFT') {
+      if (type === 'LENH' || type === 'THUCHIEN' || type === 'DRAFT_XE_ITEM') {
           let record = null;
           if (type === 'LENH') {
               record = STATE.lenh.find(l => l.id === id);
@@ -1707,23 +1858,31 @@
                       safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
                   }
               }
-          } else if (type === 'DRAFT') {
-              let lenhGoc = STATE.lenh.find(l => l.id === window.draftLoData.lenhId);
+          } else if (type === 'DRAFT_XE_ITEM') {
+              let lenhGoc = STATE.lenh.find(l => l.id === id);
+              
+              let existingList = [];
+              if (window.currentDraftItemIndex >= 0 && window.draftXeData.items[window.currentDraftItemIndex]) {
+                   existingList = window.draftXeData.items[window.currentDraftItemIndex].danhSachLo || [];
+              }
+              
               record = {
-                  id: 'DRAFT', ten: lenhGoc ? lenhGoc.ten : 'Chưa rõ', cap: lenhGoc ? lenhGoc.cap : '', dvt: lenhGoc ? lenhGoc.dvt : '',
-                  sl: window.draftLoData.list.reduce((sum,l)=>sum+l.sl, 0), // Sl is sum of current drafts
-                  slPerBaoGoi: window.draftLoData.slPerBaoGoi,
-                  tenBaoGoi: window.draftLoData.tenBaoGoi,
-                  danhSachLo: window.draftLoData.list
+                  id: 'DRAFT', lenhId: lenhGoc.id, soLenh: lenhGoc.soLenh, ten: lenhGoc.ten, cap: lenhGoc.cap, dvt: lenhGoc.dvt,
+                  sl: existingList.reduce((sum,l)=>sum+l.sl, 0), // Tính tổng draft hiện tại
+                  slPerBaoGoi: lenhGoc.slPerBaoGoi || 0,
+                  tenBaoGoi: lenhGoc.tenBaoGoi || 'Cốp',
+                  danhSachLo: existingList
               };
-              titleEl.innerText = "Soạn Lô xuất (Chưa ghi sổ)";
+              titleEl.innerText = "Soạn Lô xuất (Cho xe)";
           }
+          
           if(!record) return;
 
           nameEl.innerHTML = `${escapeHTML(record.ten)} <br><span style="font-size:12px; color:var(--text-sub); font-weight:500; display:inline-block; margin-top:4px;">Cấp: ${escapeHTML(record.cap)} &bull; ĐVT: ${escapeHTML(record.dvt)}</span>`;
           vungNhap.style.display = 'block'; 
           vungGoiYThongMinh.innerHTML = '';
           
+          // LUÔN HIỂN THỊ SEGMENT VÀ CHO PHÉP NHẬP NHANH CONFIG
           let segUI = document.getElementById('segment-che-do-nhap');
           segUI.style.display = 'flex'; 
           
@@ -1739,8 +1898,8 @@
               chuyenTabNhapLo('SL');
           }
 
-          if (type === 'THUCHIEN' || type === 'DRAFT') {
-              let targetLenhId = type === 'DRAFT' ? window.draftLoData.lenhId : record.lenhId;
+          if (type === 'THUCHIEN' || type === 'DRAFT_XE_ITEM') {
+              let targetLenhId = type === 'DRAFT_XE_ITEM' ? record.lenhId : record.lenhId;
               let lenhGoc = STATE.lenh.find(l => l.id === targetLenhId);
               if (lenhGoc && lenhGoc.danhSachLo && lenhGoc.danhSachLo.length > 0) {
                   vungGoiY.style.display = 'block';
@@ -1757,10 +1916,11 @@
               vungGoiY.style.display = 'none';
           }
 
+          let btnText = type === 'DRAFT_XE_ITEM' ? "XÁC NHẬN VÀO XE" : "LƯU LÔ";
           document.getElementById('vung-nut-lo-bottom').innerHTML = `
               <button id="btn-thoat-lo" onclick="dongModalQuanLyLo()" style="flex: 1; height: 50px; border-radius: 14px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--text-main); font-weight: 700; font-size: 16px; transition: 0.2s;">ĐÓNG</button>
               <button id="btn-huy-sua-lo" onclick="huySuaLo()" style="flex: 1; height: 50px; border-radius: 14px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--danger-color); font-weight: 700; font-size: 16px; display: none; transition: 0.2s;">HỦY SỬA</button>
-              <button id="btn-submit-lo" onclick="xuLyThemQuanLyLo()" style="flex: 1.5; height: 50px; border-radius: 14px; border: none; background: var(--primary-color); color: white; font-weight: 700; font-size: 16px; transition: 0.2s; box-shadow: 0 4px 12px rgba(0,122,255,0.3);">LƯU LÔ</button>
+              <button id="btn-submit-lo" onclick="xuLyThemQuanLyLo()" style="flex: 1.5; height: 50px; border-radius: 14px; border: none; background: var(--primary-color); color: white; font-weight: 700; font-size: 14px; transition: 0.2s; box-shadow: 0 4px 12px rgba(0,122,255,0.3);">${btnText}</button>
           `;
           renderChiTietQuanLyLo(record);
       } 
@@ -1857,7 +2017,7 @@
       
       openModal('modal-quan-ly-lo');
       setTimeout(() => {
-          if (type === 'LENH' || type === 'THUCHIEN' || type === 'DRAFT') {
+          if (type === 'LENH' || type === 'THUCHIEN' || type === 'DRAFT_XE_ITEM') {
               xuLyGoiYLoAuto();
           }
       }, 10);
@@ -1868,7 +2028,7 @@
       
       if(currentLoContext.type === 'LENH') renderBangLenh();
       if(currentLoContext.type === 'THUCHIEN') renderBangThucHien();
-      if(currentLoContext.type === 'DRAFT') renderDraftLoCount();
+      if(currentLoContext.type === 'DRAFT_XE_ITEM') renderDraftXeCart();
       
       currentLoContext = { type: null, id: null, viewData: null };
   }
@@ -1938,7 +2098,9 @@
       let record = null;
       if (currentLoContext.type === 'LENH') record = STATE.lenh.find(l => l.id === currentLoContext.id);
       else if (currentLoContext.type === 'THUCHIEN') record = STATE.thucHien.find(t => t.id === currentLoContext.id);
-      else if (currentLoContext.type === 'DRAFT') record = { danhSachLo: window.draftLoData.list };
+      else if (currentLoContext.type === 'DRAFT_XE_ITEM') {
+          if (window.currentDraftItemIndex >= 0) record = window.draftXeData.items[window.currentDraftItemIndex];
+      }
       
       if(!record || !record.danhSachLo) return;
       let loInfo = record.danhSachLo.find(l => l.id === idLo);
@@ -1981,7 +2143,7 @@
 
       let btnSubmit = document.getElementById('btn-submit-lo');
       if(btnSubmit) {
-          btnSubmit.innerText = 'LƯU LÔ';
+          btnSubmit.innerHTML = currentLoContext.type === 'DRAFT_XE_ITEM' ? "XÁC NHẬN VÀO XE" : "LƯU LÔ";
           btnSubmit.style.background = 'var(--primary-color)';
       }
       
@@ -1996,11 +2158,10 @@
       let dsLo = record.danhSachLo;
       let slDaNhap = dsLo.reduce((sum, lo) => sum + lo.sl, 0);
 
-      document.getElementById('ql-lo-sl-tong').innerText = record.sl;
+      document.getElementById('ql-lo-sl-tong').innerText = currentLoContext.type === 'DRAFT_XE_ITEM' ? "---" : record.sl;
       document.getElementById('ql-lo-sl-da-nhap').innerText = slDaNhap;
-      if(currentLoContext.type === 'DRAFT') {
+      if(currentLoContext.type === 'DRAFT_XE_ITEM') {
            document.getElementById('ql-lo-sl-da-nhap').style.color = 'var(--primary-color)';
-           document.getElementById('ql-lo-sl-tong').innerText = slDaNhap;
       } else {
            document.getElementById('ql-lo-sl-da-nhap').style.color = (slDaNhap === record.sl) ? 'var(--success-color)' : 'var(--warning-color)';
       }
@@ -2009,7 +2170,7 @@
 
       let container = document.getElementById('danh-sach-ql-lo-container');
       if(dsLo.length === 0) {
-          container.innerHTML = `<div style="padding:40px; text-align:center; color:var(--text-sub);"><i class="ph-bold ph-stack" style="font-size:32px; opacity:0.5; margin-bottom:8px;"></i><br>Chưa có Lô nào được lưu.</div>`;
+          container.innerHTML = `<div style="padding:40px; text-align:center; color:var(--text-sub);"><i class="ph-bold ph-stack" style="font-size:32px; opacity:0.5; margin-bottom:8px;"></i><br>Chưa có Lô nào được nhập.</div>`;
       } else {
           let dsHienThi = [...dsLo];
           if (currentLoContext.type === 'LENH') dsHienThi.reverse(); 
@@ -2045,7 +2206,7 @@
               document.getElementById('input-ql-sl-lo').value = Math.min(slGoiY, slConLaiThemDuoc);
               document.getElementById('input-ql-sl-lo').focus(); 
           }
-      } else if (currentLoContext.type === 'DRAFT') {
+      } else if (currentLoContext.type === 'DRAFT_XE_ITEM') {
           if(cheDoNhapHienTai === 'BG') document.getElementById('bg-input-chan').focus();
           else {
               document.getElementById('input-ql-sl-lo').value = slGoiY;
@@ -2059,7 +2220,18 @@
       let record = null;
       if (currentLoContext.type === 'LENH') record = STATE.lenh.find(l => l.id === currentLoContext.id);
       else if (currentLoContext.type === 'THUCHIEN') record = STATE.thucHien.find(t => t.id === currentLoContext.id);
-      else if (currentLoContext.type === 'DRAFT') record = { danhSachLo: window.draftLoData.list, sl: 99999999 }; // Dummy SL to bypass max check in draft
+      else if (currentLoContext.type === 'DRAFT_XE_ITEM') {
+          let lenhGoc = STATE.lenh.find(l => l.id === currentLoContext.id);
+          if (window.currentDraftItemIndex >= 0) {
+              record = window.draftXeData.items[window.currentDraftItemIndex];
+          } else {
+              // Creating a temporary record to append batches
+              record = { 
+                  lenhId: lenhGoc.id, soLenh: lenhGoc.soLenh, ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap: lenhGoc.cap,
+                  danhSachLo: [], sl: 0, tenBaoGoi: lenhGoc.tenBaoGoi, slPerBaoGoi: lenhGoc.slPerBaoGoi 
+              };
+          }
+      }
 
       if(!record) return;
 
@@ -2088,9 +2260,6 @@
                   lenhGoc.slPerBaoGoi = record.slPerBaoGoi;
                   safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh));
               }
-          } else if (currentLoContext.type === 'DRAFT') {
-              window.draftLoData.tenBaoGoi = record.tenBaoGoi;
-              window.draftLoData.slPerBaoGoi = record.slPerBaoGoi;
           }
       } else {
           slLo = parseFloat(document.getElementById('input-ql-sl-lo').value.trim());
@@ -2098,15 +2267,18 @@
 
       if(!tenLo || isNaN(slLo) || slLo <= 0) { showDialog("Lỗi", "Vui lòng nhập Tên Lô và Số lượng hợp lệ.", "alert"); return; }
       if(!record.danhSachLo) record.danhSachLo = [];
+      
       let currentDaNhap = record.danhSachLo.reduce((sum, lo) => sum + lo.sl, 0);
       if (idLoDangSua) {
           let loCu = record.danhSachLo.find(l => l.id === idLoDangSua);
           if(loCu) currentDaNhap -= loCu.sl;
       }
-      let slConLaiThemDuoc = record.sl - currentDaNhap;
-
-      if (currentLoContext.type !== 'DRAFT' && slLo > slConLaiThemDuoc) {
-          showDialog("Vượt Quá Giới Hạn", `Tổng Lô không được vượt quá số lượng gốc (${record.sl}). Bạn chỉ có thể lưu tối đa <b>${slConLaiThemDuoc}</b> cho thao tác này.`, "alert"); return;
+      
+      if (currentLoContext.type !== 'DRAFT_XE_ITEM') {
+          let slConLaiThemDuoc = record.sl - currentDaNhap;
+          if (slLo > slConLaiThemDuoc) {
+              showDialog("Vượt Quá Giới Hạn", `Tổng Lô không được vượt quá số lượng gốc (${record.sl}). Bạn chỉ có thể lưu tối đa <b>${slConLaiThemDuoc}</b> cho thao tác này.`, "alert"); return;
+          }
       }
 
       if (idLoDangSua) {
@@ -2118,12 +2290,16 @@
           record.danhSachLo.push({ id: generateID(), tenLo, sl: slLo, isBaoGoi, slChan, mangLe, tenBaoGoi: formLoaiBg });
       }
       
+      record.sl = record.danhSachLo.reduce((sum, l) => sum + l.sl, 0);
+
       if (currentLoContext.type === 'LENH') safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh));
       else if (currentLoContext.type === 'THUCHIEN') safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
-      else if (currentLoContext.type === 'DRAFT') {
-          // Gán lại tham chiếu nếu có lỗi
-          window.draftLoData.list = record.danhSachLo;
-          record.sl = record.danhSachLo.reduce((sum, l)=>sum+l.sl, 0);
+      else if (currentLoContext.type === 'DRAFT_XE_ITEM') {
+          if (window.currentDraftItemIndex === -1) {
+              window.draftXeData.items.push(record);
+              window.currentDraftItemIndex = window.draftXeData.items.length - 1; // Now we are editing
+          }
+          // The reference is updated, just re-render
       }
       
       huySuaLo(); renderChiTietQuanLyLo(record); xuLyGoiYLoAuto(); 
@@ -2137,7 +2313,13 @@
       let record = null;
       if (currentLoContext.type === 'LENH') record = STATE.lenh.find(l => l.id === currentLoContext.id);
       else if (currentLoContext.type === 'THUCHIEN') record = STATE.thucHien.find(t => t.id === currentLoContext.id);
-      else if (currentLoContext.type === 'DRAFT') record = { danhSachLo: window.draftLoData.list, sl: 99999999 };
+      else if (currentLoContext.type === 'DRAFT_XE_ITEM') {
+          if (window.currentDraftItemIndex >= 0) record = window.draftXeData.items[window.currentDraftItemIndex];
+          else {
+              let lenhGoc = STATE.lenh.find(l => l.id === currentLoContext.id);
+              record = { lenhId: lenhGoc.id, soLenh: lenhGoc.soLenh, ten: lenhGoc.ten, dvt: lenhGoc.dvt, cap: lenhGoc.cap, danhSachLo: [], sl: 0, tenBaoGoi: lenhGoc.tenBaoGoi, slPerBaoGoi: lenhGoc.slPerBaoGoi };
+          }
+      }
 
       if (!record) return;
 
@@ -2188,19 +2370,20 @@
                   return;
               }
 
-              if (currentLoContext.type !== 'DRAFT' && totalNewSl > slConLaiThemDuoc) {
+              if (currentLoContext.type !== 'DRAFT_XE_ITEM' && totalNewSl > slConLaiThemDuoc) {
                   showDialog("Vượt Quá Giới Hạn", `File Excel có tổng SL (${totalNewSl}) vượt quá SL còn lại cho phép nhập (${slConLaiThemDuoc}).`, "alert");
                   e.target.value = '';
                   return;
               }
 
               record.danhSachLo.push(...newBatches);
+              record.sl = record.danhSachLo.reduce((sum, l) => sum + l.sl, 0);
 
               if (currentLoContext.type === 'LENH') safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh));
               else if (currentLoContext.type === 'THUCHIEN') safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
-              else if (currentLoContext.type === 'DRAFT') {
-                  window.draftLoData.list = record.danhSachLo;
-                  record.sl = record.danhSachLo.reduce((sum, l)=>sum+l.sl, 0);
+              else if (currentLoContext.type === 'DRAFT_XE_ITEM' && window.currentDraftItemIndex === -1) {
+                  window.draftXeData.items.push(record);
+                  window.currentDraftItemIndex = window.draftXeData.items.length - 1;
               }
 
               renderChiTietQuanLyLo(record);
@@ -2220,15 +2403,15 @@
       let record = null;
       if (currentLoContext.type === 'LENH') record = STATE.lenh.find(l => l.id === currentLoContext.id);
       else if (currentLoContext.type === 'THUCHIEN') record = STATE.thucHien.find(t => t.id === currentLoContext.id);
-      else if (currentLoContext.type === 'DRAFT') record = { danhSachLo: window.draftLoData.list, sl: 99999999 };
+      else if (currentLoContext.type === 'DRAFT_XE_ITEM') record = window.draftXeData.items[window.currentDraftItemIndex];
       
       if(!record) return;
 
       record.danhSachLo = record.danhSachLo.filter(lo => lo.id !== idLo);
+      record.sl = record.danhSachLo.reduce((sum, l) => sum + l.sl, 0);
       
       if (currentLoContext.type === 'LENH') safeStorage.setItem('duLieuLenh', JSON.stringify(STATE.lenh));
       else if (currentLoContext.type === 'THUCHIEN') safeStorage.setItem('duLieuThucHien', JSON.stringify(STATE.thucHien));
-      else if (currentLoContext.type === 'DRAFT') window.draftLoData.list = record.danhSachLo;
 
       if (idLoDangSua === idLo) huySuaLo();
 
