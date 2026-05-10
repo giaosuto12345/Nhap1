@@ -4,7 +4,7 @@ Luyện đọc
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Teleprompter V25 - Final Masterpiece</title>
+    <title>Teleprompter V26 - Master Grid</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
@@ -13,8 +13,8 @@ Luyện đọc
             --sinh-color: #10b981; 
             --both-color: #f59e0b; 
             --accent: #ff0055;
-            --header-height: 85px; 
-            --focus-pos: 40%; /* Nâng vạch đọc lên 40% màn hình */
+            --header-height: 75px; 
+            --focus-pos: 35%; /* Tối ưu hóa điểm nhìn: 1/3 màn hình phía trên */
         }
 
         body {
@@ -25,62 +25,69 @@ Luyện đọc
             display: flex; flex-direction: column;
         }
 
-        /* HEADER CỐ ĐỊNH, CÂN BẰNG 3 ĐIỂM */
+        /* HEADER GRID (CHỐNG CHỒNG CHÉO 100%) */
         #app-header {
-            height: calc(var(--header-height) + env(safe-area-inset-top));
-            padding-top: env(safe-area-inset-top);
-            background: rgba(8, 8, 8, 0.95);
+            display: grid;
+            grid-template-columns: 1fr auto 1fr; /* Trái giãn - Giữa cố định - Phải giãn */
+            align-items: center;
+            gap: 8px; /* Luôn giữ khoảng cách giữa các khối */
+            padding: calc(env(safe-area-inset-top) + 12px) 15px 12px 15px;
+            background: rgba(10, 10, 10, 0.95);
             border-bottom: 1px solid rgba(255,255,255,0.06);
-            display: flex; justify-content: space-between; align-items: center;
-            padding-left: 15px; padding-right: 15px; z-index: 50; position: relative;
+            z-index: 50; position: relative;
             box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            height: auto;
         }
 
         .hud-box {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px; padding: 6px 12px; display: flex; flex-direction: column; min-width: 100px;
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px; padding: 6px 10px; display: flex; flex-direction: column;
+            white-space: nowrap; overflow: hidden;
         }
 
-        /* KHUNG NGƯỜI ĐỌC (CĂN GIỮA) */
-        #center-badge-wrapper {
-            position: absolute; left: 50%; top: calc(50% + (env(safe-area-inset-top) / 2));
-            transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center;
-        }
+        /* Cột Trái: Tiến độ */
+        .header-left { justify-self: start; align-items: flex-start; max-width: 100%; }
         
+        /* Cột Giữa: Người đang đọc */
+        .header-center { justify-self: center; }
         .speaker-badge {
             display: flex; align-items: center; gap: 8px;
-            background: rgba(255,255,255,0.08); padding: 8px 20px; border-radius: 24px;
-            font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;
+            background: rgba(255,255,255,0.08); padding: 8px 16px; border-radius: 24px;
+            font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;
             transition: all 0.3s; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            white-space: nowrap;
         }
-        
-        .dot { width: 10px; height: 10px; border-radius: 50%; background: currentColor; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
         .dot.pulse { animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(currentColor, 0.8); } 70% { box-shadow: 0 0 0 8px rgba(currentColor, 0); } 100% { box-shadow: 0 0 0 0 rgba(currentColor, 0); } }
-
         .dot.pausing { background: #eab308; box-shadow: 0 0 15px #eab308; animation: none; }
 
-        /* NÚT CÀI ĐẶT TRÊN HEADER */
-        #header-actions {
-            position: absolute; right: 15px; top: calc(50% + (env(safe-area-inset-top) / 2));
-            transform: translateY(-50%); display: flex; gap: 8px; transition: opacity 0.3s, pointer-events 0.3s;
+        /* Cột Phải: Dùng chung không gian cho Lượt tiếp theo & Nút bấm */
+        .header-right { justify-self: end; position: relative; height: 42px; width: 100%; display: flex; justify-content: flex-end; align-items: center;}
+        
+        #right-hud {
+            position: absolute; right: 0; align-items: flex-end;
+            transition: opacity 0.3s, transform 0.3s; transform: translateX(10px); opacity: 0; pointer-events: none;
         }
-        body.is-playing #header-actions { opacity: 0; pointer-events: none; }
+        body.is-playing #right-hud { transform: translateX(0); opacity: 1; pointer-events: auto; }
 
-        /* NGƯỜI TIẾP THEO (GÓC PHẢI) */
-        #right-hud { transition: opacity 0.3s; }
-        body:not(.is-playing) #right-hud { opacity: 0; pointer-events: none; }
+        #header-actions {
+            position: absolute; right: 0; display: flex; gap: 8px;
+            transition: opacity 0.3s, transform 0.3s; transform: translateX(0); opacity: 1; pointer-events: auto;
+        }
+        body.is-playing #header-actions { transform: translateX(10px); opacity: 0; pointer-events: none; }
 
+        /* THANH ĐIỂM NHẤN TRÊN CÙNG */
         #progress-bar {
-            position: absolute; bottom: 0; left: 0; height: 2px;
+            position: absolute; bottom: -1px; left: 0; height: 2px;
             background: var(--accent); width: 0%; box-shadow: 0 0 10px var(--accent); transition: width 0.1s linear;
         }
 
-        /* KHU VỰC CUỘN CHỮ & SPOTLIGHT (Mask tinh chỉnh theo mốc 40%) */
+        /* KHU VỰC CUỘN CHỮ & MASK CHE MỜ DỰA TRÊN 35% */
         #prompter-main {
             flex: 1; position: relative; overflow: hidden;
-            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 10%, rgba(0,0,0,0.4) 25%, black 35%, black 45%, rgba(0,0,0,0.4) 55%, rgba(0,0,0,0.1) 85%, transparent 100%);
-            mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 10%, rgba(0,0,0,0.4) 25%, black 35%, black 45%, rgba(0,0,0,0.4) 55%, rgba(0,0,0,0.1) 85%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 15%, rgba(0,0,0,0.4) 25%, black 35%, black 45%, rgba(0,0,0,0.4) 65%, rgba(0,0,0,0.1) 85%, transparent 100%);
+            mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 15%, rgba(0,0,0,0.4) 25%, black 35%, black 45%, rgba(0,0,0,0.4) 65%, rgba(0,0,0,0.1) 85%, transparent 100%);
         }
 
         #scroll-container {
@@ -91,7 +98,7 @@ Luyện đọc
         body.is-playing #scroll-container { overflow-y: hidden; }
 
         #text-content {
-            width: 90%; margin: 0 auto; padding-top: 50vh; padding-bottom: 50vh;
+            width: 90%; margin: 0 auto; padding-top: 65vh; padding-bottom: 65vh;
             white-space: pre-line; line-height: 1.4; font-weight: 800;
             transition: width 0.3s, font-size 0.3s; text-align: center; 
         }
@@ -124,7 +131,7 @@ Luyện đọc
         body[data-role="sinh"][data-opp="skip"] .spk-tai { display: none; }
         body[data-role="sinh"] .spk-sinh { text-shadow: 0 0 15px rgba(16,185,129,0.3); }
 
-        /* VẠCH FOCUS CAMERA (ĐẨY LÊN 40%) */
+        /* VẠCH FOCUS CAMERA Ở 35% */
         .focus-line {
             position: absolute; top: var(--focus-pos); left: 0; width: 100%; height: 130px;
             transform: translateY(-50%); pointer-events: none; z-index: 10;
@@ -142,11 +149,10 @@ Luyện đọc
         /* THANH ĐẾM NGƯỢC AUTO-PAUSE */
         #pause-progress-bar {
             position: absolute; bottom: -1px; left: 0; height: 3px;
-            background: #eab308; width: 0%; box-shadow: 0 0 10px #eab308;
-            opacity: 0;
+            background: #eab308; width: 0%; box-shadow: 0 0 10px #eab308; opacity: 0;
         }
 
-        /* BOTTOM DOCK */
+        /* BOTTOM DOCK (Ẩn mượt mà khi chạy) */
         #bottom-dock-wrapper {
             position: absolute; bottom: 0; left: 0; width: 100%;
             padding-bottom: max(env(safe-area-inset-bottom), 15px);
@@ -158,58 +164,62 @@ Luyện đọc
         .glass-dock {
             background: rgba(15, 15, 15, 0.95); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border: 1px solid rgba(255,255,255,0.08); border-radius: 32px; box-shadow: 0 20px 40px rgba(0,0,0,0.8);
-            width: 90%; max-width: 360px; padding: 16px; display: flex; flex-direction: column; gap: 16px;
+            width: 92%; max-width: 380px; padding: 16px; display: flex; flex-direction: column; gap: 16px;
         }
 
         .stepper-btn {
             background: rgba(255,255,255,0.1); color: white; font-weight: bold; font-size: 18px;
-            width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+            width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
             border-radius: 10px; transition: background 0.2s;
         }
         .stepper-btn:active { background: rgba(255,255,255,0.3); transform: scale(0.95); }
-        .stepper-val { font-size: 15px; font-weight: 800; font-family: monospace; width: 40px; text-align: center; color: var(--accent); }
+        .stepper-val { font-size: 14px; font-weight: 800; font-family: monospace; width: 36px; text-align: center; color: var(--accent); }
 
         .mirrored { transform: scaleX(-1); }
     </style>
 </head>
 <body data-role="all" data-opp="skip">
 
-    <!-- HEADER HOÀN HẢO -->
+    <!-- HEADER CẤU TRÚC GRID HOÀN HẢO -->
     <header id="app-header">
+        
         <!-- TRÁI: TIẾN ĐỘ -->
-        <div class="hud-box" style="align-items: flex-start;">
-            <span class="text-[8px] text-gray-500 font-bold uppercase tracking-widest mb-0.5">Tiến độ</span>
-            <div class="flex items-baseline gap-1">
-                <span id="time-elapsed" class="font-mono font-bold text-[13px] text-white">00:00</span>
-                <span id="time-total" class="font-mono text-[9px] text-gray-500">/ 00:00</span>
+        <div class="header-left">
+            <div class="hud-box">
+                <span class="text-[8px] text-gray-500 font-bold uppercase tracking-widest mb-0.5">Tiến độ</span>
+                <div class="flex items-baseline gap-1">
+                    <span id="time-elapsed" class="font-mono font-bold text-[12px] text-white">00:00</span>
+                    <span id="time-total" class="font-mono text-[9px] text-gray-500">/ 00:00</span>
+                </div>
             </div>
         </div>
 
-        <!-- GIỮA: KHUNG NGƯỜI ĐỌC HIỆN TẠI -->
-        <div id="center-badge-wrapper">
+        <!-- GIỮA: NGƯỜI ĐỌC HIỆN TẠI -->
+        <div class="header-center">
             <div id="speaker-badge" class="speaker-badge text-gray-400">
                 <div class="dot" id="speaker-dot"></div>
                 <span id="speaker-name">CHUẨN BỊ</span>
             </div>
         </div>
 
-        <!-- PHẢI (TRẠNG THÁI 1): NGƯỜI TIẾP THEO (Chỉ hiện khi PLAY) -->
-        <div class="hud-box" id="right-hud" style="align-items: flex-end; position: absolute; right: 15px; top: calc(50% + (env(safe-area-inset-top) / 2)); transform: translateY(-50%);">
-            <span class="text-[8px] text-gray-500 font-bold uppercase tracking-widest mb-0.5 text-right w-full flex items-center justify-end gap-1">
-                Lượt tiếp theo
-                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
-            </span>
-            <span id="next-speaker-name" class="font-bold text-[13px] text-gray-400">---</span>
-        </div>
+        <!-- PHẢI: XẾP CHỒNG ĐỘNG (Nút cài đặt HOẶC Lượt tiếp theo) -->
+        <div class="header-right">
+            
+            <!-- TRẠNG THÁI PLAY: Hiện Lượt tiếp theo -->
+            <div id="right-hud" class="hud-box">
+                <span class="text-[8px] text-gray-500 font-bold uppercase tracking-widest mb-0.5">Tiếp theo</span>
+                <span id="next-speaker-name" class="font-bold text-[12px] text-gray-400 text-right w-full">---</span>
+            </div>
 
-        <!-- PHẢI (TRẠNG THÁI 2): NÚT CÀI ĐẶT (Hiện khi PAUSE) -->
-        <div id="header-actions">
-            <button onclick="toggleSettings(event)" class="w-[42px] h-[42px] rounded-xl bg-white/10 flex items-center justify-center text-white active:scale-95 transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-            </button>
-            <button onclick="toggleEditor(event)" class="w-[42px] h-[42px] rounded-xl bg-[var(--tai-color)] flex items-center justify-center text-white active:scale-95 transition shadow-lg shadow-sky-500/30">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-            </button>
+            <!-- TRẠNG THÁI PAUSE: Hiện 2 Nút cài đặt -->
+            <div id="header-actions">
+                <button onclick="toggleSettings(event)" class="w-[42px] h-[42px] rounded-xl bg-white/10 flex items-center justify-center text-white active:scale-95 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </button>
+                <button onclick="toggleEditor(event)" class="w-[42px] h-[42px] rounded-xl bg-[var(--tai-color)] flex items-center justify-center text-white active:scale-95 transition shadow-lg shadow-sky-500/30">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                </button>
+            </div>
         </div>
 
         <div id="progress-bar"></div>
@@ -220,7 +230,7 @@ Luyện đọc
         <div class="focus-line" id="focus-bracket">
             <div class="focus-arrow left" id="focus-arrow-l"></div>
             <div class="focus-arrow right" id="focus-arrow-r"></div>
-            <!-- TÍNH NĂNG MỚI: Thanh tiến trình nhịp thở -->
+            <!-- Thanh tiến trình nhịp thở nằm dưới khung Focus -->
             <div id="pause-progress-bar"></div>
         </div>
         <div id="scroll-container">
@@ -231,10 +241,10 @@ Luyện đọc
     <!-- BOTTOM DOCK -->
     <footer id="bottom-dock-wrapper">
         <div class="glass-dock">
-            <div class="flex justify-between gap-4">
+            <div class="flex justify-between gap-3">
                 <div class="flex-1 bg-black/50 rounded-2xl p-2 border border-white/5 flex flex-col items-center">
-                    <span class="text-[9px] text-gray-500 font-bold uppercase mb-1">Tốc độ</span>
-                    <div class="flex items-center w-full justify-between">
+                    <span class="text-[8px] text-gray-500 font-bold uppercase mb-1 tracking-wider">Tốc độ</span>
+                    <div class="flex items-center w-full justify-between px-1">
                         <button onclick="adj('speed', -0.2, event)" class="stepper-btn">−</button>
                         <span id="ui-val-speed" class="stepper-val">4.5</span>
                         <button onclick="adj('speed', 0.2, event)" class="stepper-btn">+</button>
@@ -242,8 +252,8 @@ Luyện đọc
                 </div>
                 
                 <div class="flex-1 bg-black/50 rounded-2xl p-2 border border-white/5 flex flex-col items-center">
-                    <span class="text-[9px] text-gray-500 font-bold uppercase mb-1">Cỡ chữ</span>
-                    <div class="flex items-center w-full justify-between">
+                    <span class="text-[8px] text-gray-500 font-bold uppercase mb-1 tracking-wider">Cỡ chữ</span>
+                    <div class="flex items-center w-full justify-between px-1">
                         <button onclick="adj('fontSize', -2, event)" class="stepper-btn">−</button>
                         <span id="ui-val-font" class="stepper-val">90</span>
                         <button onclick="adj('fontSize', 2, event)" class="stepper-btn">+</button>
@@ -251,17 +261,17 @@ Luyện đọc
                 </div>
             </div>
 
-            <div class="flex items-center justify-between px-2">
+            <div class="flex items-center justify-between px-2 mt-1">
                 <button onclick="resetPrompter(event)" class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-gray-300 active:scale-95 transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                 </button>
 
-                <button onclick="togglePlay(event)" class="w-[72px] h-[72px] rounded-full bg-[var(--accent)] text-white flex items-center justify-center shadow-[0_0_20px_rgba(255,0,85,0.4)] active:scale-95 transition transform">
-                    <svg id="icon-play" class="w-10 h-10 ml-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                <button onclick="togglePlay(event)" class="w-[64px] h-[64px] rounded-full bg-[var(--accent)] text-white flex items-center justify-center shadow-[0_0_20px_rgba(255,0,85,0.4)] active:scale-95 transition transform">
+                    <svg id="icon-play" class="w-8 h-8 ml-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
                 </button>
 
                 <button onclick="toggleMirror(event)" id="btn-mirror" class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-gray-300 active:scale-95 transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
                 </button>
             </div>
         </div>
@@ -305,6 +315,7 @@ Luyện đọc
                     </div>
                 </div>
 
+                <!-- ĐỘ TRỄ TỰ ĐỘNG -->
                 <div class="bg-yellow-500/10 rounded-2xl p-4 border border-yellow-500/30 flex items-center justify-between">
                     <span class="text-[10px] font-bold text-yellow-500 uppercase tracking-widest">Thời gian tự dừng (Giây)</span>
                     <div class="flex items-center gap-3">
@@ -426,8 +437,8 @@ Một lần nữa, xin kính chúc thủ trưởng, ban giám khảo cùng toàn
 
 Cả 2: Chúc Hội thi thành công tốt đẹp!`;
 
-        // TỶ LỆ FOCUS CHUẨN MỚI (40%)
-        const FOCUS_PERCENT = 0.40;
+        // TỶ LỆ FOCUS (35%)
+        const FOCUS_PERCENT = 0.35;
 
         const state = {
             isPlaying: false,
@@ -449,8 +460,8 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
             };
 
             try {
-                DOM.input.value = localStorage.getItem('v25_script') || defaultScript;
-                const savedSettings = localStorage.getItem('v25_settings');
+                DOM.input.value = localStorage.getItem('v26_script') || defaultScript;
+                const savedSettings = localStorage.getItem('v26_settings');
                 if(savedSettings) {
                     const s = JSON.parse(savedSettings);
                     state.speed = s.speed || 4.5; state.fontSize = s.fontSize || 90;
@@ -474,7 +485,7 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
 
         function saveSettings() {
             try {
-                localStorage.setItem('v25_settings', JSON.stringify({
+                localStorage.setItem('v26_settings', JSON.stringify({
                     speed: state.speed, fontSize: state.fontSize, width: state.width, pauseDelay: state.pauseDelay,
                     align: state.align, role: state.role, oppMode: state.oppMode
                 }));
@@ -598,7 +609,7 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
             return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
         }
 
-        /* ==================== PLAY VÀ TỰ ĐỘNG DỪNG CÓ THANH TIẾN TRÌNH ==================== */
+        /* ==================== TỰ ĐỘNG DỪNG CÓ THANH TIẾN TRÌNH ==================== */
         function togglePlay(e) {
             if(e) e.stopPropagation();
             if(!DOM.btnPlay || !DOM.container) return;
@@ -638,7 +649,6 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
             
             if (state.pauseDelay > 0 && !state.isAutoPausing && state.pauseMarkers.length > 0) {
                 const containerRect = DOM.container.getBoundingClientRect();
-                // SỬ DỤNG MỐC 40% (FOCUS_PERCENT) CHUẨN XÁC
                 const cameraY = containerRect.top + (containerRect.height * FOCUS_PERCENT); 
 
                 for (let i = 0; i < state.pauseMarkers.length; i++) {
@@ -647,28 +657,21 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
                         let rect = marker.getBoundingClientRect();
                         let markerY = rect.top + (rect.height / 2);
                         
-                        // Chạm vạch 40% là kích hoạt Dừng
                         if (markerY <= cameraY) {
                             marker.setAttribute('data-triggered', 'true');
                             
-                            // BẮT ĐẦU DỪNG VÀ KÍCH HOẠT THANH CHẠY
                             state.isAutoPausing = true;
                             marker.classList.add('active-pause'); 
                             
                             const dot = document.getElementById('speaker-dot');
                             if(dot) dot.classList.add('pausing'); 
 
-                            // Hiệu ứng thanh tiến trình nhịp thở
                             const pBar = document.getElementById('pause-progress-bar');
                             if(pBar) {
                                 pBar.style.transition = 'none';
                                 pBar.style.width = '100%';
                                 pBar.style.opacity = '1';
-                                
-                                // Ép reflow để CSS nhận diện thay đổi tức thì
                                 void pBar.offsetWidth; 
-                                
-                                // Bắt đầu đếm ngược
                                 pBar.style.transition = `width ${state.pauseDelay}s linear`;
                                 pBar.style.width = '0%';
                             }
@@ -687,7 +690,7 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
             }
 
             if (state.isAutoPausing) {
-                state.lastTime = timestamp; // Đóng băng thời gian
+                state.lastTime = timestamp; 
             } else {
                 const delta = timestamp - state.lastTime;
                 state.lastTime = timestamp;
@@ -730,7 +733,7 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
 
         function handleStageClick(e) { if (e.target.closest('.ui-layer') || e.target.closest('#app-header')) return; togglePlay(e); }
 
-        /* ==================== HUD: NEXT SPEAKER, ANCHOR & FOCUS COLOR (Đồng bộ 40%) ==================== */
+        /* ==================== HUD CẬP NHẬT GIAO DIỆN (Đồng bộ 35%) ==================== */
         function clearAnchor() { document.querySelectorAll('.script-block').forEach(b => b.classList.remove('anchor-highlight')); }
 
         function updateAnchor() {
@@ -815,10 +818,11 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
                 if(state.isPlaying && !state.isAutoPausing) dot.classList.add('pulse'); else dot.classList.remove('pulse');
             }
 
+            // RÚT GỌN TÊN ĐỂ CHỐNG TRÀN VIỀN
             const nextNameEl = document.getElementById('next-speaker-name');
             if(nextNameEl) {
                 if(nextSpeaker) {
-                    let nameStr = nextSpeaker === 'tai' ? 'ĐỒNG CHÍ TÀI' : (nextSpeaker === 'sinh' ? 'ĐỒNG CHÍ SINH' : 'CẢ 2 ĐỒNG CHÍ');
+                    let nameStr = nextSpeaker === 'tai' ? 'Đ.C TÀI' : (nextSpeaker === 'sinh' ? 'Đ.C SINH' : 'CẢ 2');
                     nextNameEl.innerText = nameStr;
                 } else {
                     nextNameEl.innerText = "HẾT BÀI";
@@ -868,7 +872,7 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
         function saveScript(e) {
             if(e) e.stopPropagation(); 
             if(DOM.input) {
-                try { localStorage.setItem('v25_script', DOM.input.value); } catch(err){}
+                try { localStorage.setItem('v26_script', DOM.input.value); } catch(err){}
                 parseAndRender(); toggleEditor(); resetPrompter();
             }
         }
