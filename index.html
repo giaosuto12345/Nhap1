@@ -1,10 +1,10 @@
-Luyện Đọc
+Luyện đọc
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Teleprompter V24 - Smart Auto-Pause</title>
+    <title>Teleprompter V25 - Final Masterpiece</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
@@ -14,6 +14,7 @@ Luyện Đọc
             --both-color: #f59e0b; 
             --accent: #ff0055;
             --header-height: 85px; 
+            --focus-pos: 40%; /* Nâng vạch đọc lên 40% màn hình */
         }
 
         body {
@@ -37,12 +38,13 @@ Luyện Đọc
 
         .hud-box {
             background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px; padding: 6px 12px; display: flex; flex-direction: column; min-width: 90px;
+            border-radius: 12px; padding: 6px 12px; display: flex; flex-direction: column; min-width: 100px;
         }
 
+        /* KHUNG NGƯỜI ĐỌC (CĂN GIỮA) */
         #center-badge-wrapper {
             position: absolute; left: 50%; top: calc(50% + (env(safe-area-inset-top) / 2));
-            transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 2px;
+            transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center;
         }
         
         .speaker-badge {
@@ -56,21 +58,16 @@ Luyện Đọc
         .dot.pulse { animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(currentColor, 0.8); } 70% { box-shadow: 0 0 0 8px rgba(currentColor, 0); } 100% { box-shadow: 0 0 0 0 rgba(currentColor, 0); } }
 
-        /* MÀU ĐÈN AUTO-PAUSE (Đèn vàng khi đang dừng chờ) */
         .dot.pausing { background: #eab308; box-shadow: 0 0 15px #eab308; animation: none; }
 
-        #next-speaker {
-            font-size: 9px; font-weight: 800; color: #888; letter-spacing: 1px; text-transform: uppercase;
-            display: flex; align-items: center; gap: 4px; opacity: 0; transition: opacity 0.3s;
-        }
-        #next-speaker.visible { opacity: 1; }
-
+        /* NÚT CÀI ĐẶT TRÊN HEADER */
         #header-actions {
             position: absolute; right: 15px; top: calc(50% + (env(safe-area-inset-top) / 2));
             transform: translateY(-50%); display: flex; gap: 8px; transition: opacity 0.3s, pointer-events 0.3s;
         }
         body.is-playing #header-actions { opacity: 0; pointer-events: none; }
 
+        /* NGƯỜI TIẾP THEO (GÓC PHẢI) */
         #right-hud { transition: opacity 0.3s; }
         body:not(.is-playing) #right-hud { opacity: 0; pointer-events: none; }
 
@@ -79,11 +76,11 @@ Luyện Đọc
             background: var(--accent); width: 0%; box-shadow: 0 0 10px var(--accent); transition: width 0.1s linear;
         }
 
-        /* KHU VỰC CUỘN CHỮ & SPOTLIGHT */
+        /* KHU VỰC CUỘN CHỮ & SPOTLIGHT (Mask tinh chỉnh theo mốc 40%) */
         #prompter-main {
             flex: 1; position: relative; overflow: hidden;
-            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 15%, rgba(0,0,0,0.4) 35%, black 45%, black 55%, rgba(0,0,0,0.4) 65%, rgba(0,0,0,0.1) 85%, transparent 100%);
-            mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 15%, rgba(0,0,0,0.4) 35%, black 45%, black 55%, rgba(0,0,0,0.4) 65%, rgba(0,0,0,0.1) 85%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 10%, rgba(0,0,0,0.4) 25%, black 35%, black 45%, rgba(0,0,0,0.4) 55%, rgba(0,0,0,0.1) 85%, transparent 100%);
+            mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 10%, rgba(0,0,0,0.4) 25%, black 35%, black 45%, rgba(0,0,0,0.4) 55%, rgba(0,0,0,0.1) 85%, transparent 100%);
         }
 
         #scroll-container {
@@ -95,12 +92,11 @@ Luyện Đọc
 
         #text-content {
             width: 90%; margin: 0 auto; padding-top: 50vh; padding-bottom: 50vh;
-            /* Đã SỬA white-space để diệt khoảng trống vô hình */
             white-space: pre-line; line-height: 1.4; font-weight: 800;
             transition: width 0.3s, font-size 0.3s; text-align: center; 
         }
 
-        /* ĐỊNH DẠNG KHỐI CHỮ (ÉP GỌN GÀNG) */
+        /* ĐỊNH DẠNG KHỐI CHỮ */
         .script-block { margin-bottom: 24px; transition: color 0.3s, text-shadow 0.3s; }
         .spk-tai { color: var(--tai-color); }
         .spk-sinh { color: var(--sinh-color); }
@@ -117,10 +113,7 @@ Luyện Đọc
             font-size: 0.5em; letter-spacing: 0.2em; font-weight: 400; 
             margin: 10px 0; user-select: none; text-shadow: none; transition: all 0.3s;
         }
-        /* Hiệu ứng khi bị chạm vạch focus */
-        .pause-marker.active-pause {
-            color: #ff0055; text-shadow: 0 0 15px #ff0055; transform: scale(1.5);
-        }
+        .pause-marker.active-pause { color: #eab308; text-shadow: 0 0 15px #eab308; transform: scale(1.5); }
 
         /* LOGIC VAI DIỄN */
         body[data-role="tai"][data-opp="blur"] .spk-sinh { opacity: 0.15; filter: blur(2px) grayscale(100%); }
@@ -131,9 +124,9 @@ Luyện Đọc
         body[data-role="sinh"][data-opp="skip"] .spk-tai { display: none; }
         body[data-role="sinh"] .spk-sinh { text-shadow: 0 0 15px rgba(16,185,129,0.3); }
 
-        /* VẠCH FOCUS CAMERA */
+        /* VẠCH FOCUS CAMERA (ĐẨY LÊN 40%) */
         .focus-line {
-            position: absolute; top: 50%; left: 0; width: 100%; height: 130px;
+            position: absolute; top: var(--focus-pos); left: 0; width: 100%; height: 130px;
             transform: translateY(-50%); pointer-events: none; z-index: 10;
             border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1);
             background: linear-gradient(90deg, rgba(255,255,255,0.02) 0%, transparent 15%, transparent 85%, rgba(255,255,255,0.02) 100%);
@@ -145,6 +138,13 @@ Luyện Đọc
         }
         .focus-arrow.left { left: 0; border-left: 14px solid rgba(255,255,255,0.3); }
         .focus-arrow.right { right: 0; border-right: 14px solid rgba(255,255,255,0.3); }
+
+        /* THANH ĐẾM NGƯỢC AUTO-PAUSE */
+        #pause-progress-bar {
+            position: absolute; bottom: -1px; left: 0; height: 3px;
+            background: #eab308; width: 0%; box-shadow: 0 0 10px #eab308;
+            opacity: 0;
+        }
 
         /* BOTTOM DOCK */
         #bottom-dock-wrapper {
@@ -174,8 +174,9 @@ Luyện Đọc
 </head>
 <body data-role="all" data-opp="skip">
 
-    <!-- HEADER -->
+    <!-- HEADER HOÀN HẢO -->
     <header id="app-header">
+        <!-- TRÁI: TIẾN ĐỘ -->
         <div class="hud-box" style="align-items: flex-start;">
             <span class="text-[8px] text-gray-500 font-bold uppercase tracking-widest mb-0.5">Tiến độ</span>
             <div class="flex items-baseline gap-1">
@@ -184,22 +185,24 @@ Luyện Đọc
             </div>
         </div>
 
+        <!-- GIỮA: KHUNG NGƯỜI ĐỌC HIỆN TẠI -->
         <div id="center-badge-wrapper">
             <div id="speaker-badge" class="speaker-badge text-gray-400">
                 <div class="dot" id="speaker-dot"></div>
                 <span id="speaker-name">CHUẨN BỊ</span>
             </div>
-            <div id="next-speaker">
-                <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
-                <span id="next-speaker-name">TỚI: ---</span>
-            </div>
         </div>
 
+        <!-- PHẢI (TRẠNG THÁI 1): NGƯỜI TIẾP THEO (Chỉ hiện khi PLAY) -->
         <div class="hud-box" id="right-hud" style="align-items: flex-end; position: absolute; right: 15px; top: calc(50% + (env(safe-area-inset-top) / 2)); transform: translateY(-50%);">
-            <span class="text-[8px] text-gray-500 font-bold uppercase tracking-widest mb-0.5 text-right w-full">Giờ thực</span>
-            <span id="real-clock" class="font-mono font-bold text-[13px] text-white">00:00:00</span>
+            <span class="text-[8px] text-gray-500 font-bold uppercase tracking-widest mb-0.5 text-right w-full flex items-center justify-end gap-1">
+                Lượt tiếp theo
+                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
+            </span>
+            <span id="next-speaker-name" class="font-bold text-[13px] text-gray-400">---</span>
         </div>
 
+        <!-- PHẢI (TRẠNG THÁI 2): NÚT CÀI ĐẶT (Hiện khi PAUSE) -->
         <div id="header-actions">
             <button onclick="toggleSettings(event)" class="w-[42px] h-[42px] rounded-xl bg-white/10 flex items-center justify-center text-white active:scale-95 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -217,6 +220,8 @@ Luyện Đọc
         <div class="focus-line" id="focus-bracket">
             <div class="focus-arrow left" id="focus-arrow-l"></div>
             <div class="focus-arrow right" id="focus-arrow-r"></div>
+            <!-- TÍNH NĂNG MỚI: Thanh tiến trình nhịp thở -->
+            <div id="pause-progress-bar"></div>
         </div>
         <div id="scroll-container">
             <div id="text-content"></div>
@@ -300,7 +305,6 @@ Luyện Đọc
                     </div>
                 </div>
 
-                <!-- TÍNH NĂNG MỚI: ĐỘ TRỄ TỰ ĐỘNG THAY CHO KHOẢNG CÁCH -->
                 <div class="bg-yellow-500/10 rounded-2xl p-4 border border-yellow-500/30 flex items-center justify-between">
                     <span class="text-[10px] font-bold text-yellow-500 uppercase tracking-widest">Thời gian tự dừng (Giây)</span>
                     <div class="flex items-center gap-3">
@@ -338,7 +342,7 @@ Luyện Đọc
     </div>
 
     <script>
-        // KỊCH BẢN TRÍCH XUẤT TỪ FILE WORD
+        // KỊCH BẢN CHUẨN
         const defaultScript = `Tài: Kính thưa thủ trưởng!
 Kính thưa ban giám khảo!
 Thưa toàn thể các đồng chí!
@@ -422,11 +426,12 @@ Một lần nữa, xin kính chúc thủ trưởng, ban giám khảo cùng toàn
 
 Cả 2: Chúc Hội thi thành công tốt đẹp!`;
 
-        // STATE MANAGER CHO AUTO-PAUSE
+        // TỶ LỆ FOCUS CHUẨN MỚI (40%)
+        const FOCUS_PERCENT = 0.40;
+
         const state = {
             isPlaying: false,
-            speed: 4.5, fontSize: 90, width: 90, 
-            pauseDelay: 1.0, // CHUYỂN THÀNH BIẾN ĐỘ TRỄ (GIÂY)
+            speed: 4.5, fontSize: 90, width: 90, pauseDelay: 1.0,
             align: 'center', role: 'all', oppMode: 'skip',
             animId: null, lastTime: 0, totalWords: 0, estSeconds: 0,
             currentScrollPos: 0, anchorTimeout: null, wakeLock: null,
@@ -444,37 +449,20 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
             };
 
             try {
-                DOM.input.value = localStorage.getItem('v24_script') || defaultScript;
-                const savedSettings = localStorage.getItem('v24_settings');
+                DOM.input.value = localStorage.getItem('v25_script') || defaultScript;
+                const savedSettings = localStorage.getItem('v25_settings');
                 if(savedSettings) {
                     const s = JSON.parse(savedSettings);
                     state.speed = s.speed || 4.5; state.fontSize = s.fontSize || 90;
-                    state.width = s.width || 90; 
-                    state.pauseDelay = (s.pauseDelay !== undefined) ? s.pauseDelay : 1.0;
+                    state.width = s.width || 90; state.pauseDelay = (s.pauseDelay !== undefined) ? s.pauseDelay : 1.0;
                     state.align = s.align || 'center'; state.role = s.role || 'all'; state.oppMode = s.oppMode || 'skip';
                 }
-            } catch(e) {
-                DOM.input.value = defaultScript;
-            }
+            } catch(e) { DOM.input.value = defaultScript; }
 
             applyRoleUI(state.role); applyOppModeUI(state.oppMode); applyAlignUI(state.align);
             parseAndRender(); applySettings();
-            startRealClock(); requestWakeLock();
+            requestWakeLock();
         };
-
-        function startRealClock() {
-            const clockEl = document.getElementById('real-clock');
-            if(!clockEl) return;
-            setInterval(() => {
-                const now = new Date();
-                const hh = String(now.getHours()).padStart(2, '0');
-                const mm = String(now.getMinutes()).padStart(2, '0');
-                const ss = String(now.getSeconds()).padStart(2, '0');
-                clockEl.innerText = `${hh}:${mm}:${ss}`;
-            }, 1000);
-            const now = new Date();
-            clockEl.innerText = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
-        }
 
         async function requestWakeLock() {
             try { if ('wakeLock' in navigator) state.wakeLock = await navigator.wakeLock.request('screen'); } 
@@ -486,7 +474,7 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
 
         function saveSettings() {
             try {
-                localStorage.setItem('v24_settings', JSON.stringify({
+                localStorage.setItem('v25_settings', JSON.stringify({
                     speed: state.speed, fontSize: state.fontSize, width: state.width, pauseDelay: state.pauseDelay,
                     align: state.align, role: state.role, oppMode: state.oppMode
                 }));
@@ -497,12 +485,10 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
         function adj(key, delta, e) {
             if(e) e.stopPropagation();
             let newVal = state[key] + delta;
-
             if(key === 'speed') state.speed = Math.max(0.5, Math.min(20.0, Math.round(newVal * 10) / 10));
             else if (key === 'fontSize') state.fontSize = Math.max(30, Math.min(250, Math.round(newVal)));
             else if (key === 'width') state.width = Math.max(30, Math.min(100, Math.round(newVal)));
             else if (key === 'pauseDelay') state.pauseDelay = Math.max(0.0, Math.min(5.0, Math.round(newVal * 10) / 10));
-            
             applySettings();
         }
 
@@ -563,7 +549,7 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
             }
         }
 
-        /* ==================== AI PARSER (TRIỆT TIÊU KHOẢNG TRẮNG ẢO) ==================== */
+        /* ==================== AI PARSER ==================== */
         function parseAndRender() {
             if(!DOM.input || !DOM.content) return;
             const rawLines = DOM.input.value.split('\n');
@@ -587,25 +573,17 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
                     state.totalWords += cleanText.split(/\s+/).length;
                     
                     let markerHtml = '';
-                    // Nếu có dòng trống, tạo điểm Auto-Pause
-                    if (emptyLinesCount > 0 && html !== '') {
-                        markerHtml = '<div class="pause-marker" data-triggered="false">— ✧ —</div>';
-                    }
+                    if (emptyLinesCount > 0 && html !== '') markerHtml = '<div class="pause-marker" data-triggered="false">— ✧ —</div>';
 
-                    // Không dùng newlines trong code html để tránh lỗi khoảng trắng của pre-line
                     html += '<div class="script-block spk-' + spk + '" data-speaker="' + spk + '">' + markerHtml + cleanText + '</div>';
                     emptyLinesCount = 0;
                 }
             }
             DOM.content.innerHTML = html;
-            
-            // Xóa cache các điểm dừng cũ
             state.pauseMarkers = [];
-            
             recalcTime(); updateHUD();
         }
 
-        /* ==================== ĐỘNG CƠ AUTO-PAUSE ==================== */
         function recalcTime() {
             const speedFactor = state.speed / 4.5; 
             state.estSeconds = (state.totalWords / 2.16) / speedFactor;
@@ -620,33 +598,37 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
             return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
         }
 
+        /* ==================== PLAY VÀ TỰ ĐỘNG DỪNG CÓ THANH TIẾN TRÌNH ==================== */
         function togglePlay(e) {
             if(e) e.stopPropagation();
             if(!DOM.btnPlay || !DOM.container) return;
 
             state.isPlaying = !state.isPlaying;
+            const pBar = document.getElementById('pause-progress-bar');
+
             if (state.isPlaying) {
                 document.body.classList.add('is-playing');
                 DOM.btnPlay.innerHTML = `<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>`;
                 
-                // Thu thập tọa độ các điểm dừng
                 state.pauseMarkers = Array.from(document.querySelectorAll('.pause-marker'));
-                
                 state.currentScrollPos = DOM.container.scrollTop;
                 state.lastTime = performance.now();
                 state.isAutoPausing = false;
+                
+                if(pBar) { pBar.style.transition = 'none'; pBar.style.opacity = '0'; pBar.style.width = '0%'; }
                 
                 clearAnchor(); 
                 state.animId = requestAnimationFrame(scrollLoop);
             } else {
                 document.body.classList.remove('is-playing');
                 DOM.btnPlay.innerHTML = `<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>`;
+                
                 cancelAnimationFrame(state.animId);
                 updateAnchor(); updateFocusColor(null);
                 
-                // Trả đèn vàng về xanh
                 const dot = document.getElementById('speaker-dot');
                 if(dot) dot.classList.remove('pausing');
+                if(pBar) { pBar.style.transition = 'none'; pBar.style.opacity = '0'; pBar.style.width = '0%'; }
             }
         }
 
@@ -654,10 +636,10 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
             if (!state.isPlaying || !DOM.container) return;
             if (!timestamp) timestamp = performance.now();
             
-            // 1. Kiểm tra Auto-Pause
             if (state.pauseDelay > 0 && !state.isAutoPausing && state.pauseMarkers.length > 0) {
                 const containerRect = DOM.container.getBoundingClientRect();
-                const cameraY = containerRect.top + (containerRect.height / 2); // Tọa độ Camera
+                // SỬ DỤNG MỐC 40% (FOCUS_PERCENT) CHUẨN XÁC
+                const cameraY = containerRect.top + (containerRect.height * FOCUS_PERCENT); 
 
                 for (let i = 0; i < state.pauseMarkers.length; i++) {
                     let marker = state.pauseMarkers[i];
@@ -665,21 +647,37 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
                         let rect = marker.getBoundingClientRect();
                         let markerY = rect.top + (rect.height / 2);
                         
-                        // Nếu cuộn lên chạm vạch Camera
+                        // Chạm vạch 40% là kích hoạt Dừng
                         if (markerY <= cameraY) {
                             marker.setAttribute('data-triggered', 'true');
                             
-                            // KÍCH HOẠT DỪNG AUTO-PAUSE
+                            // BẮT ĐẦU DỪNG VÀ KÍCH HOẠT THANH CHẠY
                             state.isAutoPausing = true;
-                            marker.classList.add('active-pause'); // Phát sáng điểm dừng
+                            marker.classList.add('active-pause'); 
                             
                             const dot = document.getElementById('speaker-dot');
-                            if(dot) dot.classList.add('pausing'); // Đèn chuyển Vàng
+                            if(dot) dot.classList.add('pausing'); 
+
+                            // Hiệu ứng thanh tiến trình nhịp thở
+                            const pBar = document.getElementById('pause-progress-bar');
+                            if(pBar) {
+                                pBar.style.transition = 'none';
+                                pBar.style.width = '100%';
+                                pBar.style.opacity = '1';
+                                
+                                // Ép reflow để CSS nhận diện thay đổi tức thì
+                                void pBar.offsetWidth; 
+                                
+                                // Bắt đầu đếm ngược
+                                pBar.style.transition = `width ${state.pauseDelay}s linear`;
+                                pBar.style.width = '0%';
+                            }
                             
                             setTimeout(() => {
                                 state.isAutoPausing = false;
                                 marker.classList.remove('active-pause');
                                 if(dot) dot.classList.remove('pausing');
+                                if(pBar) pBar.style.opacity = '0';
                             }, state.pauseDelay * 1000);
                             
                             break; 
@@ -688,14 +686,11 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
                 }
             }
 
-            // 2. Logic Cuộn
             if (state.isAutoPausing) {
-                // Đang dừng -> Không cuộn, chỉ cập nhật thời gian để chống giật
-                state.lastTime = timestamp;
+                state.lastTime = timestamp; // Đóng băng thời gian
             } else {
                 const delta = timestamp - state.lastTime;
                 state.lastTime = timestamp;
-                
                 state.currentScrollPos += (state.speed * 0.4) * (delta / 16.67);
                 DOM.container.scrollTop = state.currentScrollPos;
                 updateHUD();
@@ -704,7 +699,6 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
                     togglePlay(); return;
                 }
             }
-            
             state.animId = requestAnimationFrame(scrollLoop);
         }
 
@@ -716,9 +710,8 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
                         state.currentScrollPos = scContainer.scrollTop; 
                         updateHUD(); 
                         
-                        // Chỉnh lại trạng thái Triggers khi người dùng cuộn tay
                         const containerRect = scContainer.getBoundingClientRect();
-                        const cameraY = containerRect.top + (containerRect.height / 2);
+                        const cameraY = containerRect.top + (containerRect.height * FOCUS_PERCENT);
                         state.pauseMarkers = Array.from(document.querySelectorAll('.pause-marker'));
                         
                         state.pauseMarkers.forEach(m => {
@@ -737,12 +730,12 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
 
         function handleStageClick(e) { if (e.target.closest('.ui-layer') || e.target.closest('#app-header')) return; togglePlay(e); }
 
-        /* ==================== HUD: NEXT SPEAKER & FOCUS COLOR ==================== */
+        /* ==================== HUD: NEXT SPEAKER, ANCHOR & FOCUS COLOR (Đồng bộ 40%) ==================== */
         function clearAnchor() { document.querySelectorAll('.script-block').forEach(b => b.classList.remove('anchor-highlight')); }
 
         function updateAnchor() {
             clearAnchor(); if(!DOM.container) return;
-            const cameraY = DOM.container.scrollTop + (window.innerHeight / 2);
+            const cameraY = DOM.container.scrollTop + (window.innerHeight * FOCUS_PERCENT);
             const blocks = document.querySelectorAll('.script-block');
             for (let i = 0; i < blocks.length; i++) {
                 if (blocks[i].offsetParent === null) continue; 
@@ -783,20 +776,16 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
             if(timeEl) timeEl.innerText = formatTime(state.estSeconds * progress);
             if(progBar) progBar.style.width = `${progress * 100}%`;
 
-            const cameraY = DOM.container.scrollTop + (window.innerHeight / 2);
+            const cameraY = DOM.container.scrollTop + (window.innerHeight * FOCUS_PERCENT);
             const blocks = document.querySelectorAll('.script-block');
             
-            let activeSpeaker = null;
-            let activeIndex = -1;
-            let nextSpeaker = null;
+            let activeSpeaker = null; let activeIndex = -1; let nextSpeaker = null;
 
             for (let i = 0; i < blocks.length; i++) {
                 if (blocks[i].offsetParent === null) continue; 
                 const top = blocks[i].offsetTop; const bottom = top + blocks[i].offsetHeight;
                 if (cameraY >= top - 20 && cameraY <= bottom + 20) {
-                    activeSpeaker = blocks[i].getAttribute('data-speaker');
-                    activeIndex = i;
-                    break;
+                    activeSpeaker = blocks[i].getAttribute('data-speaker'); activeIndex = i; break;
                 }
             }
 
@@ -823,20 +812,16 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
                     badge.innerText = "CHUẨN BỊ"; badgeContainer.style.color = "#666"; badgeContainer.style.borderColor = "rgba(255,255,255,0.1)";
                 }
                 
-                // Hiệu ứng đèn (Chớp Trắng nếu Play, Vàng im nếu Pause)
-                if(state.isPlaying && !state.isAutoPausing) dot.classList.add('pulse'); 
-                else dot.classList.remove('pulse');
+                if(state.isPlaying && !state.isAutoPausing) dot.classList.add('pulse'); else dot.classList.remove('pulse');
             }
 
-            const nextEl = document.getElementById('next-speaker');
             const nextNameEl = document.getElementById('next-speaker-name');
-            if(nextEl && nextNameEl) {
+            if(nextNameEl) {
                 if(nextSpeaker) {
-                    let nameStr = nextSpeaker === 'tai' ? 'Đ.C TÀI' : (nextSpeaker === 'sinh' ? 'Đ.C SINH' : 'CẢ 2');
-                    nextNameEl.innerText = `TỚI: ${nameStr}`;
-                    nextEl.classList.add('visible');
+                    let nameStr = nextSpeaker === 'tai' ? 'ĐỒNG CHÍ TÀI' : (nextSpeaker === 'sinh' ? 'ĐỒNG CHÍ SINH' : 'CẢ 2 ĐỒNG CHÍ');
+                    nextNameEl.innerText = nameStr;
                 } else {
-                    nextEl.classList.remove('visible');
+                    nextNameEl.innerText = "HẾT BÀI";
                 }
             }
 
@@ -883,7 +868,7 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
         function saveScript(e) {
             if(e) e.stopPropagation(); 
             if(DOM.input) {
-                try { localStorage.setItem('v24_script', DOM.input.value); } catch(err){}
+                try { localStorage.setItem('v25_script', DOM.input.value); } catch(err){}
                 parseAndRender(); toggleEditor(); resetPrompter();
             }
         }
@@ -896,7 +881,7 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
                 if(DOM.container) { 
                     DOM.container.scrollTop -= 100; state.currentScrollPos = DOM.container.scrollTop; 
                     state.pauseMarkers.forEach(m => {
-                        if (m.getBoundingClientRect().top > (window.innerHeight/2)) m.setAttribute('data-triggered', 'false');
+                        if (m.getBoundingClientRect().top > (window.innerHeight * FOCUS_PERCENT)) m.setAttribute('data-triggered', 'false');
                     });
                     updateHUD(); updateAnchor(); 
                 } 
