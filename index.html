@@ -1,10 +1,9 @@
-Luyện đọc
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Teleprompter V26 - Master Grid</title>
+    <title>Teleprompter V27 - Smart Progress</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
@@ -396,7 +395,7 @@ Tài: Bước vào nhiệm kỳ 2025-2030, tình hình thế giới và khu vự
 
 Thứ nhất, thường xuyên quán triệt sâu sắc Nghị quyết Đại hội XIV của Đảng, các nghị quyết, chỉ thị của Ban Chấp hành Trung ương, Bộ Chính trị, Ban Bí thư, Nghị quyết Đại hội Đảng bộ Quân đội lần thứ XII; nhất là các nghị quyết, chỉ thị về công tác Thanh niên Quân đội trong thời kỳ mới. Bám sát mục tiêu, nhiệm vụ của cách mạng, nhiệm vụ của Quân đội để xây dựng và tổ chức thực hiện thắng lợi các chương trình hoạt động đúng hướng, phù hợp với điều kiện thực tiễn của đơn vị và tâm tư nguyện vọng của cán bộ, ĐVTN; góp phần tích cực vào công tác xây dựng tổ chức Đảng trong sạch, vững mạnh tiêu biểu, xây dựng đơn vị vững mạnh toàn diện, mẫu mực tiêu biểu. Thanh niên Quân đội phải luôn là lực lượng xung kích, đi đầu trong các phong trào thi đua, góp phần thực hiện thắng lợi nhiệm vụ chính trị của các đơn vị và toàn quân.
 
-Sinh: Thứ hai, tăng cường hơn nữa công tác giáo dục chính trị, tư tưởng, nâng cao nhận thức về mục tiêu, lý tưởng cách mạng, bản lĩnh chính trị, lòng yêu nước, yêu chủ nghĩa xã hội, lòng tự hào, tự tôn dân tộc, truyền thống vẻ vang của Đảng, dân tộc, Quân đội và của Đoàn, xây dựng niềm tin và bồi dưỡng kinh nghiệm chiến đấu, có kiến thức tổng hợp và chuyên sâu; năng động, sáng tạo, tự lực, tự rèn, thích ứng nhanh với thực tiễn; tu dưỡng phẩm chất đạo đức cách mạng, lối sống có văn hóa, trung thực, lành mạnh, đoàn kết; có ý thức tổ chức kỷ luật cao, góp phần xây dựng người Thanh niên Quân đội thực sự tiêu biểu cho phẩm chất, bản lĩnh, trí tuệ của Thanh niên Việt Nam, đáp ứng yêu cầu xây dựng và bảo vệ Tổ quốc trong thời kỳ mới.
+Sinh: Thứ hai, tăng cường hơn nữa công tác giáo dục chính trị, tư tưởng, nâng cao nhận thức về mục tiêu, lý tưởng cách mạng, bản lĩnh chính trị, lòng yêu nước, yêu chủ nghĩa xã hội, lòng tự hào, tự tôn dân tộc, truyền thống vẻ vang của Đảng, dân tộc, Quân đội và của Đoàn, xây dựng niềm tin và bồi dưỡng kinh nghiệm chiến đấu, có kiến thức tổng hợp và chuyên sâu; năng động, sáng tạo, tự lực, tự rèn, thích ứng nhanh với thực hiện; tu dưỡng phẩm chất đạo đức cách mạng, lối sống có văn hóa, trung thực, lành mạnh, đoàn kết; có ý thức tổ chức kỷ luật cao, góp phần xây dựng người Thanh niên Quân đội thực sự tiêu biểu cho phẩm chất, bản lĩnh, trí tuệ của Thanh niên Việt Nam, đáp ứng yêu cầu xây dựng và bảo vệ Tổ quốc trong thời kỳ mới.
 
 Tài: Thứ ba, tổ chức tốt các phong trào hành động cách mạng, trọng tâm là thực hiện thắng lợi chỉ đạo của đồng chí Bộ trưởng Bộ Quốc phòng về “2 xung kích, 2 sẵn sàng”. Đó là: Xung kích thực hiện thắng lợi nhiệm vụ chính trị của Quân đội; Xung kích thực hiện thắng lợi các phong trào hành động cách mạng của thanh niên. Đồng thời, Sẵn sàng thực hiện nhiệm vụ khó, nhiệm vụ mới; Sẵn sàng đến vùng sâu, vùng xa, biên giới, hải đảo, những nơi khó khăn, gian khổ nhất.
 
@@ -460,8 +459,8 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
             };
 
             try {
-                DOM.input.value = localStorage.getItem('v26_script') || defaultScript;
-                const savedSettings = localStorage.getItem('v26_settings');
+                DOM.input.value = localStorage.getItem('v27_script') || defaultScript;
+                const savedSettings = localStorage.getItem('v27_settings');
                 if(savedSettings) {
                     const s = JSON.parse(savedSettings);
                     state.speed = s.speed || 4.5; state.fontSize = s.fontSize || 90;
@@ -472,20 +471,11 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
 
             applyRoleUI(state.role); applyOppModeUI(state.oppMode); applyAlignUI(state.align);
             parseAndRender(); applySettings();
-            requestWakeLock();
         };
-
-        async function requestWakeLock() {
-            try { if ('wakeLock' in navigator) state.wakeLock = await navigator.wakeLock.request('screen'); } 
-            catch (err) { }
-        }
-        document.addEventListener('visibilitychange', async () => {
-            if (state.wakeLock !== null && document.visibilityState === 'visible') await requestWakeLock();
-        });
 
         function saveSettings() {
             try {
-                localStorage.setItem('v26_settings', JSON.stringify({
+                localStorage.setItem('v27_settings', JSON.stringify({
                     speed: state.speed, fontSize: state.fontSize, width: state.width, pauseDelay: state.pauseDelay,
                     align: state.align, role: state.role, oppMode: state.oppMode
                 }));
@@ -532,7 +522,16 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
         }
 
         function setRole(roleCode, tabIndex, e) {
-            if(e) e.stopPropagation(); state.role = roleCode; document.body.setAttribute('data-role', roleCode); applyRoleUI(roleCode); updateHUD(); saveSettings();
+            if(e) e.stopPropagation(); 
+            state.role = roleCode; 
+            document.body.setAttribute('data-role', roleCode); 
+            applyRoleUI(roleCode); 
+            
+            // CẬP NHẬT LẠI TỔNG SỐ TỪ & THỜI GIAN THEO VAI ĐÃ CHỌN
+            updateTotalWords(); 
+            
+            updateHUD(); 
+            saveSettings();
         }
 
         function applyRoleUI(roleCode) {
@@ -560,11 +559,11 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
             }
         }
 
-        /* ==================== AI PARSER ==================== */
+        /* ==================== AI PARSER & SMART WORD COUNTER ==================== */
         function parseAndRender() {
             if(!DOM.input || !DOM.content) return;
             const rawLines = DOM.input.value.split('\n');
-            let html = ''; let currentSpeaker = 'both'; state.totalWords = 0; let emptyLinesCount = 0;
+            let html = ''; let currentSpeaker = 'both'; let emptyLinesCount = 0;
 
             for (let i = 0; i < rawLines.length; i++) {
                 let line = rawLines[i].trim();
@@ -581,25 +580,52 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
                 let cleanText = line.replace(/^(Tài:|Sinh:|Cả 2:|Cả 2 TTV:)[ \t]*/i, '').trim();
 
                 if (cleanText) {
-                    state.totalWords += cleanText.split(/\s+/).length;
+                    let wordCount = cleanText.split(/\s+/).length;
                     
                     let markerHtml = '';
                     if (emptyLinesCount > 0 && html !== '') markerHtml = '<div class="pause-marker" data-triggered="false">— ✧ —</div>';
 
-                    html += '<div class="script-block spk-' + spk + '" data-speaker="' + spk + '">' + markerHtml + cleanText + '</div>';
+                    // Gắn data-words vào block để tính thời gian động
+                    html += '<div class="script-block spk-' + spk + '" data-speaker="' + spk + '" data-words="' + wordCount + '">' + markerHtml + cleanText + '</div>';
                     emptyLinesCount = 0;
                 }
             }
             DOM.content.innerHTML = html;
             state.pauseMarkers = [];
-            recalcTime(); updateHUD();
+            
+            // Tính toán số từ dựa trên vai diễn hiện tại
+            updateTotalWords(); 
+        }
+
+        /* HÀM TÍNH TỔNG SỐ TỪ THÔNG MINH THEO VAI */
+        function updateTotalWords() {
+            let count = 0;
+            const blocks = document.querySelectorAll('.script-block');
+            
+            blocks.forEach(b => {
+                const spk = b.getAttribute('data-speaker');
+                const w = parseInt(b.getAttribute('data-words')) || 0;
+                
+                if (state.role === 'all') {
+                    count += w; // Vai Cả 2: Tính toàn bộ chữ
+                } else if (state.role === 'tai') {
+                    if (spk === 'tai' || spk === 'both') count += w; // Vai Tài: Chỉ tính chữ của Tài và phần chung
+                } else if (state.role === 'sinh') {
+                    if (spk === 'sinh' || spk === 'both') count += w; // Vai Sinh: Chỉ tính chữ của Sinh và phần chung
+                }
+            });
+            
+            state.totalWords = count;
+            recalcTime();
         }
 
         function recalcTime() {
             const speedFactor = state.speed / 4.5; 
             state.estSeconds = (state.totalWords / 2.16) / speedFactor;
+            
             const el = document.getElementById('time-total');
             if(el) el.innerText = `/ ${formatTime(state.estSeconds)}`;
+            
             updateHUD(); 
         }
 
@@ -776,6 +802,8 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
             const progress = Math.min(1, DOM.container.scrollTop / maxScroll);
             
             const timeEl = document.getElementById('time-elapsed'); const progBar = document.getElementById('progress-bar');
+            
+            // Tính toán thời gian đã trôi qua dựa trên tỷ lệ % bài đọc
             if(timeEl) timeEl.innerText = formatTime(state.estSeconds * progress);
             if(progBar) progBar.style.width = `${progress * 100}%`;
 
@@ -872,7 +900,7 @@ Cả 2: Chúc Hội thi thành công tốt đẹp!`;
         function saveScript(e) {
             if(e) e.stopPropagation(); 
             if(DOM.input) {
-                try { localStorage.setItem('v26_script', DOM.input.value); } catch(err){}
+                try { localStorage.setItem('v27_script', DOM.input.value); } catch(err){}
                 parseAndRender(); toggleEditor(); resetPrompter();
             }
         }
