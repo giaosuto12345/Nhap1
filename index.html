@@ -4,10 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Teleprompter V42 - Ultimate Edition</title>
+    <title>Teleprompter V50 - Ultimate AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <style id="dynamic-styles-container"></style>
     
     <style>
         :root {
@@ -24,52 +22,52 @@
             display: flex; flex-direction: column;
         }
 
-        /* ==================== UI BAO PHỦ PHÍA TRÊN ==================== */
+        /* ==================== UI BAO PHỦ ==================== */
         #top-ui-wrapper {
             position: absolute; top: 0; left: 0; width: 100%;
             z-index: 50; padding-top: max(env(safe-area-inset-top), 10px);
-            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 60%, transparent 100%);
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 60%, transparent 100%);
             pointer-events: none; 
         }
         #top-ui-wrapper > * { pointer-events: auto; }
 
-        #app-header {
-            display: flex; justify-content: space-between; align-items: flex-start;
-            padding: 0 15px; position: relative;
-        }
+        #app-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 0 15px; position: relative; }
 
         .hud-box {
-            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px; padding: 6px 10px; display: flex; flex-direction: column;
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; padding: 6px 12px; display: flex; flex-direction: column;
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
         }
 
         .header-center {
             position: absolute; left: 50%; transform: translateX(-50%); top: 0;
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
         }
         .speaker-badge {
             display: flex; align-items: center; gap: 8px;
-            background: rgba(255,255,255,0.08); padding: 8px 16px; border-radius: 24px;
+            background: rgba(255,255,255,0.1); padding: 8px 18px; border-radius: 30px;
             font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;
-            transition: all 0.3s; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            transition: all 0.3s; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 0 20px rgba(0,0,0,0.5);
             backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); white-space: nowrap;
         }
         
         #ai-speaking-badge {
-            font-size: 10px; font-weight: bold; color: #a855f7; background: rgba(168, 85, 247, 0.15);
-            padding: 2px 10px; border-radius: 10px; border: 1px solid rgba(168,85,247,0.3);
+            font-size: 10px; font-weight: bold; color: #d8b4fe; background: rgba(168, 85, 247, 0.2);
+            padding: 3px 12px; border-radius: 12px; border: 1px solid rgba(168,85,247,0.4);
             display: flex; align-items: center; gap: 4px; opacity: 0; transition: opacity 0.3s;
         }
         #ai-speaking-badge.active { opacity: 1; animation: pulse-ai 1.5s infinite; }
-        @keyframes pulse-ai { 0% { box-shadow: 0 0 0 0 rgba(168,85,247,0.4); } 70% { box-shadow: 0 0 0 6px rgba(168,85,247,0); } 100% { box-shadow: 0 0 0 0 rgba(168,85,247,0); } }
+        @keyframes pulse-ai { 0% { box-shadow: 0 0 0 0 rgba(168,85,247,0.5); } 70% { box-shadow: 0 0 0 6px rgba(168,85,247,0); } 100% { box-shadow: 0 0 0 0 rgba(168,85,247,0); } }
 
         .dot { width: 10px; height: 10px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
         .dot.pulse { animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
+        .dot.pausing { background: #eab308 !important; animation: none; }
 
         .btn-icon {
             width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s; background: rgba(255,255,255,0.1); color: white; box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            transition: all 0.2s; background: rgba(255,255,255,0.15); color: white; box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);
         }
         .btn-icon:active { transform: scale(0.95); filter: brightness(1.2); }
 
@@ -87,7 +85,7 @@
         body.is-playing #btn-settings { display: none; }
         body.is-playing #sub-header { opacity: 0; transform: translateY(-20px); pointer-events: none; }
 
-        /* ==================== KHU VỰC CHÍNH ==================== */
+        /* ==================== KHU VỰC KỊCH BẢN ==================== */
         #prompter-main {
             flex: 1; position: relative; overflow: hidden; height: 100%;
             -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 15%, rgba(0,0,0,0.4) 25%, black 35%, black 45%, rgba(0,0,0,0.4) 65%, rgba(0,0,0,0.1) 85%, transparent 100%);
@@ -105,33 +103,33 @@
 
         #text-content {
             width: 90%; margin: 0 auto; padding-top: 65vh; padding-bottom: 65vh;
-            white-space: pre-wrap; line-height: 1.4; font-weight: 800;
+            white-space: pre-wrap; line-height: 1.5; font-weight: 800; 
             transition: width 0.3s, font-size 0.3s; text-align: center; 
         }
 
-        /* Khối diễn viên & Zero Gap */
         .speaker-group {
-            margin-bottom: 3.5rem; 
-            transition: opacity 0.4s, filter 0.4s;
             display: block; 
+            margin-bottom: 2rem; 
+            transition: opacity 0.4s ease, filter 0.4s ease;
         }
 
         .script-block { 
             display: inline; 
-            margin: 0px !important; 
-            padding: 0px !important; 
-            transition: all 0.3s ease; 
-            cursor: pointer;
-            line-height: 1.4;
+            transition: background-color 0.2s, color 0.2s, opacity 0.3s, filter 0.3s; 
+            border-radius: 4px;
+            -webkit-box-decoration-break: clone;
+            box-decoration-break: clone;
+            padding: 2px 0;
         }
 
         .script-block.anchor-highlight { 
-            background-color: rgba(255, 255, 255, 0.15); 
-            border-radius: 6px; box-shadow: 0 0 10px rgba(255,255,255,0.05);
+            background-color: rgba(255, 255, 255, 0.2); 
+            color: #ffffff !important;
+            box-shadow: 0 0 10px rgba(255,255,255,0.1);
         }
 
-        body.focus-mode-on .script-block { opacity: 0.25; filter: blur(1px); pointer-events: none; }
-        body.focus-mode-on .script-block.anchor-highlight { opacity: 1; filter: blur(0); pointer-events: auto; }
+        body.focus-mode-on .script-block { opacity: 0.25; filter: blur(1px); }
+        body.focus-mode-on .script-block.anchor-highlight { opacity: 1; filter: blur(0); text-shadow: 0 0 15px currentColor; }
 
         /* VẠCH NGẮM LASER */
         .focus-line {
@@ -149,47 +147,21 @@
         .focus-arrow.right { right: 0; border-right: 14px solid rgba(255,255,255,0.3); }
 
         #pause-progress-bar {
-            position: absolute; top: 50%; left: 0; height: 2px;
+            position: absolute; top: 50%; left: 0; height: 3px;
             background: #eab308; width: 0%; box-shadow: 0 0 15px #eab308; opacity: 0;
             transform: translateY(-50%);
         }
 
-        /* KHU VỰC MỤC LỤC V42 KHÔI PHỤC */
-        #sidebar-toc {
-            position: absolute; top: 0; right: 0; bottom: 0; width: 85%; max-width: 380px;
-            background: rgba(15, 15, 15, 0.95); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border-left: 1px solid rgba(255,255,255,0.1); box-shadow: -20px 0 50px rgba(0,0,0,0.8);
-            z-index: 100; display: flex; flex-direction: column;
-            transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-        body.toc-open #sidebar-toc { transform: translateX(0); }
-
-        .toc-header {
-            padding: calc(env(safe-area-inset-top) + 20px) 20px 15px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .toc-list { flex: 1; overflow-y: auto; padding: 15px; -webkit-overflow-scrolling: touch; }
-        .toc-item {
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 12px; padding: 14px; margin-bottom: 10px;
-            display: flex; flex-direction: column; gap: 8px; cursor: pointer; transition: all 0.2s;
-        }
-        .toc-item:active { background: rgba(255,255,255,0.1); transform: scale(0.98); }
-        .toc-item-top { display: flex; justify-content: space-between; align-items: center; }
-        .toc-item-speaker { font-size: 11px; font-weight: 800; text-transform: uppercase; padding: 4px 10px; border-radius: 8px; }
-        .toc-item-time { font-family: monospace; font-size: 11px; color: #888; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;}
-        .toc-item-text { font-size: 14px; color: #e2e8f0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-
-
+        /* NÚT CHỌN VAI - FIXED: PHẢI CÓ CSS NÀY THÌ GIAO DIỆN MỚI HIỂN THỊ ĐÚNG */
         .role-btn {
-            flex: 1; min-width: 30%; padding: 10px 5px; text-align: center; font-size: 13px; font-weight: bold;
+            flex: 1; min-width: 30%; padding: 12px 6px; text-align: center; font-size: 13px; font-weight: bold;
             border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
-            background: #000; color: #6b7280; transition: all 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            background: rgba(0,0,0,0.5); color: #6b7280; transition: all 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            cursor: pointer;
         }
         .role-btn.active {
-            background: rgba(255,255,255,0.1); border-color: var(--spk-color, #ffffff); color: var(--spk-color, #ffffff);
-            box-shadow: 0 0 15px var(--spk-color, rgba(255,255,255,0.2));
+            background: rgba(255,255,255,0.15); border-color: var(--spk-color, #ffffff); color: var(--spk-color, #ffffff);
+            box-shadow: 0 0 15px var(--spk-color, rgba(255,255,255,0.3));
         }
 
         /* BOTTOM DOCK */
@@ -208,28 +180,28 @@
         }
 
         .stepper-btn {
-            background: rgba(255,255,255,0.1); color: white; font-weight: bold; font-size: 18px;
-            width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
-            border-radius: 10px; transition: background 0.2s;
+            background: rgba(255,255,255,0.1); color: white; font-weight: bold; font-size: 20px;
+            width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
+            border-radius: 12px; transition: background 0.2s; border: 1px solid rgba(255,255,255,0.05);
         }
         .stepper-btn:active { background: rgba(255,255,255,0.3); transform: scale(0.95); }
-        .stepper-val { font-size: 14px; font-weight: 800; font-family: monospace; width: 36px; text-align: center; color: var(--accent); }
+        .stepper-val { font-size: 15px; font-weight: 800; font-family: monospace; width: 40px; text-align: center; color: var(--accent); }
 
         .mirrored { transform: scaleX(-1); }
-
     </style>
-</head>
-<body data-role="all" class="focus-mode-off">
 
+    <!-- Nơi chứa Style Động để đè hiệu ứng Ẩn/Hiện chữ -->
     <style id="dynamic-styles-container"></style>
+</head>
+<body class="focus-mode-off">
 
     <div id="top-ui-wrapper">
         <header id="app-header">
-            <div class="hud-box" style="min-width: 90px;">
-                <span class="text-[8px] text-gray-500 font-bold uppercase tracking-widest mb-0.5">Tiến độ</span>
+            <div class="hud-box" style="min-width: 95px;">
+                <span class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-1">Tiến độ</span>
                 <div class="flex items-baseline gap-1">
-                    <span id="time-elapsed" class="font-mono font-bold text-[12px] text-white">00:00</span>
-                    <span id="time-total" class="font-mono text-[9px] text-gray-500">/00:00</span>
+                    <span id="time-elapsed" class="font-mono font-bold text-[14px] text-white">00:00</span>
+                    <span id="time-total" class="font-mono text-[10px] text-gray-500">/00:00</span>
                 </div>
             </div>
 
@@ -244,26 +216,20 @@
                 </div>
             </div>
 
-            <div style="min-width: 90px; display: flex; justify-content: flex-end;">
+            <div style="min-width: 95px; display: flex; justify-content: flex-end;">
                 <button id="btn-settings" onclick="toggleSettings(event)" class="btn-icon">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 </button>
                 <div id="right-hud-next" class="hud-box">
-                    <span class="text-[8px] text-gray-500 font-bold uppercase tracking-widest mb-0.5 w-full text-right">Lượt kế >></span>
-                    <span id="next-speaker-name" class="font-bold text-[12px] text-gray-300 text-right w-full">---</span>
+                    <span class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-1 w-full text-right">Lượt kế >></span>
+                    <span id="next-speaker-name" class="font-bold text-[13px] text-white text-right w-full truncate max-w-[80px]">---</span>
                 </div>
             </div>
         </header>
 
-        <!-- KHÔI PHỤC NÚT MỤC LỤC TRÊN MAIN UI -->
-        <div id="sub-header">
-            <button onclick="toggleTOC(event)" class="btn-pill relative">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
-                MỤC LỤC PHÂN CẢNH
-            </button>
+        <div id="progress-bar" style="position: absolute; top: 100%; left: 0; margin-top: 15px; height: 3px; background: rgba(255,255,255,0.1); width: 100%;">
+            <div id="progress-fill" style="height: 100%; background: var(--accent); width: 0%; box-shadow: 0 0 10px var(--accent);"></div>
         </div>
-        
-        <div id="progress-bar" style="bottom: auto; top: 100%; margin-top: 15px;"></div>
     </div>
 
     <main id="prompter-main">
@@ -274,31 +240,18 @@
             <div class="focus-arrow right" id="focus-arrow-r"></div>
             <div id="pause-progress-bar"></div>
         </div>
+        
         <div id="scroll-container">
             <div id="text-content"></div>
         </div>
     </main>
 
-    <!-- KHU VỰC MỤC LỤC BÊN PHẢI -->
-    <div id="sidebar-toc">
-        <div class="toc-header">
-            <div>
-                <h3 class="font-bold text-xl text-white">Mục Lục</h3>
-                <p class="text-[10px] text-gray-400 uppercase mt-1 tracking-wider">Chạm để nhảy đến phân cảnh</p>
-            </div>
-            <button onclick="toggleTOC(event)" class="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center text-gray-400 hover:text-white">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-        </div>
-        <div class="toc-list" id="toc-list-container"></div>
-    </div>
-
     <!-- BOTTOM DOCK -->
     <footer id="bottom-dock-wrapper">
         <div class="glass-dock">
             <div class="flex justify-between gap-3">
-                <div class="flex-1 bg-black/50 rounded-2xl p-2 border border-white/5 flex flex-col items-center">
-                    <span class="text-[8px] text-gray-500 font-bold uppercase mb-1 tracking-wider">Tốc độ</span>
+                <div class="flex-1 bg-black/60 rounded-2xl p-3 border border-white/5 flex flex-col items-center">
+                    <span class="text-[10px] text-gray-400 font-bold uppercase mb-2 tracking-wider">Tốc độ</span>
                     <div class="flex items-center w-full justify-between px-1">
                         <button onclick="adj('speed', -0.2, event)" class="stepper-btn">−</button>
                         <span id="ui-val-speed" class="stepper-val">4.5</span>
@@ -306,8 +259,8 @@
                     </div>
                 </div>
                 
-                <div class="flex-1 bg-black/50 rounded-2xl p-2 border border-white/5 flex flex-col items-center">
-                    <span class="text-[8px] text-gray-500 font-bold uppercase mb-1 tracking-wider">Cỡ chữ</span>
+                <div class="flex-1 bg-black/60 rounded-2xl p-3 border border-white/5 flex flex-col items-center">
+                    <span class="text-[10px] text-gray-400 font-bold uppercase mb-2 tracking-wider">Cỡ chữ</span>
                     <div class="flex items-center w-full justify-between px-1">
                         <button onclick="adj('fontSize', -2, event)" class="stepper-btn">−</button>
                         <span id="ui-val-font" class="stepper-val">90</span>
@@ -316,114 +269,104 @@
                 </div>
             </div>
 
-            <div class="flex items-center justify-between px-2 mt-1">
-                <button onclick="resetPrompter(event)" class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-gray-300 active:scale-95 transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            <div class="flex items-center justify-between px-3 mt-2">
+                <button onclick="resetPrompter(event)" class="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center text-gray-300 active:scale-95 transition hover:bg-white/20">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                 </button>
 
-                <button onclick="togglePlay(event)" class="w-[64px] h-[64px] rounded-full bg-[var(--accent)] text-white flex items-center justify-center shadow-[0_0_20px_rgba(255,0,85,0.4)] active:scale-95 transition transform">
-                    <svg id="icon-play" class="w-8 h-8 ml-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                <button onclick="togglePlay(event)" class="w-[72px] h-[72px] rounded-full bg-[var(--accent)] text-white flex items-center justify-center shadow-[0_0_25px_rgba(255,0,85,0.5)] active:scale-95 transition transform border-4 border-black">
+                    <svg id="icon-play" class="w-10 h-10 ml-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
                 </button>
 
-                <button onclick="toggleMirror(event)" id="btn-mirror" class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-gray-300 active:scale-95 transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                <button onclick="toggleMirror(event)" id="btn-mirror" class="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center text-gray-300 active:scale-95 transition hover:bg-white/20">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
                 </button>
             </div>
         </div>
     </footer>
 
     <!-- MODAL CÀI ĐẶT STUDIO -->
-    <div id="modal-settings" class="fixed inset-0 bg-black/85 z-[60] hidden flex-col justify-end transition-opacity opacity-0 backdrop-blur-sm" onclick="if(event.target===this) toggleSettings(event)">
-        <div class="bg-[#111] w-full max-w-md mx-auto rounded-t-[32px] p-6 pb-[max(env(safe-area-inset-bottom),20px)] border-t border-gray-800 max-h-[85vh] flex flex-col">
-            <div class="flex justify-between items-center mb-4 flex-shrink-0">
-                <h3 class="font-bold text-xl text-white flex items-center gap-2">
-                    <svg class="w-6 h-6 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+    <div id="modal-settings" class="fixed inset-0 bg-black/90 z-[60] hidden flex-col justify-end transition-opacity opacity-0 backdrop-blur-md" onclick="if(event.target===this) toggleSettings(event)">
+        <div class="bg-[#0f1115] w-full max-w-md mx-auto rounded-t-[32px] p-6 pb-[max(env(safe-area-inset-bottom),20px)] border-t border-gray-800 max-h-[85vh] flex flex-col shadow-[0_-10px_40px_rgba(0,0,0,0.8)]">
+            <div class="flex justify-between items-center mb-5 flex-shrink-0">
+                <h3 class="font-bold text-2xl text-white flex items-center gap-3">
+                    <svg class="w-7 h-7 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
                     AI Studio
                 </h3>
-                <button onclick="toggleSettings(event)" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-gray-400 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                <button onclick="toggleSettings(event)" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-gray-400 hover:text-white transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
 
-            <div class="space-y-6 overflow-y-auto pb-4 pr-1 flex-1">
+            <div class="space-y-6 overflow-y-auto pb-4 pr-2 flex-1 custom-scrollbar">
                 
-                <!-- V42: Sửa kịch bản quay lại đây -->
-                <button onclick="toggleSettings(event); setTimeout(toggleEditor, 300)" class="w-full bg-sky-600/20 border border-sky-500/30 text-sky-400 py-3 rounded-xl font-bold flex items-center justify-center gap-2">
+                <button onclick="toggleSettings(event); setTimeout(toggleEditor, 300)" class="w-full bg-sky-600/20 border border-sky-500/40 text-sky-400 py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-sky-900/20 active:scale-95 transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                    Sửa nội dung Kịch bản
+                    Chỉnh sửa Kịch bản
                 </button>
 
-                <!-- BẬT GIỌNG ĐỌC ẢO (TTS) -->
-                <div class="bg-purple-500/10 rounded-2xl p-4 border border-purple-500/30 flex items-center justify-between">
-                    <div>
-                        <span class="text-[12px] font-bold text-purple-400 block mb-0.5">Giọng đọc ảo (AI Partner)</span>
-                        <span class="text-[9px] text-gray-400">Máy sẽ đọc vang kịch bản của bạn diễn</span>
+                <!-- 1. CHỌN VAI -->
+                <div>
+                    <label class="text-[11px] font-bold text-purple-400 uppercase tracking-widest mb-3 block">1. Lọc vai diễn của bạn (Bạn là ai?)</label>
+                    <div id="dynamic-role-container" class="flex flex-wrap gap-2"></div>
+                </div>
+
+                <!-- 2. HIỂN THỊ KỊCH BẢN NGƯỜI KHÁC -->
+                <div>
+                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 block">2. Giao diện kịch bản người khác</label>
+                    <div class="flex gap-2">
+                        <button onclick="setOppMode('hide', event)" id="opp-hide" class="flex-1 py-3 text-sm font-bold rounded-xl bg-gray-800 text-white border border-gray-600 transition">Tàng hình</button>
+                        <button onclick="setOppMode('blur', event)" id="opp-blur" class="flex-1 py-3 text-sm font-bold rounded-xl bg-black text-gray-500 border border-gray-800 transition">Mờ mịt</button>
+                        <button onclick="setOppMode('gray', event)" id="opp-gray" class="flex-1 py-3 text-sm font-bold rounded-xl bg-black text-gray-500 border border-gray-800 transition">Xám nhẹ</button>
                     </div>
-                    <button id="btn-tts-toggle" onclick="toggleTTS(event)" class="w-12 h-6 bg-gray-700 rounded-full relative transition-colors duration-300">
-                        <div class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform duration-300"></div>
+                </div>
+
+                <!-- 3. AI ĐỌC VAI KHÁC -->
+                <div class="bg-purple-500/10 rounded-2xl p-5 border border-purple-500/40 flex items-center justify-between shadow-[0_0_15px_rgba(168,85,247,0.1)]">
+                    <div>
+                        <span class="text-[14px] font-bold text-purple-400 block mb-1">🎙️ AI đọc thay bạn diễn</span>
+                        <span class="text-[11px] text-gray-400 leading-tight block">Tự động hiện đủ chữ khi đến lượt AI đọc</span>
+                    </div>
+                    <button id="btn-tts-toggle" onclick="toggleTTS(event)" class="w-14 h-7 bg-gray-700 rounded-full relative transition-colors duration-300 shrink-0 border border-white/10">
+                        <div class="w-6 h-6 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform duration-300 shadow-md"></div>
                     </button>
                 </div>
 
-                <!-- CHỌN VAI ĐỌC ĐỘNG -->
-                <div>
-                    <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 block">1. Chọn vai của bạn (AI tự nhận diện)</label>
-                    <div id="dynamic-role-container" class="flex flex-wrap gap-2">
-                        <!-- Nút sẽ được gen tự động bằng JS -->
-                    </div>
-                </div>
-
-                <div>
-                    <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 block">2. Kịch bản của bạn diễn</label>
-                    <div class="flex gap-2">
-                        <!-- Opacity 0 logic -->
-                        <button onclick="setOppMode('skip', event)" id="opp-skip" class="flex-1 py-2.5 text-xs font-bold rounded-xl bg-gray-800 text-white border border-gray-600 transition">Tàng hình (Chờ AI đọc)</button>
-                        <button onclick="setOppMode('blur', event)" id="opp-blur" class="flex-1 py-2.5 text-xs font-bold rounded-xl bg-black text-gray-500 border border-gray-800 transition">Làm mờ mịt</button>
-                    </div>
-                </div>
-
-                <!-- KHÔI PHỤC TÙY CHỌN MỤC LỤC -->
-                <div>
-                    <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 block">3. Hiển thị Mục Lục</label>
-                    <div class="flex gap-2">
-                        <button onclick="setTocMode('turn', event)" id="toc-turn" class="flex-1 py-2.5 text-xs font-bold rounded-xl bg-gray-800 text-white border border-gray-600 transition">Gộp theo Lượt nói</button>
-                        <button onclick="setTocMode('detail', event)" id="toc-detail" class="flex-1 py-2.5 text-xs font-bold rounded-xl bg-black text-gray-500 border border-gray-800 transition">Chi tiết từng Đoạn</button>
-                    </div>
-                </div>
+                <div class="h-px w-full bg-gray-800 my-4"></div>
                 
-                <!-- KHÔI PHỤC CĂN LỀ -->
                 <div>
-                    <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 block">4. Căn lề kịch bản</label>
+                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 block">Căn lề kịch bản</label>
                     <div class="flex gap-2">
-                        <button onclick="setAlign('left', event)" id="align-left" class="flex-1 py-2 rounded-xl bg-black text-gray-500 border border-gray-800 flex justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h10M4 18h16"></path></svg></button>
-                        <button onclick="setAlign('center', event)" id="align-center" class="flex-1 py-2 rounded-xl bg-gray-800 text-white border border-gray-600 flex justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M7 12h10M4 18h16"></path></svg></button>
-                        <button onclick="setAlign('right', event)" id="align-right" class="flex-1 py-2 rounded-xl bg-black text-gray-500 border border-gray-800 flex justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M10 12h10M4 18h16"></path></svg></button>
-                        <button onclick="setAlign('justify', event)" id="align-justify" class="flex-1 py-2 rounded-xl bg-black text-gray-500 border border-gray-800 flex justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
+                        <button onclick="setAlign('left', event)" id="align-left" class="flex-1 py-3 rounded-xl bg-black text-gray-500 border border-gray-800 flex justify-center transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h10M4 18h16"></path></svg></button>
+                        <button onclick="setAlign('center', event)" id="align-center" class="flex-1 py-3 rounded-xl bg-gray-800 text-white border border-gray-600 flex justify-center transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M7 12h10M4 18h16"></path></svg></button>
+                        <button onclick="setAlign('right', event)" id="align-right" class="flex-1 py-3 rounded-xl bg-black text-gray-500 border border-gray-800 flex justify-center transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M10 12h10M4 18h16"></path></svg></button>
+                        <button onclick="setAlign('justify', event)" id="align-justify" class="flex-1 py-3 rounded-xl bg-black text-gray-500 border border-gray-800 flex justify-center transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
                     </div>
                 </div>
 
-                <div class="bg-indigo-500/10 rounded-2xl p-4 border border-indigo-500/30 flex items-center justify-between">
+                <div class="bg-indigo-500/10 rounded-2xl p-5 border border-indigo-500/40 flex items-center justify-between">
                     <div>
-                        <span class="text-[12px] font-bold text-indigo-400 block mb-0.5">Đọc Tập Trung (Focus Mode)</span>
-                        <span class="text-[9px] text-gray-400">Chỉ sáng rõ câu đang đọc ở vạch ngắm</span>
+                        <span class="text-[14px] font-bold text-indigo-400 block mb-1">Đọc Tập Trung (Focus Mode)</span>
+                        <span class="text-[11px] text-gray-400 leading-tight block">Chỉ làm sáng rõ dòng chữ ngay tại vạch ngắm</span>
                     </div>
-                    <button id="btn-focus-toggle" onclick="toggleFocusMode(event)" class="w-12 h-6 bg-gray-700 rounded-full relative transition-colors duration-300">
-                        <div class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform duration-300"></div>
+                    <button id="btn-focus-toggle" onclick="toggleFocusMode(event)" class="w-14 h-7 bg-gray-700 rounded-full relative transition-colors duration-300 shrink-0 border border-white/10">
+                        <div class="w-6 h-6 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform duration-300 shadow-md"></div>
                     </button>
                 </div>
 
-                <div class="bg-yellow-500/10 rounded-2xl p-4 border border-yellow-500/30 flex items-center justify-between">
-                    <span class="text-[10px] font-bold text-yellow-500 uppercase tracking-widest">Thời gian tự dừng (Giây)</span>
+                <div class="bg-yellow-500/10 rounded-2xl p-5 border border-yellow-500/40 flex items-center justify-between">
+                    <span class="text-[12px] font-bold text-yellow-500 uppercase tracking-widest">Thời gian chờ (Laser Pause)</span>
                     <div class="flex items-center gap-3">
-                        <button onclick="adj('pauseDelay', -0.1, event)" class="stepper-btn" style="background:rgba(234, 179, 8, 0.2); color:#eab308">−</button>
-                        <span id="ui-val-delay" class="stepper-val text-yellow-500" style="width:40px">1.0s</span>
-                        <button onclick="adj('pauseDelay', 0.1, event)" class="stepper-btn" style="background:rgba(234, 179, 8, 0.2); color:#eab308">+</button>
+                        <button onclick="adj('pauseDelay', -0.1, event)" class="stepper-btn" style="background:rgba(234, 179, 8, 0.2); color:#eab308; border: none;">−</button>
+                        <span id="ui-val-delay" class="stepper-val text-yellow-500 text-lg" style="width:45px">1.0s</span>
+                        <button onclick="adj('pauseDelay', 0.1, event)" class="stepper-btn" style="background:rgba(234, 179, 8, 0.2); color:#eab308; border: none;">+</button>
                     </div>
                 </div>
 
-                <div class="bg-white/5 rounded-2xl p-4 border border-white/5 flex items-center justify-between">
-                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Độ rộng khung đọc</span>
+                <div class="bg-white/5 rounded-2xl p-5 border border-white/10 flex items-center justify-between">
+                    <span class="text-[12px] font-bold text-gray-300 uppercase tracking-widest">Độ rộng khung đọc</span>
                     <div class="flex items-center gap-3">
-                        <button onclick="adj('width', -2, event)" class="stepper-btn" style="background:rgba(0,0,0,0.5)">−</button>
-                        <span id="ui-val-width" class="stepper-val text-white" style="width:40px">90%</span>
-                        <button onclick="adj('width', 2, event)" class="stepper-btn" style="background:rgba(0,0,0,0.5)">+</button>
+                        <button onclick="adj('width', -2, event)" class="stepper-btn" style="background:rgba(255,255,255,0.1); border: none;">−</button>
+                        <span id="ui-val-width" class="stepper-val text-white text-lg" style="width:45px">90%</span>
+                        <button onclick="adj('width', 2, event)" class="stepper-btn" style="background:rgba(255,255,255,0.1); border: none;">+</button>
                     </div>
                 </div>
             </div>
@@ -434,54 +377,53 @@
     <div id="modal-editor" class="fixed inset-0 bg-[#0a0a0a] z-[70] hidden flex-col transition-opacity opacity-0">
         <div class="pt-[max(env(safe-area-inset-top),10px)] p-4 flex justify-between items-center bg-white/5 border-b border-white/10">
             <div class="flex items-center gap-3">
-                <button onclick="clearScript(event)" class="bg-red-500/20 text-red-400 p-2 rounded-full hover:bg-red-500/40 transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                <button onclick="clearScript(event)" class="bg-red-500/20 text-red-400 p-2.5 rounded-full hover:bg-red-500/40 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                 </button>
-                <h2 class="font-bold text-white text-lg">Soạn Kịch bản</h2>
+                <h2 class="font-bold text-white text-xl">Soạn Kịch bản</h2>
             </div>
-            <button onclick="saveScript(event)" class="bg-sky-500 text-white px-5 py-2 rounded-full font-bold shadow-lg shadow-sky-500/30">Lưu lại</button>
+            <button onclick="saveScript(event)" class="bg-sky-500 text-white px-6 py-2.5 rounded-full font-bold shadow-lg shadow-sky-500/40 active:scale-95 transition">Lưu & Đọc</button>
         </div>
-        <div class="px-4 pb-2 text-xs text-gray-400 border-b border-white/5">
-            Mẹo: Hãy gõ Tên nhân vật kèm dấu hai chấm (VD: <span class="text-sky-400">Tài:</span>, <span class="text-pink-400">Sinh:</span>). AI sẽ tự nhận diện!
+        <div class="px-5 py-4 text-sm text-sky-200 bg-sky-900/30 border-b border-sky-500/20 leading-relaxed font-medium">
+            <span class="font-bold text-sky-300">💡 Hướng dẫn V50:</span> Đã phục hồi giao diện chọn vai và tối ưu siêu thuật toán Tàng Hình + AI. Chữ sẽ ẩn 100% nếu bạn không dùng AI.
         </div>
         <textarea id="script-input" class="flex-1 w-full bg-transparent text-white p-5 text-xl outline-none resize-none leading-relaxed" placeholder="Dán kịch bản vào đây..."></textarea>
     </div>
 
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+    </style>
+
     <script>
-        const defaultScript = `Tài: Kính thưa thủ trưởng!
+        const defaultScript = `Đ.c Tài: Kính thưa thủ trưởng!
 Kính thưa ban giám khảo!
 Thưa toàn thể các đồng chí!
-Đến với chương trình Tuyên truyền viên trẻ năm 2026 của Kho KV1, cho phép Đội thi Chi đoàn Khối CMKT xin được gửi tới thủ trưởng, các vị đại biểu cùng toàn thể các đồng chí lời kính chúc sức khỏe và lời chào trân trọng nhất. Chúc Hội thi Cán bộ đoàn giỏi và Tuyên truyền viên trẻ ngày hôm nay…
+
+Đến với chương trình Tuyên truyền viên trẻ năm 2026 của Kho KV1, cho phép Đội thi Chi đoàn Khối CMKT xin được gửi tới thủ trưởng lời kính chúc sức khỏe và lời chào trân trọng nhất. Chúc Hội thi ngày hôm nay…
 
 Cả 2 TTV: … thành công tốt đẹp! 
 
-Tài: Đội thi Chúng tôi xin được tự giới thiệu: 
-Tôi: Thượng úy Đỗ Văn Tài, Bí thư Chi đoàn Khối CMKT
+Đ.c Sinh: Sau đây, phần thi của Chi đoàn Khối CMKT xin phép được bắt đầu!
+Đại hội đại biểu Đoàn TNCS Hồ Chí Minh Quân đội lần thứ XI là một sự kiện chính trị quan trọng, có ý nghĩa sâu sắc đối với tuổi trẻ trong Quân đội nhân dân Việt Nam.
 
-Sinh: Tôi: Thượng úy CN Nguyễn Văn Sinh – Phó bí thư Chi đoàn Khối CMKT
-
-Tài: Sau đây, phần thi của Chi đoàn Khối CMKT xin phép được bắt đầu!
-
-Sinh: Kính thưa thủ trưởng!
-Kính thưa ban giám khảo!
-Thưa toàn thể các đồng chí!
-Đại hội đại biểu Đoàn TNCS Hồ Chí Minh Quân đội lần thứ XI là một sự kiện chính trị quan trọng, có ý nghĩa sâu sắc đối với tuổi trẻ trong Quân đội nhân dân Việt Nam. 
-
-Đại hội là dịp để chúng ta nhìn lại chặng đường đã qua, đánh giá những kết quả đạt được, thẳng thắn chỉ ra những hạn chế, đồng thời xác định phương hướng, mục tiêu, nhiệm vụ cho nhiệm kỳ mới. Đây cũng là đợt sinh hoạt chính trị sâu rộng nhằm nâng cao nhận thức, trách nhiệm và khơi dậy niềm tự hào, ý chí phấn đấu trong mỗi cán bộ, đoàn viên, Thanh niên toàn quân.`;
+Đ.c Tài: Đại hội đã chỉ ra những hạn chế sau:
+Thứ nhất, nội dung, phương thức hoạt động ở một số nơi còn chậm đổi mới.
+Thứ hai, việc nắm bắt tư tưởng Thanh niên có lúc chưa kịp thời.`;
 
         const FOCUS_PERCENT = 0.35;
         const PALETTE = ['#0ea5e9', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#ef4444', '#14b8a6', '#f97316'];
 
         const state = {
-            isPlaying: false, speed: 4.5, fontSize: 90, width: 90, pauseDelay: 1.0,
-            align: 'center', role: 'all', oppMode: 'skip', tocMode: 'turn', isFocusMode: false, ttsEnabled: false,
+            isPlaying: false, speed: 4.5, fontSize: 90, width: 90, pauseDelay: 1.0, align: 'center', 
+            myRole: '', oppMode: 'hide', isFocusMode: false, ttsEnabled: false,
             animId: null, lastTime: 0, totalWords: 0, estSeconds: 0,
             currentScrollPos: 0, anchorTimeout: null, wakeLock: null,
-            isAutoPausing: false, lastCameraY: 0,
+            isAutoPausing: false, 
             speakerMap: {}, 
-            currentActiveGroupId: null,
-            currentUtterance: null,
-            tocData: [] // Khôi phục mảng chứa dữ liệu mục lục
+            currentActiveBlockId: null,
+            currentUtterance: null
         };
 
         let DOM = {};
@@ -498,19 +440,19 @@ Thưa toàn thể các đồng chí!
             };
 
             try {
-                DOM.input.value = localStorage.getItem('v42_script') || defaultScript;
-                const savedSettings = localStorage.getItem('v42_settings');
+                DOM.input.value = localStorage.getItem('v50_script') || defaultScript;
+                const savedSettings = localStorage.getItem('v50_settings');
                 if(savedSettings) {
                     const s = JSON.parse(savedSettings);
                     state.speed = s.speed || 4.5; state.fontSize = s.fontSize || 90;
                     state.width = s.width || 90; state.pauseDelay = (s.pauseDelay !== undefined) ? s.pauseDelay : 1.0;
-                    state.align = s.align || 'center'; state.role = s.role || 'all'; 
-                    state.oppMode = s.oppMode || 'skip'; state.tocMode = s.tocMode || 'turn';
+                    state.align = s.align || 'center'; state.myRole = s.myRole || ''; 
+                    state.oppMode = s.oppMode || 'hide'; 
                     state.isFocusMode = s.isFocusMode || false; state.ttsEnabled = s.ttsEnabled || false;
                 }
             } catch(e) { DOM.input.value = defaultScript; }
 
-            applyOppModeUI(state.oppMode); applyFocusModeUI(); applyTTSUI(); applyTocModeUI(state.tocMode); applyAlignUI(state.align);
+            applyOppModeUI(state.oppMode); applyFocusModeUI(); applyTTSUI(); applyAlignUI(state.align);
             parseAndRender(); 
             applySettings();
             requestWakeLock();
@@ -545,18 +487,20 @@ Thưa toàn thể các đồng chí!
 
         function jumpRelative(direction) {
             if(!DOM.container) return;
-            const cameraY = DOM.container.scrollTop + (window.innerHeight * FOCUS_PERCENT);
+            const containerRect = DOM.container.getBoundingClientRect();
+            const focusScreenY = containerRect.top + (containerRect.height * FOCUS_PERCENT);
             const blocks = document.querySelectorAll('.script-block');
             
             let currentIndex = -1;
             for (let i = 0; i < blocks.length; i++) {
                 if (blocks[i].offsetParent === null) continue;
-                let rect = blocks[i].getBoundingClientRect();
-                let absoluteTop = rect.top - DOM.container.getBoundingClientRect().top + DOM.container.scrollTop;
-                
-                if (cameraY >= absoluteTop - 20 && cameraY <= absoluteTop + rect.height + 20) {
-                    currentIndex = i; break;
+                let rects = blocks[i].getClientRects();
+                for(let r of rects) {
+                    if (focusScreenY >= r.top - 10 && focusScreenY <= r.bottom + 10) {
+                        currentIndex = i; break;
+                    }
                 }
+                if(currentIndex !== -1) break;
             }
 
             if (currentIndex !== -1) {
@@ -565,15 +509,15 @@ Thưa toàn thể các đồng chí!
                     const wasPlaying = state.isPlaying;
                     if (wasPlaying) togglePlay();
                     
-                    const offset = (window.innerHeight * FOCUS_PERCENT) - 20;
-                    let targetRect = blocks[targetIndex].getBoundingClientRect();
-                    let targetAbsTop = targetRect.top - DOM.container.getBoundingClientRect().top + DOM.container.scrollTop;
+                    const targetRect = blocks[targetIndex].getBoundingClientRect();
+                    const targetOffsetTop = targetRect.top - containerRect.top + DOM.container.scrollTop;
+                    const offset = (DOM.container.clientHeight * FOCUS_PERCENT) - 10;
                     
-                    DOM.container.scrollTop = targetAbsTop - offset;
+                    DOM.container.scrollTop = targetOffsetTop - offset;
                     state.currentScrollPos = DOM.container.scrollTop;
                     
-                    blocks[targetIndex].style.boxShadow = '0 0 50px rgba(255,255,255,0.2)';
-                    setTimeout(() => blocks[targetIndex].style.boxShadow = '', 500);
+                    blocks[targetIndex].classList.add('anchor-highlight');
+                    setTimeout(() => blocks[targetIndex].classList.remove('anchor-highlight'), 500);
 
                     if (wasPlaying) setTimeout(() => togglePlay(), 500);
                 }
@@ -585,11 +529,11 @@ Thưa toàn thể các đồng chí!
             if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); togglePlay(); } 
             else if (e.code === 'ArrowUp' || e.code === 'PageUp') { 
                 e.preventDefault(); 
-                if(DOM.container) { DOM.container.scrollTop -= 100; state.currentScrollPos = DOM.container.scrollTop; updateHUD(); updateAnchor(); resetTriggerFlags(); } 
+                if(DOM.container) { DOM.container.scrollTop -= 100; state.currentScrollPos = DOM.container.scrollTop; updateHUD(); updateAnchor(); } 
             } 
             else if (e.code === 'ArrowDown' || e.code === 'PageDown') { 
                 e.preventDefault(); 
-                if(DOM.container) { DOM.container.scrollTop += 100; state.currentScrollPos = DOM.container.scrollTop; updateHUD(); updateAnchor(); resetTriggerFlags(); } 
+                if(DOM.container) { DOM.container.scrollTop += 100; state.currentScrollPos = DOM.container.scrollTop; updateHUD(); updateAnchor(); } 
             }
             else if (e.code === 'ArrowLeft') { e.preventDefault(); jumpRelative(-1); }
             else if (e.code === 'ArrowRight') { e.preventDefault(); jumpRelative(1); }
@@ -601,9 +545,9 @@ Thưa toàn thể các đồng chí!
 
         function saveSettings() {
             try {
-                localStorage.setItem('v42_settings', JSON.stringify({
+                localStorage.setItem('v50_settings', JSON.stringify({
                     speed: state.speed, fontSize: state.fontSize, width: state.width, pauseDelay: state.pauseDelay,
-                    align: state.align, role: state.role, oppMode: state.oppMode, tocMode: state.tocMode, 
+                    align: state.align, myRole: state.myRole, oppMode: state.oppMode, 
                     isFocusMode: state.isFocusMode, ttsEnabled: state.ttsEnabled
                 }));
             } catch(e) {}
@@ -628,12 +572,11 @@ Thưa toàn thể các đồng chí!
             if(DOM.content) {
                 DOM.content.style.fontSize = `${state.fontSize}px`;
                 DOM.content.style.width = `${state.width}%`;
-                DOM.content.style.textAlign = state.align; // V42: Căn lề
+                DOM.content.style.textAlign = state.align; 
             }
-            recalcTime(); renderTOC(); saveSettings(); // V42: Cập nhật thời gian mục lục khi đổi tốc độ
+            recalcTime(); saveSettings(); 
         }
 
-        /* V42 Khôi phục Căn Lề */
         function setAlign(alignType, e) {
             if(e) e.stopPropagation(); state.align = alignType; applyAlignUI(alignType); applySettings();
         }
@@ -648,125 +591,39 @@ Thưa toàn thể các đồng chí!
             });
         }
 
-        /* V42 Khôi phục Tùy chọn Mục Lục */
-        function setTocMode(mode, e) {
-            if(e) e.stopPropagation(); state.tocMode = mode; applyTocModeUI(mode); renderTOC(); saveSettings();
-        }
-
-        function applyTocModeUI(mode) {
-            const bTurn = document.getElementById('toc-turn'); const bDetail = document.getElementById('toc-detail');
-            if(!bTurn || !bDetail) return;
-            if (mode === 'turn') {
-                bTurn.classList.replace('text-gray-500', 'text-white'); bTurn.classList.replace('bg-black', 'bg-gray-800'); bTurn.classList.replace('border-gray-800', 'border-gray-600');
-                bDetail.classList.replace('text-white', 'text-gray-500'); bDetail.classList.replace('bg-gray-800', 'bg-black'); bDetail.classList.replace('border-gray-600', 'border-gray-800');
-            } else {
-                bDetail.classList.replace('text-gray-500', 'text-white'); bDetail.classList.replace('bg-black', 'bg-gray-800'); bDetail.classList.replace('border-gray-800', 'border-gray-600');
-                bTurn.classList.replace('text-white', 'text-gray-500'); bTurn.classList.replace('bg-gray-800', 'bg-black'); bTurn.classList.replace('border-gray-600', 'border-gray-800');
-            }
-        }
-
-        function toggleTOC(e) {
-            if(e) e.stopPropagation();
-            document.body.classList.toggle('toc-open');
-            document.body.classList.toggle('modal-open');
-        }
-
         function hexToRgbaStr(hex, alpha) {
             let r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
             return `rgba(${r}, ${g}, ${b}, ${alpha})`;
         }
 
-        function renderTOC() {
-            const container = document.getElementById('toc-list-container');
-            if(!container) return;
-            let html = ''; const speedFactor = state.speed / 4.5;
-
-            if (state.tocMode === 'detail') {
-                state.tocData.forEach(item => {
-                    let estSec = (item.words / 2.16) / speedFactor;
-                    html += buildTocItemHtml(item.id, item.speaker, formatTime(estSec), item.textSnippet);
-                });
-            } else {
-                let currentTurn = null;
-                state.tocData.forEach((item, index) => {
-                    if (!currentTurn || item.speaker !== currentTurn.speaker || item.isNewSpeaker) {
-                        if (currentTurn) {
-                            let estSec = (currentTurn.words / 2.16) / speedFactor;
-                            html += buildTocItemHtml(currentTurn.id, currentTurn.speaker, formatTime(estSec), currentTurn.textSnippet);
-                        }
-                        currentTurn = { id: item.id, speaker: item.speaker, textSnippet: item.textSnippet, words: item.words };
-                    } else { currentTurn.words += item.words; }
-                    
-                    if (index === state.tocData.length - 1 && currentTurn) {
-                        let estSec = (currentTurn.words / 2.16) / speedFactor;
-                        html += buildTocItemHtml(currentTurn.id, currentTurn.speaker, formatTime(estSec), currentTurn.textSnippet);
-                    }
-                });
-            }
-            container.innerHTML = html;
+        function escapeHtml(unsafe) {
+            return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+        function escapeJS(str) {
+            return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
         }
 
-        function buildTocItemHtml(blockId, speaker, timeStr, text) {
-            let colorHex = state.speakerMap[speaker] || '#ffffff';
-            let bgRgba = hexToRgbaStr(colorHex, 0.15);
-            let borderRgba = hexToRgbaStr(colorHex, 0.3);
-            
-            return `
-            <div class="toc-item" onclick="jumpToBlock('${blockId}', event)">
-                <div class="toc-item-top">
-                    <span class="toc-item-speaker" style="color: ${colorHex}; background: ${bgRgba}; border: 1px solid ${borderRgba}">${escapeHtml(speaker.toUpperCase())}</span>
-                    <span class="toc-item-time">⏱ ${timeStr}</span>
-                </div>
-                <div class="toc-item-text">${text}</div>
-            </div>`;
-        }
-
-        function jumpToBlock(blockId, e) {
-            if(e) e.stopPropagation();
-            const block = document.getElementById(blockId);
-            if(!block || !DOM.container) return;
-
-            document.body.classList.remove('toc-open', 'modal-open');
-
-            const offset = (window.innerHeight * FOCUS_PERCENT) - 20;
-            let rect = block.getBoundingClientRect();
-            let absoluteTop = rect.top - DOM.container.getBoundingClientRect().top + DOM.container.scrollTop;
-
-            DOM.container.scrollTo({ top: absoluteTop - offset, behavior: 'smooth' });
-
-            resetTriggerFlags();
-            synth.cancel(); // Ngắt giọng đọc khi nhảy mục lục
-            state.currentActiveGroupId = null;
-            
-            block.classList.add('anchor-highlight');
-            setTimeout(() => { block.classList.remove('anchor-highlight'); }, 800);
-        }
-
-        /* Các hàm khác giữ nguyên */
-        function toggleTTS(e) {
-            if(e) e.stopPropagation();
-            state.ttsEnabled = !state.ttsEnabled;
-            applyTTSUI(); saveSettings();
-            if(state.ttsEnabled) { let u = new SpeechSynthesisUtterance(''); synth.speak(u); } else { synth.cancel(); }
-        }
-
-        function applyTTSUI() {
-            const btn = document.getElementById('btn-tts-toggle');
-            if(!btn) return;
-            if(state.ttsEnabled) {
-                btn.classList.replace('bg-gray-700', 'bg-purple-500');
-                btn.firstElementChild.style.transform = 'translateX(24px)';
-            } else {
-                btn.classList.replace('bg-purple-500', 'bg-gray-700');
-                btn.firstElementChild.style.transform = 'translateX(0)';
-                synth.cancel();
-            }
-        }
-
-        function setRole(roleCode, e) {
+        /* ==================== V50 - LÕI XỬ LÝ CSS ĐỘNG AI ==================== */
+        
+        function setMyRole(roleCode, e) {
             if(e) e.stopPropagation(); 
-            state.role = roleCode; 
+            state.myRole = roleCode; 
             updateDynamicStyles(); renderRoleUI(); updateTotalWords(); updateHUD(); saveSettings();
+        }
+
+        function renderRoleUI() {
+            if(!DOM.roleContainer) return;
+            let html = `<button onclick="setMyRole('all', event)" class="role-btn ${state.myRole==='all'?'active':''}" style="--spk-color: #ffffff;">Đọc tất cả</button>`;
+            
+            const pureRoles = Object.keys(state.speakerMap).filter(k => !state.speakerMap[k].isShared);
+            
+            pureRoles.forEach(spk => {
+                let isActive = (state.myRole === spk) ? 'active' : '';
+                let color = state.speakerMap[spk].color;
+                html += `<button onclick="setMyRole('${escapeJS(spk)}', event)" class="role-btn ${isActive}" style="--spk-color: ${color};">${escapeHtml(spk)}</button>`;
+            });
+            
+            DOM.roleContainer.innerHTML = html;
         }
 
         function setOppMode(mode, e) {
@@ -776,15 +633,52 @@ Thưa toàn thể các đồng chí!
         }
 
         function applyOppModeUI(mode) {
-            const bSkip = document.getElementById('opp-skip'); const bBlur = document.getElementById('opp-blur');
-            if(!bSkip || !bBlur) return;
-            if (mode === 'skip') {
-                bSkip.classList.replace('text-gray-500', 'text-white'); bSkip.classList.replace('bg-black', 'bg-gray-800'); bSkip.classList.replace('border-gray-800', 'border-gray-600');
-                bBlur.classList.replace('text-white', 'text-gray-500'); bBlur.classList.replace('bg-gray-800', 'bg-black'); bBlur.classList.replace('border-gray-600', 'border-gray-800');
-            } else {
-                bBlur.classList.replace('text-gray-500', 'text-white'); bBlur.classList.replace('bg-black', 'bg-gray-800'); bBlur.classList.replace('border-gray-800', 'border-gray-600');
-                bSkip.classList.replace('text-white', 'text-gray-500'); bSkip.classList.replace('bg-gray-800', 'bg-black'); bSkip.classList.replace('border-gray-600', 'border-gray-800');
-            }
+            ['hide', 'blur', 'gray'].forEach(m => {
+                let btn = document.getElementById(`opp-${m}`);
+                if(btn) {
+                    if(m === mode) {
+                        btn.classList.replace('text-gray-500', 'text-white'); btn.classList.replace('bg-black', 'bg-gray-800'); btn.classList.replace('border-gray-800', 'border-gray-600');
+                    } else {
+                        btn.classList.replace('text-white', 'text-gray-500'); btn.classList.replace('bg-gray-800', 'bg-black'); btn.classList.replace('border-gray-600', 'border-gray-800');
+                    }
+                }
+            });
+        }
+
+        /* V50: GẮN TRỰC TIẾP TRẠNG THÁI AI VÀO MÃ CSS ĐỂ ĐÈ MỌI QUY TẮC HIỂN THỊ */
+        function updateDynamicStyles() {
+            if(!DOM.dynamicStyles) return;
+            let css = '';
+            
+            Object.keys(state.speakerMap).forEach(spk => {
+                let color = state.speakerMap[spk].color;
+                let escapedSpk = escapeHtml(spk);
+
+                css += `body .script-block[data-speaker="${escapedSpk}"] { color: ${color}; }\n`;
+
+                if (state.myRole !== 'all' && spk !== state.myRole && !state.speakerMap[spk].isShared) {
+                    // ĐÂY LÀ VAI DIỄN CỦA NGƯỜI KHÁC (OPPONENT)
+                    if (state.ttsEnabled) {
+                        // KHI BẬT AI: Cưỡng chế hiển thị đủ các vai để biết AI đang đọc chữ gì
+                        css += `body .script-block[data-speaker="${escapedSpk}"] { opacity: 0.65 !important; filter: none !important; pointer-events: auto !important; }\n`;
+                    } else {
+                        // KHI TẮT AI: Áp dụng triệt để bộ lọc Tàng hình / Mờ / Xám
+                        if (state.oppMode === 'hide') {
+                            // Ẩn 100% nhưng vẫn giữ dòng trắng để giữ nhịp cuộn (Invisible Text)
+                            css += `body .script-block[data-speaker="${escapedSpk}"] { opacity: 0 !important; pointer-events: none !important; }\n`;
+                        } else if (state.oppMode === 'blur') {
+                            css += `body .script-block[data-speaker="${escapedSpk}"] { opacity: 0.15 !important; filter: blur(5px) grayscale(100%) !important; pointer-events: none !important; }\n`;
+                        } else if (state.oppMode === 'gray') {
+                            css += `body .script-block[data-speaker="${escapedSpk}"] { opacity: 0.4 !important; filter: grayscale(100%) !important; }\n`;
+                        }
+                    }
+                } else {
+                    // VAI DIỄN CỦA BẢN THÂN hoặc VAI CHUNG (CẢ HAI)
+                    css += `body .script-block[data-speaker="${escapedSpk}"] { text-shadow: 0 0 10px ${color}40; opacity: 1 !important; }\n`;
+                }
+            });
+            
+            DOM.dynamicStyles.textContent = css;
         }
 
         function toggleFocusMode(e) {
@@ -796,7 +690,6 @@ Thưa toàn thể các đồng chí!
             if(!btn) return;
             if(state.isFocusMode) {
                 document.body.classList.replace('focus-mode-off', 'focus-mode-on');
-                if(!document.body.classList.contains('focus-mode-on')) document.body.classList.add('focus-mode-on');
                 btn.classList.replace('bg-gray-700', 'bg-indigo-500');
                 btn.firstElementChild.style.transform = 'translateX(24px)';
             } else {
@@ -807,126 +700,139 @@ Thưa toàn thể các đồng chí!
             updateAnchor(); 
         }
 
-        /* ==================== V42 PARSER ==================== */
+        function toggleTTS(e) {
+            if(e) e.stopPropagation();
+            state.ttsEnabled = !state.ttsEnabled;
+            if(state.ttsEnabled) { 
+                let u = new SpeechSynthesisUtterance('Đã bật chế độ AI đọc thay bạn diễn'); 
+                u.lang = 'vi-VN'; u.volume = 0.6; u.rate = 1.2; synth.speak(u); 
+            } else { synth.cancel(); }
+            
+            applyTTSUI(); 
+            updateDynamicStyles(); // Gọi ngay lập tức để CSS đổi từ Tàng hình sang Hiện chữ
+            saveSettings();
+        }
+
+        function applyTTSUI() {
+            const btn = document.getElementById('btn-tts-toggle');
+            if(!btn) return;
+            if(state.ttsEnabled) {
+                btn.classList.replace('bg-gray-700', 'bg-purple-500');
+                btn.firstElementChild.style.transform = 'translateX(24px)';
+            } else {
+                btn.classList.replace('bg-purple-500', 'bg-gray-700');
+                btn.firstElementChild.style.transform = 'translateX(0)';
+            }
+        }
+
+        /* ==================== V50 PARSER ==================== */
         function parseAndRender() {
             if(!DOM.input || !DOM.content) return;
             const rawLines = DOM.input.value.split('\n');
             let html = ''; 
             
-            let currentSpeaker = 'Tất cả'; 
+            let currentSpeaker = 'Độc thoại'; 
             state.speakerMap = {}; 
             let colorIndex = 0;
             let currentGroupHtml = '';
-            let currentGroupId = '';
-            let emptyLinesCount = 0;
-            state.tocData = []; // Khởi tạo lại TOC data
+            let emptyLinePending = false;
+
+            const badSuffixes = ['như sau', 'sau đây', 'giới thiệu', 'là', 'gồm', 'rằng', 'thứ nhất', 'thứ hai', 'thứ ba', 'kết luận', 'chú ý', 'lưu ý', 'ghi chú', 'cụ thể', 'hạn chế', 'đạt được', 'chỉ ra', 'ý kiến', 'tóm lại'];
 
             for (let i = 0; i < rawLines.length; i++) {
                 let line = rawLines[i].trim();
-                if (line === '') { emptyLinesCount++; continue; }
+                
+                if (line === '') { 
+                    if(currentGroupHtml !== '') emptyLinePending = true; 
+                    continue; 
+                }
 
-                let isNewSpeaker = false;
+                let spkName = currentSpeaker;
                 let text = line;
+                let isNewSpeaker = false;
 
-                const match = line.match(/^([^:]+):\s*(.*)/);
-                if (match) {
-                    let spkName = match[1].trim();
-                    text = match[2].trim();
-                    if (spkName !== currentSpeaker) {
-                        currentSpeaker = spkName;
-                        isNewSpeaker = true;
+                let bracketMatch = line.match(/^\[(.*?)\]\s*(.*)/);
+                if (bracketMatch) {
+                    spkName = bracketMatch[1].trim();
+                    text = bracketMatch[2].trim();
+                } else {
+                    const colonIdx = line.indexOf(':');
+                    if (colonIdx > 0 && colonIdx <= 40) { 
+                        let potentialName = line.substring(0, colonIdx).trim();
+                        let lowerName = potentialName.toLowerCase();
+                        
+                        let isBad = false;
+                        if (/^[-+*]/.test(potentialName)) isBad = true;
+                        if (/[?!;,]/.test(potentialName)) isBad = true;
+                        if (badSuffixes.some(s => lowerName.endsWith(s) || lowerName === s)) isBad = true;
+
+                        if (!isBad && potentialName.length > 0) {
+                            if (/^(tài|đ\.c tài|đc tài)$/i.test(potentialName)) spkName = 'Đ.c Tài';
+                            else if (/^(sinh|đ\.c sinh|đc sinh)$/i.test(potentialName)) spkName = 'Đ.c Sinh';
+                            else if (/^(cả 2|cả 2 ttv)$/i.test(potentialName)) spkName = 'Cả 2';
+                            else spkName = potentialName;
+                            
+                            text = line.substring(colonIdx + 1).trim();
+                        }
                     }
                 }
 
+                if (spkName !== currentSpeaker) {
+                    if (currentGroupHtml !== '') {
+                        html += `<div class="speaker-group">${currentGroupHtml}</div>`;
+                        currentGroupHtml = '';
+                    }
+                    currentSpeaker = spkName;
+                    isNewSpeaker = true;
+                    emptyLinePending = false; 
+                }
+
                 if (!state.speakerMap[currentSpeaker]) {
-                    state.speakerMap[currentSpeaker] = PALETTE[colorIndex % PALETTE.length];
+                    let isShared = false;
+                    let lower = currentSpeaker.toLowerCase();
+                    if (lower.includes('cả') || lower.includes('cùng') || lower.includes('chung') || lower.includes('all') || lower.includes('2')) {
+                        isShared = true;
+                    }
+                    state.speakerMap[currentSpeaker] = {
+                        color: PALETTE[colorIndex % PALETTE.length],
+                        isShared: isShared
+                    };
                     colorIndex++;
                 }
 
-                if (isNewSpeaker && currentGroupHtml !== '') {
-                    html += `<div id="${currentGroupId}" class="speaker-group" data-speaker="${escapeHtml(currentSpeaker)}">${currentGroupHtml}</div>`;
-                    currentGroupHtml = '';
-                }
-
                 if (text) {
-                    if (currentGroupHtml === '') { currentGroupId = `group-${Math.random().toString(36).substr(2, 9)}`; }
-                    
                     let wordCount = text.split(/\s+/).length;
-                    let needsPause = (emptyLinesCount > 0 && currentGroupHtml !== '');
-                    let blockId = `block-${Math.random().toString(36).substr(2, 9)}`;
+                    let blockId = `b_${Math.random().toString(36).substr(2, 9)}`;
                     
-                    currentGroupHtml += `<span id="${blockId}" class="script-block" data-words="${wordCount}" data-needs-pause="${needsPause}" data-triggered="false">${text} </span>`;
-                    
-                    // V42: Thêm dữ liệu vào TOC
-                    state.tocData.push({
-                        id: blockId, speaker: currentSpeaker, textSnippet: text.substring(0, 40) + '...',
-                        words: wordCount, isNewSpeaker: isNewSpeaker || needsPause
-                    });
+                    if(currentGroupHtml !== '' && !emptyLinePending && !isNewSpeaker) {
+                        currentGroupHtml += `<br>`;
+                    }
 
-                    emptyLinesCount = 0;
+                    currentGroupHtml += `<span id="${blockId}" class="script-block" data-pause="${emptyLinePending}" data-words="${wordCount}" data-speaker="${escapeHtml(currentSpeaker)}">${text} </span>`;
+                    emptyLinePending = false;
                 }
             }
             
             if (currentGroupHtml !== '') {
-                 html += `<div id="${currentGroupId}" class="speaker-group" data-speaker="${escapeHtml(currentSpeaker)}">${currentGroupHtml}</div>`;
+                 html += `<div class="speaker-group">${currentGroupHtml}</div>`;
             }
 
             DOM.content.innerHTML = html;
             
-            if(state.role !== 'all' && !state.speakerMap[state.role]) state.role = 'all';
+            const pureRoles = Object.keys(state.speakerMap).filter(k => !state.speakerMap[k].isShared);
+            if (!state.myRole || (state.myRole !== 'all' && !state.speakerMap[state.myRole])) {
+                state.myRole = pureRoles.length > 0 ? pureRoles[0] : 'all'; 
+            }
             
             renderRoleUI();
             updateDynamicStyles();
             updateTotalWords(); 
-            renderTOC(); // Cập nhật lại giao diện mục lục
-        }
-
-        function escapeHtml(unsafe) {
-            return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-        }
-
-        function renderRoleUI() {
-            if(!DOM.roleContainer) return;
-            let html = `<button onclick="setRole('all', event)" class="role-btn ${state.role==='all'?'active':''}" style="--spk-color: #ffffff">Đọc tất cả</button>`;
-            
-            Object.keys(state.speakerMap).forEach(spk => {
-                let isActive = (state.role === spk) ? 'active' : '';
-                html += `<button onclick="setRole('${escapeHtml(spk)}', event)" class="role-btn ${isActive}" style="--spk-color: ${state.speakerMap[spk]}">${escapeHtml(spk)}</button>`;
-            });
-            DOM.roleContainer.innerHTML = html;
-        }
-
-        function updateDynamicStyles() {
-            if(!DOM.dynamicStyles) return;
-            let css = '';
-            
-            Object.keys(state.speakerMap).forEach(spk => {
-                let color = state.speakerMap[spk];
-                css += `.speaker-group[data-speaker="${spk}"] { color: ${color}; }\n`;
-            });
-
-            if (state.role !== 'all') {
-                if (state.oppMode === 'blur') {
-                    css += `.speaker-group:not([data-speaker="${state.role}"]) { opacity: 0.2; filter: blur(3px) grayscale(100%); }\n`;
-                } else if (state.oppMode === 'skip') {
-                    css += `.speaker-group:not([data-speaker="${state.role}"]) { opacity: 0 !important; pointer-events: none; }\n`;
-                }
-                css += `.speaker-group[data-speaker="${state.role}"] { text-shadow: 0 0 15px currentColor; }\n`;
-            }
-            
-            DOM.dynamicStyles.innerHTML = css;
         }
 
         function updateTotalWords() {
             let count = 0;
-            const groups = document.querySelectorAll('.speaker-group');
-            groups.forEach(g => {
-                const spk = g.getAttribute('data-speaker');
-                if (state.role === 'all' || spk === state.role) {
-                    const spans = g.querySelectorAll('.script-block');
-                    spans.forEach(s => { count += parseInt(s.getAttribute('data-words')) || 0; });
-                }
-            });
+            const spans = document.querySelectorAll('.script-block');
+            spans.forEach(s => { count += parseInt(s.getAttribute('data-words')) || 0; });
             state.totalWords = count;
             recalcTime();
         }
@@ -945,7 +851,7 @@ Thưa toàn thể các đồng chí!
             return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
         }
 
-        /* ==================== PLAY & THUẬT TOÁN ĐỌC AI TTS ==================== */
+        /* ==================== PLAY & THUẬT TOÁN ĐỌC TỐI ƯU ==================== */
         function togglePlay(e) {
             if(e) e.stopPropagation();
             if(!DOM.btnPlay || !DOM.container) return;
@@ -960,14 +866,11 @@ Thưa toàn thể các đồng chí!
                 DOM.btnPlay.innerHTML = `<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>`;
                 
                 state.currentScrollPos = DOM.container.scrollTop;
-                state.lastCameraY = DOM.container.scrollTop + (window.innerHeight * FOCUS_PERCENT);
                 state.lastTime = performance.now();
                 state.isAutoPausing = false;
-                state.currentActiveGroupId = null;
+                state.currentActiveBlockId = null;
                 
-                resetTriggerFlags();
-                
-                if(state.ttsEnabled) { let u = new SpeechSynthesisUtterance(''); synth.speak(u); }
+                if(state.ttsEnabled) { synth.speak(new SpeechSynthesisUtterance('')); }
                 
                 if(pBar) { pBar.style.transition = 'none'; pBar.style.opacity = '0'; pBar.style.width = '0%'; }
                 clearAnchor(); 
@@ -983,102 +886,98 @@ Thưa toàn thể các đồng chí!
                 if(dot) dot.classList.remove('pausing');
                 if(pBar) { pBar.style.transition = 'none'; pBar.style.opacity = '0'; pBar.style.width = '0%'; }
                 
-                const main = document.getElementById('prompter-main');
-                if(main) main.style.boxShadow = '';
-                
                 synth.cancel(); 
                 if(aiBadge) aiBadge.classList.remove('active');
             }
         }
 
-        function resetTriggerFlags() {
-            const cameraY = DOM.container.scrollTop + (window.innerHeight * FOCUS_PERCENT);
-            state.lastCameraY = cameraY;
-            document.querySelectorAll('.script-block[data-needs-pause="true"]').forEach(b => {
-                let absoluteTop = b.getBoundingClientRect().top - DOM.container.getBoundingClientRect().top + DOM.container.scrollTop;
-                if (absoluteTop > cameraY) b.setAttribute('data-triggered', 'false');
-                else b.setAttribute('data-triggered', 'true');
-            });
-        }
-
-        function playTTSForGroup(groupEl) {
+        function triggerTTS(block) {
             if(!state.ttsEnabled) return;
-            synth.cancel();
             
             const aiBadge = document.getElementById('ai-speaking-badge');
-            
-            let spk = groupEl.getAttribute('data-speaker');
-            if (state.role !== 'all' && spk !== state.role) {
-                let text = groupEl.innerText;
-                if(!text || text.trim() === '') return;
+            let spk = block.getAttribute('data-speaker');
+            let isShared = state.speakerMap[spk] && state.speakerMap[spk].isShared;
+
+            // Đọc nếu: Là vai của người khác, HOẶC là vai chung (cùng đọc), HOẶC chọn "Đọc tất cả"
+            if (spk !== state.myRole || isShared || state.myRole === 'all') {
+                synth.cancel(); 
                 
-                state.currentUtterance = new SpeechSynthesisUtterance(text);
-                state.currentUtterance.lang = 'vi-VN';
-                let rate = Math.max(0.7, Math.min(1.5, state.speed / 4.5));
-                state.currentUtterance.rate = rate;
-                
-                state.currentUtterance.onstart = () => { if(aiBadge) aiBadge.classList.add('active'); };
-                state.currentUtterance.onend = () => { if(aiBadge) aiBadge.classList.remove('active'); };
-                state.currentUtterance.onerror = () => { if(aiBadge) aiBadge.classList.remove('active'); };
-                
-                synth.speak(state.currentUtterance);
+                setTimeout(() => {
+                    let text = block.innerText.replace(/[\n\r]/g, ' ').trim();
+                    if(!text) return;
+                    
+                    state.currentUtterance = new SpeechSynthesisUtterance(text);
+                    state.currentUtterance.lang = 'vi-VN';
+                    state.currentUtterance.rate = Math.max(0.7, Math.min(1.5, state.speed / 4.5));
+                    
+                    state.currentUtterance.onstart = () => { if(aiBadge) aiBadge.classList.add('active'); };
+                    state.currentUtterance.onend = () => { if(aiBadge) aiBadge.classList.remove('active'); };
+                    state.currentUtterance.onerror = () => { if(aiBadge) aiBadge.classList.remove('active'); };
+                    
+                    synth.speak(state.currentUtterance);
+                }, 50);
             } else {
+                synth.cancel();
                 if(aiBadge) aiBadge.classList.remove('active');
             }
+        }
+
+        function triggerPause() {
+            state.isAutoPausing = true;
+            const dot = document.getElementById('speaker-dot');
+            if(dot) dot.classList.add('pausing'); 
+
+            const pBar = document.getElementById('pause-progress-bar');
+            if(pBar) {
+                pBar.style.transition = 'none'; pBar.style.width = '100%'; pBar.style.opacity = '1';
+                void pBar.offsetWidth; 
+                pBar.style.transition = `width ${state.pauseDelay}s linear`;
+                pBar.style.width = '0%';
+            }
+            
+            synth.pause(); 
+
+            setTimeout(() => {
+                state.isAutoPausing = false;
+                if(dot) dot.classList.remove('pausing');
+                if(pBar) pBar.style.opacity = '0';
+                synth.resume(); 
+            }, state.pauseDelay * 1000);
         }
 
         function scrollLoop(timestamp) {
             if (!state.isPlaying || !DOM.container) return;
             if (!timestamp) timestamp = performance.now();
             
-            const currentCameraY = DOM.container.scrollTop + (window.innerHeight * FOCUS_PERCENT);
-            const containerRectTop = DOM.container.getBoundingClientRect().top;
+            const containerRect = DOM.container.getBoundingClientRect();
+            const focusScreenY = containerRect.top + (containerRect.height * FOCUS_PERCENT);
 
-            let activeGroup = null;
-            const groups = document.querySelectorAll('.speaker-group');
-            for(let g of groups) {
-                let absoluteTop = g.getBoundingClientRect().top - containerRectTop + DOM.container.scrollTop;
-                if (currentCameraY >= absoluteTop && currentCameraY <= absoluteTop + g.offsetHeight) {
-                    activeGroup = g; break;
-                }
-            }
-
-            if (activeGroup && activeGroup.id !== state.currentActiveGroupId) {
-                state.currentActiveGroupId = activeGroup.id;
-                playTTSForGroup(activeGroup);
-            }
-
-            if (state.pauseDelay > 0 && !state.isAutoPausing) {
-                const blocks = document.querySelectorAll('.script-block[data-needs-pause="true"]:not([data-triggered="true"])');
-                for (let i = 0; i < blocks.length; i++) {
-                    let blockAbsoluteTop = blocks[i].getBoundingClientRect().top - containerRectTop + DOM.container.scrollTop;
-                    
-                    if (state.lastCameraY < blockAbsoluteTop && currentCameraY >= blockAbsoluteTop) {
-                        blocks[i].setAttribute('data-triggered', 'true');
-                        state.isAutoPausing = true;
-                        
-                        const dot = document.getElementById('speaker-dot');
-                        if(dot) dot.classList.add('pausing'); 
-
-                        const pBar = document.getElementById('pause-progress-bar');
-                        if(pBar) {
-                            pBar.style.transition = 'none'; pBar.style.width = '100%'; pBar.style.opacity = '1';
-                            void pBar.offsetWidth; 
-                            pBar.style.transition = `width ${state.pauseDelay}s linear`;
-                            pBar.style.width = '0%';
-                        }
-                        
-                        synth.pause(); 
-
-                        setTimeout(() => {
-                            state.isAutoPausing = false;
-                            if(dot) dot.classList.remove('pausing');
-                            if(pBar) pBar.style.opacity = '0';
-                            synth.resume();
-                        }, state.pauseDelay * 1000);
-                        break; 
+            let activeBlock = null;
+            const blocks = document.querySelectorAll('.script-block');
+            for(let block of blocks) {
+                if (block.offsetParent === null) continue;
+                let rects = block.getClientRects();
+                let isHit = false;
+                for (let r of rects) {
+                    if (focusScreenY >= r.top - 5 && focusScreenY <= r.bottom + 5) {
+                        isHit = true; break;
                     }
                 }
+                if (isHit) {
+                    activeBlock = block;
+                    break;
+                }
+            }
+
+            if (activeBlock && activeBlock.id !== state.currentActiveBlockId) {
+                state.currentActiveBlockId = activeBlock.id;
+                
+                if (activeBlock.getAttribute('data-pause') === 'true' && state.pauseDelay > 0) {
+                    activeBlock.setAttribute('data-pause', 'false'); 
+                    triggerPause();
+                }
+
+                triggerTTS(activeBlock);
             }
 
             if (state.isAutoPausing) {
@@ -1086,13 +985,14 @@ Thưa toàn thể các đồng chí!
             } else {
                 const delta = timestamp - state.lastTime;
                 state.lastTime = timestamp;
-                state.lastCameraY = currentCameraY; 
                 
                 state.currentScrollPos += (state.speed * 0.4) * (delta / 16.67);
                 DOM.container.scrollTop = state.currentScrollPos;
                 updateHUD();
 
-                if (DOM.container.scrollTop >= DOM.container.scrollHeight - DOM.container.clientHeight - 5) { togglePlay(); return; }
+                if (DOM.container.scrollTop >= DOM.container.scrollHeight - DOM.container.clientHeight - 5) { 
+                    togglePlay(); return; 
+                }
             }
             state.animId = requestAnimationFrame(scrollLoop);
         }
@@ -1104,7 +1004,6 @@ Thưa toàn thể các đồng chí!
                     if(!state.isPlaying) { 
                         state.currentScrollPos = scContainer.scrollTop; 
                         updateHUD(); 
-                        resetTriggerFlags();
                         clearTimeout(state.anchorTimeout);
                         state.anchorTimeout = setTimeout(updateAnchor, 150);
                     }
@@ -1112,21 +1011,29 @@ Thưa toàn thể các đồng chí!
             }
         });
 
-        /* ==================== CẬP NHẬT UI & SMART CUE ĐỘNG ==================== */
-        function clearAnchor() { document.querySelectorAll('.script-block').forEach(b => b.classList.remove('anchor-highlight')); }
+        /* ==================== CẬP NHẬT GIAO DIỆN ==================== */
+        function clearAnchor() { 
+            document.querySelectorAll('.script-block').forEach(b => b.classList.remove('anchor-highlight')); 
+        }
 
         function updateAnchor() {
             clearAnchor(); if(!DOM.container) return;
-            const cameraY = DOM.container.scrollTop + (window.innerHeight * FOCUS_PERCENT);
-            const containerRectTop = DOM.container.getBoundingClientRect().top;
+            const containerRect = DOM.container.getBoundingClientRect();
+            const focusScreenY = containerRect.top + (containerRect.height * FOCUS_PERCENT);
             const blocks = document.querySelectorAll('.script-block');
             
-            for (let i = 0; i < blocks.length; i++) {
-                if (blocks[i].offsetParent === null) continue; 
-                let rect = blocks[i].getBoundingClientRect();
-                let absoluteTop = rect.top - containerRectTop + DOM.container.scrollTop;
-                if (cameraY >= absoluteTop - 40 && cameraY <= absoluteTop + rect.height + 40) { 
-                    blocks[i].classList.add('anchor-highlight'); break; 
+            for (let block of blocks) {
+                if (block.offsetParent === null) continue;
+                let rects = block.getClientRects();
+                let isHit = false;
+                for (let r of rects) {
+                    if (focusScreenY >= r.top - 15 && focusScreenY <= r.bottom + 15) { 
+                        isHit = true; break; 
+                    }
+                }
+                if (isHit) {
+                    block.classList.add('anchor-highlight'); 
+                    break;
                 }
             }
         }
@@ -1144,7 +1051,7 @@ Thưa toàn thể các đồng chí!
                 return;
             }
 
-            let hex = state.speakerMap[speakerName];
+            let hex = state.speakerMap[speakerName].color;
             let bgRgba = hexToRgbaStr(hex, 0.05);
             let colorRgba = hexToRgbaStr(hex, 0.5);
             let solidRgba = hexToRgbaStr(hex, 1);
@@ -1159,30 +1066,34 @@ Thưa toàn thể các đồng chí!
             const maxScroll = Math.max(1, DOM.container.scrollHeight - DOM.container.clientHeight);
             const progress = Math.min(1, DOM.container.scrollTop / maxScroll);
             
-            const timeEl = document.getElementById('time-elapsed'); const progBar = document.getElementById('progress-bar');
+            const timeEl = document.getElementById('time-elapsed'); const progBar = document.getElementById('progress-fill');
             if(timeEl) timeEl.innerText = formatTime(state.estSeconds * progress);
             if(progBar) progBar.style.width = `${progress * 100}%`;
 
-            const cameraY = DOM.container.scrollTop + (window.innerHeight * FOCUS_PERCENT);
-            const containerRectTop = DOM.container.getBoundingClientRect().top;
-            const groups = document.querySelectorAll('.speaker-group');
+            const containerRect = DOM.container.getBoundingClientRect();
+            const focusScreenY = containerRect.top + (containerRect.height * FOCUS_PERCENT);
+            const blocks = document.querySelectorAll('.script-block');
             
-            let activeSpeaker = null; let activeIndex = -1; let nextSpeaker = null; let nextBlockTop = 0;
+            let activeSpeaker = null; let activeIndex = -1; let nextSpeaker = null;
 
-            for (let i = 0; i < groups.length; i++) {
-                let absoluteTop = groups[i].getBoundingClientRect().top - containerRectTop + DOM.container.scrollTop;
-                if (cameraY >= absoluteTop - 20 && cameraY <= absoluteTop + groups[i].offsetHeight + 20) {
-                    activeSpeaker = groups[i].getAttribute('data-speaker'); activeIndex = i; break;
+            for (let i = 0; i < blocks.length; i++) {
+                if (blocks[i].offsetParent === null) continue;
+                let rects = blocks[i].getClientRects();
+                for (let r of rects) {
+                    if (focusScreenY >= r.top - 20 && focusScreenY <= r.bottom + 20) {
+                        activeSpeaker = blocks[i].getAttribute('data-speaker'); 
+                        activeIndex = i; 
+                        break;
+                    }
                 }
+                if (activeIndex !== -1) break;
             }
 
             if (activeIndex !== -1) {
-                for (let i = activeIndex + 1; i < groups.length; i++) {
-                    let spk = groups[i].getAttribute('data-speaker');
+                for (let i = activeIndex + 1; i < blocks.length; i++) {
+                    let spk = blocks[i].getAttribute('data-speaker');
                     if (spk !== activeSpeaker) { 
-                        nextSpeaker = spk; 
-                        nextBlockTop = groups[i].getBoundingClientRect().top - containerRectTop + DOM.container.scrollTop;
-                        break; 
+                        nextSpeaker = spk; break; 
                     }
                 }
             }
@@ -1194,10 +1105,10 @@ Thưa toàn thể các đồng chí!
             if(badge && badgeContainer) {
                 if (activeSpeaker && state.speakerMap[activeSpeaker]) {
                     badge.innerText = activeSpeaker.toUpperCase(); 
-                    badgeContainer.style.color = state.speakerMap[activeSpeaker]; 
-                    badgeContainer.style.borderColor = state.speakerMap[activeSpeaker] + '60';
+                    badgeContainer.style.color = state.speakerMap[activeSpeaker].color; 
+                    badgeContainer.style.borderColor = state.speakerMap[activeSpeaker].color + '60';
                 } else {
-                    badge.innerText = "CHUẨN BỊ"; badgeContainer.style.color = "#666"; badgeContainer.style.borderColor = "rgba(255,255,255,0.1)";
+                    badge.innerText = "CHUẨN BỊ"; badgeContainer.style.color = "#888"; badgeContainer.style.borderColor = "rgba(255,255,255,0.15)";
                 }
                 if(state.isPlaying && !state.isAutoPausing) dot.classList.add('pulse'); else dot.classList.remove('pulse');
             }
@@ -1206,19 +1117,13 @@ Thưa toàn thể các đồng chí!
             if(nextNameEl) {
                 if(nextSpeaker) {
                     nextNameEl.innerText = nextSpeaker.toUpperCase();
-                } else { nextNameEl.innerText = "HẾT BÀI"; }
+                    nextNameEl.style.color = state.speakerMap[nextSpeaker]?.color || '#fff';
+                } else { 
+                    nextNameEl.innerText = "HẾT BÀI"; 
+                    nextNameEl.style.color = '#888';
+                }
             }
             if (state.isPlaying) updateFocusColor(activeSpeaker);
-
-            const mainEl = document.getElementById('prompter-main');
-            if (mainEl && state.isPlaying && nextSpeaker && state.speakerMap[nextSpeaker]) {
-                const distance = nextBlockTop - cameraY;
-                if (distance > 0 && distance < 150) { 
-                    mainEl.style.boxShadow = `inset 0 60px 100px -40px ${state.speakerMap[nextSpeaker]}80, inset 0 -60px 100px -40px ${state.speakerMap[nextSpeaker]}80`;
-                } else { mainEl.style.boxShadow = ''; }
-            } else if (mainEl) {
-                mainEl.style.boxShadow = '';
-            }
         }
 
         /* ==================== MODAL KHÁC ==================== */
@@ -1244,14 +1149,15 @@ Thưa toàn thể các đồng chí!
         
         function saveScript(e) {
             if(e) e.stopPropagation(); 
-            if(DOM.input) { try { localStorage.setItem('v42_script', DOM.input.value); } catch(err){} parseAndRender(); toggleEditor(); resetPrompter(); }
+            if(DOM.input) { try { localStorage.setItem('v50_script', DOM.input.value); } catch(err){} parseAndRender(); toggleEditor(); resetPrompter(); }
         }
 
         function resetPrompter(e) {
             if(e) e.stopPropagation();
             if (state.isPlaying) togglePlay();
             if(DOM.container) DOM.container.scrollTop = 0; state.currentScrollPos = 0; 
-            resetTriggerFlags(); synth.cancel();
+            synth.cancel();
+            parseAndRender(); 
             updateHUD(); updateAnchor();
         }
 
