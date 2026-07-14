@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đếm Vật Thể Bằng OpenCV (Bản Hoàn Chỉnh)</title>
+    <title>Đếm Vật Thể Bằng OpenCV (Đã Fix Lỗi Mạng)</title>
     
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; background-color: #f8f9fa; color: #333; }
@@ -13,9 +13,12 @@
         .control-group { margin-bottom: 20px; }
         .control-group label { display: block; font-weight: bold; margin-bottom: 8px; }
         input[type="range"] { width: 100%; cursor: pointer; }
-        input[type="file"] { padding: 10px; background: #fff; border: 1px dashed #adb5bd; border-radius: 4px; width: 100%; box-sizing: border-box; }
-        input[type="file"]:disabled { background: #e9ecef; cursor: not-allowed; }
-        #statusMessage { font-weight: bold; color: #e74c3c; margin-left: 10px; font-size: 0.9em; }
+        
+        /* Chỉnh lại nút bấm để luôn click được rõ ràng */
+        input[type="file"] { padding: 12px; background: #fff; border: 2px dashed #3498db; border-radius: 6px; width: 100%; box-sizing: border-box; cursor: pointer; font-weight: bold; color: #2980b9; }
+        input[type="file"]:hover { background: #ebf5fb; }
+        
+        #statusMessage { font-weight: bold; color: #e67e22; display: block; margin-top: 10px; font-size: 0.95em; }
         .canvas-wrapper { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
         .canvas-box { text-align: center; flex: 1; min-width: 320px; }
         canvas { max-width: 100%; border: 1px solid #ced4da; border-radius: 4px; background: #fff; min-height: 200px; }
@@ -25,29 +28,27 @@
 </head>
 <body>
 
-    <h2>Hệ Thống Đếm Vật Thể (Bằng Phân Tích Hình Dáng)</h2>
+    <h2>Hệ Thống Đếm Vật Thể</h2>
     
     <div class="container">
         
         <div class="controls" id="controlsPanel">
             <div class="control-group">
-                <label>
-                    1. Tải ảnh lên: 
-                    <span id="statusMessage">(Đang tải thư viện xử lý ảnh lõi, vui lòng đợi...)</span>
-                </label>
-                <input type="file" id="imageUpload" accept="image/*" disabled>
+                <label>1. Tải ảnh lên để đếm:</label>
+                <input type="file" id="imageUpload" accept="image/*">
+                <span id="statusMessage">⏳ Đang tải thư viện lõi (Khoảng 8MB), vui lòng đợi trong giây lát...</span>
             </div>
             
             <div class="control-group">
                 <label>2. Độ nhạy tách nền (Threshold): <span id="threshVal" style="color: #2980b9;">127</span></label>
                 <input type="range" id="threshold" min="0" max="255" value="127">
-                <small>Kéo thanh này sang trái/phải để vật thể biến thành CỤC MÀU TRẮNG nổi bật hẳn trên NỀN ĐEN (xem ở ảnh lăng kính bên phải).</small>
+                <small>Kéo thanh này sao cho vật thể biến thành KHỐI MÀU TRẮNG trên NỀN ĐEN (xem lăng kính bên phải).</small>
             </div>
 
             <div class="control-group">
                 <label>3. Lọc nhiễu - Kích thước tối thiểu: <span id="areaVal" style="color: #2980b9;">100</span> px²</label>
                 <input type="range" id="minArea" min="0" max="2000" value="100" step="10">
-                <small>Tăng giá trị này lên nếu hệ thống đếm nhầm cả những hạt bụi, viền chữ hoặc chấm nhỏ liti.</small>
+                <small>Tăng lên nếu hệ thống đếm nhầm các hạt bụi nhỏ.</small>
             </div>
         </div>
 
@@ -59,7 +60,7 @@
                 <canvas id="canvasOutput"></canvas>
             </div>
             <div class="canvas-box">
-                <h4>Lăng Kính Đen Trắng (Cách AI nhìn)</h4>
+                <h4>Lăng Kính Đen Trắng</h4>
                 <canvas id="canvasFilter"></canvas>
             </div>
         </div>
@@ -75,85 +76,78 @@
         const minAreaSlider = document.getElementById('minArea');
         const threshVal = document.getElementById('threshVal');
         const areaVal = document.getElementById('areaVal');
-        const canvasOutput = document.getElementById('canvasOutput');
-        const resultCount = document.getElementById('resultCount');
         const statusMessage = document.getElementById('statusMessage');
 
-        // Hàm này tự động chạy khi thư viện OpenCV tải xong từ link CDN
-        function onOpenCvReady() {
-            isOpenCvReady = true;
-            imageUpload.disabled = false; // Mở khóa nút tải ảnh
-            statusMessage.style.color = '#27ae60';
-            statusMessage.innerText = '(Thư viện đã sẵn sàng!)';
-        }
+        // Định nghĩa hàm chờ WebAssembly của OpenCV khởi tạo xong
+        var Module = {
+            onRuntimeInitialized() {
+                isOpenCvReady = true;
+                statusMessage.style.color = '#27ae60';
+                statusMessage.innerText = '✅ Thư viện đã tải xong! Hãy chọn ảnh để quét.';
+                
+                // Nếu người dùng đã chọn ảnh trước khi thư viện tải xong, quét luôn
+                if (imgElement.src) {
+                    processImage();
+                }
+            }
+        };
 
         // Đọc ảnh tải lên
         imageUpload.addEventListener('change', (e) => {
-            if (!isOpenCvReady) {
-                alert("Thư viện chưa tải xong, vui lòng đợi thêm chút nhé!");
-                return;
-            }
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     imgElement.src = event.target.result;
                     imgElement.onload = () => {
-                        processImage(); 
+                        if (!isOpenCvReady) {
+                            alert("Hệ thống đang nạp thư viện xử lý ảnh. Ảnh của bạn đã được ghi nhận và sẽ tự động quét ngay khi nạp xong!");
+                        } else {
+                            processImage(); 
+                        }
                     }
                 }
                 reader.readAsDataURL(file);
             }
         });
 
-        // Lắng nghe sự kiện kéo thanh trượt để cập nhật kết quả ngay lập tức (Real-time)
+        // Lắng nghe sự kiện kéo thanh trượt
         thresholdSlider.addEventListener('input', () => {
             threshVal.innerText = thresholdSlider.value;
-            if (imgElement.src) processImage();
+            if (isOpenCvReady && imgElement.src) processImage();
         });
 
         minAreaSlider.addEventListener('input', () => {
             areaVal.innerText = minAreaSlider.value;
-            if (imgElement.src) processImage();
+            if (isOpenCvReady && imgElement.src) processImage();
         });
 
         // HÀM LÕI: QUÉT VÀ ĐẾM
         function processImage() {
             try {
-                // Khởi tạo ma trận (Bảng dữ liệu pixel)
                 srcMat = cv.imread(imgElement);
                 grayMat = new cv.Mat();
                 dstMat = new cv.Mat();
+                
                 let thresholdValue = parseInt(thresholdSlider.value);
                 let minAreaValue = parseInt(minAreaSlider.value);
 
-                // Chuyển ảnh màu sang thang độ xám (Grayscale)
                 cv.cvtColor(srcMat, grayMat, cv.COLOR_RGBA2GRAY, 0);
-
-                // Tách nền: Các điểm ảnh > Threshold thành Đen, < Threshold thành Trắng
-                // (Dùng cv.THRESH_BINARY_INV để nền sáng thành đen, vật thể tối thành trắng)
                 cv.threshold(grayMat, dstMat, thresholdValue, 255, cv.THRESH_BINARY_INV);
-                
-                // Vẽ ảnh đen trắng ra màn hình phụ
                 cv.imshow('canvasFilter', dstMat);
 
-                // Tìm đường viền
                 let contours = new cv.MatVector();
                 let hierarchy = new cv.Mat();
                 cv.findContours(dstMat, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
 
                 let count = 0;
 
-                // Lặp qua các đường viền và vẽ khung
                 for (let i = 0; i < contours.size(); ++i) {
                     let contour = contours.get(i);
                     let area = cv.contourArea(contour);
 
-                    // Chỉ đếm những vật thể lớn hơn mức lọc nhiễu
                     if (area > minAreaValue) {
                         count++;
-                        
-                        // Vẽ hình chữ nhật bao quanh vật thể (Màu đỏ, độ dày 3px)
                         let rect = cv.boundingRect(contour);
                         let point1 = new cv.Point(rect.x, rect.y);
                         let point2 = new cv.Point(rect.x + rect.width, rect.y + rect.height);
@@ -161,11 +155,9 @@
                     }
                 }
 
-                // In kết quả ra màn hình
                 cv.imshow('canvasOutput', srcMat);
-                resultCount.innerText = `Số vật thể đếm được: ${count}`;
+                document.getElementById('resultCount').innerText = `Số vật thể đếm được: ${count}`;
 
-                // Dọn dẹp RAM
                 srcMat.delete(); grayMat.delete(); dstMat.delete(); contours.delete(); hierarchy.delete();
             } catch (err) {
                 console.error("Lỗi xử lý ảnh: ", err);
@@ -173,7 +165,7 @@
         }
     </script>
 
-    <script async src="https://docs.opencv.org/4.8.0/opencv.js" onload="onOpenCvReady();" onerror="document.getElementById('statusMessage').innerText='(Lỗi mạng: Không thể tải thư viện. Vui lòng F5 lại trang)';"></script>
+    <script async src="https://cdn.jsdelivr.net/npm/opencv.js@1.2.1/opencv.min.js"></script>
 
 </body>
 </html>
