@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đếm Vật Thể - Chống Nhiễu</title>
+    <title>Đếm Vật Thể - Tách Phông Dải Màu (HSV)</title>
     
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; background-color: #f8f9fa; color: #333; }
@@ -13,18 +13,18 @@
         .control-group { margin-bottom: 15px; }
         .control-group label { display: block; font-weight: bold; margin-bottom: 8px; }
         input[type="range"] { width: 100%; cursor: pointer; }
-        select { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; font-size: 16px; margin-bottom: 10px; }
         input[type="file"] { padding: 12px; background: #fff; border: 2px dashed #3498db; border-radius: 6px; width: 100%; box-sizing: border-box; cursor: pointer; font-weight: bold; color: #2980b9; }
         #statusMessage { font-weight: bold; color: #e67e22; display: block; margin-top: 10px; font-size: 0.95em; }
         .canvas-wrapper { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
         .canvas-box { text-align: center; flex: 1; min-width: 320px; }
-        canvas { max-width: 100%; border: 1px solid #ced4da; border-radius: 4px; background: #fff; min-height: 200px; }
+        canvas { max-width: 100%; border: 1px solid #ced4da; border-radius: 4px; background: #000; min-height: 200px; }
         .result { text-align: center; font-size: 1.8em; color: #fff; background-color: #27ae60; padding: 15px; margin: 20px 0; border-radius: 8px; font-weight: bold; }
+        small { color: #555; font-size: 0.9em; }
     </style>
 </head>
 <body>
 
-    <h2>Hệ Thống Đếm Vật Thể (Bản Nâng Cấp)</h2>
+    <h2>Hệ Thống Đếm (Công Nghệ Tách Màu HSV)</h2>
     
     <div class="container">
         
@@ -32,24 +32,23 @@
             <div class="control-group">
                 <label>1. Tải ảnh lên:</label>
                 <input type="file" id="imageUpload" accept="image/*">
-                <span id="statusMessage">⏳ Đang tải thư viện (Khoảng 8MB)...</span>
-            </div>
-            
-            <div class="control-group">
-                <label>2. Màu sắc vật thể:</label>
-                <select id="objectType">
-                    <option value="light">Vật thể SÁNG MÀU (Trắng, Vàng...) trên nền tối</option>
-                    <option value="dark">Vật thể TỐI MÀU (Đen, Xám...) trên nền sáng</option>
-                </select>
+                <span id="statusMessage">⏳ Đang tải thư viện xử lý ảnh...</span>
             </div>
 
             <div class="control-group">
-                <label>3. Lọc sáng (Threshold): <span id="threshVal" style="color: #2980b9;">180</span></label>
-                <input type="range" id="threshold" min="0" max="255" value="180">
+                <label>2. XÓA BÀN GỖ - Giới hạn Độ bão hòa màu (Saturation): <span id="satVal" style="color: #c0392b;">50</span></label>
+                <input type="range" id="maxSat" min="0" max="255" value="50">
+                <small>Giữ mức thấp (dưới 80) để máy tính xóa bỏ mặt gỗ nâu. Chỉ giữ lại tăm bông trắng (không có màu).</small>
             </div>
 
             <div class="control-group">
-                <label>4. Lọc nhiễu kích thước: <span id="areaVal" style="color: #2980b9;">300</span> px²</label>
+                <label>3. XÓA VẢI NỀN - Yêu cầu Độ sáng tối thiểu (Brightness): <span id="valVal" style="color: #2980b9;">150</span></label>
+                <input type="range" id="minVal" min="0" max="255" value="150">
+                <small>Kéo lên cao để xóa bỏ các mảng vải tối màu.</small>
+            </div>
+
+            <div class="control-group">
+                <label>4. Lọc nhiễu vụn (Kích thước tăm bông tối thiểu): <span id="areaVal" style="color: #8e44ad;">300</span> px²</label>
                 <input type="range" id="minArea" min="0" max="5000" value="300" step="50">
             </div>
         </div>
@@ -58,11 +57,11 @@
 
         <div class="canvas-wrapper">
             <div class="canvas-box">
-                <h4>Kết Quả Quét</h4>
+                <h4>Kết Quả Quét Trực Tiếp</h4>
                 <canvas id="canvasOutput"></canvas>
             </div>
             <div class="canvas-box">
-                <h4>Lăng Kính AI (Trắng = Sẽ đếm)</h4>
+                <h4>Lăng Kính Đã Xóa Phông</h4>
                 <canvas id="canvasFilter"></canvas>
             </div>
         </div>
@@ -70,22 +69,20 @@
 
     <script>
         let imgElement = new Image();
-        let srcMat, dstMat, grayMat;
+        let srcMat, hsvMat, dstMat;
         let isOpenCvReady = false;
 
         const imageUpload = document.getElementById('imageUpload');
-        const objectType = document.getElementById('objectType');
-        const thresholdSlider = document.getElementById('threshold');
+        const maxSatSlider = document.getElementById('maxSat');
+        const minValSlider = document.getElementById('minVal');
         const minAreaSlider = document.getElementById('minArea');
-        const threshVal = document.getElementById('threshVal');
-        const areaVal = document.getElementById('areaVal');
         const statusMessage = document.getElementById('statusMessage');
 
         var Module = {
             onRuntimeInitialized() {
                 isOpenCvReady = true;
                 statusMessage.style.color = '#27ae60';
-                statusMessage.innerText = '✅ Sẵn sàng! Hãy tải ảnh lên.';
+                statusMessage.innerText = '✅ Đã tải xong! Hệ thống sẵn sàng xóa phông.';
                 if (imgElement.src) processImage();
             }
         };
@@ -104,11 +101,12 @@
             }
         });
 
-        // Lắng nghe sự kiện thay đổi thanh trượt và dropdown
-        [objectType, thresholdSlider, minAreaSlider].forEach(el => {
+        // Cập nhật real-time khi kéo slider
+        [maxSatSlider, minValSlider, minAreaSlider].forEach(el => {
             el.addEventListener('input', () => {
-                threshVal.innerText = thresholdSlider.value;
-                areaVal.innerText = minAreaSlider.value;
+                document.getElementById('satVal').innerText = maxSatSlider.value;
+                document.getElementById('valVal').innerText = minValSlider.value;
+                document.getElementById('areaVal').innerText = minAreaSlider.value;
                 if (isOpenCvReady && imgElement.src) processImage();
             });
         });
@@ -116,27 +114,32 @@
         function processImage() {
             try {
                 srcMat = cv.imread(imgElement);
-                grayMat = new cv.Mat();
+                hsvMat = new cv.Mat();
                 dstMat = new cv.Mat();
                 
-                let thresholdValue = parseInt(thresholdSlider.value);
+                // Chuyển hệ màu RGB sang HSV để phân tích độ bão hòa
+                cv.cvtColor(srcMat, hsvMat, cv.COLOR_RGBA2RGB);
+                cv.cvtColor(hsvMat, hsvMat, cv.COLOR_RGB2HSV);
+
+                let maxSat = parseInt(maxSatSlider.value);
+                let minVal = parseInt(minValSlider.value);
                 let minAreaValue = parseInt(minAreaSlider.value);
-                let isLightObj = objectType.value === 'light';
 
-                // 1. Chuyển ảnh sang xám
-                cv.cvtColor(srcMat, grayMat, cv.COLOR_RGBA2GRAY, 0);
+                // Khởi tạo giới hạn dải màu (Chỉ lấy màu Trắng/Xám sáng)
+                // Hue (0-180), Saturation (0-maxSat), Value (minVal-255)
+                let low = new cv.Mat(hsvMat.rows, hsvMat.cols, hsvMat.type(), [0, 0, minVal, 0]);
+                let high = new cv.Mat(hsvMat.rows, hsvMat.cols, hsvMat.type(), [180, maxSat, 255, 0]);
 
-                // 2. Làm mờ ảnh (Gaussian Blur) để xóa vân gỗ và nhiễu vải
-                let ksize = new cv.Size(9, 9);
-                cv.GaussianBlur(grayMat, grayMat, ksize, 0, 0, cv.BORDER_DEFAULT);
+                // Xóa phông triệt để bằng cv.inRange
+                cv.inRange(hsvMat, low, high, dstMat);
 
-                // 3. Tách nền dựa trên tùy chọn màu sáng/tối
-                let threshMethod = isLightObj ? cv.THRESH_BINARY : cv.THRESH_BINARY_INV;
-                cv.threshold(grayMat, dstMat, thresholdValue, 255, threshMethod);
-                
+                // Dùng thuật toán Morphology để làm mịn các cạnh tăm bông, xóa nhiễu chấm nhỏ
+                let M = cv.Mat.ones(3, 3, cv.CV_8U);
+                cv.morphologyEx(dstMat, dstMat, cv.MORPH_OPEN, M);
+
                 cv.imshow('canvasFilter', dstMat);
 
-                // 4. Tìm đường viền
+                // Tìm và vẽ đường viền
                 let contours = new cv.MatVector();
                 let hierarchy = new cv.Mat();
                 cv.findContours(dstMat, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
@@ -152,16 +155,18 @@
                         let rect = cv.boundingRect(contour);
                         let point1 = new cv.Point(rect.x, rect.y);
                         let point2 = new cv.Point(rect.x + rect.width, rect.y + rect.height);
-                        cv.rectangle(srcMat, point1, point2, [231, 76, 60, 255], 3);
+                        cv.rectangle(srcMat, point1, point2, [46, 204, 113, 255], 3); // Viền xanh lá
                     }
                 }
 
                 cv.imshow('canvasOutput', srcMat);
-                document.getElementById('resultCount').innerText = `Số vật thể đếm được: ${count}`;
+                document.getElementById('resultCount').innerText = `Số tăm bông đếm được: ${count}`;
 
-                srcMat.delete(); grayMat.delete(); dstMat.delete(); contours.delete(); hierarchy.delete();
+                // Dọn dẹp RAM
+                srcMat.delete(); hsvMat.delete(); dstMat.delete(); 
+                low.delete(); high.delete(); M.delete(); contours.delete(); hierarchy.delete();
             } catch (err) {
-                console.error("Lỗi: ", err);
+                console.error("Lỗi thuật toán: ", err);
             }
         }
     </script>
