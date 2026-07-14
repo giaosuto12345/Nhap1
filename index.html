@@ -3,52 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đếm Vật Thể Bằng OpenCV (Đã Fix Lỗi Mạng)</title>
+    <title>Đếm Vật Thể - Chống Nhiễu</title>
     
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; background-color: #f8f9fa; color: #333; }
         h2 { text-align: center; color: #2c3e50; }
         .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .controls { background-color: #e9ecef; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ced4da; }
-        .control-group { margin-bottom: 20px; }
+        .control-group { margin-bottom: 15px; }
         .control-group label { display: block; font-weight: bold; margin-bottom: 8px; }
         input[type="range"] { width: 100%; cursor: pointer; }
-        
-        /* Chỉnh lại nút bấm để luôn click được rõ ràng */
+        select { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; font-size: 16px; margin-bottom: 10px; }
         input[type="file"] { padding: 12px; background: #fff; border: 2px dashed #3498db; border-radius: 6px; width: 100%; box-sizing: border-box; cursor: pointer; font-weight: bold; color: #2980b9; }
-        input[type="file"]:hover { background: #ebf5fb; }
-        
         #statusMessage { font-weight: bold; color: #e67e22; display: block; margin-top: 10px; font-size: 0.95em; }
         .canvas-wrapper { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
         .canvas-box { text-align: center; flex: 1; min-width: 320px; }
         canvas { max-width: 100%; border: 1px solid #ced4da; border-radius: 4px; background: #fff; min-height: 200px; }
-        .result { text-align: center; font-size: 1.8em; color: #fff; background-color: #27ae60; padding: 15px; margin: 20px 0; border-radius: 8px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        small { color: #6c757d; font-style: italic; }
+        .result { text-align: center; font-size: 1.8em; color: #fff; background-color: #27ae60; padding: 15px; margin: 20px 0; border-radius: 8px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <h2>Hệ Thống Đếm Vật Thể</h2>
+    <h2>Hệ Thống Đếm Vật Thể (Bản Nâng Cấp)</h2>
     
     <div class="container">
         
         <div class="controls" id="controlsPanel">
             <div class="control-group">
-                <label>1. Tải ảnh lên để đếm:</label>
+                <label>1. Tải ảnh lên:</label>
                 <input type="file" id="imageUpload" accept="image/*">
-                <span id="statusMessage">⏳ Đang tải thư viện lõi (Khoảng 8MB), vui lòng đợi trong giây lát...</span>
+                <span id="statusMessage">⏳ Đang tải thư viện (Khoảng 8MB)...</span>
             </div>
             
             <div class="control-group">
-                <label>2. Độ nhạy tách nền (Threshold): <span id="threshVal" style="color: #2980b9;">127</span></label>
-                <input type="range" id="threshold" min="0" max="255" value="127">
-                <small>Kéo thanh này sao cho vật thể biến thành KHỐI MÀU TRẮNG trên NỀN ĐEN (xem lăng kính bên phải).</small>
+                <label>2. Màu sắc vật thể:</label>
+                <select id="objectType">
+                    <option value="light">Vật thể SÁNG MÀU (Trắng, Vàng...) trên nền tối</option>
+                    <option value="dark">Vật thể TỐI MÀU (Đen, Xám...) trên nền sáng</option>
+                </select>
             </div>
 
             <div class="control-group">
-                <label>3. Lọc nhiễu - Kích thước tối thiểu: <span id="areaVal" style="color: #2980b9;">100</span> px²</label>
-                <input type="range" id="minArea" min="0" max="2000" value="100" step="10">
-                <small>Tăng lên nếu hệ thống đếm nhầm các hạt bụi nhỏ.</small>
+                <label>3. Lọc sáng (Threshold): <span id="threshVal" style="color: #2980b9;">180</span></label>
+                <input type="range" id="threshold" min="0" max="255" value="180">
+            </div>
+
+            <div class="control-group">
+                <label>4. Lọc nhiễu kích thước: <span id="areaVal" style="color: #2980b9;">300</span> px²</label>
+                <input type="range" id="minArea" min="0" max="5000" value="300" step="50">
             </div>
         </div>
 
@@ -56,11 +58,11 @@
 
         <div class="canvas-wrapper">
             <div class="canvas-box">
-                <h4>Ảnh Gốc & Kết Quả Quét</h4>
+                <h4>Kết Quả Quét</h4>
                 <canvas id="canvasOutput"></canvas>
             </div>
             <div class="canvas-box">
-                <h4>Lăng Kính Đen Trắng</h4>
+                <h4>Lăng Kính AI (Trắng = Sẽ đếm)</h4>
                 <canvas id="canvasFilter"></canvas>
             </div>
         </div>
@@ -72,27 +74,22 @@
         let isOpenCvReady = false;
 
         const imageUpload = document.getElementById('imageUpload');
+        const objectType = document.getElementById('objectType');
         const thresholdSlider = document.getElementById('threshold');
         const minAreaSlider = document.getElementById('minArea');
         const threshVal = document.getElementById('threshVal');
         const areaVal = document.getElementById('areaVal');
         const statusMessage = document.getElementById('statusMessage');
 
-        // Định nghĩa hàm chờ WebAssembly của OpenCV khởi tạo xong
         var Module = {
             onRuntimeInitialized() {
                 isOpenCvReady = true;
                 statusMessage.style.color = '#27ae60';
-                statusMessage.innerText = '✅ Thư viện đã tải xong! Hãy chọn ảnh để quét.';
-                
-                // Nếu người dùng đã chọn ảnh trước khi thư viện tải xong, quét luôn
-                if (imgElement.src) {
-                    processImage();
-                }
+                statusMessage.innerText = '✅ Sẵn sàng! Hãy tải ảnh lên.';
+                if (imgElement.src) processImage();
             }
         };
 
-        // Đọc ảnh tải lên
         imageUpload.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
@@ -100,29 +97,22 @@
                 reader.onload = (event) => {
                     imgElement.src = event.target.result;
                     imgElement.onload = () => {
-                        if (!isOpenCvReady) {
-                            alert("Hệ thống đang nạp thư viện xử lý ảnh. Ảnh của bạn đã được ghi nhận và sẽ tự động quét ngay khi nạp xong!");
-                        } else {
-                            processImage(); 
-                        }
+                        if (isOpenCvReady) processImage();
                     }
                 }
                 reader.readAsDataURL(file);
             }
         });
 
-        // Lắng nghe sự kiện kéo thanh trượt
-        thresholdSlider.addEventListener('input', () => {
-            threshVal.innerText = thresholdSlider.value;
-            if (isOpenCvReady && imgElement.src) processImage();
+        // Lắng nghe sự kiện thay đổi thanh trượt và dropdown
+        [objectType, thresholdSlider, minAreaSlider].forEach(el => {
+            el.addEventListener('input', () => {
+                threshVal.innerText = thresholdSlider.value;
+                areaVal.innerText = minAreaSlider.value;
+                if (isOpenCvReady && imgElement.src) processImage();
+            });
         });
 
-        minAreaSlider.addEventListener('input', () => {
-            areaVal.innerText = minAreaSlider.value;
-            if (isOpenCvReady && imgElement.src) processImage();
-        });
-
-        // HÀM LÕI: QUÉT VÀ ĐẾM
         function processImage() {
             try {
                 srcMat = cv.imread(imgElement);
@@ -131,11 +121,22 @@
                 
                 let thresholdValue = parseInt(thresholdSlider.value);
                 let minAreaValue = parseInt(minAreaSlider.value);
+                let isLightObj = objectType.value === 'light';
 
+                // 1. Chuyển ảnh sang xám
                 cv.cvtColor(srcMat, grayMat, cv.COLOR_RGBA2GRAY, 0);
-                cv.threshold(grayMat, dstMat, thresholdValue, 255, cv.THRESH_BINARY_INV);
+
+                // 2. Làm mờ ảnh (Gaussian Blur) để xóa vân gỗ và nhiễu vải
+                let ksize = new cv.Size(9, 9);
+                cv.GaussianBlur(grayMat, grayMat, ksize, 0, 0, cv.BORDER_DEFAULT);
+
+                // 3. Tách nền dựa trên tùy chọn màu sáng/tối
+                let threshMethod = isLightObj ? cv.THRESH_BINARY : cv.THRESH_BINARY_INV;
+                cv.threshold(grayMat, dstMat, thresholdValue, 255, threshMethod);
+                
                 cv.imshow('canvasFilter', dstMat);
 
+                // 4. Tìm đường viền
                 let contours = new cv.MatVector();
                 let hierarchy = new cv.Mat();
                 cv.findContours(dstMat, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
@@ -160,12 +161,10 @@
 
                 srcMat.delete(); grayMat.delete(); dstMat.delete(); contours.delete(); hierarchy.delete();
             } catch (err) {
-                console.error("Lỗi xử lý ảnh: ", err);
+                console.error("Lỗi: ", err);
             }
         }
     </script>
-
     <script async src="https://cdn.jsdelivr.net/npm/opencv.js@1.2.1/opencv.min.js"></script>
-
 </body>
 </html>
