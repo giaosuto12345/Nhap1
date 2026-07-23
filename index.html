@@ -1,149 +1,618 @@
+```html
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Đếm Vật Thể - Thuật Toán Tách Dính (Distance Transform)</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; background-color: #f8f9fa; color: #333; }
-        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .controls { background-color: #e9ecef; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ced4da; }
-        .control-group { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; margin-bottom: 8px; }
-        input[type="range"] { width: 100%; cursor: pointer; }
-        input[type="file"] { padding: 12px; border: 2px dashed #3498db; width: 100%; cursor: pointer; color: #2980b9; font-weight: bold; }
-        .canvas-wrapper { display: flex; gap: 20px; justify-content: center; margin-top: 20px; }
-        canvas { max-width: 48%; border: 1px solid #ccc; border-radius: 4px; background: #000; }
-        .result { text-align: center; font-size: 1.8em; color: #fff; background-color: #2c3e50; padding: 15px; border-radius: 8px; font-weight: bold; }
-    </style>
-</head>
-<body>
-
-    <div class="container">
-        <h2>Thuật Toán Phân Tách Lõi Vật Thể</h2>
-        
-        <div class="controls">
-            <div class="control-group">
-                <input type="file" id="imageUpload" accept="image/*">
-                <span id="statusMessage" style="color: #e67e22; font-weight: bold; display: block; margin-top:10px;">⏳ Đang tải thuật toán lõi...</span>
-            </div>
-
-            <div class="control-group">
-                <label>1. Tách nền (Threshold): <span id="threshVal">180</span></label>
-                <input type="range" id="threshold" min="0" max="255" value="180">
-            </div>
-
-            <div class="control-group">
-                <label>2. Tách vật thể dính nhau (Tìm lõi): <span id="distVal">40</span>%</label>
-                <input type="range" id="distThreshold" min="1" max="100" value="40">
-                <small style="color: #555;">Kéo thanh này để "cắt" các tăm bông đang nằm sát nhau (Nhìn ảnh X-quang bên phải: Mỗi chấm trắng nhỏ sẽ tính là 1 vật thể).</small>
-            </div>
-        </div>
-
-        <div class="result" id="resultCount">Số lõi đếm được: 0</div>
-
-        <div class="canvas-wrapper">
-            <div>
-                <h4 style="text-align: center;">Kết Quả</h4>
-                <canvas id="canvasOutput"></canvas>
-            </div>
-            <div>
-                <h4 style="text-align: center;">Chụp X-Quang Tìm Lõi</h4>
-                <canvas id="canvasFilter"></canvas>
-            </div>
-        </div>
-    </div>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Siri Vocab Pro</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: SF Pro Display Alternative -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <script>
-        let imgElement = new Image();
-        let isOpenCvReady = false;
-
-        const imageUpload = document.getElementById('imageUpload');
-        const thresholdSlider = document.getElementById('threshold');
-        const distSlider = document.getElementById('distThreshold');
-
-        var Module = {
-            onRuntimeInitialized() {
-                isOpenCvReady = true;
-                document.getElementById('statusMessage').innerText = '✅ Hệ thống sẵn sàng!';
-                document.getElementById('statusMessage').style.color = '#27ae60';
-                if (imgElement.src) processImage();
-            }
-        };
-
-        imageUpload.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    imgElement.src = event.target.result;
-                    imgElement.onload = () => { if (isOpenCvReady) processImage(); }
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-
-        [thresholdSlider, distSlider].forEach(el => {
-            el.addEventListener('input', () => {
-                document.getElementById('threshVal').innerText = thresholdSlider.value;
-                document.getElementById('distVal').innerText = distSlider.value;
-                if (isOpenCvReady && imgElement.src) processImage();
-            });
-        });
-
-        function processImage() {
-            try {
-                let srcMat = cv.imread(imgElement);
-                let grayMat = new cv.Mat();
-                let binaryMat = new cv.Mat();
-                
-                // Bước 1: Chuyển sang ảnh xám và tách nền
-                cv.cvtColor(srcMat, grayMat, cv.COLOR_RGBA2GRAY);
-                cv.threshold(grayMat, binaryMat, parseInt(thresholdSlider.value), 255, cv.THRESH_BINARY);
-
-                // Bước 2: Distance Transform (Chụp X-quang tìm lõi)
-                let distMat = new cv.Mat();
-                cv.distanceTransform(binaryMat, distMat, cv.DIST_L2, 3);
-                
-                // Chuẩn hóa dải giá trị về 0-255 để dễ lọc
-                cv.normalize(distMat, distMat, 0, 255, cv.NORM_MINMAX);
-                distMat.convertTo(distMat, cv.CV_8U);
-
-                // Bước 3: Lọc lấy các đỉnh núi (Lõi vật thể)
-                let peaksMat = new cv.Mat();
-                let peakThreshold = (parseInt(distSlider.value) / 100) * 255; 
-                cv.threshold(distMat, peaksMat, peakThreshold, 255, cv.THRESH_BINARY);
-
-                cv.imshow('canvasFilter', peaksMat);
-
-                // Bước 4: Tìm và đếm số lõi
-                let contours = new cv.MatVector();
-                let hierarchy = new cv.Mat();
-                cv.findContours(peaksMat, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-
-                let count = 0;
-                for (let i = 0; i < contours.size(); ++i) {
-                    let contour = contours.get(i);
-                    // Lọc bỏ nhiễu hạt bụi quá nhỏ
-                    if (cv.contourArea(contour) > 5) {
-                        count++;
-                        // Vẽ vòng tròn vào chính giữa tâm của tăm bông
-                        let moments = cv.moments(contour);
-                        let cx = moments.m10 / moments.m00;
-                        let cy = moments.m01 / moments.m00;
-                        cv.circle(srcMat, new cv.Point(cx, cy), 5, [231, 76, 60, 255], -1);
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        apple: { blue: '#007AFF', gray: '#F2F2F7', dark: '#1C1C1E', card: 'rgba(255, 255, 255, 0.8)' }
                     }
                 }
-
-                cv.imshow('canvasOutput', srcMat);
-                document.getElementById('resultCount').innerText = `Số lõi đếm được: ${count}`;
-
-                srcMat.delete(); grayMat.delete(); binaryMat.delete(); 
-                distMat.delete(); peaksMat.delete(); contours.delete(); hierarchy.delete();
-            } catch (err) {
-                console.error("Lỗi thuật toán: ", err);
             }
         }
     </script>
-    <script async src="https://cdn.jsdelivr.net/npm/opencv.js@1.2.1/opencv.min.js"></script>
+    <style>
+        body {
+            background-color: #F2F2F7;
+            background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,0.05) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225,39%,30%,0.05) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,0.05) 0, transparent 50%);
+            /* Safe area for iPhone notch/Dynamic Island */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Glassmorphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* 3D Card Flip */
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { 
+            transform-style: preserve-3d; 
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+        .backface-hidden { 
+            backface-visibility: hidden; 
+            -webkit-backface-visibility: hidden; 
+        }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        .is-flipped { transform: rotateY(180deg); }
+
+        /* Animations */
+        @keyframes pop {
+            0% { transform: scale(0.95); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop { animation: pop 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        @keyframes pulse-mic {
+            0% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(255, 59, 48, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); }
+        }
+        .listening {
+            animation: pulse-mic 1.5s infinite;
+            background-color: #FF3B30 !important;
+            color: white !important;
+        }
+
+        /* Hide scrollbar for category selector */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="h-screen flex flex-col text-gray-800">
+
+    <!-- Header & Category Selector -->
+    <header class="px-5 pt-4 pb-2 z-10">
+        <h1 class="text-2xl font-bold tracking-tight mb-4 flex items-center justify-between">
+            <span><i class="fa-brands fa-apple mr-2 text-gray-900"></i>Siri Pro</span>
+            <span id="progress-text" class="text-sm font-normal text-gray-500 bg-gray-200 px-3 py-1 rounded-full">1/5</span>
+        </h1>
+        
+        <!-- Categories -->
+        <div class="flex space-x-3 overflow-x-auto no-scrollbar pb-2" id="category-container">
+            <!-- Categories rendered via JS -->
+        </div>
+    </header>
+
+    <!-- Main Content Area (Dynamic based on Tab) -->
+    <main class="flex-1 relative overflow-hidden px-5 flex flex-col justify-center items-center pb-24" id="main-content">
+        
+        <!-- TAB 1: LEARN (Flashcards) -->
+        <div id="tab-learn" class="w-full max-w-md animate-pop w-full absolute transition-opacity duration-300">
+            <div class="w-full aspect-[3/4] max-h-[60vh] perspective-1000 cursor-pointer" id="flashcard-container">
+                <div class="relative w-full h-full transform-style-3d shadow-xl rounded-[2.5rem] glass" id="flashcard">
+                    
+                    <!-- FRONT -->
+                    <div class="absolute w-full h-full backface-hidden rounded-[2.5rem] flex flex-col items-center justify-center p-8 bg-white/90">
+                        <div class="absolute top-6 left-6 text-apple-blue opacity-50"><i class="fa-solid fa-quote-left text-2xl"></i></div>
+                        <h2 id="card-word" class="text-5xl font-bold text-gray-900 mb-2 text-center tracking-tight">Word</h2>
+                        <p id="card-phonetic" class="text-lg text-apple-blue font-medium mb-10">/phonetic/</p>
+                        
+                        <button onclick="playAudio(event, document.getElementById('card-word').textContent)" class="w-16 h-16 rounded-full bg-apple-blue/10 text-apple-blue flex items-center justify-center text-2xl hover:bg-apple-blue/20 transition-transform active:scale-90">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                        
+                        <div class="absolute bottom-6 flex items-center text-gray-400 text-sm font-medium">
+                            <i class="fa-solid fa-hand-pointer mr-2 animate-bounce"></i> Chạm để xem nghĩa
+                        </div>
+                    </div>
+
+                    <!-- BACK -->
+                    <div class="absolute w-full h-full backface-hidden rounded-[2.5rem] flex flex-col items-center justify-center p-8 bg-gray-900 text-white rotate-y-180 border border-gray-700">
+                        <span id="card-type" class="px-4 py-1.5 bg-gray-800 text-apple-blue text-sm rounded-full font-semibold mb-4 border border-gray-700">Type</span>
+                        <h3 id="card-meaning" class="text-3xl font-bold mb-8 text-center">Ý nghĩa</h3>
+                        
+                        <div class="w-full bg-gray-800/80 p-5 rounded-2xl text-left border border-gray-700 backdrop-blur-md">
+                            <div class="flex justify-between items-start mb-2">
+                                <p class="text-apple-blue text-xs uppercase font-bold tracking-wider"><i class="fa-solid fa-comment-dots mr-1"></i>Mẫu câu Siri</p>
+                                <button onclick="playAudio(event, document.getElementById('card-example').textContent)" class="text-gray-400 hover:text-white active:scale-90"><i class="fa-solid fa-volume-high"></i></button>
+                            </div>
+                            <p id="card-example" class="text-lg font-medium text-white mb-2 leading-tight">"Example"</p>
+                            <p id="card-example-trans" class="text-gray-400 text-sm">Dịch</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Swipe Hints -->
+            <div class="flex justify-between w-full mt-6 px-4 text-gray-400 text-sm font-medium">
+                <span><i class="fa-solid fa-chevron-left"></i> Vuốt trái</span>
+                <span>Vuốt phải <i class="fa-solid fa-chevron-right"></i></span>
+            </div>
+        </div>
+
+        <!-- TAB 2: QUIZ -->
+        <div id="tab-quiz" class="w-full max-w-md animate-pop hidden absolute w-full px-5">
+            <div class="glass rounded-3xl p-6 shadow-lg">
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-sm font-bold text-gray-500 uppercase tracking-wide">Kiểm tra</span>
+                    <span id="quiz-score" class="text-apple-blue font-bold">Điểm: 0</span>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Đâu là câu lệnh đúng để:</h3>
+                <p id="quiz-question" class="text-lg text-gray-600 mb-6 min-h-[3rem]">...</p>
+                
+                <div class="space-y-3" id="quiz-options">
+                    <!-- Options rendered via JS -->
+                </div>
+                
+                <button onclick="nextQuiz()" id="btn-next-quiz" class="w-full mt-6 py-3.5 bg-gray-200 text-gray-400 font-bold rounded-xl hidden transition-all">Câu tiếp theo <i class="fa-solid fa-arrow-right ml-2"></i></button>
+            </div>
+        </div>
+
+        <!-- TAB 3: VOICE CHECK -->
+        <div id="tab-voice" class="w-full max-w-md animate-pop hidden absolute w-full px-5">
+            <div class="glass rounded-3xl p-6 shadow-lg text-center flex flex-col items-center">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-apple-blue mb-4">
+                    <i class="fa-solid fa-robot text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Đóng vai gọi Siri</h3>
+                <p class="text-sm text-gray-500 mb-6">Hãy đọc to câu lệnh dưới đây. AI sẽ nghe và kiểm tra phát âm của bạn.</p>
+                
+                <div class="w-full bg-white p-5 rounded-2xl border border-gray-100 mb-8 shadow-sm">
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Câu lệnh mục tiêu</p>
+                    <p id="voice-target" class="text-xl font-bold text-gray-800">"Hey Siri,..."</p>
+                    <button onclick="playAudio(event, document.getElementById('voice-target').textContent.replace(/"/g, ''))" class="mt-3 text-apple-blue text-sm font-medium"><i class="fa-solid fa-circle-play mr-1"></i>Nghe mẫu</button>
+                </div>
+
+                <!-- Recognition Result Area -->
+                <div id="voice-result-area" class="h-20 flex items-center justify-center w-full mb-6">
+                    <p id="voice-result-text" class="text-gray-400 italic">Nhấn nút Micro và bắt đầu nói...</p>
+                </div>
+
+                <div class="flex items-center space-x-6">
+                    <button onclick="skipVoice()" class="w-12 h-12 rounded-full bg-gray-200 text-gray-600 active:scale-90 transition-transform"><i class="fa-solid fa-forward-step"></i></button>
+                    
+                    <button id="btn-record" class="w-20 h-20 rounded-full bg-gray-900 text-white text-3xl shadow-xl flex items-center justify-center active:scale-95 transition-all">
+                        <i class="fa-solid fa-microphone"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Bottom Navigation Bar (iOS Style) -->
+    <nav class="fixed bottom-0 left-0 w-full glass pb-[env(safe-area-inset-bottom)] z-50 rounded-t-3xl border-t border-white/40 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+        <div class="flex justify-around items-center h-20 px-4">
+            <button onclick="switchTab('learn')" class="nav-btn active flex flex-col items-center justify-center w-20 text-gray-400 hover:text-apple-blue transition-colors">
+                <i class="fa-solid fa-layer-group text-xl mb-1 transition-transform"></i>
+                <span class="text-[10px] font-bold">Thẻ lật</span>
+            </button>
+            <button onclick="switchTab('quiz')" class="nav-btn flex flex-col items-center justify-center w-20 text-gray-400 hover:text-apple-blue transition-colors">
+                <i class="fa-solid fa-gamepad text-xl mb-1 transition-transform"></i>
+                <span class="text-[10px] font-bold">Luyện tập</span>
+            </button>
+            <button onclick="switchTab('voice')" class="nav-btn flex flex-col items-center justify-center w-20 text-gray-400 hover:text-apple-blue transition-colors relative">
+                <div class="absolute -top-1 right-3 w-2 h-2 bg-red-500 rounded-full"></div>
+                <i class="fa-solid fa-headset text-xl mb-1 transition-transform"></i>
+                <span class="text-[10px] font-bold">Nói AI</span>
+            </button>
+        </div>
+    </nav>
+
+    <style>
+        /* Styles for active bottom nav icons */
+        .nav-btn.active { color: #007AFF; }
+        .nav-btn.active i { transform: translateY(-2px) scale(1.1); }
+    </style>
+
+    <script>
+        // --- DATA STRUCTURE (Phân loại theo ngữ cảnh) ---
+        const vocabData = {
+            "Productivity": {
+                name: "Công việc & Lịch",
+                icon: "fa-calendar-check",
+                words: [
+                    { word: "Set", phonetic: "/set/", type: "Verb", meaning: "Đặt, thiết lập", example: "Hey Siri, set an alarm for 7 AM.", trans: "Siri, đặt báo thức lúc 7 giờ sáng." },
+                    { word: "Remind", phonetic: "/rɪˈmaɪnd/", type: "Verb", meaning: "Nhắc nhở", example: "Hey Siri, remind me to call John at 5.", trans: "Siri, nhắc tôi gọi John lúc 5 giờ." },
+                    { word: "Schedule", phonetic: "/ˈskedʒ.uːl/", type: "Noun", meaning: "Lịch trình", example: "Hey Siri, what's on my schedule today?", trans: "Lịch trình hôm nay của tôi có gì?" },
+                    { word: "Timer", phonetic: "/ˈtaɪ.mɚ/", type: "Noun", meaning: "Đồng hồ hẹn giờ", example: "Hey Siri, set a timer for 10 minutes.", trans: "Hẹn giờ 10 phút." }
+                ]
+            },
+            "SmartHome": {
+                name: "Nhà thông minh",
+                icon: "fa-house-signal",
+                words: [
+                    { word: "Turn on/off", phonetic: "/tɝːn ɑːn/ɑːf/", type: "Phrasal Verb", meaning: "Bật / Tắt", example: "Hey Siri, turn off the bedroom lights.", trans: "Tắt đèn phòng ngủ." },
+                    { word: "Dim", phonetic: "/dɪm/", type: "Verb", meaning: "Làm tối đi", example: "Hey Siri, dim the lights to 50%.", trans: "Giảm độ sáng đèn xuống 50%." },
+                    { word: "Lock", phonetic: "/lɑːk/", type: "Verb", meaning: "Khóa", example: "Hey Siri, lock the front door.", trans: "Khóa cửa trước." },
+                    { word: "Temperature", phonetic: "/ˈtem.pɚ.ə.tʃɚ/", type: "Noun", meaning: "Nhiệt độ", example: "Hey Siri, set the temperature to 24 degrees.", trans: "Chỉnh nhiệt độ điều hòa thành 24 độ." }
+                ]
+            },
+            "Media": {
+                name: "Giải trí & Gọi",
+                icon: "fa-music",
+                words: [
+                    { word: "Play", phonetic: "/pleɪ/", type: "Verb", meaning: "Phát (nhạc/video)", example: "Hey Siri, play some acoustic music.", trans: "Phát một chút nhạc acoustic." },
+                    { word: "Skip", phonetic: "/skɪp/", type: "Verb", meaning: "Bỏ qua (bài hát)", example: "Hey Siri, skip this song.", trans: "Bỏ qua bài hát này." },
+                    { word: "Volume", phonetic: "/ˈvɑːl.juːm/", type: "Noun", meaning: "Âm lượng", example: "Hey Siri, turn the volume up.", trans: "Tăng âm lượng lên." },
+                    { word: "Speaker", phonetic: "/ˈspiː.kɚ/", type: "Noun", meaning: "Loa ngoài", example: "Hey Siri, call Mom on speaker.", trans: "Gọi cho mẹ bằng loa ngoài." }
+                ]
+            }
+        };
+
+        // --- GLOBAL STATE ---
+        let currentCategory = "Productivity";
+        let currentIndex = 0;
+        let isFlipped = false;
+        let activeTab = 'learn';
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        // Quiz State
+        let quizScore = 0;
+        let currentQuizWord = null;
+
+        // --- INIT APP ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCategories();
+            updateCard();
+            setupSwipe();
+            initSpeechRecognition();
+        });
+
+        // --- UI & NAVIGATION ---
+        function renderCategories() {
+            const container = document.getElementById('category-container');
+            container.innerHTML = '';
+            
+            Object.keys(vocabData).forEach(key => {
+                const cat = vocabData[key];
+                const isActive = key === currentCategory;
+                const btn = document.createElement('button');
+                btn.className = `flex-shrink-0 px-4 py-2 rounded-2xl text-sm font-semibold transition-all ${isActive ? 'bg-gray-900 text-white shadow-md' : 'bg-white text-gray-500 border border-gray-200'}`;
+                btn.innerHTML = `<i class="fa-solid ${cat.icon} mr-2"></i>${cat.name}`;
+                btn.onclick = () => {
+                    currentCategory = key;
+                    currentIndex = 0;
+                    renderCategories();
+                    
+                    if(activeTab === 'learn') updateCard();
+                    if(activeTab === 'quiz') startQuiz();
+                    if(activeTab === 'voice') loadVoiceTarget();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function switchTab(tabId) {
+            activeTab = tabId;
+            
+            // Update UI buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            // Hide all tabs
+            ['learn', 'quiz', 'voice'].forEach(id => {
+                const el = document.getElementById(`tab-${id}`);
+                el.classList.add('hidden');
+                el.classList.remove('animate-pop');
+            });
+
+            // Show active tab
+            const activeEl = document.getElementById(`tab-${tabId}`);
+            activeEl.classList.remove('hidden');
+            // Trigger reflow to restart animation
+            void activeEl.offsetWidth;
+            activeEl.classList.add('animate-pop');
+
+            // Setup Tab specific logic
+            if (tabId === 'learn') updateCard();
+            if (tabId === 'quiz') startQuiz();
+            if (tabId === 'voice') loadVoiceTarget();
+        }
+
+        // --- MODE 1: LEARN (Flashcards) ---
+        function updateCard() {
+            const list = vocabData[currentCategory].words;
+            const vocab = list[currentIndex];
+            
+            document.getElementById('card-word').textContent = vocab.word;
+            document.getElementById('card-phonetic').textContent = vocab.phonetic;
+            document.getElementById('card-type').textContent = vocab.type;
+            document.getElementById('card-meaning').textContent = vocab.meaning;
+            document.getElementById('card-example').textContent = `"${vocab.example}"`;
+            document.getElementById('card-example-trans').textContent = vocab.trans;
+            
+            document.getElementById('progress-text').textContent = `${currentIndex + 1}/${list.length}`;
+
+            const card = document.getElementById('flashcard');
+            if (isFlipped) {
+                isFlipped = false;
+                card.classList.remove('is-flipped');
+            }
+        }
+
+        document.getElementById('flashcard-container').addEventListener('click', () => {
+            const card = document.getElementById('flashcard');
+            isFlipped = !isFlipped;
+            isFlipped ? card.classList.add('is-flipped') : card.classList.remove('is-flipped');
+        });
+
+        // Swipe Gestures
+        function setupSwipe() {
+            const container = document.getElementById('flashcard-container');
+            
+            container.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, {passive: true});
+
+            container.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, {passive: true});
+        }
+
+        function handleSwipe() {
+            const list = vocabData[currentCategory].words;
+            const threshold = 50; // minimum distance to register swipe
+            
+            if (touchEndX < touchStartX - threshold) {
+                // Swipe Left (Next)
+                if (currentIndex < list.length - 1) {
+                    currentIndex++;
+                    updateCard();
+                    animateCardChange('left');
+                } else {
+                    // Haptic feedback logic could go here if supported via PWA/Native
+                    const card = document.getElementById('flashcard-container');
+                    card.style.transform = 'translateX(-10px)';
+                    setTimeout(() => card.style.transform = 'translateX(0)', 150);
+                }
+            }
+            if (touchEndX > touchStartX + threshold) {
+                // Swipe Right (Prev)
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    updateCard();
+                    animateCardChange('right');
+                }
+            }
+        }
+
+        function animateCardChange(direction) {
+            const card = document.getElementById('flashcard-container');
+            card.style.transition = 'none';
+            card.style.transform = `translateX(${direction === 'left' ? '50px' : '-50px'})`;
+            card.style.opacity = '0';
+            
+            setTimeout(() => {
+                card.style.transition = 'all 0.3s ease-out';
+                card.style.transform = 'translateX(0)';
+                card.style.opacity = '1';
+            }, 50);
+        }
+
+        // --- MODE 2: QUIZ ---
+        function startQuiz() {
+            const list = vocabData[currentCategory].words;
+            // Pick a random word
+            currentQuizWord = list[Math.floor(Math.random() * list.length)];
+            
+            document.getElementById('quiz-question').textContent = `"${currentQuizWord.trans}"`;
+            document.getElementById('quiz-score').textContent = `Điểm: ${quizScore}`;
+            
+            const btnNext = document.getElementById('btn-next-quiz');
+            btnNext.classList.add('hidden');
+
+            // Generate Options (1 correct, 3 wrong from any category to increase difficulty)
+            let allWords = [];
+            Object.values(vocabData).forEach(cat => allWords = allWords.concat(cat.words));
+            
+            let options = [currentQuizWord];
+            while(options.length < 4) {
+                let randomWord = allWords[Math.floor(Math.random() * allWords.length)];
+                if(!options.find(o => o.word === randomWord.word)) {
+                    options.push(randomWord);
+                }
+            }
+            
+            // Shuffle options
+            options.sort(() => Math.random() - 0.5);
+            
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "w-full p-4 rounded-xl border-2 border-gray-100 bg-white text-left font-medium text-gray-700 hover:border-apple-blue hover:bg-blue-50 transition-all";
+                // Show the example sentence as the option
+                btn.textContent = opt.example;
+                btn.onclick = () => handleQuizAnswer(btn, opt === currentQuizWord);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function handleQuizAnswer(btn, isCorrect) {
+            // Disable all buttons
+            const allBtns = document.getElementById('quiz-options').querySelectorAll('button');
+            allBtns.forEach(b => b.disabled = true);
+            
+            if (isCorrect) {
+                btn.classList.remove('border-gray-100', 'hover:border-apple-blue');
+                btn.classList.add('border-green-500', 'bg-green-50', 'text-green-700');
+                btn.innerHTML += ' <i class="fa-solid fa-circle-check float-right mt-1 text-xl"></i>';
+                quizScore += 10;
+            } else {
+                btn.classList.remove('border-gray-100', 'hover:border-apple-blue');
+                btn.classList.add('border-red-500', 'bg-red-50', 'text-red-700');
+                btn.innerHTML += ' <i class="fa-solid fa-circle-xmark float-right mt-1 text-xl"></i>';
+                
+                // Highlight correct answer
+                allBtns.forEach(b => {
+                    if(b.textContent.includes(currentQuizWord.example)) {
+                        b.classList.add('border-green-500', 'bg-green-50');
+                    }
+                });
+            }
+            
+            document.getElementById('quiz-score').textContent = `Điểm: ${quizScore}`;
+            
+            // Show next button
+            const btnNext = document.getElementById('btn-next-quiz');
+            btnNext.classList.remove('hidden');
+            btnNext.classList.add('bg-gray-900', 'text-white');
+            btnNext.classList.remove('bg-gray-200', 'text-gray-400');
+        }
+
+        function nextQuiz() {
+            startQuiz();
+        }
+
+        // --- MODE 3: VOICE CHECK (SPEECH RECOGNITION) ---
+        let recognition = null;
+        let isRecording = false;
+
+        function loadVoiceTarget() {
+            const list = vocabData[currentCategory].words;
+            const vocab = list[Math.floor(Math.random() * list.length)];
+            document.getElementById('voice-target').textContent = `"${vocab.example}"`;
+            
+            const resultArea = document.getElementById('voice-result-text');
+            resultArea.textContent = "Nhấn nút Micro và bắt đầu nói...";
+            resultArea.className = "text-gray-400 italic";
+            document.getElementById('voice-result-area').className = "h-20 flex items-center justify-center w-full mb-6";
+        }
+
+        function skipVoice() {
+            loadVoiceTarget();
+        }
+
+        function initSpeechRecognition() {
+            window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (window.SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.lang = 'en-US';
+                recognition.interimResults = false; // Only final results
+                recognition.maxAlternatives = 1;
+
+                const btnRecord = document.getElementById('btn-record');
+                const resultText = document.getElementById('voice-result-text');
+                const resultArea = document.getElementById('voice-result-area');
+
+                btnRecord.addEventListener('click', () => {
+                    if (isRecording) {
+                        recognition.stop();
+                        return;
+                    }
+
+                    try {
+                        recognition.start();
+                    } catch (e) {
+                        console.error(e);
+                    }
+                });
+
+                recognition.onstart = () => {
+                    isRecording = true;
+                    btnRecord.classList.add('listening');
+                    btnRecord.innerHTML = '<i class="fa-solid fa-stop"></i>';
+                    resultText.textContent = "Đang nghe...";
+                    resultText.className = "text-apple-blue font-medium animate-pulse";
+                };
+
+                recognition.onspeechend = () => {
+                    recognition.stop();
+                };
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    const confidence = event.results[0][0].confidence;
+                    
+                    checkVoiceMatch(transcript);
+                };
+
+                recognition.onerror = (event) => {
+                    isRecording = false;
+                    btnRecord.classList.remove('listening');
+                    btnRecord.innerHTML = '<i class="fa-solid fa-microphone"></i>';
+                    resultText.textContent = "Không nghe rõ, vui lòng thử lại!";
+                    resultText.className = "text-red-500 font-medium";
+                };
+
+                recognition.onend = () => {
+                    isRecording = false;
+                    btnRecord.classList.remove('listening');
+                    btnRecord.innerHTML = '<i class="fa-solid fa-microphone"></i>';
+                };
+            } else {
+                // Not supported
+                const btnRecord = document.getElementById('btn-record');
+                btnRecord.disabled = true;
+                btnRecord.classList.add('opacity-50');
+                document.getElementById('voice-result-text').textContent = "Trình duyệt không hỗ trợ nhận diện giọng nói (Vui lòng dùng Safari/Chrome).";
+            }
+        }
+
+        function checkVoiceMatch(spokenText) {
+            const targetEl = document.getElementById('voice-target');
+            // Remove quotes and punctuation, convert to lowercase for comparison
+            const targetText = targetEl.textContent.replace(/["',.?!]/g, '').toLowerCase().trim();
+            const userText = spokenText.replace(/["',.?!]/g, '').toLowerCase().trim();
+            
+            const resultText = document.getElementById('voice-result-text');
+            const resultArea = document.getElementById('voice-result-area');
+            
+            resultText.innerHTML = `Bạn nói: <br><span class="text-lg font-bold text-gray-800">"${spokenText}"</span>`;
+            
+            // Loose matching: If the spoken text contains 80% of the target words or matches completely
+            if (userText === targetText || userText.includes(targetText) || targetText.includes(userText)) {
+                resultArea.className = "h-24 flex items-center justify-center w-full mb-6 bg-green-100 rounded-2xl border-2 border-green-400 p-4 text-center";
+                resultText.innerHTML += `<br><span class="text-green-600 font-bold mt-2"><i class="fa-solid fa-check-circle mr-1"></i> Xuất sắc! Siri sẽ hiểu bạn.</span>`;
+            } else {
+                resultArea.className = "h-24 flex items-center justify-center w-full mb-6 bg-red-50 rounded-2xl border-2 border-red-300 p-4 text-center";
+                resultText.innerHTML += `<br><span class="text-red-500 font-medium mt-2"><i class="fa-solid fa-circle-xmark mr-1"></i> Gần đúng rồi, thử lại nhé!</span>`;
+            }
+        }
+
+        // --- AUDIO PLAYBACK ---
+        function playAudio(e, text) {
+            e.stopPropagation(); // Prevent card flip
+            
+            if ('speechSynthesis' in window) {
+                // Cancel any ongoing speech
+                window.speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                // Find a good voice (preferably Siri/Apple voices if on iOS)
+                const voices = window.speechSynthesis.getVoices();
+                const appleVoice = voices.find(v => v.name.includes('Siri') || v.name.includes('Samantha'));
+                if (appleVoice) utterance.voice = appleVoice;
+                
+                utterance.rate = 0.9; 
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+        
+        // Ensure voices load (Chrome/Safari quirk)
+        window.speechSynthesis.onvoiceschanged = function() {};
+
+    </script>
 </body>
 </html>
+
+
+```
