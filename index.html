@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Siri Vocab Pro 5.0</title>
+    <title>Siri Vocab Pro 7.0 - 100 Commands</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -19,10 +19,7 @@
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
                         apple: {
-                            blue: '#0A7AFF',
-                            green: '#34C759',
-                            red: '#FF3B30',
-                            gray: '#8E8E93',
+                            blue: '#0A7AFF', green: '#34C759', red: '#FF3B30', gray: '#8E8E93',
                         }
                     }
                 }
@@ -32,8 +29,8 @@
     <style>
         body {
             background-color: #F2F2F7;
+            height: 100dvh; 
             padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
             -webkit-tap-highlight-color: transparent;
             overflow: hidden;
         }
@@ -52,9 +49,7 @@
             border: 1px solid rgba(0,0,0,0.04);
         }
         
-        .bg-sub-card {
-            background-color: #F8F9FA;
-        }
+        .bg-sub-card { background-color: #F8F9FA; }
 
         #welcome-overlay {
             backdrop-filter: blur(25px);
@@ -62,15 +57,14 @@
             z-index: 100;
         }
 
-        /* Animations */
-        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .tab-content { display: none; }
+        .tab-content.active { display: flex; animation: fadeIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
         
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .slide-left { animation: slideLeft 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-        @keyframes slideLeft { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
-
+        @keyframes slideLeft { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
         .slide-right { animation: slideRight 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-        @keyframes slideRight { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slideRight { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
 
         .pulse-record { animation: pulseRed 1.5s infinite; }
         @keyframes pulseRed { 
@@ -82,77 +76,63 @@
         .hide-scroll::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="h-screen flex flex-col text-gray-900 selection:bg-apple-blue selection:text-white">
+<body class="flex flex-col text-gray-900 selection:bg-apple-blue selection:text-white">
 
-    <!-- WELCOME OVERLAY (Mở khóa âm thanh iOS) -->
+    <!-- WELCOME OVERLAY -->
     <div id="welcome-overlay" class="fixed inset-0 bg-white/85 dark:bg-black/85 flex flex-col items-center justify-center p-6 text-center transition-opacity duration-500">
         <div class="w-24 h-24 bg-apple-blue text-white rounded-[2rem] flex items-center justify-center text-5xl mb-6 shadow-2xl shadow-blue-500/30">
             <i class="fa-brands fa-apple"></i>
         </div>
-        <h1 class="text-3xl font-extrabold mb-2 apple-text tracking-tight">Siri Vocab 5.0</h1>
-        <p class="text-gray-500 dark:text-gray-400 mb-10 max-w-xs text-sm">Toàn bộ thông tin hiển thị trực quan. Chạm để bắt đầu cấp quyền âm thanh.</p>
+        <h1 class="text-3xl font-extrabold mb-2 apple-text tracking-tight">Siri Vocab 7.0</h1>
+        <p class="text-gray-500 dark:text-gray-400 mb-10 max-w-xs text-sm">Kho dữ liệu khổng lồ: Tròn 100 Câu lệnh. Chạm để cấp quyền âm thanh cho iOS.</p>
         <button onclick="startApp()" class="w-full max-w-xs bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold text-lg py-4 rounded-2xl active:scale-95 transition-transform shadow-xl">
-            Bắt Đầu Học Ngay
+            Bắt Đầu Khám Phá
         </button>
     </div>
 
-    <!-- APP HEADER -->
-    <header class="px-5 pt-4 pb-2 shrink-0 z-10 fade-in hidden" id="app-header">
-        <div class="flex items-center justify-between mb-5">
-            <h1 class="text-2xl font-bold tracking-tight flex items-center apple-text">
-                <i class="fa-solid fa-graduation-cap text-apple-blue mr-2"></i> Học Từ Vựng
+    <!-- HEADER -->
+    <header class="px-5 pt-4 pb-2 shrink-0 z-10 hidden" id="app-header">
+        <div class="flex items-center justify-between mb-4">
+            <h1 class="text-xl font-bold tracking-tight flex items-center apple-text">
+                <i class="fa-solid fa-layer-group text-apple-blue mr-2"></i> Tròn 100 Từ
             </h1>
-            <span id="progress-badge" class="bg-blue-50 dark:bg-blue-900/30 text-apple-blue border border-blue-100 dark:border-blue-800 text-sm font-bold px-3 py-1.5 rounded-full">1/10</span>
+            <span id="progress-badge" class="bg-blue-50 dark:bg-blue-900/30 text-apple-blue border border-blue-100 dark:border-blue-800 text-sm font-bold px-3 py-1 rounded-full">1/100</span>
         </div>
-        <!-- Phân loại chủ đề -->
+        <!-- Thanh chọn chủ đề cuộn ngang -->
         <div class="flex space-x-3 overflow-x-auto hide-scroll pb-2" id="category-container"></div>
     </header>
 
     <!-- MAIN CONTENT -->
-    <main class="flex-1 w-full relative overflow-hidden hidden" id="app-main">
+    <main class="flex-1 w-full overflow-y-auto overflow-x-hidden pb-28 pt-2 hidden" id="app-main">
         
-        <!-- ================= TAB 1: THẺ TỪ VỰNG (TRỰC QUAN - KHÔNG LẬT) ================= -->
-        <div id="tab-learn" class="absolute inset-0 flex flex-col items-center justify-start pt-2 px-5 fade-in">
-            <!-- Khung thẻ -->
-            <div id="flashcard" class="w-full max-w-md apple-card flex flex-col p-6 min-h-[460px] relative transition-transform">
-                
-                <!-- Loại từ -->
-                <div class="flex justify-center mb-4">
-                    <span id="fc-type" class="bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-[11px] font-bold uppercase tracking-widest px-3 py-1 rounded-md">
-                        Verb
-                    </span>
+        <!-- ================= TAB 1: THẺ TỪ VỰNG ================= -->
+        <div id="tab-learn" class="tab-content active h-full flex-col px-5 max-w-md mx-auto">
+            <div id="flashcard" class="flex-1 apple-card flex flex-col p-6 min-h-0 relative transition-transform mb-4">
+                <div class="flex justify-center mb-2 shrink-0">
+                    <span id="fc-type" class="bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-md">Verb</span>
                 </div>
-
-                <!-- Từ vựng, Phiên âm, Nghĩa -->
-                <div class="text-center flex-1 flex flex-col justify-center items-center">
-                    <h2 id="fc-word" class="text-5xl font-extrabold text-gray-900 dark:text-white mb-1 tracking-tight">Word</h2>
-                    <p id="fc-phonetic" class="text-lg text-gray-500 dark:text-gray-400 font-medium mb-3">/phonetic/</p>
-                    <h3 id="fc-meaning" class="text-2xl font-bold text-apple-blue mb-5">Ý nghĩa tiếng Việt</h3>
+                <div class="text-center flex-1 flex flex-col justify-center items-center overflow-y-auto hide-scroll py-2">
+                    <h2 id="fc-word" class="text-4xl sm:text-5xl font-extrabold text-gray-900 dark:text-white mb-1 tracking-tight px-2 break-words max-w-full">Word</h2>
+                    <p id="fc-phonetic" class="text-base text-gray-500 dark:text-gray-400 font-medium mb-3">/phonetic/</p>
+                    <h3 id="fc-meaning" class="text-xl sm:text-2xl font-bold text-apple-blue mb-4">Ý nghĩa tiếng Việt</h3>
                     
-                    <button onclick="playAudio(event, document.getElementById('fc-word').textContent)" class="w-14 h-14 rounded-full bg-blue-50 dark:bg-blue-900/30 text-apple-blue text-xl flex items-center justify-center active:scale-90 transition-transform mb-2">
+                    <button onclick="playAudio(event, document.getElementById('fc-word').textContent)" class="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/30 text-apple-blue text-lg flex items-center justify-center active:scale-90 transition-transform">
                         <i class="fa-solid fa-volume-high"></i>
                     </button>
                 </div>
-
-                <!-- Khung câu ví dụ -->
-                <div class="bg-sub-card rounded-2xl p-4 mt-4 border border-gray-100 dark:border-gray-700 w-full">
-                    <div class="flex justify-between items-start mb-2">
+                <div class="bg-sub-card rounded-2xl p-4 shrink-0 border border-gray-100 dark:border-gray-700 w-full mt-2">
+                    <div class="flex justify-between items-start mb-1">
                         <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-1">Câu nói với Siri</span>
-                        <button onclick="playAudio(event, document.getElementById('fc-example').textContent)" class="text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-700 w-8 h-8 rounded-full flex items-center justify-center active:scale-90 transition-transform">
-                            <i class="fa-solid fa-volume-high text-xs"></i>
+                        <button onclick="playAudio(event, document.getElementById('fc-example').textContent)" class="text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-700 w-7 h-7 rounded-full flex items-center justify-center active:scale-90 transition-transform">
+                            <i class="fa-solid fa-volume-high text-[10px]"></i>
                         </button>
                     </div>
-                    <p id="fc-example" class="text-[17px] font-semibold text-gray-900 dark:text-white mb-2 leading-snug">"Example sentence"</p>
-                    
-                    <!-- Đường kẻ ngang -->
+                    <p id="fc-example" class="text-base font-semibold text-gray-900 dark:text-white mb-2 leading-snug">"Example sentence"</p>
                     <div class="w-full h-px bg-gray-200 dark:bg-gray-700 my-2"></div>
-                    
-                    <p id="fc-trans" class="text-sm text-gray-600 dark:text-gray-300 font-medium italic">Dịch nghĩa câu ví dụ...</p>
+                    <p id="fc-trans" class="text-xs text-gray-600 dark:text-gray-300 font-medium italic">Dịch nghĩa...</p>
                 </div>
             </div>
-
-            <!-- Nút điều hướng (Thuật toán tuần tự vòng lặp) -->
-            <div class="w-full max-w-md flex gap-4 mt-6">
+            <div class="w-full flex gap-4 shrink-0 pb-2">
                 <button onclick="changeCard(-1)" class="flex-1 apple-card py-4 text-gray-700 dark:text-gray-300 font-bold active:scale-95 transition-transform flex justify-center items-center shadow-sm">
                     <i class="fa-solid fa-arrow-left mr-2"></i> Trước
                 </button>
@@ -163,69 +143,58 @@
         </div>
 
         <!-- ================= TAB 2: TRẮC NGHIỆM ================= -->
-        <div id="tab-quiz" class="absolute inset-0 flex flex-col items-center justify-start pt-2 px-5 hidden">
-            <div class="w-full max-w-md apple-card p-6 min-h-[460px] flex flex-col">
-                <div class="flex justify-between items-center mb-6">
+        <div id="tab-quiz" class="tab-content h-full flex-col px-5 max-w-md mx-auto">
+            <div class="w-full flex-1 apple-card p-6 flex flex-col mb-4 overflow-y-auto hide-scroll">
+                <div class="flex justify-between items-center mb-6 shrink-0">
                     <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Trắc nghiệm</span>
                     <span id="quiz-score" class="text-apple-green font-bold bg-green-50 dark:bg-green-900/30 border border-green-100 dark:border-green-800 px-3 py-1 rounded-full text-sm">Điểm: 0</span>
                 </div>
-                
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2 font-medium">Làm sao để nói với Siri câu này?</p>
-                <p id="quiz-question" class="text-xl font-bold text-gray-900 dark:text-white mb-6 leading-snug">...</p>
-                
-                <div class="space-y-3" id="quiz-options"></div>
-                
-                <button onclick="startQuiz()" id="btn-next-quiz" class="w-full mt-auto bg-gray-900 dark:bg-white text-white dark:text-gray-900 py-4 rounded-xl font-bold hidden active:scale-95 transition-transform">
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2 font-medium shrink-0">Làm sao để nói với Siri câu này?</p>
+                <p id="quiz-question" class="text-lg font-bold text-gray-900 dark:text-white mb-6 leading-snug shrink-0">...</p>
+                <div class="space-y-3 flex-1" id="quiz-options"></div>
+                <button onclick="startQuiz()" id="btn-next-quiz" class="w-full mt-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 py-4 rounded-xl font-bold hidden active:scale-95 transition-transform shrink-0">
                     Câu tiếp theo <i class="fa-solid fa-forward-step ml-2"></i>
                 </button>
             </div>
         </div>
 
         <!-- ================= TAB 3: NÓI VỚI AI ================= -->
-        <div id="tab-voice" class="absolute inset-0 flex flex-col items-center justify-start pt-2 px-5 hidden">
-            <div class="w-full max-w-md apple-card p-6 flex flex-col items-center min-h-[460px]">
+        <div id="tab-voice" class="tab-content h-full flex-col px-5 max-w-md mx-auto">
+            <div class="w-full flex-1 apple-card p-6 flex flex-col items-center mb-4 overflow-y-auto hide-scroll">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-1 shrink-0">Kiểm tra phát âm</h3>
+                <p class="text-sm text-gray-500 mb-5 text-center shrink-0">Đọc to câu lệnh dưới đây để AI chấm điểm</p>
                 
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-1">Kiểm tra phát âm</h3>
-                <p class="text-sm text-gray-500 mb-5 text-center">Đọc to câu lệnh dưới đây để AI chấm điểm</p>
-                
-                <!-- Target Box (Có Dịch Nghĩa) -->
-                <div class="w-full bg-sub-card p-5 rounded-2xl border border-gray-100 dark:border-gray-700 mb-5 shadow-sm">
+                <div class="w-full bg-sub-card p-5 rounded-2xl border border-gray-100 dark:border-gray-700 mb-5 shadow-sm shrink-0">
                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Câu lệnh mục tiêu</p>
-                    <p id="voice-target" class="text-[19px] font-bold text-gray-900 dark:text-white mb-3 leading-snug">"Hey Siri, set an alarm..."</p>
-                    
+                    <p id="voice-target" class="text-lg font-bold text-gray-900 dark:text-white mb-3 leading-snug">...</p>
                     <div class="border-l-2 border-apple-blue pl-3 py-1 mb-4">
                         <p class="text-[10px] text-gray-500 uppercase font-semibold">Nghĩa tiếng Việt:</p>
-                        <p id="voice-target-trans" class="text-sm text-gray-700 dark:text-gray-300 font-medium italic">Siri, đặt báo thức...</p>
+                        <p id="voice-target-trans" class="text-sm text-gray-700 dark:text-gray-300 font-medium italic">...</p>
                     </div>
-                    
                     <button onclick="playAudio(event, document.getElementById('voice-target').textContent.replace(/"/g, ''))" class="w-full bg-white dark:bg-gray-800 text-apple-blue border border-gray-200 dark:border-gray-600 py-3 rounded-xl text-sm font-bold active:scale-95 transition-transform shadow-sm">
                         <i class="fa-solid fa-volume-high mr-2 text-lg"></i> Nghe đọc mẫu
                     </button>
                 </div>
 
-                <!-- Result Box -->
-                <div id="voice-result-area" class="w-full min-h-[70px] flex items-center justify-center mb-6 p-4 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 transition-colors">
+                <div id="voice-result-area" class="w-full min-h-[70px] flex items-center justify-center mb-4 p-4 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 transition-colors shrink-0">
                     <p class="text-gray-400 text-sm font-medium"><i class="fa-solid fa-microphone mr-1"></i> Bấm micro và nói</p>
                 </div>
 
-                <!-- Controls -->
-                <div class="flex items-center justify-center gap-8 mt-auto">
+                <div class="flex items-center justify-center gap-8 mt-auto shrink-0 py-2">
                     <button onclick="loadVoiceTarget()" class="w-14 h-14 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xl active:scale-90 transition-transform flex items-center justify-center shadow-sm">
                         <i class="fa-solid fa-forward-step"></i>
                     </button>
-                    
                     <button id="btn-record" class="w-20 h-20 rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-3xl shadow-xl flex items-center justify-center active:scale-95 transition-all">
                         <i class="fa-solid fa-microphone"></i>
                     </button>
                 </div>
             </div>
         </div>
-
     </main>
 
     <!-- BOTTOM NAV -->
     <nav class="fixed bottom-0 left-0 w-full bg-white/90 dark:bg-[#1C1C1E]/90 backdrop-blur-xl z-50 border-t border-gray-200/60 dark:border-white/10 pb-[env(safe-area-inset-bottom)] hidden" id="app-nav">
-        <div class="flex justify-around items-center h-[80px] px-2">
+        <div class="flex justify-around items-center h-[80px] px-2 max-w-md mx-auto">
             <button onclick="switchTab('learn')" id="nav-learn" class="nav-btn active flex flex-col items-center justify-center w-24 text-gray-400 transition-colors py-2 rounded-xl">
                 <i class="fa-solid fa-book-open text-[22px] mb-1.5 transition-transform"></i>
                 <span class="text-[11px] font-semibold tracking-wide">Học Từ</span>
@@ -247,39 +216,136 @@
     </style>
 
     <script>
-        // --- DATA ---
+        // --- 100 VOCABULARY DATABASE ---
         const vocabData = {
             "Productivity": {
-                name: "Công Việc", icon: "fa-briefcase",
+                name: "Công Việc & Lịch", icon: "fa-briefcase",
                 words: [
-                    { word: "Set", phonetic: "/set/", type: "Động từ", meaning: "Cài đặt, thiết lập", example: "Hey Siri, set an alarm for 7 AM.", trans: "Siri, đặt báo thức lúc 7 giờ sáng." },
-                    { word: "Remind", phonetic: "/rɪˈmaɪnd/", type: "Động từ", meaning: "Nhắc nhở", example: "Hey Siri, remind me to call John at 5.", trans: "Siri, nhắc tôi gọi John lúc 5 giờ chiều." },
-                    { word: "Schedule", phonetic: "/ˈskedʒ.uːl/", type: "Danh từ", meaning: "Lịch trình", example: "Hey Siri, what's on my schedule today?", trans: "Lịch trình hôm nay của tôi có gì?" },
-                    { word: "Timer", phonetic: "/ˈtaɪ.mɚ/", type: "Danh từ", meaning: "Đồng hồ hẹn giờ", example: "Hey Siri, set a timer for 15 minutes.", trans: "Siri, hẹn giờ 15 phút." }
+                    { word: "Set", phonetic: "/set/", type: "Động từ", meaning: "Cài đặt, thiết lập", example: "Hey Siri, set an alarm for 6 AM.", trans: "Siri, đặt báo thức lúc 6 giờ sáng." },
+                    { word: "Remind", phonetic: "/rɪˈmaɪnd/", type: "Động từ", meaning: "Nhắc nhở", example: "Hey Siri, remind me to call John at 5 PM.", trans: "Siri, nhắc tôi gọi cho John lúc 5 giờ chiều." },
+                    { word: "Schedule", phonetic: "/ˈskedʒ.uːl/", type: "Động từ", meaning: "Lên lịch trình", example: "Hey Siri, schedule a meeting for tomorrow.", trans: "Siri, lên lịch một cuộc họp vào ngày mai." },
+                    { word: "Timer", phonetic: "/ˈtaɪ.mɚ/", type: "Danh từ", meaning: "Hẹn giờ", example: "Hey Siri, set a timer for 10 minutes.", trans: "Siri, hẹn giờ 10 phút." },
+                    { word: "Meeting", phonetic: "/ˈmiː.t̬ɪŋ/", type: "Danh từ", meaning: "Cuộc họp", example: "Hey Siri, what time is my next meeting?", trans: "Siri, cuộc họp tiếp theo của tôi lúc mấy giờ?" },
+                    { word: "Note", phonetic: "/noʊt/", type: "Danh từ", meaning: "Ghi chú", example: "Hey Siri, create a new note.", trans: "Siri, tạo một ghi chú mới." },
+                    { word: "Email", phonetic: "/ˈiː.meɪl/", type: "Danh/Động từ", meaning: "Thư điện tử", example: "Hey Siri, send an email to my boss.", trans: "Siri, gửi email cho sếp của tôi." },
+                    { word: "Alarm", phonetic: "/əˈlɑːrm/", type: "Danh từ", meaning: "Báo thức", example: "Hey Siri, turn off all my alarms.", trans: "Siri, tắt tất cả báo thức của tôi." },
+                    { word: "Delete", phonetic: "/dɪˈliːt/", type: "Động từ", meaning: "Xóa", example: "Hey Siri, delete my 7 AM alarm.", trans: "Siri, xóa báo thức 7 giờ sáng của tôi." },
+                    { word: "Update", phonetic: "/ʌpˈdeɪt/", type: "Động từ", meaning: "Cập nhật", example: "Hey Siri, update my schedule.", trans: "Siri, cập nhật lịch trình của tôi." },
+                    { word: "Event", phonetic: "/ɪˈvent/", type: "Danh từ", meaning: "Sự kiện", example: "Hey Siri, add an event to my calendar.", trans: "Siri, thêm một sự kiện vào lịch của tôi." },
+                    { word: "List", phonetic: "/lɪst/", type: "Danh từ", meaning: "Danh sách", example: "Hey Siri, add milk to my shopping list.", trans: "Siri, thêm sữa vào danh sách mua sắm." },
+                    { word: "Add", phonetic: "/æd/", type: "Động từ", meaning: "Thêm vào", example: "Hey Siri, add a task.", trans: "Siri, thêm một nhiệm vụ." },
+                    { word: "Cancel", phonetic: "/ˈkæn.səl/", type: "Động từ", meaning: "Hủy bỏ", example: "Hey Siri, cancel my afternoon meeting.", trans: "Siri, hủy cuộc họp buổi chiều của tôi." },
+                    { word: "Read", phonetic: "/riːd/", type: "Động từ", meaning: "Đọc", example: "Hey Siri, read my latest emails.", trans: "Siri, đọc các email mới nhất của tôi." },
+                    { word: "Share", phonetic: "/ʃer/", type: "Động từ", meaning: "Chia sẻ", example: "Hey Siri, share this note with Anna.", trans: "Siri, chia sẻ ghi chú này với Anna." },
+                    { word: "Postpone", phonetic: "/poʊstˈpoʊn/", type: "Động từ", meaning: "Trì hoãn", example: "Hey Siri, postpone my alarm by 10 minutes.", trans: "Siri, hoãn báo thức của tôi thêm 10 phút." }
+                ]
+            },
+            "Communication": {
+                name: "Liên Lạc", icon: "fa-comment-dots",
+                words: [
+                    { word: "Call", phonetic: "/kɑːl/", type: "Động từ", meaning: "Gọi điện", example: "Hey Siri, call Mom.", trans: "Siri, gọi cho mẹ." },
+                    { word: "Message", phonetic: "/ˈmes.ɪdʒ/", type: "Danh/Động từ", meaning: "Tin nhắn", example: "Hey Siri, read my new messages.", trans: "Siri, đọc các tin nhắn mới của tôi." },
+                    { word: "Text", phonetic: "/tekst/", type: "Động từ", meaning: "Nhắn tin", example: "Hey Siri, text David 'I am late'.", trans: "Siri, nhắn tin cho David 'Tôi đến trễ'." },
+                    { word: "FaceTime", phonetic: "/ˈfeɪs.taɪm/", type: "Động từ", meaning: "Gọi video", example: "Hey Siri, FaceTime Sarah.", trans: "Siri, gọi FaceTime cho Sarah." },
+                    { word: "Reply", phonetic: "/rɪˈplaɪ/", type: "Động từ", meaning: "Trả lời", example: "Hey Siri, reply 'Okay, see you soon'.", trans: "Siri, trả lời 'Được, gặp bạn sau'." },
+                    { word: "Send", phonetic: "/send/", type: "Động từ", meaning: "Gửi", example: "Hey Siri, send it.", trans: "Siri, gửi đi." },
+                    { word: "Contact", phonetic: "/ˈkɑːn.tækt/", type: "Danh từ", meaning: "Danh bạ", example: "Hey Siri, find John's contact info.", trans: "Siri, tìm thông tin liên lạc của John." },
+                    { word: "Announce", phonetic: "/əˈnaʊns/", type: "Động từ", meaning: "Thông báo", example: "Hey Siri, announce messages.", trans: "Siri, bật thông báo tin nhắn." },
+                    { word: "Voicemail", phonetic: "/ˈvɔɪs.meɪl/", type: "Danh từ", meaning: "Thư thoại", example: "Hey Siri, play my voicemail.", trans: "Siri, mở thư thoại của tôi." },
+                    { word: "Answer", phonetic: "/ˈæn.sɚ/", type: "Động từ", meaning: "Trả lời cuộc gọi", example: "Hey Siri, answer the call.", trans: "Siri, nhận cuộc gọi." },
+                    { word: "Decline", phonetic: "/dɪˈklaɪn/", type: "Động từ", meaning: "Từ chối", example: "Hey Siri, decline the call.", trans: "Siri, từ chối cuộc gọi." },
+                    { word: "Dictate", phonetic: "/dɪkˈteɪt/", type: "Động từ", meaning: "Đọc chính tả", example: "Hey Siri, dictate a message.", trans: "Siri, soạn tin nhắn bằng giọng nói." },
+                    { word: "Location", phonetic: "/loʊˈkeɪ.ʃən/", type: "Danh từ", meaning: "Vị trí", example: "Hey Siri, share my location with Peter.", trans: "Siri, chia sẻ vị trí của tôi cho Peter." },
+                    { word: "Find", phonetic: "/faɪnd/", type: "Động từ", meaning: "Tìm kiếm", example: "Hey Siri, find my iPhone.", trans: "Siri, tìm iPhone của tôi." },
+                    { word: "Speaker", phonetic: "/ˈspiː.kɚ/", type: "Danh từ", meaning: "Loa ngoài", example: "Hey Siri, call Dad on speaker.", trans: "Siri, gọi cho bố bằng loa ngoài." },
+                    { word: "Check", phonetic: "/tʃek/", type: "Động từ", meaning: "Kiểm tra", example: "Hey Siri, check my missed calls.", trans: "Siri, kiểm tra cuộc gọi nhỡ." }
                 ]
             },
             "SmartHome": {
                 name: "Smart Home", icon: "fa-house-signal",
                 words: [
-                    { word: "Turn on/off", phonetic: "/tɝːn ɑːn/ɑːf/", type: "Cụm động từ", meaning: "Bật / Tắt (thiết bị)", example: "Hey Siri, turn off the living room lights.", trans: "Siri, tắt đèn phòng khách." },
-                    { word: "Dim", phonetic: "/dɪm/", type: "Động từ", meaning: "Làm mờ, giảm độ sáng", example: "Hey Siri, dim the lights to 50%.", trans: "Siri, giảm độ sáng đèn xuống 50%." },
-                    { word: "Lock", phonetic: "/lɑːk/", type: "Động từ", meaning: "Khóa", example: "Hey Siri, lock the front door.", trans: "Siri, khóa cửa chính lại." }
+                    { word: "Turn on", phonetic: "/tɝːn ɑːn/", type: "Cụm động từ", meaning: "Bật", example: "Hey Siri, turn on the lights.", trans: "Siri, bật đèn lên." },
+                    { word: "Turn off", phonetic: "/tɝːn ɑːf/", type: "Cụm động từ", meaning: "Tắt", example: "Hey Siri, turn off the TV.", trans: "Siri, tắt TV." },
+                    { word: "Dim", phonetic: "/dɪm/", type: "Động từ", meaning: "Làm mờ, giảm sáng", example: "Hey Siri, dim the lights to 50%.", trans: "Siri, giảm sáng đèn xuống 50%." },
+                    { word: "Lock", phonetic: "/lɑːk/", type: "Động từ", meaning: "Khóa", example: "Hey Siri, lock the front door.", trans: "Siri, khóa cửa chính." },
+                    { word: "Unlock", phonetic: "/ʌnˈlɑːk/", type: "Động từ", meaning: "Mở khóa", example: "Hey Siri, unlock the back door.", trans: "Siri, mở khóa cửa sau." },
+                    { word: "Temperature", phonetic: "/ˈtem.pɚ.ə.tʃɚ/", type: "Danh từ", meaning: "Nhiệt độ", example: "Hey Siri, set the temperature to 24.", trans: "Siri, đặt nhiệt độ ở mức 24." },
+                    { word: "Camera", phonetic: "/ˈkæm.rə/", type: "Danh từ", meaning: "Máy quay", example: "Hey Siri, show me the front door camera.", trans: "Siri, cho xem camera cửa trước." },
+                    { word: "Fan", phonetic: "/fæn/", type: "Danh từ", meaning: "Cái quạt", example: "Hey Siri, turn on the bedroom fan.", trans: "Siri, bật quạt phòng ngủ." },
+                    { word: "Blinds", phonetic: "/blaɪndz/", type: "Danh từ", meaning: "Rèm cửa", example: "Hey Siri, close the blinds.", trans: "Siri, đóng rèm cửa." },
+                    { word: "Air conditioner", phonetic: "/ˈer kənˌdɪʃ.ən.ɚ/", type: "Danh từ", meaning: "Máy lạnh", example: "Hey Siri, turn on the air conditioner.", trans: "Siri, bật máy lạnh." },
+                    { word: "Vacuum", phonetic: "/ˈvæk.juːm/", type: "Danh/Động từ", meaning: "Máy hút bụi", example: "Hey Siri, start the vacuum.", trans: "Siri, khởi động máy hút bụi." },
+                    { word: "TV", phonetic: "/ˌtiːˈviː/", type: "Danh từ", meaning: "Ti vi", example: "Hey Siri, turn off the living room TV.", trans: "Siri, tắt TV phòng khách." },
+                    { word: "Garage", phonetic: "/ɡəˈrɑːʒ/", type: "Danh từ", meaning: "Ga ra", example: "Hey Siri, open the garage door.", trans: "Siri, mở cửa ga ra." },
+                    { word: "Color", phonetic: "/ˈkʌl.ɚ/", type: "Danh từ", meaning: "Màu sắc", example: "Hey Siri, change the light color to blue.", trans: "Siri, đổi màu đèn sang màu xanh." },
+                    { word: "Brightness", phonetic: "/ˈbraɪt.nəs/", type: "Danh từ", meaning: "Độ sáng", example: "Hey Siri, increase the brightness.", trans: "Siri, tăng độ sáng lên." },
+                    { word: "Thermostat", phonetic: "/ˈθɝː.mə.stæt/", type: "Danh từ", meaning: "Máy điều nhiệt", example: "Hey Siri, adjust the thermostat.", trans: "Siri, điều chỉnh máy điều nhiệt." }
                 ]
             },
             "Media": {
                 name: "Giải Trí", icon: "fa-music",
                 words: [
-                    { word: "Play", phonetic: "/pleɪ/", type: "Động từ", meaning: "Phát (nhạc/video)", example: "Hey Siri, play some pop music.", trans: "Siri, phát một chút nhạc pop." },
-                    { word: "Volume", phonetic: "/ˈvɑːl.juːm/", type: "Danh từ", meaning: "Âm lượng", example: "Hey Siri, turn the volume up.", trans: "Siri, tăng âm lượng lên." },
-                    { word: "Skip", phonetic: "/skɪp/", type: "Động từ", meaning: "Bỏ qua", example: "Hey Siri, skip this song.", trans: "Siri, bỏ qua bài hát này." }
+                    { word: "Play", phonetic: "/pleɪ/", type: "Động từ", meaning: "Phát (nhạc, phim)", example: "Hey Siri, play some relaxing music.", trans: "Siri, phát một chút nhạc thư giãn." },
+                    { word: "Volume", phonetic: "/ˈvɑːl.juːm/", type: "Danh từ", meaning: "Âm lượng", example: "Hey Siri, turn the volume up to 80%.", trans: "Siri, tăng âm lượng lên 80%." },
+                    { word: "Skip", phonetic: "/skɪp/", type: "Động từ", meaning: "Bỏ qua", example: "Hey Siri, skip this song.", trans: "Siri, bỏ qua bài hát này." },
+                    { word: "Pause", phonetic: "/pɑːz/", type: "Động từ", meaning: "Tạm dừng", example: "Hey Siri, pause the music.", trans: "Siri, tạm dừng nhạc." },
+                    { word: "Shuffle", phonetic: "/ˈʃʌf.əl/", type: "Động từ", meaning: "Phát ngẫu nhiên", example: "Hey Siri, shuffle my playlist.", trans: "Siri, phát ngẫu nhiên danh sách nhạc của tôi." },
+                    { word: "Podcast", phonetic: "/ˈpɑːd.kæst/", type: "Danh từ", meaning: "Tệp âm thanh", example: "Hey Siri, play the latest podcast.", trans: "Siri, phát bản podcast mới nhất." },
+                    { word: "Repeat", phonetic: "/rɪˈpiːt/", type: "Động từ", meaning: "Lặp lại", example: "Hey Siri, repeat this track.", trans: "Siri, lặp lại bài này." },
+                    { word: "Rewind", phonetic: "/ˌriːˈwaɪnd/", type: "Động từ", meaning: "Tua lại", example: "Hey Siri, rewind 15 seconds.", trans: "Siri, tua lại 15 giây." },
+                    { word: "Fast-forward", phonetic: "/ˌfæstˈfɔːr.wɚd/", type: "Động từ", meaning: "Tua đi", example: "Hey Siri, fast-forward 1 minute.", trans: "Siri, tua đi 1 phút." },
+                    { word: "Stop", phonetic: "/stɑːp/", type: "Động từ", meaning: "Dừng lại", example: "Hey Siri, stop playing.", trans: "Siri, dừng phát nhạc." },
+                    { word: "Next", phonetic: "/nekst/", type: "Tính từ/Trạng từ", meaning: "Kế tiếp", example: "Hey Siri, play the next song.", trans: "Siri, mở bài tiếp theo." },
+                    { word: "Previous", phonetic: "/ˈpriː.vi.əs/", type: "Tính từ", meaning: "Trước đó", example: "Hey Siri, play the previous track.", trans: "Siri, mở bài trước đó." },
+                    { word: "Resume", phonetic: "/rɪˈzuːm/", type: "Động từ", meaning: "Tiếp tục", example: "Hey Siri, resume the movie.", trans: "Siri, tiếp tục phát phim." },
+                    { word: "Radio", phonetic: "/ˈreɪ.di.oʊ/", type: "Danh từ", meaning: "Đài phát thanh", example: "Hey Siri, play a jazz radio station.", trans: "Siri, mở đài phát nhạc Jazz." },
+                    { word: "Song", phonetic: "/sɑːŋ/", type: "Danh từ", meaning: "Bài hát", example: "Hey Siri, what song is this?", trans: "Siri, đây là bài hát gì?" },
+                    { word: "Artist", phonetic: "/ˈɑːr.t̬ɪst/", type: "Danh từ", meaning: "Nghệ sĩ", example: "Hey Siri, play songs by Taylor Swift.", trans: "Siri, mở các bài hát của Taylor Swift." },
+                    { word: "Playlist", phonetic: "/ˈpleɪ.lɪst/", type: "Danh từ", meaning: "Danh sách phát", example: "Hey Siri, play my workout playlist.", trans: "Siri, mở danh sách nhạc tập thể dục." }
                 ]
             },
-            "Basic": {
-                name: "Giao Tiếp", icon: "fa-compass",
+            "Utilities": {
+                name: "Tiện Ích", icon: "fa-screwdriver-wrench",
                 words: [
-                    { word: "Weather", phonetic: "/ˈweð.ɚ/", type: "Danh từ", meaning: "Thời tiết", example: "Hey Siri, what's the weather like today?", trans: "Thời tiết hôm nay thế nào?" },
-                    { word: "Translate", phonetic: "/trænsˈleɪt/", type: "Động từ", meaning: "Dịch thuật", example: "Hey Siri, translate 'Hello' to French.", trans: "Dịch từ 'Hello' sang tiếng Pháp." },
-                    { word: "Call", phonetic: "/kɑːl/", type: "Động từ", meaning: "Gọi điện", example: "Hey Siri, call Mom on speaker.", trans: "Siri, gọi cho mẹ bằng loa ngoài." }
+                    { word: "Weather", phonetic: "/ˈweð.ɚ/", type: "Danh từ", meaning: "Thời tiết", example: "Hey Siri, what's the weather like?", trans: "Siri, thời tiết thế nào?" },
+                    { word: "Navigate", phonetic: "/ˈnæv.ə.ɡeɪt/", type: "Động từ", meaning: "Điều hướng", example: "Hey Siri, navigate to the airport.", trans: "Siri, chỉ đường tới sân bay." },
+                    { word: "Battery", phonetic: "/ˈbæt̬.ɚ.i/", type: "Danh từ", meaning: "Pin", example: "Hey Siri, what is my battery level?", trans: "Siri, pin của tôi còn bao nhiêu?" },
+                    { word: "Flashlight", phonetic: "/ˈflæʃ.laɪt/", type: "Danh từ", meaning: "Đèn pin", example: "Hey Siri, turn on the flashlight.", trans: "Siri, bật đèn pin." },
+                    { word: "Calculate", phonetic: "/ˈkæl.kjə.leɪt/", type: "Động từ", meaning: "Tính toán", example: "Hey Siri, calculate 15 percent of 200.", trans: "Siri, tính 15 phần trăm của 200." },
+                    { word: "Convert", phonetic: "/kənˈvɝːt/", type: "Động từ", meaning: "Chuyển đổi", example: "Hey Siri, convert 10 miles to kilometers.", trans: "Siri, đổi 10 dặm sang ki-lô-mét." },
+                    { word: "Wi-Fi", phonetic: "/ˈwaɪ.faɪ/", type: "Danh từ", meaning: "Mạng không dây", example: "Hey Siri, turn off Wi-Fi.", trans: "Siri, tắt Wi-Fi." },
+                    { word: "Bluetooth", phonetic: "/ˈbluː.tuːθ/", type: "Danh từ", meaning: "Bluetooth", example: "Hey Siri, turn on Bluetooth.", trans: "Siri, bật Bluetooth." },
+                    { word: "Airplane mode", phonetic: "/ˈer.pleɪn ˌmoʊd/", type: "Danh từ", meaning: "Chế độ máy bay", example: "Hey Siri, turn on airplane mode.", trans: "Siri, bật chế độ máy bay." },
+                    { word: "Take", phonetic: "/teɪk/", type: "Động từ", meaning: "Chụp/Lấy", example: "Hey Siri, take a picture.", trans: "Siri, chụp một bức ảnh." },
+                    { word: "Open", phonetic: "/ˈoʊ.pən/", type: "Động từ", meaning: "Mở", example: "Hey Siri, open the Settings app.", trans: "Siri, mở ứng dụng Cài đặt." },
+                    { word: "Close", phonetic: "/kloʊz/", type: "Động từ", meaning: "Đóng", example: "Hey Siri, close the app.", trans: "Siri, đóng ứng dụng." },
+                    { word: "Sleep", phonetic: "/sliːp/", type: "Động từ", meaning: "Ngủ", example: "Hey Siri, put my Mac to sleep.", trans: "Siri, đưa Mac của tôi vào chế độ ngủ." },
+                    { word: "Restart", phonetic: "/ˌriːˈstɑːrt/", type: "Động từ", meaning: "Khởi động lại", example: "Hey Siri, restart my phone.", trans: "Siri, khởi động lại điện thoại của tôi." },
+                    { word: "Directions", phonetic: "/dɪˈrek.ʃənz/", type: "Danh từ", meaning: "Chỉ đường", example: "Hey Siri, get directions home.", trans: "Siri, lấy chỉ đường về nhà." },
+                    { word: "Distance", phonetic: "/ˈdɪs.təns/", type: "Danh từ", meaning: "Khoảng cách", example: "Hey Siri, what's the distance to Paris?", trans: "Siri, khoảng cách đến Paris là bao xa?" },
+                    { word: "Traffic", phonetic: "/ˈtræf.ɪk/", type: "Danh từ", meaning: "Giao thông", example: "Hey Siri, how is the traffic?", trans: "Siri, tình hình giao thông thế nào?" }
+                ]
+            },
+            "Information": {
+                name: "Tra Cứu", icon: "fa-magnifying-glass",
+                words: [
+                    { word: "Translate", phonetic: "/trænsˈleɪt/", type: "Động từ", meaning: "Dịch", example: "Hey Siri, translate 'Thank you' to Spanish.", trans: "Siri, dịch từ 'Cảm ơn' sang tiếng Tây Ban Nha." },
+                    { word: "Define", phonetic: "/dɪˈfaɪn/", type: "Động từ", meaning: "Định nghĩa", example: "Hey Siri, define 'empathy'.", trans: "Siri, định nghĩa từ 'empathy'." },
+                    { word: "Spell", phonetic: "/spel/", type: "Động từ", meaning: "Đánh vần", example: "Hey Siri, how do you spell 'beautiful'?", trans: "Siri, bạn đánh vần từ 'beautiful' như thế nào?" },
+                    { word: "Time", phonetic: "/taɪm/", type: "Danh từ", meaning: "Thời gian", example: "Hey Siri, what time is it in Tokyo?", trans: "Siri, ở Tokyo bây giờ là mấy giờ?" },
+                    { word: "Date", phonetic: "/deɪt/", type: "Danh từ", meaning: "Ngày tháng", example: "Hey Siri, what's the date today?", trans: "Siri, hôm nay là ngày mấy?" },
+                    { word: "Sunrise", phonetic: "/ˈsʌn.raɪz/", type: "Danh từ", meaning: "Bình minh", example: "Hey Siri, when is sunrise tomorrow?", trans: "Siri, ngày mai bình minh lúc mấy giờ?" },
+                    { word: "Sunset", phonetic: "/ˈsʌn.set/", type: "Danh từ", meaning: "Hoàng hôn", example: "Hey Siri, when is sunset?", trans: "Siri, hoàng hôn lúc mấy giờ?" },
+                    { word: "Stock", phonetic: "/stɑːk/", type: "Danh từ", meaning: "Cổ phiếu", example: "Hey Siri, how is the Apple stock doing?", trans: "Siri, cổ phiếu Apple đang thế nào?" },
+                    { word: "News", phonetic: "/nuːz/", type: "Danh từ", meaning: "Tin tức", example: "Hey Siri, what's the latest news?", trans: "Siri, có tin tức gì mới không?" },
+                    { word: "Score", phonetic: "/skɔːr/", type: "Danh từ", meaning: "Tỉ số", example: "Hey Siri, what was the score of the game?", trans: "Siri, tỉ số trận đấu là bao nhiêu?" },
+                    { word: "Recipe", phonetic: "/ˈres.ə.pi/", type: "Danh từ", meaning: "Công thức", example: "Hey Siri, find a recipe for pancakes.", trans: "Siri, tìm công thức làm bánh kẹp." },
+                    { word: "Fact", phonetic: "/fækt/", type: "Danh từ", meaning: "Sự thật", example: "Hey Siri, tell me an interesting fact.", trans: "Siri, kể cho tôi một sự thật thú vị." },
+                    { word: "Capital", phonetic: "/ˈkæp.ə.t̬əl/", type: "Danh từ", meaning: "Thủ đô", example: "Hey Siri, what is the capital of Japan?", trans: "Siri, thủ đô của Nhật Bản là gì?" },
+                    { word: "Height", phonetic: "/haɪt/", type: "Danh từ", meaning: "Chiều cao", example: "Hey Siri, what is the height of Mount Everest?", trans: "Siri, đỉnh Everest cao bao nhiêu?" },
+                    { word: "Age", phonetic: "/eɪdʒ/", type: "Danh từ", meaning: "Tuổi", example: "Hey Siri, what is the age of the Earth?", trans: "Siri, Trái Đất bao nhiêu tuổi?" },
+                    { word: "Population", phonetic: "/ˌpɑː.pjəˈleɪ.ʃən/", type: "Danh từ", meaning: "Dân số", example: "Hey Siri, what is the population of Vietnam?", trans: "Siri, dân số Việt Nam là bao nhiêu?" },
+                    { word: "History", phonetic: "/ˈhɪs.t̬ɚ.i/", type: "Danh từ", meaning: "Lịch sử", example: "Hey Siri, tell me about the history of Rome.", trans: "Siri, kể cho tôi nghe về lịch sử thành Rome." }
                 ]
             }
         };
@@ -290,7 +356,7 @@
         let synth = window.speechSynthesis;
         let iosAudioUnlocked = false;
 
-        // --- HỆ THỐNG AUDIO ---
+        // --- INIT AUDIO & START ---
         function startApp() {
             if (synth && !iosAudioUnlocked) {
                 let utterance = new SpeechSynthesisUtterance('');
@@ -320,7 +386,7 @@
             setTimeout(() => {
                 let utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'en-US';
-                utterance.rate = 0.85; // Đọc chậm chuẩn Mỹ
+                utterance.rate = 0.85; 
                 
                 let voices = synth.getVoices();
                 let voice = voices.find(v => v.lang.includes('en-US') && (v.name.includes('Siri') || v.name.includes('Samantha')));
@@ -335,7 +401,7 @@
             synth.onvoiceschanged = () => synth.getVoices();
         }
 
-        // --- RENDER GIAO DIỆN ---
+        // --- RENDER & NAVIGATION ---
         function renderCategories() {
             const container = document.getElementById('category-container');
             container.innerHTML = '';
@@ -353,7 +419,7 @@
                 btn.innerHTML = `<i class="fa-solid ${cat.icon} mr-1.5"></i>${cat.name}`;
                 btn.onclick = () => { 
                     currentCategory = key; 
-                    currentIndex = 0; // Luôn Reset index về 0 khi đổi chủ đề
+                    currentIndex = 0; 
                     renderCategories(); 
                     switchTab(document.querySelector('.nav-btn.active').id.replace('nav-',''), true); 
                 };
@@ -369,30 +435,28 @@
             tabs.forEach(t => {
                 const el = document.getElementById(`tab-${t}`);
                 if (t === tabId) {
-                    el.classList.remove('hidden');
-                    el.classList.remove('fade-in');
-                    void el.offsetWidth;
-                    el.classList.add('fade-in');
+                    el.classList.add('active');
                 } else {
-                    el.classList.add('hidden');
+                    el.classList.remove('active');
                 }
             });
 
             if (tabId === 'learn' || forceUpdate) updateCard();
             if (tabId === 'quiz') startQuiz();
             if (tabId === 'voice') loadVoiceTarget();
+            
+            document.getElementById('app-main').scrollTop = 0;
         }
 
-        // --- TAB 1: THUẬT TOÁN CHUYỂN THẺ ---
+        // --- TAB 1: THẺ TỪ ---
         function updateCard(animationClass = '') {
             const list = vocabData[currentCategory].words;
             const vocab = list[currentIndex];
             
-            // Xóa class animation cũ và thêm mới
             const card = document.getElementById('flashcard');
             card.classList.remove('slide-left', 'slide-right');
             if (animationClass) {
-                void card.offsetWidth; // Force reflow
+                void card.offsetWidth; 
                 card.classList.add(animationClass);
             }
 
@@ -402,25 +466,20 @@
             document.getElementById('fc-meaning').textContent = vocab.meaning;
             document.getElementById('fc-example').textContent = `"${vocab.example}"`;
             document.getElementById('fc-trans').textContent = vocab.trans;
-            document.getElementById('progress-badge').textContent = `${currentIndex + 1}/${list.length}`;
+            
+            // Tính tổng số từ
+            let totalWords = 0;
+            Object.values(vocabData).forEach(cat => totalWords += cat.words.length);
+            document.getElementById('progress-badge').textContent = `${currentIndex + 1}/${list.length} (Tổng ${totalWords})`;
         }
 
         function changeCard(dir) {
             const list = vocabData[currentCategory].words;
-            
-            // Thuật toán Vòng Lặp Trơn Tru
             currentIndex += dir;
             
-            // Nếu bấm "Trở lại" ở thẻ đầu -> quay về thẻ cuối
-            if (currentIndex < 0) {
-                currentIndex = list.length - 1;
-            }
-            // Nếu bấm "Tiếp" ở thẻ cuối -> quay về thẻ đầu
-            else if (currentIndex >= list.length) {
-                currentIndex = 0;
-            }
+            if (currentIndex < 0) currentIndex = list.length - 1;
+            else if (currentIndex >= list.length) currentIndex = 0;
             
-            // Cập nhật với hiệu ứng trượt tương ứng
             const anim = dir > 0 ? 'slide-left' : 'slide-right';
             updateCard(anim);
         }
@@ -452,6 +511,7 @@
                 btn.onclick = () => handleQuizAnswer(btn, opt === currentQuizAnswer, options);
                 container.appendChild(btn);
             });
+            document.getElementById('app-main').scrollTop = 0;
         }
 
         function handleQuizAnswer(btn, isCorrect) {
@@ -465,19 +525,20 @@
             } else {
                 btn.className = "w-full p-4 rounded-2xl border-2 border-apple-red bg-red-50 dark:bg-red-900/30 text-left font-bold text-apple-red shadow-sm";
                 btn.innerHTML += '<i class="fa-solid fa-circle-xmark float-right text-xl"></i>';
-                
                 allBtns.forEach(b => {
-                    if(b.textContent.includes(currentQuizAnswer.example)) {
-                        b.classList.add('border-apple-green');
-                    }
+                    if(b.textContent.includes(currentQuizAnswer.example)) b.classList.add('border-apple-green');
                 });
             }
             
             document.getElementById('quiz-score').textContent = `Điểm: ${quizScore}`;
             document.getElementById('btn-next-quiz').classList.remove('hidden');
+            
+            setTimeout(() => {
+                document.getElementById('app-main').scrollTo({ top: document.getElementById('app-main').scrollHeight, behavior: 'smooth' });
+            }, 100);
         }
 
-        // --- TAB 3: NHẬN DIỆN GIỌNG NÓI ---
+        // --- TAB 3: AI VOICE ---
         let recognition = null;
         let isRecording = false;
 
@@ -489,7 +550,7 @@
             document.getElementById('voice-target-trans').textContent = vocab.trans; 
             
             const resArea = document.getElementById('voice-result-area');
-            resArea.className = "w-full min-h-[70px] flex items-center justify-center mb-6 p-4 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#2C2C2E]";
+            resArea.className = "w-full min-h-[70px] flex items-center justify-center mb-4 p-4 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-[#2C2C2E]";
             resArea.innerHTML = '<p class="text-gray-400 text-sm font-medium"><i class="fa-solid fa-microphone mr-1"></i> Bấm micro và nói</p>';
         }
 
@@ -517,7 +578,7 @@
                 
                 recognition.onerror = (e) => {
                     let msg = "Không nghe rõ, thử lại nhé.";
-                    if(e.error === 'not-allowed') msg = "Vui lòng cấp quyền Micro cho trình duyệt.";
+                    if(e.error === 'not-allowed') msg = "Vui lòng cấp quyền Micro.";
                     document.getElementById('voice-result-area').innerHTML = `<p class="text-apple-red text-sm font-bold">${msg}</p>`;
                 };
 
@@ -540,10 +601,10 @@
             let html = `<div class="w-full text-center"><p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Bạn vừa đọc:</p><p class="text-base font-bold text-gray-900 dark:text-white mb-2">"${spokenText}"</p>`;
             
             if (userText === targetText || userText.includes(targetText) || targetText.includes(userText)) {
-                resArea.className = "w-full min-h-[70px] flex items-center justify-center mb-6 p-4 rounded-xl border border-apple-green bg-green-50 dark:bg-green-900/20";
+                resArea.className = "w-full min-h-[70px] flex items-center justify-center mb-4 p-4 rounded-xl border border-apple-green bg-green-50 dark:bg-green-900/20";
                 html += `<div class="bg-apple-green text-white text-[11px] font-bold px-3 py-1.5 rounded-full inline-block"><i class="fa-solid fa-check mr-1"></i> Phát âm chuẩn</div></div>`;
             } else {
-                resArea.className = "w-full min-h-[70px] flex items-center justify-center mb-6 p-4 rounded-xl border border-apple-red bg-red-50 dark:bg-red-900/20";
+                resArea.className = "w-full min-h-[70px] flex items-center justify-center mb-4 p-4 rounded-xl border border-apple-red bg-red-50 dark:bg-red-900/20";
                 html += `<div class="bg-apple-red text-white text-[11px] font-bold px-3 py-1.5 rounded-full inline-block"><i class="fa-solid fa-xmark mr-1"></i> Chưa khớp, thử lại</div></div>`;
             }
             resArea.innerHTML = html;
