@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Siri Vocab Pro 7.0 - 100 Commands</title>
+    <title>Siri Vocab Pro 8.0 - Audio Fixed</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -83,10 +83,10 @@
         <div class="w-24 h-24 bg-apple-blue text-white rounded-[2rem] flex items-center justify-center text-5xl mb-6 shadow-2xl shadow-blue-500/30">
             <i class="fa-brands fa-apple"></i>
         </div>
-        <h1 class="text-3xl font-extrabold mb-2 apple-text tracking-tight">Siri Vocab 7.0</h1>
-        <p class="text-gray-500 dark:text-gray-400 mb-10 max-w-xs text-sm">Kho dữ liệu khổng lồ: Tròn 100 Câu lệnh. Chạm để cấp quyền âm thanh cho iOS.</p>
+        <h1 class="text-3xl font-extrabold mb-2 apple-text tracking-tight">Siri Vocab 8.0</h1>
+        <p class="text-gray-500 dark:text-gray-400 mb-10 max-w-xs text-sm">Đã sửa lỗi âm thanh triệt để. Chạm nút dưới để kích hoạt loa.</p>
         <button onclick="startApp()" class="w-full max-w-xs bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold text-lg py-4 rounded-2xl active:scale-95 transition-transform shadow-xl">
-            Bắt Đầu Khám Phá
+            Bắt Đầu Học 
         </button>
     </div>
 
@@ -98,7 +98,6 @@
             </h1>
             <span id="progress-badge" class="bg-blue-50 dark:bg-blue-900/30 text-apple-blue border border-blue-100 dark:border-blue-800 text-sm font-bold px-3 py-1 rounded-full">1/100</span>
         </div>
-        <!-- Thanh chọn chủ đề cuộn ngang -->
         <div class="flex space-x-3 overflow-x-auto hide-scroll pb-2" id="category-container"></div>
     </header>
 
@@ -116,14 +115,14 @@
                     <p id="fc-phonetic" class="text-base text-gray-500 dark:text-gray-400 font-medium mb-3">/phonetic/</p>
                     <h3 id="fc-meaning" class="text-xl sm:text-2xl font-bold text-apple-blue mb-4">Ý nghĩa tiếng Việt</h3>
                     
-                    <button onclick="playAudio(event, document.getElementById('fc-word').textContent)" class="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/30 text-apple-blue text-lg flex items-center justify-center active:scale-90 transition-transform">
+                    <button onclick="playElementAudio(event, 'fc-word')" class="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/30 text-apple-blue text-lg flex items-center justify-center active:scale-90 transition-transform">
                         <i class="fa-solid fa-volume-high"></i>
                     </button>
                 </div>
                 <div class="bg-sub-card rounded-2xl p-4 shrink-0 border border-gray-100 dark:border-gray-700 w-full mt-2">
                     <div class="flex justify-between items-start mb-1">
                         <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-1">Câu nói với Siri</span>
-                        <button onclick="playAudio(event, document.getElementById('fc-example').textContent)" class="text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-700 w-7 h-7 rounded-full flex items-center justify-center active:scale-90 transition-transform">
+                        <button onclick="playElementAudio(event, 'fc-example')" class="text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-700 w-7 h-7 rounded-full flex items-center justify-center active:scale-90 transition-transform">
                             <i class="fa-solid fa-volume-high text-[10px]"></i>
                         </button>
                     </div>
@@ -171,7 +170,9 @@
                         <p class="text-[10px] text-gray-500 uppercase font-semibold">Nghĩa tiếng Việt:</p>
                         <p id="voice-target-trans" class="text-sm text-gray-700 dark:text-gray-300 font-medium italic">...</p>
                     </div>
-                    <button onclick="playAudio(event, document.getElementById('voice-target').textContent.replace(/"/g, ''))" class="w-full bg-white dark:bg-gray-800 text-apple-blue border border-gray-200 dark:border-gray-600 py-3 rounded-xl text-sm font-bold active:scale-95 transition-transform shadow-sm">
+                    
+                    <!-- Nút Audio Đã Sửa Lỗi Cú Pháp -->
+                    <button onclick="playElementAudio(event, 'voice-target')" class="w-full bg-white dark:bg-gray-800 text-apple-blue border border-gray-200 dark:border-gray-600 py-3 rounded-xl text-sm font-bold active:scale-95 transition-transform shadow-sm">
                         <i class="fa-solid fa-volume-high mr-2 text-lg"></i> Nghe đọc mẫu
                     </button>
                 </div>
@@ -219,46 +220,46 @@
         // --- 100 VOCABULARY DATABASE ---
         const vocabData = {
             "Productivity": {
-                name: "Công Việc & Lịch", icon: "fa-briefcase",
+                name: "Công Việc", icon: "fa-briefcase",
                 words: [
-                    { word: "Set", phonetic: "/set/", type: "Động từ", meaning: "Cài đặt, thiết lập", example: "Hey Siri, set an alarm for 6 AM.", trans: "Siri, đặt báo thức lúc 6 giờ sáng." },
-                    { word: "Remind", phonetic: "/rɪˈmaɪnd/", type: "Động từ", meaning: "Nhắc nhở", example: "Hey Siri, remind me to call John at 5 PM.", trans: "Siri, nhắc tôi gọi cho John lúc 5 giờ chiều." },
-                    { word: "Schedule", phonetic: "/ˈskedʒ.uːl/", type: "Động từ", meaning: "Lên lịch trình", example: "Hey Siri, schedule a meeting for tomorrow.", trans: "Siri, lên lịch một cuộc họp vào ngày mai." },
+                    { word: "Set", phonetic: "/set/", type: "Động từ", meaning: "Cài đặt", example: "Hey Siri, set an alarm for 6 AM.", trans: "Siri, đặt báo thức lúc 6 giờ sáng." },
+                    { word: "Remind", phonetic: "/rɪˈmaɪnd/", type: "Động từ", meaning: "Nhắc nhở", example: "Hey Siri, remind me to call John.", trans: "Siri, nhắc tôi gọi cho John." },
+                    { word: "Schedule", phonetic: "/ˈskedʒ.uːl/", type: "Động từ", meaning: "Lên lịch", example: "Hey Siri, schedule a meeting.", trans: "Siri, lên lịch một cuộc họp." },
                     { word: "Timer", phonetic: "/ˈtaɪ.mɚ/", type: "Danh từ", meaning: "Hẹn giờ", example: "Hey Siri, set a timer for 10 minutes.", trans: "Siri, hẹn giờ 10 phút." },
-                    { word: "Meeting", phonetic: "/ˈmiː.t̬ɪŋ/", type: "Danh từ", meaning: "Cuộc họp", example: "Hey Siri, what time is my next meeting?", trans: "Siri, cuộc họp tiếp theo của tôi lúc mấy giờ?" },
+                    { word: "Meeting", phonetic: "/ˈmiː.t̬ɪŋ/", type: "Danh từ", meaning: "Cuộc họp", example: "Hey Siri, what time is my next meeting?", trans: "Siri, cuộc họp tiếp theo lúc mấy giờ?" },
                     { word: "Note", phonetic: "/noʊt/", type: "Danh từ", meaning: "Ghi chú", example: "Hey Siri, create a new note.", trans: "Siri, tạo một ghi chú mới." },
-                    { word: "Email", phonetic: "/ˈiː.meɪl/", type: "Danh/Động từ", meaning: "Thư điện tử", example: "Hey Siri, send an email to my boss.", trans: "Siri, gửi email cho sếp của tôi." },
-                    { word: "Alarm", phonetic: "/əˈlɑːrm/", type: "Danh từ", meaning: "Báo thức", example: "Hey Siri, turn off all my alarms.", trans: "Siri, tắt tất cả báo thức của tôi." },
-                    { word: "Delete", phonetic: "/dɪˈliːt/", type: "Động từ", meaning: "Xóa", example: "Hey Siri, delete my 7 AM alarm.", trans: "Siri, xóa báo thức 7 giờ sáng của tôi." },
+                    { word: "Email", phonetic: "/ˈiː.meɪl/", type: "Danh/Động từ", meaning: "Gửi Email", example: "Hey Siri, send an email to boss.", trans: "Siri, gửi email cho sếp." },
+                    { word: "Alarm", phonetic: "/əˈlɑːrm/", type: "Danh từ", meaning: "Báo thức", example: "Hey Siri, turn off my alarms.", trans: "Siri, tắt báo thức của tôi." },
+                    { word: "Delete", phonetic: "/dɪˈliːt/", type: "Động từ", meaning: "Xóa", example: "Hey Siri, delete my 7 AM alarm.", trans: "Siri, xóa báo thức 7 giờ sáng." },
                     { word: "Update", phonetic: "/ʌpˈdeɪt/", type: "Động từ", meaning: "Cập nhật", example: "Hey Siri, update my schedule.", trans: "Siri, cập nhật lịch trình của tôi." },
-                    { word: "Event", phonetic: "/ɪˈvent/", type: "Danh từ", meaning: "Sự kiện", example: "Hey Siri, add an event to my calendar.", trans: "Siri, thêm một sự kiện vào lịch của tôi." },
-                    { word: "List", phonetic: "/lɪst/", type: "Danh từ", meaning: "Danh sách", example: "Hey Siri, add milk to my shopping list.", trans: "Siri, thêm sữa vào danh sách mua sắm." },
+                    { word: "Event", phonetic: "/ɪˈvent/", type: "Danh từ", meaning: "Sự kiện", example: "Hey Siri, add an event to calendar.", trans: "Siri, thêm sự kiện vào lịch." },
+                    { word: "List", phonetic: "/lɪst/", type: "Danh từ", meaning: "Danh sách", example: "Hey Siri, add milk to shopping list.", trans: "Siri, thêm sữa vào danh sách mua sắm." },
                     { word: "Add", phonetic: "/æd/", type: "Động từ", meaning: "Thêm vào", example: "Hey Siri, add a task.", trans: "Siri, thêm một nhiệm vụ." },
-                    { word: "Cancel", phonetic: "/ˈkæn.səl/", type: "Động từ", meaning: "Hủy bỏ", example: "Hey Siri, cancel my afternoon meeting.", trans: "Siri, hủy cuộc họp buổi chiều của tôi." },
-                    { word: "Read", phonetic: "/riːd/", type: "Động từ", meaning: "Đọc", example: "Hey Siri, read my latest emails.", trans: "Siri, đọc các email mới nhất của tôi." },
-                    { word: "Share", phonetic: "/ʃer/", type: "Động từ", meaning: "Chia sẻ", example: "Hey Siri, share this note with Anna.", trans: "Siri, chia sẻ ghi chú này với Anna." },
-                    { word: "Postpone", phonetic: "/poʊstˈpoʊn/", type: "Động từ", meaning: "Trì hoãn", example: "Hey Siri, postpone my alarm by 10 minutes.", trans: "Siri, hoãn báo thức của tôi thêm 10 phút." }
+                    { word: "Cancel", phonetic: "/ˈkæn.səl/", type: "Động từ", meaning: "Hủy bỏ", example: "Hey Siri, cancel my meeting.", trans: "Siri, hủy cuộc họp của tôi." },
+                    { word: "Read", phonetic: "/riːd/", type: "Động từ", meaning: "Đọc", example: "Hey Siri, read my latest emails.", trans: "Siri, đọc email mới nhất." },
+                    { word: "Share", phonetic: "/ʃer/", type: "Động từ", meaning: "Chia sẻ", example: "Hey Siri, share this note.", trans: "Siri, chia sẻ ghi chú này." },
+                    { word: "Postpone", phonetic: "/poʊstˈpoʊn/", type: "Động từ", meaning: "Trì hoãn", example: "Hey Siri, postpone my alarm.", trans: "Siri, hoãn báo thức của tôi." }
                 ]
             },
             "Communication": {
                 name: "Liên Lạc", icon: "fa-comment-dots",
                 words: [
                     { word: "Call", phonetic: "/kɑːl/", type: "Động từ", meaning: "Gọi điện", example: "Hey Siri, call Mom.", trans: "Siri, gọi cho mẹ." },
-                    { word: "Message", phonetic: "/ˈmes.ɪdʒ/", type: "Danh/Động từ", meaning: "Tin nhắn", example: "Hey Siri, read my new messages.", trans: "Siri, đọc các tin nhắn mới của tôi." },
-                    { word: "Text", phonetic: "/tekst/", type: "Động từ", meaning: "Nhắn tin", example: "Hey Siri, text David 'I am late'.", trans: "Siri, nhắn tin cho David 'Tôi đến trễ'." },
+                    { word: "Message", phonetic: "/ˈmes.ɪdʒ/", type: "Danh/Động từ", meaning: "Tin nhắn", example: "Hey Siri, read my new messages.", trans: "Siri, đọc tin nhắn mới của tôi." },
+                    { word: "Text", phonetic: "/tekst/", type: "Động từ", meaning: "Nhắn tin", example: "Hey Siri, text David 'I am late'.", trans: "Siri, nhắn cho David 'Tôi đến trễ'." },
                     { word: "FaceTime", phonetic: "/ˈfeɪs.taɪm/", type: "Động từ", meaning: "Gọi video", example: "Hey Siri, FaceTime Sarah.", trans: "Siri, gọi FaceTime cho Sarah." },
-                    { word: "Reply", phonetic: "/rɪˈplaɪ/", type: "Động từ", meaning: "Trả lời", example: "Hey Siri, reply 'Okay, see you soon'.", trans: "Siri, trả lời 'Được, gặp bạn sau'." },
+                    { word: "Reply", phonetic: "/rɪˈplaɪ/", type: "Động từ", meaning: "Trả lời", example: "Hey Siri, reply 'Okay'.", trans: "Siri, trả lời 'Okay'." },
                     { word: "Send", phonetic: "/send/", type: "Động từ", meaning: "Gửi", example: "Hey Siri, send it.", trans: "Siri, gửi đi." },
-                    { word: "Contact", phonetic: "/ˈkɑːn.tækt/", type: "Danh từ", meaning: "Danh bạ", example: "Hey Siri, find John's contact info.", trans: "Siri, tìm thông tin liên lạc của John." },
-                    { word: "Announce", phonetic: "/əˈnaʊns/", type: "Động từ", meaning: "Thông báo", example: "Hey Siri, announce messages.", trans: "Siri, bật thông báo tin nhắn." },
+                    { word: "Contact", phonetic: "/ˈkɑːn.tækt/", type: "Danh từ", meaning: "Danh bạ", example: "Hey Siri, find John's contact.", trans: "Siri, tìm thông tin của John." },
+                    { word: "Announce", phonetic: "/əˈnaʊns/", type: "Động từ", meaning: "Thông báo", example: "Hey Siri, announce messages.", trans: "Siri, bật đọc thông báo tin nhắn." },
                     { word: "Voicemail", phonetic: "/ˈvɔɪs.meɪl/", type: "Danh từ", meaning: "Thư thoại", example: "Hey Siri, play my voicemail.", trans: "Siri, mở thư thoại của tôi." },
-                    { word: "Answer", phonetic: "/ˈæn.sɚ/", type: "Động từ", meaning: "Trả lời cuộc gọi", example: "Hey Siri, answer the call.", trans: "Siri, nhận cuộc gọi." },
-                    { word: "Decline", phonetic: "/dɪˈklaɪn/", type: "Động từ", meaning: "Từ chối", example: "Hey Siri, decline the call.", trans: "Siri, từ chối cuộc gọi." },
+                    { word: "Answer", phonetic: "/ˈæn.sɚ/", type: "Động từ", meaning: "Trả lời (gọi)", example: "Hey Siri, answer the call.", trans: "Siri, nhận cuộc gọi." },
+                    { word: "Decline", phonetic: "/dɪˈklaɪn/", type: "Động từ", meaning: "Từ chối (gọi)", example: "Hey Siri, decline the call.", trans: "Siri, từ chối cuộc gọi." },
                     { word: "Dictate", phonetic: "/dɪkˈteɪt/", type: "Động từ", meaning: "Đọc chính tả", example: "Hey Siri, dictate a message.", trans: "Siri, soạn tin nhắn bằng giọng nói." },
-                    { word: "Location", phonetic: "/loʊˈkeɪ.ʃən/", type: "Danh từ", meaning: "Vị trí", example: "Hey Siri, share my location with Peter.", trans: "Siri, chia sẻ vị trí của tôi cho Peter." },
+                    { word: "Location", phonetic: "/loʊˈkeɪ.ʃən/", type: "Danh từ", meaning: "Vị trí", example: "Hey Siri, share my location.", trans: "Siri, chia sẻ vị trí của tôi." },
                     { word: "Find", phonetic: "/faɪnd/", type: "Động từ", meaning: "Tìm kiếm", example: "Hey Siri, find my iPhone.", trans: "Siri, tìm iPhone của tôi." },
                     { word: "Speaker", phonetic: "/ˈspiː.kɚ/", type: "Danh từ", meaning: "Loa ngoài", example: "Hey Siri, call Dad on speaker.", trans: "Siri, gọi cho bố bằng loa ngoài." },
-                    { word: "Check", phonetic: "/tʃek/", type: "Động từ", meaning: "Kiểm tra", example: "Hey Siri, check my missed calls.", trans: "Siri, kiểm tra cuộc gọi nhỡ." }
+                    { word: "Check", phonetic: "/tʃek/", type: "Động từ", meaning: "Kiểm tra", example: "Hey Siri, check missed calls.", trans: "Siri, kiểm tra cuộc gọi nhỡ." }
                 ]
             },
             "SmartHome": {
@@ -266,80 +267,80 @@
                 words: [
                     { word: "Turn on", phonetic: "/tɝːn ɑːn/", type: "Cụm động từ", meaning: "Bật", example: "Hey Siri, turn on the lights.", trans: "Siri, bật đèn lên." },
                     { word: "Turn off", phonetic: "/tɝːn ɑːf/", type: "Cụm động từ", meaning: "Tắt", example: "Hey Siri, turn off the TV.", trans: "Siri, tắt TV." },
-                    { word: "Dim", phonetic: "/dɪm/", type: "Động từ", meaning: "Làm mờ, giảm sáng", example: "Hey Siri, dim the lights to 50%.", trans: "Siri, giảm sáng đèn xuống 50%." },
+                    { word: "Dim", phonetic: "/dɪm/", type: "Động từ", meaning: "Làm mờ", example: "Hey Siri, dim the lights to 50%.", trans: "Siri, giảm độ sáng đèn xuống 50%." },
                     { word: "Lock", phonetic: "/lɑːk/", type: "Động từ", meaning: "Khóa", example: "Hey Siri, lock the front door.", trans: "Siri, khóa cửa chính." },
                     { word: "Unlock", phonetic: "/ʌnˈlɑːk/", type: "Động từ", meaning: "Mở khóa", example: "Hey Siri, unlock the back door.", trans: "Siri, mở khóa cửa sau." },
-                    { word: "Temperature", phonetic: "/ˈtem.pɚ.ə.tʃɚ/", type: "Danh từ", meaning: "Nhiệt độ", example: "Hey Siri, set the temperature to 24.", trans: "Siri, đặt nhiệt độ ở mức 24." },
-                    { word: "Camera", phonetic: "/ˈkæm.rə/", type: "Danh từ", meaning: "Máy quay", example: "Hey Siri, show me the front door camera.", trans: "Siri, cho xem camera cửa trước." },
-                    { word: "Fan", phonetic: "/fæn/", type: "Danh từ", meaning: "Cái quạt", example: "Hey Siri, turn on the bedroom fan.", trans: "Siri, bật quạt phòng ngủ." },
+                    { word: "Temperature", phonetic: "/ˈtem.pɚ.ə.tʃɚ/", type: "Danh từ", meaning: "Nhiệt độ", example: "Hey Siri, set the temperature to 24.", trans: "Siri, đặt nhiệt độ 24 độ." },
+                    { word: "Camera", phonetic: "/ˈkæm.rə/", type: "Danh từ", meaning: "Máy quay", example: "Hey Siri, show front door camera.", trans: "Siri, cho xem camera cửa trước." },
+                    { word: "Fan", phonetic: "/fæn/", type: "Danh từ", meaning: "Quạt", example: "Hey Siri, turn on the bedroom fan.", trans: "Siri, bật quạt phòng ngủ." },
                     { word: "Blinds", phonetic: "/blaɪndz/", type: "Danh từ", meaning: "Rèm cửa", example: "Hey Siri, close the blinds.", trans: "Siri, đóng rèm cửa." },
-                    { word: "Air conditioner", phonetic: "/ˈer kənˌdɪʃ.ən.ɚ/", type: "Danh từ", meaning: "Máy lạnh", example: "Hey Siri, turn on the air conditioner.", trans: "Siri, bật máy lạnh." },
+                    { word: "Air conditioner", phonetic: "/ˈer kənˌdɪʃ.ən.ɚ/", type: "Danh từ", meaning: "Máy lạnh", example: "Hey Siri, turn on air conditioner.", trans: "Siri, bật máy lạnh." },
                     { word: "Vacuum", phonetic: "/ˈvæk.juːm/", type: "Danh/Động từ", meaning: "Máy hút bụi", example: "Hey Siri, start the vacuum.", trans: "Siri, khởi động máy hút bụi." },
-                    { word: "TV", phonetic: "/ˌtiːˈviː/", type: "Danh từ", meaning: "Ti vi", example: "Hey Siri, turn off the living room TV.", trans: "Siri, tắt TV phòng khách." },
+                    { word: "TV", phonetic: "/ˌtiːˈviː/", type: "Danh từ", meaning: "Ti vi", example: "Hey Siri, turn off living room TV.", trans: "Siri, tắt TV phòng khách." },
                     { word: "Garage", phonetic: "/ɡəˈrɑːʒ/", type: "Danh từ", meaning: "Ga ra", example: "Hey Siri, open the garage door.", trans: "Siri, mở cửa ga ra." },
-                    { word: "Color", phonetic: "/ˈkʌl.ɚ/", type: "Danh từ", meaning: "Màu sắc", example: "Hey Siri, change the light color to blue.", trans: "Siri, đổi màu đèn sang màu xanh." },
+                    { word: "Color", phonetic: "/ˈkʌl.ɚ/", type: "Danh từ", meaning: "Màu sắc", example: "Hey Siri, change light color to blue.", trans: "Siri, đổi màu đèn sang màu xanh." },
                     { word: "Brightness", phonetic: "/ˈbraɪt.nəs/", type: "Danh từ", meaning: "Độ sáng", example: "Hey Siri, increase the brightness.", trans: "Siri, tăng độ sáng lên." },
-                    { word: "Thermostat", phonetic: "/ˈθɝː.mə.stæt/", type: "Danh từ", meaning: "Máy điều nhiệt", example: "Hey Siri, adjust the thermostat.", trans: "Siri, điều chỉnh máy điều nhiệt." }
+                    { word: "Thermostat", phonetic: "/ˈθɝː.mə.stæt/", type: "Danh từ", meaning: "Điều nhiệt", example: "Hey Siri, adjust the thermostat.", trans: "Siri, điều chỉnh máy điều nhiệt." }
                 ]
             },
             "Media": {
                 name: "Giải Trí", icon: "fa-music",
                 words: [
-                    { word: "Play", phonetic: "/pleɪ/", type: "Động từ", meaning: "Phát (nhạc, phim)", example: "Hey Siri, play some relaxing music.", trans: "Siri, phát một chút nhạc thư giãn." },
-                    { word: "Volume", phonetic: "/ˈvɑːl.juːm/", type: "Danh từ", meaning: "Âm lượng", example: "Hey Siri, turn the volume up to 80%.", trans: "Siri, tăng âm lượng lên 80%." },
+                    { word: "Play", phonetic: "/pleɪ/", type: "Động từ", meaning: "Phát nhạc", example: "Hey Siri, play some relaxing music.", trans: "Siri, phát một chút nhạc thư giãn." },
+                    { word: "Volume", phonetic: "/ˈvɑːl.juːm/", type: "Danh từ", meaning: "Âm lượng", example: "Hey Siri, turn the volume up.", trans: "Siri, tăng âm lượng lên." },
                     { word: "Skip", phonetic: "/skɪp/", type: "Động từ", meaning: "Bỏ qua", example: "Hey Siri, skip this song.", trans: "Siri, bỏ qua bài hát này." },
                     { word: "Pause", phonetic: "/pɑːz/", type: "Động từ", meaning: "Tạm dừng", example: "Hey Siri, pause the music.", trans: "Siri, tạm dừng nhạc." },
-                    { word: "Shuffle", phonetic: "/ˈʃʌf.əl/", type: "Động từ", meaning: "Phát ngẫu nhiên", example: "Hey Siri, shuffle my playlist.", trans: "Siri, phát ngẫu nhiên danh sách nhạc của tôi." },
-                    { word: "Podcast", phonetic: "/ˈpɑːd.kæst/", type: "Danh từ", meaning: "Tệp âm thanh", example: "Hey Siri, play the latest podcast.", trans: "Siri, phát bản podcast mới nhất." },
+                    { word: "Shuffle", phonetic: "/ˈʃʌf.əl/", type: "Động từ", meaning: "Phát trộn", example: "Hey Siri, shuffle my playlist.", trans: "Siri, phát ngẫu nhiên danh sách nhạc." },
+                    { word: "Podcast", phonetic: "/ˈpɑːd.kæst/", type: "Danh từ", meaning: "Podcast", example: "Hey Siri, play the latest podcast.", trans: "Siri, phát podcast mới nhất." },
                     { word: "Repeat", phonetic: "/rɪˈpiːt/", type: "Động từ", meaning: "Lặp lại", example: "Hey Siri, repeat this track.", trans: "Siri, lặp lại bài này." },
                     { word: "Rewind", phonetic: "/ˌriːˈwaɪnd/", type: "Động từ", meaning: "Tua lại", example: "Hey Siri, rewind 15 seconds.", trans: "Siri, tua lại 15 giây." },
                     { word: "Fast-forward", phonetic: "/ˌfæstˈfɔːr.wɚd/", type: "Động từ", meaning: "Tua đi", example: "Hey Siri, fast-forward 1 minute.", trans: "Siri, tua đi 1 phút." },
-                    { word: "Stop", phonetic: "/stɑːp/", type: "Động từ", meaning: "Dừng lại", example: "Hey Siri, stop playing.", trans: "Siri, dừng phát nhạc." },
-                    { word: "Next", phonetic: "/nekst/", type: "Tính từ/Trạng từ", meaning: "Kế tiếp", example: "Hey Siri, play the next song.", trans: "Siri, mở bài tiếp theo." },
-                    { word: "Previous", phonetic: "/ˈpriː.vi.əs/", type: "Tính từ", meaning: "Trước đó", example: "Hey Siri, play the previous track.", trans: "Siri, mở bài trước đó." },
+                    { word: "Stop", phonetic: "/stɑːp/", type: "Động từ", meaning: "Dừng", example: "Hey Siri, stop playing.", trans: "Siri, dừng phát nhạc." },
+                    { word: "Next", phonetic: "/nekst/", type: "Trạng từ", meaning: "Tiếp theo", example: "Hey Siri, play the next song.", trans: "Siri, mở bài tiếp theo." },
+                    { word: "Previous", phonetic: "/ˈpriː.vi.əs/", type: "Tính từ", meaning: "Trước đó", example: "Hey Siri, play previous track.", trans: "Siri, mở bài trước đó." },
                     { word: "Resume", phonetic: "/rɪˈzuːm/", type: "Động từ", meaning: "Tiếp tục", example: "Hey Siri, resume the movie.", trans: "Siri, tiếp tục phát phim." },
-                    { word: "Radio", phonetic: "/ˈreɪ.di.oʊ/", type: "Danh từ", meaning: "Đài phát thanh", example: "Hey Siri, play a jazz radio station.", trans: "Siri, mở đài phát nhạc Jazz." },
+                    { word: "Radio", phonetic: "/ˈreɪ.di.oʊ/", type: "Danh từ", meaning: "Đài radio", example: "Hey Siri, play a jazz radio station.", trans: "Siri, mở đài phát nhạc Jazz." },
                     { word: "Song", phonetic: "/sɑːŋ/", type: "Danh từ", meaning: "Bài hát", example: "Hey Siri, what song is this?", trans: "Siri, đây là bài hát gì?" },
-                    { word: "Artist", phonetic: "/ˈɑːr.t̬ɪst/", type: "Danh từ", meaning: "Nghệ sĩ", example: "Hey Siri, play songs by Taylor Swift.", trans: "Siri, mở các bài hát của Taylor Swift." },
+                    { word: "Artist", phonetic: "/ˈɑːr.t̬ɪst/", type: "Danh từ", meaning: "Nghệ sĩ", example: "Hey Siri, play songs by Taylor Swift.", trans: "Siri, mở nhạc của Taylor Swift." },
                     { word: "Playlist", phonetic: "/ˈpleɪ.lɪst/", type: "Danh từ", meaning: "Danh sách phát", example: "Hey Siri, play my workout playlist.", trans: "Siri, mở danh sách nhạc tập thể dục." }
                 ]
             },
             "Utilities": {
                 name: "Tiện Ích", icon: "fa-screwdriver-wrench",
                 words: [
-                    { word: "Weather", phonetic: "/ˈweð.ɚ/", type: "Danh từ", meaning: "Thời tiết", example: "Hey Siri, what's the weather like?", trans: "Siri, thời tiết thế nào?" },
-                    { word: "Navigate", phonetic: "/ˈnæv.ə.ɡeɪt/", type: "Động từ", meaning: "Điều hướng", example: "Hey Siri, navigate to the airport.", trans: "Siri, chỉ đường tới sân bay." },
+                    { word: "Navigate", phonetic: "/ˈnæv.ə.ɡeɪt/", type: "Động từ", meaning: "Chỉ đường", example: "Hey Siri, navigate to the airport.", trans: "Siri, chỉ đường tới sân bay." },
                     { word: "Battery", phonetic: "/ˈbæt̬.ɚ.i/", type: "Danh từ", meaning: "Pin", example: "Hey Siri, what is my battery level?", trans: "Siri, pin của tôi còn bao nhiêu?" },
                     { word: "Flashlight", phonetic: "/ˈflæʃ.laɪt/", type: "Danh từ", meaning: "Đèn pin", example: "Hey Siri, turn on the flashlight.", trans: "Siri, bật đèn pin." },
-                    { word: "Calculate", phonetic: "/ˈkæl.kjə.leɪt/", type: "Động từ", meaning: "Tính toán", example: "Hey Siri, calculate 15 percent of 200.", trans: "Siri, tính 15 phần trăm của 200." },
-                    { word: "Convert", phonetic: "/kənˈvɝːt/", type: "Động từ", meaning: "Chuyển đổi", example: "Hey Siri, convert 10 miles to kilometers.", trans: "Siri, đổi 10 dặm sang ki-lô-mét." },
-                    { word: "Wi-Fi", phonetic: "/ˈwaɪ.faɪ/", type: "Danh từ", meaning: "Mạng không dây", example: "Hey Siri, turn off Wi-Fi.", trans: "Siri, tắt Wi-Fi." },
+                    { word: "Calculate", phonetic: "/ˈkæl.kjə.leɪt/", type: "Động từ", meaning: "Làm toán", example: "Hey Siri, calculate 15 percent of 200.", trans: "Siri, tính 15 phần trăm của 200." },
+                    { word: "Convert", phonetic: "/kənˈvɝːt/", type: "Động từ", meaning: "Đổi đơn vị", example: "Hey Siri, convert 10 miles to km.", trans: "Siri, đổi 10 dặm sang ki-lô-mét." },
+                    { word: "Wi-Fi", phonetic: "/ˈwaɪ.faɪ/", type: "Danh từ", meaning: "Wi-Fi", example: "Hey Siri, turn off Wi-Fi.", trans: "Siri, tắt Wi-Fi." },
                     { word: "Bluetooth", phonetic: "/ˈbluː.tuːθ/", type: "Danh từ", meaning: "Bluetooth", example: "Hey Siri, turn on Bluetooth.", trans: "Siri, bật Bluetooth." },
                     { word: "Airplane mode", phonetic: "/ˈer.pleɪn ˌmoʊd/", type: "Danh từ", meaning: "Chế độ máy bay", example: "Hey Siri, turn on airplane mode.", trans: "Siri, bật chế độ máy bay." },
-                    { word: "Take", phonetic: "/teɪk/", type: "Động từ", meaning: "Chụp/Lấy", example: "Hey Siri, take a picture.", trans: "Siri, chụp một bức ảnh." },
+                    { word: "Take", phonetic: "/teɪk/", type: "Động từ", meaning: "Chụp", example: "Hey Siri, take a picture.", trans: "Siri, chụp một bức ảnh." },
                     { word: "Open", phonetic: "/ˈoʊ.pən/", type: "Động từ", meaning: "Mở", example: "Hey Siri, open the Settings app.", trans: "Siri, mở ứng dụng Cài đặt." },
                     { word: "Close", phonetic: "/kloʊz/", type: "Động từ", meaning: "Đóng", example: "Hey Siri, close the app.", trans: "Siri, đóng ứng dụng." },
-                    { word: "Sleep", phonetic: "/sliːp/", type: "Động từ", meaning: "Ngủ", example: "Hey Siri, put my Mac to sleep.", trans: "Siri, đưa Mac của tôi vào chế độ ngủ." },
-                    { word: "Restart", phonetic: "/ˌriːˈstɑːrt/", type: "Động từ", meaning: "Khởi động lại", example: "Hey Siri, restart my phone.", trans: "Siri, khởi động lại điện thoại của tôi." },
-                    { word: "Directions", phonetic: "/dɪˈrek.ʃənz/", type: "Danh từ", meaning: "Chỉ đường", example: "Hey Siri, get directions home.", trans: "Siri, lấy chỉ đường về nhà." },
+                    { word: "Sleep", phonetic: "/sliːp/", type: "Động từ", meaning: "Ngủ", example: "Hey Siri, put my Mac to sleep.", trans: "Siri, đưa Mac vào chế độ ngủ." },
+                    { word: "Restart", phonetic: "/ˌriːˈstɑːrt/", type: "Động từ", meaning: "Khởi động lại", example: "Hey Siri, restart my phone.", trans: "Siri, khởi động lại điện thoại." },
+                    { word: "Directions", phonetic: "/dɪˈrek.ʃənz/", type: "Danh từ", meaning: "Đường đi", example: "Hey Siri, get directions home.", trans: "Siri, lấy chỉ đường về nhà." },
                     { word: "Distance", phonetic: "/ˈdɪs.təns/", type: "Danh từ", meaning: "Khoảng cách", example: "Hey Siri, what's the distance to Paris?", trans: "Siri, khoảng cách đến Paris là bao xa?" },
-                    { word: "Traffic", phonetic: "/ˈtræf.ɪk/", type: "Danh từ", meaning: "Giao thông", example: "Hey Siri, how is the traffic?", trans: "Siri, tình hình giao thông thế nào?" }
+                    { word: "Traffic", phonetic: "/ˈtræf.ɪk/", type: "Danh từ", meaning: "Giao thông", example: "Hey Siri, how is the traffic?", trans: "Siri, tình hình giao thông thế nào?" },
+                    { word: "Wallet", phonetic: "/ˈwɑː.lɪt/", type: "Danh từ", meaning: "Ví Apple", example: "Hey Siri, open Apple Wallet.", trans: "Siri, mở ví Apple Pay." }
                 ]
             },
             "Information": {
                 name: "Tra Cứu", icon: "fa-magnifying-glass",
                 words: [
-                    { word: "Translate", phonetic: "/trænsˈleɪt/", type: "Động từ", meaning: "Dịch", example: "Hey Siri, translate 'Thank you' to Spanish.", trans: "Siri, dịch từ 'Cảm ơn' sang tiếng Tây Ban Nha." },
+                    { word: "Translate", phonetic: "/trænsˈleɪt/", type: "Động từ", meaning: "Dịch", example: "Hey Siri, translate 'Thank you' to French.", trans: "Siri, dịch từ 'Cảm ơn' sang tiếng Pháp." },
                     { word: "Define", phonetic: "/dɪˈfaɪn/", type: "Động từ", meaning: "Định nghĩa", example: "Hey Siri, define 'empathy'.", trans: "Siri, định nghĩa từ 'empathy'." },
                     { word: "Spell", phonetic: "/spel/", type: "Động từ", meaning: "Đánh vần", example: "Hey Siri, how do you spell 'beautiful'?", trans: "Siri, bạn đánh vần từ 'beautiful' như thế nào?" },
                     { word: "Time", phonetic: "/taɪm/", type: "Danh từ", meaning: "Thời gian", example: "Hey Siri, what time is it in Tokyo?", trans: "Siri, ở Tokyo bây giờ là mấy giờ?" },
                     { word: "Date", phonetic: "/deɪt/", type: "Danh từ", meaning: "Ngày tháng", example: "Hey Siri, what's the date today?", trans: "Siri, hôm nay là ngày mấy?" },
                     { word: "Sunrise", phonetic: "/ˈsʌn.raɪz/", type: "Danh từ", meaning: "Bình minh", example: "Hey Siri, when is sunrise tomorrow?", trans: "Siri, ngày mai bình minh lúc mấy giờ?" },
                     { word: "Sunset", phonetic: "/ˈsʌn.set/", type: "Danh từ", meaning: "Hoàng hôn", example: "Hey Siri, when is sunset?", trans: "Siri, hoàng hôn lúc mấy giờ?" },
-                    { word: "Stock", phonetic: "/stɑːk/", type: "Danh từ", meaning: "Cổ phiếu", example: "Hey Siri, how is the Apple stock doing?", trans: "Siri, cổ phiếu Apple đang thế nào?" },
+                    { word: "Stock", phonetic: "/stɑːk/", type: "Danh từ", meaning: "Cổ phiếu", example: "Hey Siri, how is Apple stock doing?", trans: "Siri, cổ phiếu Apple đang thế nào?" },
                     { word: "News", phonetic: "/nuːz/", type: "Danh từ", meaning: "Tin tức", example: "Hey Siri, what's the latest news?", trans: "Siri, có tin tức gì mới không?" },
                     { word: "Score", phonetic: "/skɔːr/", type: "Danh từ", meaning: "Tỉ số", example: "Hey Siri, what was the score of the game?", trans: "Siri, tỉ số trận đấu là bao nhiêu?" },
-                    { word: "Recipe", phonetic: "/ˈres.ə.pi/", type: "Danh từ", meaning: "Công thức", example: "Hey Siri, find a recipe for pancakes.", trans: "Siri, tìm công thức làm bánh kẹp." },
+                    { word: "Recipe", phonetic: "/ˈres.ə.pi/", type: "Danh từ", meaning: "Công thức", example: "Hey Siri, find a recipe for pancakes.", trans: "Siri, tìm công thức làm bánh." },
                     { word: "Fact", phonetic: "/fækt/", type: "Danh từ", meaning: "Sự thật", example: "Hey Siri, tell me an interesting fact.", trans: "Siri, kể cho tôi một sự thật thú vị." },
                     { word: "Capital", phonetic: "/ˈkæp.ə.t̬əl/", type: "Danh từ", meaning: "Thủ đô", example: "Hey Siri, what is the capital of Japan?", trans: "Siri, thủ đô của Nhật Bản là gì?" },
                     { word: "Height", phonetic: "/haɪt/", type: "Danh từ", meaning: "Chiều cao", example: "Hey Siri, what is the height of Mount Everest?", trans: "Siri, đỉnh Everest cao bao nhiêu?" },
@@ -353,17 +354,34 @@
         let currentCategory = "Productivity";
         let currentIndex = 0;
         let quizScore = 0;
-        let synth = window.speechSynthesis;
-        let iosAudioUnlocked = false;
+        let availableVoices = [];
 
-        // --- INIT AUDIO & START ---
-        function startApp() {
-            if (synth && !iosAudioUnlocked) {
-                let utterance = new SpeechSynthesisUtterance('');
-                utterance.volume = 0;
-                synth.speak(utterance);
+        // --- HỆ THỐNG AUDIO RẤT BỀN BỈ CHO IOS ---
+        
+        // 1. Load Voices sớm nhất có thể
+        function loadVoices() {
+            availableVoices = window.speechSynthesis.getVoices();
+        }
+        if (window.speechSynthesis && window.speechSynthesis.onvoiceschanged !== undefined) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
+        // 2. Mở khóa Audio Engine an toàn
+        let iosAudioUnlocked = false;
+        function unlockAudioEngine() {
+            if (!iosAudioUnlocked && 'speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(' '); // Phát 1 khoảng trắng vô hình
+                utterance.volume = 0; 
+                utterance.rate = 2;
+                window.speechSynthesis.speak(utterance);
                 iosAudioUnlocked = true;
             }
+        }
+        // Gắn vào cả document touchstart dự phòng
+        document.addEventListener('touchstart', unlockAudioEngine, {once: true});
+
+        function startApp() {
+            unlockAudioEngine(); // Chắc chắn mở khóa khi bấm nút Bắt đầu
 
             document.getElementById('welcome-overlay').style.opacity = '0';
             setTimeout(() => {
@@ -378,27 +396,37 @@
             }, 400);
         }
 
-        function playAudio(e, text) {
-            if(e) e.stopPropagation();
-            if (!synth) return;
-            synth.cancel(); 
+        // 3. Hàm PlayAudio ĐƯỢC FIX LỖI QUOTES
+        function playElementAudio(e, elementId) {
+            if (e) e.stopPropagation();
             
-            setTimeout(() => {
-                let utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'en-US';
-                utterance.rate = 0.85; 
-                
-                let voices = synth.getVoices();
-                let voice = voices.find(v => v.lang.includes('en-US') && (v.name.includes('Siri') || v.name.includes('Samantha')));
-                if(!voice) voice = voices.find(v => v.lang.includes('en'));
-                if(voice) utterance.voice = voice;
-                
-                synth.speak(utterance);
-            }, 50);
-        }
-        
-        if (synth.onvoiceschanged !== undefined) {
-            synth.onvoiceschanged = () => synth.getVoices();
+            if (!('speechSynthesis' in window)) {
+                alert("Safari/Trình duyệt của bạn đang không hỗ trợ Audio.");
+                return;
+            }
+
+            // Lấy text từ Element
+            let rawText = document.getElementById(elementId).textContent;
+            
+            // XÓA MỌI DẤU NGOẶC KÉP Ở ĐÂY (Trong JS, không phải trong HTML)
+            let cleanText = rawText.replace(/["“”]/g, '').trim();
+
+            window.speechSynthesis.cancel(); 
+
+            // Cố gắng lấy danh sách giọng nếu mảng rỗng (Trường hợp load chậm)
+            if (availableVoices.length === 0) loadVoices();
+
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.85; 
+            
+            // Tìm giọng đọc Mỹ tốt nhất (Siri hoặc Samantha)
+            let voice = availableVoices.find(v => v.lang.includes('en-US') && (v.name.includes('Siri') || v.name.includes('Samantha')));
+            if(!voice) voice = availableVoices.find(v => v.lang.includes('en-US'));
+            if(!voice) voice = availableVoices.find(v => v.lang.includes('en'));
+            if(voice) utterance.voice = voice;
+            
+            setTimeout(() => { window.speechSynthesis.speak(utterance); }, 50);
         }
 
         // --- RENDER & NAVIGATION ---
@@ -467,7 +495,6 @@
             document.getElementById('fc-example').textContent = `"${vocab.example}"`;
             document.getElementById('fc-trans').textContent = vocab.trans;
             
-            // Tính tổng số từ
             let totalWords = 0;
             Object.values(vocabData).forEach(cat => totalWords += cat.words.length);
             document.getElementById('progress-badge').textContent = `${currentIndex + 1}/${list.length} (Tổng ${totalWords})`;
